@@ -236,3 +236,28 @@ La arquitectura conserva la capacidad de soportar en el futuro: niveles de membr
 **Consequences.** El primer vertical slice implementa NS-ARP v0.1 de extremo a extremo con datos demo de NS Sevilla.
 
 **Revisit when.** Se complete el primer vertical slice y existan aprendizajes reales del matching.
+
+---
+
+## D-009 · Espíritu del core: agentes que ejecutan, reparto ilimitado de referidos, calidad cualificada por el receptor y auditada por NS, reconocimiento escalable
+
+**Status:** CONFIRMED (input directo del fundador)
+**Date:** 2026-09-11
+
+**Context.** El fundador ha fijado tres claves del espíritu de NS que precisan la constitución: (1) los agentes de IA realizan todo el trabajo de control, seguimiento, producción y desarrollo de los contactos facilitados por las empresas, e incluso prospectan y proponen referidos para su empresa; (2) no existe límite en el reparto de referidos (empresas o personas que necesitan a otra empresa), y cuanto mayor sea la cantidad y la calidad tangible, mayor reconocimiento; (3) tras entregar un referido, la App realiza seguimiento de su calidad, la empresa receptora cualifica la calidad final, NS puede auditarla, y la empresa que lo refirió recibe puntuación proporcional a esa calidad.
+
+**Choice.** Se adopta este espíritu como marco del núcleo del producto: fusión de lo mejor del networking estructurado (confianza, reciprocidad, exclusividad) con un entorno agentic potente y un sistema de cualificación y reconocimiento escalable.
+
+Reglas derivadas:
+
+- El agente no es un asistente pasivo: prospecta, cualifica, prepara, persigue y cierra el bucle de cada referido. El miembro decide y aporta relación.
+- No hay cuota máxima de referidos. La reputación crece sin techo, pero **solo** con calidad verificada por el receptor y auditada por NS. Un referido mal cualificado no suma y puede restar.
+- Todo referido termina en una cualificación estructurada del receptor (rúbrica estándar) más evidencia recogida por los agentes. NS audita la coherencia entre lo declarado y la evidencia.
+- La reputación es bilateral: se mide a quien da (calidad del referido) y a quien recibe (atención, tiempo de respuesta, honestidad al reportar).
+- El reconocimiento es escalable en niveles con privilegios de acceso, nunca un ranking de cantidad.
+
+**Why.** Sitúa el trabajo en los agentes y la decisión en las personas; convierte la generosidad en un activo verificable; hace que el efecto red crezca con cada referido bien dado.
+
+**Consequences.** NS-ARP v0.2 debe incorporar: `ReferralQualification` (rúbrica del receptor), reputación bilateral en `TrustEvent`, índice de coherencia del evaluador, y fuentes de señal de prospección (`SignalSource`). El banco de ideas derivado vive en `docs/11_IDEAS_DISRUPTIVAS.md`. Se mantiene D-005: la puntuación nunca se convierte en comisión.
+
+**Revisit when.** Se disponga de los primeros 50 referidos cualificados en NS Sevilla.
