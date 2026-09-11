@@ -139,6 +139,10 @@ El Trust & Compliance Agent vigila cualquier indicio de dinero, comisión, descu
 
 Ver `docs/12_SALAS.md` y D-013. La exclusividad vive en la Sala (una empresa por especialidad). Una zona abre Salas nuevas mientras la lista de espera de calidad y la profundidad de mercado lo permitan, y deja de abrirlas cuando el flujo de referidos válidos por miembro empieza a diluirse. El mapa de Salas y plazas de la zona es el principal argumento de captación.
 
+### C8 · Encuentros entre Salas con agenda generada por los agentes
+
+Las Salas no son territoriales, así que el encuentro entre Salas no es "la reunión del barrio": es una cita convocada cuando los agentes detectan demanda cruzada real (necesidades de una Sala que otra cubre, referidos exportados frecuentes, sectores complementarios sin relación). La agenda la escriben los agentes: introducciones concretas preparadas de antemano. El resultado se mide en referidos entre Salas. Ver `docs/12_SALAS.md` §6bis.
+
 ## D · Tensiones que hay que resolver (no ignorar)
 
 | Tensión | Riesgo | Respuesta de diseño |

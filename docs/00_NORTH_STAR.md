@@ -73,6 +73,7 @@ Business DNA acumulado
 13. Crear propiedad intelectual propia de NS.
 14. El producto debe generar negocio medible.
 15. Cada mejora debe fortalecer el Network Effect.
+16. La Sala no es territorial: se define por sus empresas, no por su mapa.
 
 ## Reglas inmutables (D-010)
 

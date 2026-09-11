@@ -145,7 +145,7 @@ NS Sevilla
 
 Puede haber varias Salas en una misma ciudad.
 
-**Nomenclatura (D-014).** El nombre de la ciudad o municipio está reservado a NS para agrupar las Salas de la zona ("NS Sevilla"). Ninguna Sala puede llevar el nombre de una ciudad o municipio. Cada Sala elige un nombre propio, con el prefijo NS, que debe ser autorizado por NS: "NS Cumbre", "NS Ágora". El nombre es único en toda la red.
+**La Sala no es territorial (D-014).** Una Sala se define por sus empresas, no por un mapa. No tiene barrio, distrito ni radio. Su nombre no debe dar ninguna pista territorial: el nombre de la ciudad o municipio está reservado a NS para agrupar las Salas de la zona ("NS Sevilla"), y ninguna Sala puede llevar el nombre de una ciudad, municipio, provincia, comunidad autónoma, país, barrio o distrito. Cada Sala elige un nombre propio, con el prefijo NS, autorizado por NS y único en toda la red: "NS Cumbre", "NS Ágora". Las Salas de una zona se encuentran entre sí (encuentros entre Salas) porque generan negocio, no porque compartan territorio.
 
 Posteriormente existirán:
 
@@ -1280,6 +1280,7 @@ Y posteriormente:
 13. Crear propiedad intelectual propia de NS.
 14. El producto debe generar negocio medible.
 15. Cada mejora debe fortalecer el Network Effect.
+16. La Sala no es territorial: se define por sus empresas, no por su mapa.
 
 ## Reglas inmutables (D-010)
 

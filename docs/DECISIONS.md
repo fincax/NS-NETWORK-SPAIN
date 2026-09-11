@@ -380,7 +380,8 @@ Reglas derivadas:
 **Choice.**
 
 - El nombre de la ciudad o municipio queda reservado a NS y designa la **zona**: "NS Sevilla" agrupa todas las Salas de Sevilla.
-- Ninguna Sala puede usar el nombre de una ciudad o municipio. Propuesta de extensión (pendiente del fundador): tampoco provincia, comunidad, país, barrio o distrito.
+- Ninguna Sala puede usar el nombre de una ciudad, municipio, provincia, comunidad autónoma, país, barrio o distrito, ni ningún término que dé pistas territoriales (confirmado por el fundador). **La Sala no es territorial**: se define por sus empresas, no por un mapa. Se incorpora como principio no negociable 16. No existen sub-zonas ni áreas de influencia de Sala; la asignación de miembros a Salas no usa la ubicación; ninguna pantalla sitúa Salas sobre un mapa.
+- Las Salas de una zona (y, más adelante, de zonas distintas) celebran encuentros entre Salas porque generan negocio, no porque compartan territorio. Formato y ritmo pendientes (`docs/12_SALAS.md` §6bis).
 - Cada Sala elige un nombre propio con prefijo NS ("NS Cumbre"), propuesto por sus fundadoras y **autorizado por NS** conforme a criterios explícitos: unicidad en toda la red, no topónimo administrativo, no marca registrada ni nombre de empresa miembro, no término protegido de otras organizaciones, sin connotaciones ofensivas o partidistas, una o dos palabras.
 - Hasta la autorización, la Sala usa un código provisional interno que nunca es nombre público.
 - NS mantiene el registro central de nombres y la lista de reservados.

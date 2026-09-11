@@ -36,7 +36,7 @@ No se usa "capítulo" ni "grupo": son términos de otros modelos. "Sala" es leng
 ### 0.1 Nomenclatura de zonas y Salas (D-014)
 
 - **La zona lleva el nombre de la ciudad y pertenece a NS:** "NS Sevilla", "NS Madrid". Agrupa todas las Salas de la zona. Solo NS puede usarlo.
-- **Ninguna Sala puede llevar el nombre de una ciudad o municipio.** Tampoco el de la provincia, comunidad autónoma o país, ni el de un barrio o distrito de la zona (extensión propuesta para evitar que una Sala parezca "la de Triana" y otra "la de Nervión": la Sala no es territorial).
+- **Ninguna Sala puede llevar el nombre de una ciudad, municipio, provincia, comunidad autónoma, país, barrio o distrito**, ni ningún otro término que dé pistas territoriales (ríos, monumentos o hitos identificables de la zona incluidos). **La Sala no es territorial**: se define por sus empresas, no por un mapa (principio 16).
 - **Cada Sala elige su nombre propio**, con el prefijo NS: "NS Cumbre", "NS Ágora", "NS Meridiana". Lo proponen las empresas fundadoras y lo **autoriza NS**.
 - **Criterios de autorización:** prefijo NS + una o dos palabras; único en toda la red (un solo "NS Cumbre" en el mundo); no topónimo administrativo; no marca registrada ni nombre de una empresa miembro; no término protegido de otras organizaciones de networking; sin connotaciones ofensivas o partidistas; pronunciable en el idioma de la zona. NS mantiene un registro central de nombres y una lista de reservados.
 - **Hasta la autorización**, una Sala en formación se identifica con un código provisional interno ("NS Sevilla · Sala en formación 03") que nunca es su nombre público.
@@ -84,9 +84,15 @@ Señales que detienen la apertura y que el Chapter Intelligence Agent vigila:
 
 La saturación **no es un número fijo de Salas**: es una lectura continua de datos. Sevilla puede sostener 3 Salas o 12; lo dirán la lista de espera y el flujo de referidos.
 
-### 2.4 Sub-zonas de gravedad (opcional)
+### 2.4 La Sala no es territorial
 
-Cuando una zona tiene varias Salas, cada una puede declarar una **sub-zona de gravedad** (Sevilla Este, Aljarafe, Centro) para facilitar la reunión presencial y la afinidad de clientela. Es una preferencia de asignación, no una frontera: la exclusividad sigue siendo por Sala.
+Dentro de una zona, la Sala **no** tiene barrio, distrito ni radio de acción. Las empresas se asignan a una Sala por disponibilidad de plaza, complementariedad y calidad, nunca por dónde tienen la sede. Dos empresas de la misma calle pueden estar en Salas distintas; dos de municipios opuestos de la zona, en la misma. La geografía sigue contando en el **matching** (el NS Match Score valora si la empresa puede servir dónde está la necesidad), pero nunca en la **identidad ni en la composición** de la Sala.
+
+Consecuencias de diseño:
+
+- la asignación de nuevos miembros a Salas no usa la ubicación como criterio;
+- ninguna pantalla muestra las Salas sobre un mapa ni sugiere áreas de influencia;
+- el lugar de reunión presencial de una Sala es logística, no identidad, y puede rotar.
 
 ---
 
@@ -198,12 +204,27 @@ Gobierno: Presidencia y consejo de Sala (rotación anual), Directiva de Zona (ap
 
 ---
 
+## 6bis. Encuentros entre Salas (a plantear con el fundador)
+
+Las Salas de una zona, y con el tiempo de zonas distintas, se encuentran entre sí porque generan negocio, no porque compartan territorio. Propuesta inicial de formato, pendiente de decisión:
+
+| Elemento | Propuesta |
+| --- | --- |
+| Quién convoca | La Directiva de Zona, a propuesta del Chapter Intelligence Agent, cuando detecta demanda cruzada: necesidades de una Sala que las plazas de otra cubrirían, referidos exportados frecuentes entre dos Salas, o especialidades complementarias sin relación previa. |
+| Con quién | Dos o más Salas completas, o una selección de plazas de varias Salas ("encuentro por sector": todas las plazas de construcción y afines de la zona). |
+| Agenda | Generada por los agentes: lista de necesidades abiertas sin plaza en la Sala de origen, pares de empresas con mayor potencial cruzado, y referidos exportados pendientes de introducción. Nada de presentaciones genéricas. |
+| Formato | Presencial o mixto, corto, centrado en introducciones concretas preparadas de antemano por los agentes. |
+| Resultado medible | Referidos entre Salas originados en el encuentro, con el mismo ciclo, cualificación y reputación que cualquier otro (D-009, D-010). |
+| Ritmo | Trimestral por zona como hipótesis; el agente propone adelantar cuando la demanda cruzada lo justifica. |
+
+Regla: el encuentro entre Salas nunca sustituye la prioridad de la propia Sala en el enrutamiento (§5); la complementa cuando la Sala no cubre la necesidad.
+
 ## 7. Producto
 
 - **Web pública.** "Comprobar disponibilidad de mi sector" muestra, para la especialidad elegida, el estado en cada Sala de la zona: Disponible · Ocupada · Lista de espera · Próxima Sala en formación. Genera urgencia honesta y explica el modelo en una pantalla.
 - **Mi Sala.** Mapa de plazas de la Sala, perfiles, cuota de contribución de cada miembro (verificada), muro de victorias.
 - **Command Center de Zona.** Salas con estado, plazas por especialidad, lista de espera por especialidad, flujo de referidos por miembro, tasa de exportación, propuesta automática de apertura o fusión, cola del Comité de Clasificación.
-- **Radar.** Las señales y referidos se representan dentro de la Sala; los exportados aparecen como conexiones entre Salas de la zona.
+- **Radar.** Las señales y referidos se representan dentro de la Sala; los exportados aparecen como conexiones entre Salas de la zona. Nunca sobre un mapa geográfico: las Salas no tienen territorio.
 
 ---
 
@@ -212,7 +233,7 @@ Gobierno: Presidencia y consejo de Sala (rotación anual), Directiva de Zona (ap
 ```text
 Zone          { id, country, name, ine_municipalities[], status, saturation_indicators }
 Chapter(Sala) { id, zone_id, sequence (interno), name ("NS <Nombre>", único en la red), name_status: PROPOSED|AUTHORIZED|REJECTED, status: FORMING|ACTIVE|CONSOLIDATED|SPLITTING|MERGING|CLOSED,
-                gravity_subzone?, council[], nscat_version, protocol_version }
+                council[], nscat_version, protocol_version }
 Specialty     { id, nscat_code, cnae_class, name, description, status: OFFICIAL|NS_EXTENDED|PROVISIONAL|RETIRED,
                 overlaps_with[], perfect_referral_examples[], not_for_examples[] }
 CategorySeat  { id, chapter_id, specialty_id, company_id, status: ACTIVE|VACANT|WAITLISTED|RELEASED, granted_at }
@@ -226,6 +247,6 @@ ReferralRoute { referral_id, origin_chapter_id, target_chapter_id, level: CHAPTE
 
 1. Delimitar la Zona NS Sevilla (solo capital, o capital + área metropolitana).
 2. Confirmar la lista de especialidades fundadoras de la primera Sala de NS Sevilla (30–40) y su primera versión NS-CAT.
-5. Confirmar si la reserva de topónimos se extiende a barrios, distritos, provincias y comunidades (propuesto) o se limita a ciudad y municipio (regla literal).
+5. Decidir el formato y ritmo de los encuentros entre Salas (§6bis).
 3. Fijar los umbrales de apertura y saturación (propuesta: ≥ 3× cuota de D-010; dos periodos de caída de flujo).
 4. Decidir si el enrutamiento a otras Salas de la zona requiere consentimiento del originador en cada caso o una preferencia general en su Business DNA.
