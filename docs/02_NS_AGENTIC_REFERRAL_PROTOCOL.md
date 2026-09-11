@@ -729,7 +729,7 @@ Se documenta en `01_PRODUCT_REQUIREMENTS.md` (flujo de Application). NS-ARP solo
 4. Política de expiración de `OpportunitySignal` por tipo de trigger (una expansión internacional dura más que una sustitución de proveedor).
 5. Calibración inicial de pesos con datos demo antes del piloto real.
 6. Objeto `ContributionQuota` (D-010): mínimo de referidos válidos por periodo y Sala, cómputo solo de referidos cualificados por el receptor, escalera de consecuencias y papel del agente en el cumplimiento. Parámetros por estipular por el fundador.
-7. Objeto `ReferralQualification` (D-009): rúbrica del receptor y reputación bilateral.
+7. Objeto `ReferralQualification` (D-009, D-020): Veredicto del receptor en tres ejes (Facilidad, Negocio, Trato) con evidencia del Agente; objeto `Recognition{axis, reason}` para la Distinción, máximo una por titular y mes; reputación bilateral.
 8. Objetos `Zone` y `Sala` (D-013): saturación de zona, apertura de nuevas Salas y enrutamiento Sala → Zona → Red en S4/§13. Clasificación `NS-CAT` como origen de `Specialty`.
 
 ---

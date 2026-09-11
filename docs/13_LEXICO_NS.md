@@ -50,11 +50,11 @@ Criterios de cada nombre: castellano; una palabra siempre que sea posible; insti
 
 | Término NS | Qué es | Identificador técnico |
 | --- | --- | --- |
-| **Veredicto** | Cualificación de la Cesión por el cesionario en cinco ejes: encaje, oportunidad en el tiempo, calor de la relación, información aportada, resultado. Tres toques por hito. | `ReferralQualification` |
+| **Veredicto** | Cualificación de la Cesión por el cesionario en tres ejes, en tres toques: **Facilidad** (qué fácil fue prestar el servicio), **Negocio** (cuánto negocio generó) y **Trato** (cómo fue el trato de las personas). El Agente aporta la evidencia de cada eje. | `ReferralQualification{ease, business, treatment}` |
 | **Contraste** | Auditoría de NS: comparación entre el Veredicto declarado y la evidencia recogida por los agentes. | `Audit` |
 | **Mérito** | Unidad de reputación verificable. Solo nace de Veredictos y Cierres contrastados. Nunca de cantidad. | `TrustEvent.weight` |
 | **Hoja de Méritos** | Panel público (dentro de la red) de comportamientos verificables de una empresa: cesiones, calidad media, valor contrastado, tiempo de respuesta, fiabilidad como cesionario. Nunca un número opaco. | `ReputationProfile` |
-| **Distinción** | Reconocimiento periódico por calidad: "Cesión de la semana", "Cierre del mes", memoria anual. La otorga quien recibe. | `Recognition` |
+| **Distinción** | Reconocimiento que el cesionario otorga al cedente por una Cesión concreta, nombrando el eje que destacó (Facilidad, Negocio o Trato) y una línea de motivo. Escasa: máximo una por titular y mes. Se publica en la Crónica y alimenta el Mérito. De entre las Distinciones del mes sale la **Cesión del mes** de la Sala. | `Recognition{axis, reason}` |
 | **Compromiso** | Mínimo de Cesiones válidas por Ejercicio que toda empresa debe aportar (D-010). | `ContributionQuota` |
 | **Ejercicio** | Periodo de cómputo del Compromiso (por estipular: mes o trimestre). | `QuotaPeriod` |
 | **Niveles** | Miembro · Contribuidor · Referente · Consejero · Fundador. Se ganan con Mérito; amplían acceso, nunca lo restringen. ("Embajador" queda reservado a la Embajada.) | `MembershipTier` |

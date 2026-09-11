@@ -67,19 +67,19 @@ def cover(c, doc):
     c.setFillColor(PORCELAIN); c.setFont('Serif',15); c.drawCentredString(M+8*mm,H-64.5*mm,'NS')
     c.setFillColor(AMBER); c.rect(M,52*mm,28*mm,1.2,fill=1,stroke=0)
     c.setFillColor(colors.HexColor('#8A9098')); c.setFont('Mono',7.5)
-    c.drawString(M,44*mm,'NS NETWORK SPAIN · LÉXICO OFICIAL · v0.2 · 11 SEPTIEMBRE 2026')
-    c.drawString(M,39*mm,'DECISIONES D-013 A D-019 · DOCUMENTO INTERNO DEL EQUIPO FUNDADOR')
+    c.drawString(M,44*mm,'NS NETWORK SPAIN · LÉXICO OFICIAL · v0.3 · 11 SEPTIEMBRE 2026')
+    c.drawString(M,39*mm,'DECISIONES D-013 A D-020 · DOCUMENTO INTERNO DEL EQUIPO FUNDADOR')
     c.restoreState()
 
 def later(c, doc):
     c.saveState()
     c.setFillColor(BLUE); c.rect(0,H-6*mm,W,6*mm,fill=1,stroke=0)
     c.setFont('Mono',7); c.setFillColor(GREY)
-    c.drawString(M,10*mm,'NS Network Spain · Léxico oficial v0.2')
+    c.drawString(M,10*mm,'NS Network Spain · Léxico oficial v0.3')
     c.drawRightString(W-M,10*mm,'%d' % doc.page)
     c.restoreState()
 
-doc=SimpleDocTemplate('NS_Lexico_v0.2.pdf', pagesize=A4, leftMargin=M, rightMargin=M, topMargin=16*mm, bottomMargin=18*mm,
+doc=SimpleDocTemplate('NS_Lexico_v0.3.pdf', pagesize=A4, leftMargin=M, rightMargin=M, topMargin=16*mm, bottomMargin=18*mm,
                       title='NS Network · Léxico oficial', author='NS Network Spain', subject='Naming de estructura, protocolos, reputación y día a día')
 S=[]
 # Cover
@@ -152,11 +152,11 @@ S.append(table([
 # 4 Reputación
 S.append(Paragraph('4 · Calidad, reputación y compromiso', sH1))
 S.append(table([
- ('Veredicto','Cualificación de la Cesión por el cesionario en cinco ejes: encaje, oportunidad en el tiempo, calor de la relación, información aportada, resultado. Tres toques por hito.','ReferralQualification'),
+ ('Veredicto','Cualificación de la Cesión por el cesionario en tres ejes, en tres toques: Facilidad (qué fácil fue prestar el servicio), Negocio (cuánto negocio generó) y Trato (cómo fue el trato de las personas). El Agente aporta la evidencia de cada eje.','ReferralQualification'),
  ('Contraste','Auditoría de NS: comparación entre el Veredicto declarado y la evidencia recogida por los agentes.','Audit'),
  ('Mérito','Unidad de reputación verificable. Solo nace de Veredictos y Cierres contrastados. Nunca de cantidad. Nunca «puntos».','TrustEvent.weight'),
  ('Hoja de Méritos','Panel de comportamientos verificables de una empresa: cesiones, calidad media, valor contrastado, tiempo de respuesta, fiabilidad como cesionario. Nunca un número opaco.','ReputationProfile'),
- ('Distinción','Reconocimiento periódico por calidad: «Cesión de la semana», «Cierre del mes», memoria anual. La otorga quien recibe.','Recognition'),
+ ('Distinción','Reconocimiento que el cesionario otorga al cedente por una Cesión concreta, nombrando el eje que destacó (Facilidad, Negocio o Trato) y una línea de motivo. Escasa: máximo una por titular y mes. Se publica en la Crónica y alimenta el Mérito. De las Distinciones del mes sale la Cesión del mes.','Recognition{axis, reason}'),
  ('Compromiso','Mínimo de Cesiones válidas por Ejercicio que toda empresa debe aportar (regla inmutable).','ContributionQuota'),
  ('Ejercicio','Periodo de cómputo del Compromiso. Por estipular: mes o trimestre.','QuotaPeriod'),
  ('Niveles','Miembro · Contribuidor · Referente · Consejero · Fundador. Se ganan con Mérito; amplían acceso, nunca lo restringen.','MembershipTier'),
@@ -232,8 +232,8 @@ flow=['El Agente de Híspalis detecta un <b>Indicio</b> en su <b>Rastreo</b>: un
  'Cumplimiento emite <b>Salvoconducto</b>. Carlos da el <b>visto bueno</b> en su <b>Despacho</b>; Lucía acepta.',
  '<b>Apertura</b>: se revela la identidad del <b>Interesado</b>. Carlos tiende el <b>Puente</b>; el Interesado ve la <b>Carta de Presentación</b>.',
  'La <b>Cesión</b> avanza a <b>Oportunidad</b> y a <b>Cierre</b> ganado. Ambos confirman: 38.000 € de <b>valor contrastado</b> en el <b>Libro de Valor</b>.',
- 'Lucía emite su <b>Veredicto</b>; NS hace <b>Contraste</b>. Híspalis suma <b>Mérito</b> y cumple su <b>Compromiso</b> del <b>Ejercicio</b>.',
- 'La <b>Crónica</b> de NS Cumbre lo publica; la Cesión recibe la <b>Distinción</b> de la semana.',
+ 'Lucía emite su <b>Veredicto</b> (Facilidad, Negocio, Trato); NS hace <b>Contraste</b>. Híspalis suma <b>Mérito</b> y cumple su <b>Compromiso</b> del <b>Ejercicio</b>.',
+ 'Lucía otorga a Híspalis su <b>Distinción</b> del mes, por Trato; la <b>Crónica</b> de NS Cumbre la publica.',
  'La plaza de Mobiliario estaba vacante en NS Cumbre: Carlos hizo una <b>Embajada</b> a un titular de NS Ágora, que pasó a ser <b>Embajadora</b> de Mobiliario en NS Cumbre; Carlos obtuvo prima de Mérito.',
  'El domingo, el Agente de Híspalis envía su <b>Comunicado</b>; el lunes, la <b>Gaceta</b> lo resume para toda la Sala y el <b>Dossier</b> de Híspalis queda actualizado.',
  'La <b>Balanza</b> de NS Cumbre muestra a Híspalis En <b>Ritmo</b>: 2 de 2 esta semana. Su <b>Brújula</b> le propone tres <b>Movimientos</b> para la próxima.',
@@ -245,7 +245,7 @@ for i,f in enumerate(flow,1):
 S.append(Paragraph('9 · Palabras que NS no usa', sH1))
 S.append(Paragraph('«Lead», «referencia» (en el sentido de referido), «capítulo», «grupo», «círculo», «networking» como sustantivo del producto, «sinergia», «match» en la interfaz, «ranking», «puntos», «compliance» y «ticket» en el copy de la app. Y ninguna expresión, lema o formato protegido de otras organizaciones de networking. Los identificadores técnicos del protocolo se mantienen en inglés y se mapean en este léxico.', sBody))
 S.append(Spacer(1,6*mm))
-S.append(Paragraph('Fuentes: docs/13_LEXICO_NS.md · docs/12_SALAS.md · docs/14_PROTOCOLOS_DE_SALA.md · docs/DECISIONS.md (D-013 a D-019). Términos confirmados por el fundador el 11 de septiembre de 2026; «Extramuros» descartado en favor de «Embajada»; el nivel «Embajador» pasa a «Consejero».', sSmall))
+S.append(Paragraph('Fuentes: docs/13_LEXICO_NS.md · docs/12_SALAS.md · docs/14_PROTOCOLOS_DE_SALA.md · docs/DECISIONS.md (D-013 a D-020). Términos confirmados por el fundador el 11 de septiembre de 2026; «Extramuros» descartado en favor de «Embajada»; el nivel «Embajador» pasa a «Consejero».', sSmall))
 
 doc.build(S, onFirstPage=cover, onLaterPages=later)
 print('ok')

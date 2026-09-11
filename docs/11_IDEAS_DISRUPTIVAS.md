@@ -54,12 +54,12 @@ Nota de voz de 20 segundos, foto de una tarjeta, un vCard reenviado, un "He sabi
 Cada referido es un objeto firmado y auditable con ciclo de vida completo (NS-ARP §9) y una **cualificación final del receptor** en una rúbrica estándar de 5 ejes:
 
 ```text
-Encaje        ¿Era mi cliente ideal?
-Timing        ¿Había necesidad real ahora?
-Calor         ¿La relación del originador abrió la puerta?
-Información   ¿Llegó con contexto suficiente?
-Resultado     Reunión · Propuesta · Ganado · Valor verificado
+Facilidad   ¿Fue fácil prestar el servicio?   (información, momento, decisor, encaje)
+Negocio     ¿Cuánto negocio generó?           (oportunidad, cierre, valor contrastado)
+Trato       ¿Cómo fue el trato de las personas?
 ```
+
+(Versión confirmada por el fundador, D-020. Los cinco ejes iniciales pasan a ser evidencia que el Agente aporta bajo estos tres.)
 
 El receptor puntúa en 3 toques en cada hito. El agente rellena la evidencia (fechas, mensajes enviados, reuniones confirmadas). NS audita el conjunto.
 

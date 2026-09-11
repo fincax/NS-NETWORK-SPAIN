@@ -492,3 +492,26 @@ Reglas derivadas:
 **Consequences.** `docs/14_PROTOCOLOS_DE_SALA.md` incorpora NS-ATP v0.1 con especificación agentic. Objetos `MemberBalance`, `ChapterBalance`, `WeeklyPace`, `MemberCompass`, `CompassMove`. Mi Sala, Dossier, Hoy, Despacho y Parte incorporan Balanza, Ritmo y Brújula. Léxico ampliado (`docs/13_LEXICO_NS.md` §4ter). PDF del léxico regenerado como v0.2.
 
 **Revisit when.** Tras el primer Ejercicio completo con Balanza pública en la Sala piloto, con datos de aceptación y conversión de Movimientos.
+
+---
+
+## D-020 · Veredicto en tres ejes (Facilidad, Negocio, Trato) y Distinción otorgada por quien recibe la Cesión
+
+**Status:** CONFIRMED (criterios fijados por el fundador); parámetros de escasez PROPOSED
+**Date:** 2026-09-11
+
+**Context.** El fundador ratifica que las Distinciones las otorga quien recibe la Cesión, teniendo en cuenta la facilidad de prestar el servicio, el negocio generado y el trato de las personas. Esos tres criterios sustituyen a la rúbrica de cinco ejes propuesta en D-009 por ser más simples, más memorables y más cercanos a cómo un empresario valora de verdad un referido.
+
+**Choice.**
+
+- **Veredicto** del cesionario en tres ejes, tres toques: Facilidad (información completa, momento real, decisor identificado, encaje), Negocio (oportunidad, cierre, valor contrastado) y Trato (del cedente en el Puente y del Interesado en la relación). El Agente aporta la evidencia de cada eje; la valoración opcional del Interesado desde la Carta de Presentación alimenta Trato.
+- **Distinción**: acto deliberado del cesionario hacia el cedente por una Cesión concreta. Nombra el eje que destacó y una línea de motivo. Se publica en la Crónica y suma Mérito. Escasez propuesta: máximo una por titular y mes, y no más de dos al mismo cedente por Ejercicio. Nadie se distingue a sí mismo; nunca por cantidad.
+- **Hoja de Méritos** muestra las Distinciones recibidas por eje ("5 por Trato, 4 por Facilidad, 3 por Negocio"): el perfil de por qué valoran a una empresa.
+- **Cesión del mes** de la Sala: la Distinción del mes con mejor Veredicto y valor contrastado; empate a favor de Trato.
+- **Contraste**: toda Distinción debe corresponder a una Cesión con Veredicto válido; vigilancia de pares que se distinguen mutuamente y de Distinciones sin motivo.
+
+**Why.** Poner la valoración en manos de quien recibe elimina el autobombo y alinea el reconocimiento con la calidad real. Tres ejes se recuerdan y se responden en segundos. La escasez hace que una Distinción importe.
+
+**Consequences.** `ReferralQualification{ease, business, treatment}` y `Recognition{axis, reason}` en NS-ARP v0.2. El core (`CLAUDE.md` §14), el léxico y el banco de ideas quedan actualizados. PDF del léxico regenerado como v0.3.
+
+**Revisit when.** Se disponga de 100 Veredictos en la Sala piloto, para calibrar la escasez de la Distinción.

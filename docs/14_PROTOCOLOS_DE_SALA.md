@@ -16,7 +16,7 @@ Los tres tienen cadencia semanal, cumplimiento verificable y consecuencias (D-01
 
 ## Protocolo I · Generar Negocio (resumen)
 
-Cada semana el Agente de cada empresa propone el máximo de Cesiones válidas posibles a partir de Indicios propios (Despacho), Rastreo y Sondeo. El titular cualifica con Veredicto, NS hace Contraste, el cedente suma Mérito y cumple su Compromiso. Sin titular en la Sala: Embajada. Todo el detalle vive en `docs/02_NS_AGENTIC_REFERRAL_PROTOCOL.md`, `docs/12_SALAS.md` y `docs/13_LEXICO_NS.md`.
+Cada semana el Agente de cada empresa propone el máximo de Cesiones válidas posibles a partir de Indicios propios (Despacho), Rastreo y Sondeo. El titular cualifica con Veredicto (Facilidad, Negocio, Trato) y puede otorgar una Distinción; NS hace Contraste; el cedente suma Mérito y cumple su Compromiso. Sin titular en la Sala: Embajada. Todo el detalle vive en `docs/02_NS_AGENTIC_REFERRAL_PROTOCOL.md`, `docs/12_SALAS.md` y `docs/13_LEXICO_NS.md`.
 
 ---
 
@@ -190,7 +190,7 @@ Mobiliario · vacante         —          —          —                  —
 Reglas:
 
 1. **Solo cuenta lo válido y lo contrastado.** "Dadas" y "Recibidas" son Cesiones con Veredicto válido. Las Cesiones en curso se muestran aparte, en gris, como "en curso". El valor es siempre valor contrastado (confirmado por ambas partes). El valor potencial y el pipeline nunca aparecen en la Balanza.
-2. **Nunca es un ranking.** El orden es por plaza. No hay medallas, posiciones ni "top". Las Distinciones se otorgan por calidad y las decide quien recibe (D-009).
+2. **Nunca es un ranking.** El orden es por plaza. No hay medallas, posiciones ni "top". Las Distinciones las otorga quien recibe, por Facilidad, Negocio o Trato (D-020), y se muestran junto al titular como hechos, no como puntos.
 3. **El Ritmo se ve.** Cada titular muestra su estado semanal frente al Ritmo: **En Ritmo**, **Por encima**, **Por debajo**, con la cifra (hechas de objetivo). Es el único indicador de "cómo va" que la Sala ve de cada miembro, y es el que el Consejo de Zona usa en el Parte.
 4. **Reciprocidad explicada, no juzgada.** Junto a cada titular, un indicador de balance con explicación del Agente de Sala: "Da más de lo que recibe: su especialidad genera muchas señales para otros" o "Recibe más de lo que da: especialidad de destino frecuente". Nunca un número de reciprocidad a secas.
 5. **El valor de una Cesión concreta nunca se muestra en la Balanza.** Solo agregados por titular. Las dos partes de una Cesión conocen su valor; el resto de la Sala ve sumas.
