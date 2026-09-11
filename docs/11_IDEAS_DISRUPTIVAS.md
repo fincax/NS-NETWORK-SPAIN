@@ -143,6 +143,10 @@ Ver `docs/12_SALAS.md` y D-013. La exclusividad vive en la Sala (una empresa por
 
 Las Salas no son territoriales, así que el encuentro entre Salas no es "la reunión del barrio": es una cita convocada cuando los agentes detectan demanda cruzada real (necesidades de una Sala que otra cubre, referidos exportados frecuentes, sectores complementarios sin relación). La agenda la escriben los agentes: introducciones concretas preparadas de antemano. El resultado se mide en referidos entre Salas. Ver `docs/12_SALAS.md` §6bis.
 
+### C9 · Extramuros: la generosidad que más cuesta es la que más vale
+
+Propuesta Fuera de la Sala (D-015, en el core). Cuando tu Sala no tiene titular para un buen referido, lo propones a un titular de otra Sala y, si resuelve, obtienes una prima de Mérito muy superior. Cada Extramuros marca además una plaza que la Sala debería cubrir: el hueco se convierte en captación.
+
 ## D · Tensiones que hay que resolver (no ignorar)
 
 | Tensión | Riesgo | Respuesta de diseño |

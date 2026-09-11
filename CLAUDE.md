@@ -572,6 +572,20 @@ Medir preferentemente: valor generado; calidad; aceptación; conversiones; tiemp
 
 La reputación debe basarse en comportamiento verificable. No crear un "número mágico" opaco que pueda destruir injustamente la reputación de una empresa.
 
+### Extramuros · Propuesta Fuera de la Sala (D-015)
+
+Cuando un miembro dispone de un buen referido y **en su Sala no hay titular de esa especialidad** (plaza vacante o especialidad sin representar), NS le ofrece un acto extraordinario: proponer él mismo a un titular de **otra Sala de la zona**. Su Agente le presenta candidatos ordenados por Hoja de Méritos, tiempo de respuesta y encaje; el miembro puede elegir uno que ya conozca. La cesión sigue el ciclo completo de NS-ARP.
+
+Reglas del core:
+
+- Solo procede cuando la plaza está vacante en la Sala del cedente. El sistema lo verifica. Con la plaza ocupada, la prioridad es siempre de la propia Sala.
+- Si resuelve (veredicto válido del cesionario, y más aún si llega a valor contrastado), el cedente recibe una **prima de Mérito muy superior** a la de una cesión ordinaria. Parámetros propuestos en D-015.
+- Cada Extramuros deja constancia de una plaza que la Sala debería cubrir desde la Antesala. Tres Extramuros de una misma especialidad en un Ejercicio abren candidatura preferente para esa plaza.
+- Se aplican todas las reglas inmutables: nunca contraprestación. El Contraste vigila cesiones cruzadas entre dos empresas de Salas distintas.
+- Si ninguna Sala de la zona cubre la especialidad, el mismo acto se extiende a otra zona (Extramuros en Red) con la misma prima.
+
+Extramuros recompensa la generosidad exactamente donde más cuesta, evita que un buen referido se pierda y convierte cada hueco en una señal de captación.
+
 ## 15. Privacidad como ventaja competitiva
 
 NS puede acceder en el futuro, con autorización, a fuentes como: CRM; correo; calendario; ERP; formularios; notas; contactos; conversaciones comerciales; documentación; sitios web; APIs empresariales.

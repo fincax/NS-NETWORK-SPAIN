@@ -394,9 +394,9 @@ Reglas derivadas:
 
 ---
 
-## D-015 · Cesión Extramuros: cuando la plaza está vacante en la Sala, el miembro puede ceder el referido a un titular de otra Sala como acto extraordinario con prima de Mérito
+## D-015 · Extramuros (Propuesta Fuera de la Sala): cuando la plaza está vacante en la Sala, el miembro puede ceder el referido a un titular de otra Sala como acto extraordinario con prima de Mérito
 
-**Status:** CONFIRMED en su idea (propuesta directa del fundador); parámetros PROPOSED
+**Status:** CONFIRMED en su idea e integrada en el core de `CLAUDE.md` (propuesta directa del fundador); nombre "Extramuros" y parámetros PROPOSED
 **Date:** 2026-09-11
 
 **Context.** El fundador propone que, cuando una empresa de una Sala disponga de un buen referido y no haya en su Sala ninguna empresa de alta con ese CNAE o especialidad, NS ofrezca la posibilidad de proponerlo a una empresa de otra Sala, como algo extraordinario, y que si resuelve proporcione muchos puntos al cedente. El enrutamiento Sala → Zona → Red (D-013) ya prevé que el referido no se pierda; esta decisión lo convierte en un acto del miembro, reconocido y recompensado.
@@ -408,7 +408,8 @@ Reglas derivadas:
 - **Prima de Mérito (propuesta).** Veredicto válido del cesionario: ×2 respecto a una Cesión ordinaria. Valor contrastado: ×3. La Cesión Extramuros cuenta para el Compromiso del cedente como una Cesión ordinaria y media.
 - **Efecto sobre la Sala.** Cada Cesión Extramuros registra una plaza que la Sala del cedente debería cubrir. El Parte del Consejo de Zona la muestra como prioridad de captación desde la Antesala. Si una especialidad acumula tres Cesiones Extramuros en un Ejercicio, se abre candidatura preferente para esa plaza.
 - **Salvaguardas.** El cesionario de otra Sala no adquiere derecho alguno sobre la Sala del cedente. Se aplican todas las reglas inmutables (D-010): nunca contraprestación. El Contraste vigila anillos de cesiones cruzadas entre dos empresas de Salas distintas. El cedente necesita consentimiento del tercero según NS-ARP como en cualquier Cesión.
-- **Cesión en Red.** Si ninguna Sala de la zona cubre la especialidad, el mismo mecanismo se extiende a otra zona con la misma prima.
+- **Extramuros en Red.** Si ninguna Sala de la zona cubre la especialidad, el mismo mecanismo se extiende a otra zona con la misma prima.
+- **Nombre.** Recomendado "Extramuros" (alternativas en `docs/13_LEXICO_NS.md` §6bis). Etiqueta descriptiva: Propuesta Fuera de la Sala.
 
 **Why.** Recompensa la generosidad exactamente donde más cuesta (fuera de la propia Sala), evita que un buen referido se pierda, y convierte cada hueco en una señal de captación para la Sala.
 
@@ -425,7 +426,7 @@ Reglas derivadas:
 
 **Context.** El fundador pide nombres originales para las acciones del protocolo y del día a día de NS. La constitución exige lenguaje propio y prohíbe terminología de otras organizaciones.
 
-**Choice.** Se adopta `docs/13_LEXICO_NS.md` como léxico oficial. Núcleo: Red NS · Zona · Sala · Plaza · Titular · Antesala · Candidatura · Directiva · Consejo de Zona · Pleno · Confluencia; Indicio · Pista · Encaje · Fundamento · Salvoconducto · Visto bueno · Apertura · Cesión · Cesión Extramuros · Cesión en Red · Cedente/Cesionario · Puente · Oportunidad · Cierre · Valor contrastado · Libro de Valor; Veredicto · Contraste · Mérito · Hoja de Méritos · Distinción · Compromiso · Ejercicio · Niveles · Arbitraje; Agente NS · ADN de Empresa · Mesa Permanente · Despacho · Encargo · Rastreo · Sondeo · Hoy · Parte · Crónica · Carta de Presentación · NS Radar; NS-ARP · NS-CAT · Especialidad. Los identificadores técnicos del protocolo se mantienen en inglés y se mapean en el léxico.
+**Choice.** Se adopta `docs/13_LEXICO_NS.md` como léxico oficial. Núcleo: Red NS · Zona · Sala · Plaza · Titular · Antesala · Candidatura · Directiva · Consejo de Zona · Pleno · Confluencia; Indicio · Pista · Encaje · Fundamento · Salvoconducto · Visto bueno · Apertura · Cesión · Extramuros · Extramuros en Red · Cedente/Cesionario · Puente · Oportunidad · Cierre · Valor contrastado · Libro de Valor; Veredicto · Contraste · Mérito · Hoja de Méritos · Distinción · Compromiso · Ejercicio · Niveles · Arbitraje; Agente NS · ADN de Empresa · Mesa Permanente · Despacho · Encargo · Rastreo · Sondeo · Hoy · Parte · Crónica · Carta de Presentación · NS Radar; NS-ARP · NS-CAT · Especialidad. Los identificadores técnicos del protocolo se mantienen en inglés y se mapean en el léxico.
 
 **Why.** El léxico es propiedad intelectual y es producto: microcopy, web y app hablan con él. Palabras castellanas, sobrias, de una sola pieza, sin pistas territoriales.
 

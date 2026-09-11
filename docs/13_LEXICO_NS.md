@@ -35,8 +35,8 @@ Criterios de cada nombre: castellano; una palabra siempre que sea posible; insti
 | **Visto bueno** | Decisión humana de aprobar (originador, receptor o Directiva). | `HumanDecision.APPROVE` | "aprobar" |
 | **Apertura** | Momento en que el originador autoriza revelar identidad y contexto al receptor. | `INTRO_AUTHORIZED` + `reveal_scope` | "reveal" |
 | **Cesión** | El referido NS: un contacto o necesidad concreta que un miembro (cedente) entrega a un titular (cesionario) de su Sala. Es la unidad que se cualifica, se contrasta y genera Mérito. | `Referral` | "referido", "referencia" |
-| **Cesión Extramuros** | Cesión extraordinaria a un titular de **otra Sala de la zona** cuando la plaza está vacante en la Sala del cedente. Prima de Mérito. Ver D-015. | `Referral{ route: ZONE }` | — |
-| **Cesión en Red** | Cesión a otra zona cuando ninguna Sala de la zona cubre la necesidad. | `Referral{ route: NETWORK }` | "global routing" |
+| **Extramuros** | Propuesta Fuera de la Sala: cesión extraordinaria que el miembro propone a un titular de **otra Sala de la zona** cuando la plaza está vacante en la suya. Prima de Mérito. Ver D-015. Se usa como sustantivo: "hacer un Extramuros". | `Referral{ route: ZONE, extramuros: true }` | — |
+| **Extramuros en Red** | El mismo acto extendido a otra zona cuando ninguna Sala de la zona cubre la necesidad. | `Referral{ route: NETWORK, extramuros: true }` | "global routing" |
 | **Cedente / Cesionario** | Quien entrega la Cesión / quien la recibe. | `originator` / `receiver` | "giver / receiver" |
 | **Puente** | La introducción cálida: el mensaje o reunión que conecta al cesionario con el tercero, preparado por el agente y enviado por la persona. | `Introduction`, `IntroPackage` | "intro" |
 | **Oportunidad** | Negociación abierta confirmada por el cesionario tras el Puente. | `Opportunity` | — |
@@ -96,9 +96,21 @@ Apertura: se revela la identidad. Carlos tiende el Puente; el tercero ve la Cart
 La Cesión avanza a Oportunidad y a Cierre ganado. Ambos confirman: 38.000 € de valor contrastado en el Libro de Valor.
 Lucía emite su Veredicto; NS hace Contraste. Híspalis suma Mérito y cumple su Compromiso del Ejercicio.
 La Crónica de NS Cumbre lo publica; la Cesión recibe la Distinción de la semana.
-La plaza de Mobiliario estaba vacante en NS Cumbre: Carlos hizo una Cesión Extramuros a un titular de NS Ágora y obtuvo prima de Mérito.
+La plaza de Mobiliario estaba vacante en NS Cumbre: Carlos hizo un Extramuros a un titular de NS Ágora y obtuvo prima de Mérito.
 El Parte del Consejo de Zona anota que Mobiliario debería cubrirse desde la Antesala.
 ```
+
+## 6bis. Alternativas de nombre para la Propuesta Fuera de la Sala
+
+Recomendado: **Extramuros**. Alternativas consideradas, por si el fundador prefiere otro registro:
+
+| Nombre | Registro | Por qué sí | Por qué no |
+| --- | --- | --- | --- |
+| **Extramuros** | institucional, histórico | una palabra; literal (fuera de los muros de la Sala); sin pista territorial; "NS Extramuros" registrable; funciona como sustantivo y como adjetivo | ninguna objeción de peso |
+| **Cesión de Honor** | ceremonial | subraya la generosidad y el prestigio del acto | dos palabras; "honor" puede sonar solemne en la interfaz diaria |
+| **Embajada** | diplomático | enlaza con el nivel Embajador; el cedente representa a su Sala ante otra | puede confundirse con el nivel de membresía |
+| **Cesión Abierta** | funcional | describe el mecanismo sin metáfora | genérico; poco memorable |
+| **Puente Largo** | metafórico | continúa la metáfora del Puente | "largo" insinúa distancia geográfica, que no es el punto |
 
 ## 7. Palabras que NS no usa
 
