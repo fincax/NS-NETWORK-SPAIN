@@ -572,6 +572,18 @@ Medir preferentemente: valor generado; calidad; aceptación; conversiones; tiemp
 
 La reputación debe basarse en comportamiento verificable. No crear un "número mágico" opaco que pueda destruir injustamente la reputación de una empresa.
 
+### Veredicto y Distinción: quien recibe, valora (D-020)
+
+Toda Cesión resuelta termina en el **Veredicto** del cesionario sobre tres ejes, en tres toques:
+
+```text
+FACILIDAD   ¿Fue fácil prestar el servicio?  (información completa, momento real, decisor identificado, encaje)
+NEGOCIO     ¿Cuánto negocio generó?          (oportunidad, cierre, valor contrastado)
+TRATO       ¿Cómo fue el trato de las personas?  (del cedente en el Puente, del Interesado en la relación)
+```
+
+Además del Veredicto, el cesionario puede otorgar una **Distinción** al cedente por esa Cesión. Es un acto deliberado y escaso: como máximo una por titular y mes. Debe nombrar el eje que destacó (Facilidad, Negocio o Trato) y una línea de motivo, que se publica en la Crónica. Las Distinciones alimentan el Mérito y la Hoja de Méritos del cedente, que muestra por qué le valoran ("12 Distinciones: 5 por Trato, 4 por Facilidad, 3 por Negocio"). El Contraste verifica que cada Distinción corresponde a una Cesión con Veredicto válido y vigila los pares que se distinguen mutuamente. Nadie se distingue a sí mismo ni distingue por cantidad: solo quien recibe, y solo por calidad.
+
 ### Embajada · Propuesta Fuera de la Sala (D-015)
 
 Cuando un miembro dispone de un buen referido y **en su Sala no hay titular de esa especialidad** (plaza vacante o especialidad sin representar), NS le ofrece un acto extraordinario: la **Embajada**. El miembro propone él mismo a un titular de **otra Sala de la zona**. Su Agente le presenta candidatos ordenados por Hoja de Méritos, tiempo de respuesta y encaje; el miembro puede elegir uno que ya conozca. La cesión sigue el ciclo completo de NS-ARP.
