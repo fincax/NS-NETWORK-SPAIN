@@ -106,7 +106,7 @@ La Directiva revisa únicamente cuando el Trust & Compliance Agent marca al meno
 
 **Why.** Sitúa la aprobación humana exactamente donde genera valor. El empresario es quien conoce al cliente y asume el riesgo reputacional de la introducción; la Directiva aporta valor en las situaciones de conflicto, no en el flujo ordinario.
 
-**Consequences.** El estado `HUMAN_REVIEW` del ciclo de vida se divide en `MEMBER_REVIEW` y `DIRECTOR_REVIEW`. Las excepciones deben ser visibles y explicables en la referral card ("Este referral requiere revisión de la Directiva porque…").
+**Consequences.** El estado conceptual `HUMAN_REVIEW` del ciclo de vida se concreta en el protocolo como `MEMBER_REVIEW` con los subestados `ORIGINATOR_PENDING`, `RECEIVER_PENDING` y `DIRECTOR_PENDING` (este último solo con excepciones). Las excepciones deben ser visibles y explicables en la referral card ("Este referral requiere revisión de la Directiva porque…").
 
 **Revisit when.** Se produzca el primer incidente reputacional, o cuando la tasa de intervención de la Directiva supere el 15% de los referrals.
 
