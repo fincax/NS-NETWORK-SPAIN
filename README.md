@@ -4,7 +4,7 @@
 
 > Tu empresa no hace networking. Su agente sí. 24/7.
 
-Primera implantación: **NS Sevilla · Sala 01**, una empresa por especialidad en cada Sala.
+Primera implantación: **NS Sevilla · NS Cumbre** (primera Sala de la zona), una empresa por especialidad en cada Sala. Las Salas llevan nombre propio autorizado por NS; el nombre de la ciudad queda reservado a la zona (D-014).
 
 ## Estado del proyecto
 

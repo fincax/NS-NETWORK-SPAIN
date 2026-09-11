@@ -14,10 +14,10 @@ Una **Sala NS** es un grupo cerrado de empresas seleccionadas, con **una empresa
 NS Network
 └── NS España
     └── Zona NS Sevilla
-        ├── Sala 01   (25–35 empresas, una por especialidad)
-        ├── Sala 02
-        ├── Sala 03
-        └── ...       tantas como permita la saturación de la zona
+        ├── NS Cumbre      (Sala · 25–35 empresas, una por especialidad)
+        ├── NS Ágora       (Sala)
+        ├── NS Meridiana   (Sala)
+        └── ...            tantas como permita la saturación de la zona
 ```
 
 Vocabulario oficial:
@@ -32,6 +32,17 @@ Vocabulario oficial:
 | **Directiva de Zona** | Gobierna apertura, escisión y fusión de Salas en la zona. | `ZoneDirector` |
 
 No se usa "capítulo" ni "grupo": son términos de otros modelos. "Sala" es lenguaje propio de NS.
+
+### 0.1 Nomenclatura de zonas y Salas (D-014)
+
+- **La zona lleva el nombre de la ciudad y pertenece a NS:** "NS Sevilla", "NS Madrid". Agrupa todas las Salas de la zona. Solo NS puede usarlo.
+- **Ninguna Sala puede llevar el nombre de una ciudad o municipio.** Tampoco el de la provincia, comunidad autónoma o país, ni el de un barrio o distrito de la zona (extensión propuesta para evitar que una Sala parezca "la de Triana" y otra "la de Nervión": la Sala no es territorial).
+- **Cada Sala elige su nombre propio**, con el prefijo NS: "NS Cumbre", "NS Ágora", "NS Meridiana". Lo proponen las empresas fundadoras y lo **autoriza NS**.
+- **Criterios de autorización:** prefijo NS + una o dos palabras; único en toda la red (un solo "NS Cumbre" en el mundo); no topónimo administrativo; no marca registrada ni nombre de una empresa miembro; no término protegido de otras organizaciones de networking; sin connotaciones ofensivas o partidistas; pronunciable en el idioma de la zona. NS mantiene un registro central de nombres y una lista de reservados.
+- **Hasta la autorización**, una Sala en formación se identifica con un código provisional interno ("NS Sevilla · Sala en formación 03") que nunca es su nombre público.
+- **Identidad visual:** el lockup de zona (NS Sevilla) y el de Sala (NS Cumbre) conviven en la app; la Sala tiene nombre pero no marca propia separada de NS.
+
+Ejemplo completo: una empresa es miembro de **NS Cumbre**, Sala de **NS Sevilla**, dentro de **NS España**.
 
 ---
 
@@ -162,8 +173,8 @@ Reglas (integran D-001 y D-004):
 La Sala tiene prioridad sobre los referidos que nacen en ella. Cuando ninguna plaza de la Sala cubre la necesidad, el referido no se pierde:
 
 ```text
-Necesidad detectada por un agente de la Sala 01
-  → plaza de la especialidad en Sala 01          (titular recibe)
+Necesidad detectada por un agente de NS Cumbre
+  → plaza de la especialidad en NS Cumbre        (titular recibe)
   → si vacante: otras Salas de la Zona Sevilla    (rotación por reputación y tiempo de respuesta; requiere consentimiento del originador, NS-ARP §13)
   → si ninguna: red NS (otras zonas, Global Routing)
 ```
@@ -175,8 +186,8 @@ El originador acumula reputación en todos los casos (D-009). La tasa de referid
 ## 6. Ciclo de vida de una Sala
 
 ```text
-EN_FORMACIÓN   12–15 fundadoras admitidas; Directiva provisional; agentes activados
-  → ACTIVA     ≥ 15 plazas ocupadas; cuota de contribución en vigor
+EN_FORMACIÓN   12–15 fundadoras admitidas; Directiva provisional; agentes activados; código provisional; nombre propuesto pendiente de autorización NS
+  → ACTIVA     ≥ 15 plazas ocupadas; nombre autorizado (NS <Nombre>); cuota de contribución en vigor
   → CONSOLIDADA  25–35 plazas; consejo elegido; rituales estables
   → ESCISIÓN   > 35 plazas con lista de espera: la Directiva de Zona planifica la Sala N+1 y ofrece a los miembros interesados fundarla
   → FUSIÓN     < 12 plazas activas durante 2 periodos: se fusiona con otra Sala de la zona (las plazas en conflicto se resuelven por antigüedad y reputación)
@@ -200,7 +211,7 @@ Gobierno: Presidencia y consejo de Sala (rotación anual), Directiva de Zona (ap
 
 ```text
 Zone          { id, country, name, ine_municipalities[], status, saturation_indicators }
-Chapter(Sala) { id, zone_id, number, name, status: FORMING|ACTIVE|CONSOLIDATED|SPLITTING|MERGING|CLOSED,
+Chapter(Sala) { id, zone_id, sequence (interno), name ("NS <Nombre>", único en la red), name_status: PROPOSED|AUTHORIZED|REJECTED, status: FORMING|ACTIVE|CONSOLIDATED|SPLITTING|MERGING|CLOSED,
                 gravity_subzone?, council[], nscat_version, protocol_version }
 Specialty     { id, nscat_code, cnae_class, name, description, status: OFFICIAL|NS_EXTENDED|PROVISIONAL|RETIRED,
                 overlaps_with[], perfect_referral_examples[], not_for_examples[] }
@@ -214,6 +225,7 @@ ReferralRoute { referral_id, origin_chapter_id, target_chapter_id, level: CHAPTE
 ## 9. Pendientes del fundador
 
 1. Delimitar la Zona NS Sevilla (solo capital, o capital + área metropolitana).
-2. Confirmar la lista de especialidades fundadoras de la Sala 01 (30–40) y su primera versión NS-CAT.
+2. Confirmar la lista de especialidades fundadoras de la primera Sala de NS Sevilla (30–40) y su primera versión NS-CAT.
+5. Confirmar si la reserva de topónimos se extiende a barrios, distritos, provincias y comunidades (propuesto) o se limita a ciudad y municipio (regla literal).
 3. Fijar los umbrales de apertura y saturación (propuesta: ≥ 3× cuota de D-010; dos periodos de caída de flujo).
 4. Decidir si el enrutamiento a otras Salas de la zona requiere consentimiento del originador en cada caso o una preferencia general en su Business DNA.

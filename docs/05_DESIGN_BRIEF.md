@@ -125,7 +125,7 @@ Diseñar el sistema de identidad completo:
 
 1. **Monograma NS** que funcione desde 16 px (favicon) hasta una fachada.
 2. **Wordmark** "NS Network".
-3. **Lockups jerárquicos:** NS Network · NS España · NS Sevilla · NS Sevilla · Sala 01. La arquitectura de marca es global → país → ciudad → Sala y el sistema debe escalar sin rediseño.
+3. **Lockups jerárquicos:** NS Network · NS España · NS Sevilla · NS Cumbre. La arquitectura de marca es global → país → zona (ciudad) → Sala y el sistema debe escalar sin rediseño. El nombre de ciudad pertenece a la zona; cada Sala tiene nombre propio con prefijo NS, autorizado por NS (D-014). El sistema de identidad debe prever un lockup de Sala que conviva con el de zona sin competir con él.
 4. Versiones: positivo sobre porcelain, negativo sobre obsidian, monocromo, azul institucional, y una versión "activa" donde un único elemento adopta signal green (para estados de la app: "tu agente está trabajando").
 5. App icon, favicon, avatar de agente (ver 5.3), marca de agua para documentos, sello de "Miembro NS Sevilla" para que las empresas lo usen en sus webs y firmas de correo.
 
@@ -213,7 +213,7 @@ Con acceso inmediato a: nueva señal ("He sabido que…"), referidos pendientes,
 
 ### Prioridad 2 · Flujo público y admisión
 
-- Comprobar disponibilidad de mi sector (selector Sector → Especialidad, resultado "Disponible / Ocupada / Lista de espera" en NS Sevilla · Sala 01).
+- Comprobar disponibilidad de mi sector (selector Sector → Especialidad, resultado "Disponible / Ocupada / Lista de espera" en NS Sevilla, por Sala: NS Cumbre, NS Ágora…).
 - Solicitar plaza (formulario que se siente como candidatura, no como registro).
 - Cómo funciona · Para empresas · Filosofía · Seguridad y privacidad · Membresía.
 
@@ -242,7 +242,7 @@ loading · empty · first use · error · partial data · offline/retry · permi
 
 ---
 
-## 8. Datos demo: NS Sevilla · Sala 01
+## 8. Datos demo: NS Sevilla · NS Cumbre
 
 Usa siempre empresas verosímiles. Nunca "Empresa A" ni lorem ipsum. Nombres ya establecidos en el protocolo (mantenlos para coherencia):
 

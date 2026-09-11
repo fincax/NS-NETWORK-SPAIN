@@ -367,3 +367,26 @@ Reglas derivadas:
 **Consequences.** D-011 queda superada. D-001 y D-006 se mantienen íntegras con "Sala" como término. Se sustituye `docs/12_TERRITORIALIDAD.md` por `docs/12_SALAS.md`. NS-ARP v0.2 incorpora `Zone`, `Sala` (identificador técnico `Chapter`), el enrutamiento Sala → Zona → Red y `NS-CAT` como origen de `Specialty`. La web pública muestra disponibilidad por Sala dentro de la zona. La Directiva de zona gestiona apertura, escisión y fusión de Salas.
 
 **Revisit when.** La primera zona alcance tres Salas activas y se disponga de datos de exportación de referidos entre Salas.
+
+---
+
+## D-014 · Nomenclatura: el nombre de la ciudad pertenece a NS y agrupa la zona; cada Sala lleva un nombre propio con prefijo NS, autorizado por NS
+
+**Status:** CONFIRMED (decisión directa del fundador)
+**Date:** 2026-09-11
+
+**Context.** Con varias Salas por zona (D-013) hace falta una regla de nombres que evite que una Sala se apropie de la identidad de la ciudad, que distinga claramente zona y Sala, y que dé a cada Sala una identidad propia sin fragmentar la marca NS.
+
+**Choice.**
+
+- El nombre de la ciudad o municipio queda reservado a NS y designa la **zona**: "NS Sevilla" agrupa todas las Salas de Sevilla.
+- Ninguna Sala puede usar el nombre de una ciudad o municipio. Propuesta de extensión (pendiente del fundador): tampoco provincia, comunidad, país, barrio o distrito.
+- Cada Sala elige un nombre propio con prefijo NS ("NS Cumbre"), propuesto por sus fundadoras y **autorizado por NS** conforme a criterios explícitos: unicidad en toda la red, no topónimo administrativo, no marca registrada ni nombre de empresa miembro, no término protegido de otras organizaciones, sin connotaciones ofensivas o partidistas, una o dos palabras.
+- Hasta la autorización, la Sala usa un código provisional interno que nunca es nombre público.
+- NS mantiene el registro central de nombres y la lista de reservados.
+
+**Why.** Protege la marca y la neutralidad de NS en cada ciudad, da a cada Sala pertenencia e identidad propia, y evita que las Salas se perciban como territoriales.
+
+**Consequences.** `Chapter` incorpora `name` único en la red y `name_status`. El ciclo de vida de la Sala (`docs/12_SALAS.md` §6) incluye la autorización del nombre antes de ACTIVA. La arquitectura de marca (brief de diseño) prevé lockups de zona y de Sala. Los datos demo pasan a "NS Sevilla · NS Cumbre".
+
+**Revisit when.** Se abra la primera zona fuera de España (idiomas y topónimos distintos).

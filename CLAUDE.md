@@ -128,22 +128,24 @@ La exclusividad se aplica a nivel de Sala, no de ciudad. En una misma zona (por 
 
 ```text
 NS Sevilla
-├── Sala 01
+├── NS Cumbre        (Sala)
 │   ├── Arquitectura
 │   ├── Seguros
 │   ├── Legal
 │   └── ...
 │
-├── Sala 02
+├── NS Ágora         (Sala)
 │   ├── Arquitectura
 │   ├── Seguros
 │   ├── Legal
 │   └── ...
 │
-└── Sala 03
+└── NS Meridiana     (Sala)
 ```
 
 Puede haber varias Salas en una misma ciudad.
+
+**Nomenclatura (D-014).** El nombre de la ciudad o municipio está reservado a NS para agrupar las Salas de la zona ("NS Sevilla"). Ninguna Sala puede llevar el nombre de una ciudad o municipio. Cada Sala elige un nombre propio, con el prefijo NS, que debe ser autorizado por NS: "NS Cumbre", "NS Ágora". El nombre es único en toda la red.
 
 Posteriormente existirán:
 
