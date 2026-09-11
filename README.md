@@ -17,9 +17,10 @@ Primera implantación: **NS Sevilla**, un círculo, una empresa por especialidad
 | [`CLAUDE.md`](./CLAUDE.md) | Constitución maestra de producto. Contexto, rol, forma de trabajo, principios no negociables. |
 | [`docs/00_NORTH_STAR.md`](./docs/00_NORTH_STAR.md) | Tesis, mantra, métrica primaria, moat y principios. |
 | [`docs/02_NS_AGENTIC_REFERRAL_PROTOCOL.md`](./docs/02_NS_AGENTIC_REFERRAL_PROTOCOL.md) | NS-ARP v0.1: objetos, mensajes agente-a-agente, visibilidad y permisos, NS Match Score, máquina de estados, puertas humanas, auditoría, escenarios de referencia. |
+| [`docs/05_DESIGN_BRIEF.md`](./docs/05_DESIGN_BRIEF.md) | Brief para Claude Design: identidad, logo, dirección visual, pantallas prioritarias, datos demo y entregables. |
 | [`docs/DECISIONS.md`](./docs/DECISIONS.md) | Registro de decisiones estratégicas y arquitectónicas. |
 
-Documentos pendientes según la constitución: `01_PRODUCT_REQUIREMENTS`, `03_USER_ROLES`, `04_INFORMATION_ARCHITECTURE`, `05_DESIGN_SYSTEM`, `06_DATA_MODEL`, `07_AGENT_ARCHITECTURE`, `08_SECURITY_PRIVACY_GDPR`, `09_ANALYTICS`, `10_ROADMAP`.
+Documentos pendientes según la constitución: `01_PRODUCT_REQUIREMENTS`, `03_USER_ROLES`, `04_INFORMATION_ARCHITECTURE`, `05_DESIGN_SYSTEM` (se derivará del brief y de los tokens entregados por Claude Design), `06_DATA_MODEL`, `07_AGENT_ARCHITECTURE`, `08_SECURITY_PRIVACY_GDPR`, `09_ANALYTICS`, `10_ROADMAP`.
 
 ## Cómo trabajar en este repositorio
 
