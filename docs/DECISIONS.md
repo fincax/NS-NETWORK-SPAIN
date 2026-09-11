@@ -261,3 +261,32 @@ Reglas derivadas:
 **Consequences.** NS-ARP v0.2 debe incorporar: `ReferralQualification` (rúbrica del receptor), reputación bilateral en `TrustEvent`, índice de coherencia del evaluador, y fuentes de señal de prospección (`SignalSource`). El banco de ideas derivado vive en `docs/11_IDEAS_DISRUPTIVAS.md`. Se mantiene D-005: la puntuación nunca se convierte en comisión.
 
 **Revisit when.** Se disponga de los primeros 50 referidos cualificados en NS Sevilla.
+
+---
+
+## D-010 · Reglas inmutables: nunca se cobra por un referido (expulsión); aportación mínima obligatoria de referidos por periodo; calidad por encima de cantidad
+
+**Status:** CONFIRMED (input directo del fundador)
+**Date:** 2026-09-11
+
+**Context.** El fundador ha marcado a fuego tres ideas que no admiten revisión y que definen el espíritu de NS como network colaborativo, no como mercado de leads.
+
+**Choice.**
+
+1. **Prohibición absoluta de cobrar por un referido.** Ningún miembro puede pedir, ofrecer, aceptar o condicionar un referido a dinero, comisión, descuento, contraprestación o favor. NS tampoco cobra por referido (coherente con D-005). Es **motivo de expulsión** del círculo y de la red.
+2. **Aportación mínima obligatoria.** Toda empresa debe aportar un número mínimo de referidos en los plazos que se estipulen. Pertenecer a NS es contribuir. Los parámetros (número, periodo, escalera de consecuencias) se fijan por círculo; los valores concretos quedan **pendientes de estipulación por el fundador** y se registrarán como decisión propia.
+3. **Calidad por encima de cantidad.** Solo cuenta para el mínimo y para la reputación el referido que el receptor cualifica como válido y NS puede auditar. Un referido flojo no cumple y puede restar.
+
+Reglas derivadas:
+
+- No existe ningún campo de retribución, comisión o contraprestación en ningún objeto de NS-ARP. El Trust & Compliance Agent produce `FAIL` y emite `REFERRAL_FEE_VIOLATION` ante cualquier indicio; la Directiva instruye el expediente de expulsión. Existe un canal confidencial de denuncia.
+- Las relaciones comerciales ordinarias entre miembros (cliente/proveedor) son legítimas. Lo prohibido es condicionar el referido.
+- Se introduce el objeto `ContributionQuota` por círculo y periodo. El agente de cada empresa muestra el estado en "Hoy", propone candidatos concretos y avisa con antelación. Escalera de consecuencias propuesta: aviso del agente → conversación con la Directiva → plan de contribución de un periodo → plaza en revisión → baja.
+- `TrustEvent` incorpora `CONTRIBUTION_QUOTA_MET` y `CONTRIBUTION_QUOTA_MISSED`.
+- Estas reglas se comunican en la web pública, en la solicitud de plaza y en el onboarding. El solicitante las acepta expresamente antes de la admisión.
+
+**Why.** La gratuidad del referido protege la confianza y la neutralidad del sistema. La aportación mínima garantiza que cada plaza produce valor para el círculo y que nadie ocupa una especialidad sin contribuir. La primacía de la calidad evita que el mínimo degenere en relleno.
+
+**Consequences.** `CLAUDE.md` y `00_NORTH_STAR.md` incorporan una sección "Reglas inmutables". NS-ARP v0.2 añade la comprobación 10 de Compliance, los nuevos `TrustEvent` y el objeto `ContributionQuota`. La solicitud de membresía y el onboarding incluyen aceptación expresa. El banco de ideas (`11_IDEAS_DISRUPTIVAS.md`) reformula el pilar 2 como "con suelo, sin techo".
+
+**Revisit when.** Nunca en cuanto a las tres reglas. Los parámetros de la cuota (número, periodo, consecuencias) se revisan tras el primer periodo completo de NS Sevilla.

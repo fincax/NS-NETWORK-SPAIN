@@ -1279,6 +1279,14 @@ Y posteriormente:
 14. El producto debe generar negocio medible.
 15. Cada mejora debe fortalecer el Network Effect.
 
+## Reglas inmutables (D-010)
+
+Estas tres reglas están por encima de cualquier feature, decisión de diseño o modelo económico. No se revisan; se aplican.
+
+1. **Nunca se cobra por un referido.** Ningún miembro puede pedir, ofrecer, aceptar o condicionar un referido a dinero, comisión, descuento, contraprestación o favor. NS tampoco cobra por referido (D-005). Hacerlo es **motivo de expulsión** del círculo y de la red. El espíritu de NS es un network colaborativo: se da porque se pertenece.
+2. **Toda empresa debe aportar un número mínimo de referidos en los plazos que se estipulen.** Pertenecer a NS es contribuir. El mínimo y el plazo se fijan por círculo y se aplican con una escalera de consecuencias que termina en la pérdida de la plaza. El agente de cada empresa trabaja para que su miembro lo cumpla sin esfuerzo.
+3. **La calidad importa más que la cantidad.** Un referido cuenta cuando el receptor lo cualifica como válido y NS puede auditarlo. Un referido flojo no cumple el mínimo ni suma reputación; puede restar.
+
 # NORTH STAR
 
 Cuando exista incertidumbre sobre qué construir, recordar:

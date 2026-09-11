@@ -74,6 +74,12 @@ Business DNA acumulado
 14. El producto debe generar negocio medible.
 15. Cada mejora debe fortalecer el Network Effect.
 
+## Reglas inmutables (D-010)
+
+1. **Nunca se cobra por un referido.** Ni entre miembros ni por parte de NS. Pedir, ofrecer o aceptar dinero, comisión o contraprestación por un referido es motivo de expulsión.
+2. **Toda empresa debe aportar un mínimo de referidos en los plazos estipulados por su círculo.** Pertenecer es contribuir. El incumplimiento reiterado supone la pérdida de la plaza.
+3. **Calidad por encima de cantidad.** Solo cuenta el referido que el receptor cualifica como válido y NS puede auditar.
+
 ## Pregunta de control antes de cualquier feature
 
 ```text

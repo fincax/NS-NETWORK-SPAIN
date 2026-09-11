@@ -222,7 +222,9 @@ interface TrustEvent {                  // alimenta la reputación verificable
   company_id: CompanyId;
   kind: "REFERRAL_ACCEPTED" | "REFERRAL_DECLINED_WITH_REASON" | "RESPONSE_ON_TIME"
       | "RESPONSE_LATE" | "INTRO_COMPLETED" | "OUTCOME_REPORTED" | "VALUE_VERIFIED"
-      | "COMPLAINT" | "DISPUTE_OPENED" | "DISPUTE_RESOLVED" | "POLICY_VIOLATION";
+      | "COMPLAINT" | "DISPUTE_OPENED" | "DISPUTE_RESOLVED" | "POLICY_VIOLATION"
+      | "REFERRAL_FEE_VIOLATION"        // D-010 · motivo de expulsión
+      | "CONTRIBUTION_QUOTA_MET" | "CONTRIBUTION_QUOTA_MISSED";  // D-010 · mínimo de aportación
   weight: number;
   evidence_ref: string;
 }
@@ -530,6 +532,7 @@ interface ComplianceVerdict {
 7. **Periodo de prueba:** miembros con < 3 referrals completados.
 8. **Umbral de valor:** `value_band` por encima del umbral del círculo.
 9. **Reputación:** `TrustEvent` de tipo `POLICY_VIOLATION` reciente en cualquiera de las partes.
+10. **Retribución por referido (regla inmutable D-010):** cualquier indicio de dinero, comisión, descuento o contraprestación condicionada al referido en mensajes, notas, `IntroPackage` o `learning_notes` produce `FAIL`, emite `REFERRAL_FEE_VIOLATION` y abre expediente de expulsión ante la Directiva. No existe campo de retribución en ningún objeto del protocolo.
 
 Ante cualquier `FAIL` el veredicto es `BLOCK`. Ante `WARN` es `PASS_WITH_EXCEPTIONS` y se añade `DIRECTOR` a `required_reviewers`.
 
@@ -725,6 +728,8 @@ Se documenta en `01_PRODUCT_REQUIREMENTS.md` (flujo de Application). NS-ARP solo
 3. Cómo tratar señales multilaterales (una obra que requiere arquitectura + reforma + instalaciones coordinadas). Propuesta: `ReferralBundle` en v0.3.
 4. Política de expiración de `OpportunitySignal` por tipo de trigger (una expansión internacional dura más que una sustitución de proveedor).
 5. Calibración inicial de pesos con datos demo antes del piloto real.
+6. Objeto `ContributionQuota` (D-010): mínimo de referidos válidos por periodo y círculo, cómputo solo de referidos cualificados por el receptor, escalera de consecuencias y papel del agente en el cumplimiento. Parámetros por estipular por el fundador.
+7. Objeto `ReferralQualification` (D-009): rúbrica del receptor y reputación bilateral.
 
 ---
 

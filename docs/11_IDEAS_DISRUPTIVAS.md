@@ -12,7 +12,7 @@
 Tres pilares:
 
 1. **Agentic**: el agente no asiste, ejecuta: prospecta, cualifica, prepara, persigue, cierra el bucle.
-2. **Sin techo**: no hay límite al número de referidos que una empresa puede dar. Cuantos más y mejores, más reconocimiento.
+2. **Con suelo, sin techo**: toda empresa debe aportar un mínimo de referidos válidos por periodo (D-010, regla inmutable). Por encima de ese mínimo no hay límite. Cuantos más y mejores, más reconocimiento. Nunca se cobra por un referido: hacerlo es motivo de expulsión.
 3. **Calidad verificada**: quien recibe cualifica; NS audita; quien da acumula reputación verificable y portable.
 
 ---
@@ -127,11 +127,20 @@ Antes de recibir su primer referido, el agente de un miembro nuevo genera candid
 
 ---
 
+### B8 · Cuota de contribución asistida por el agente
+
+El mínimo obligatorio de referidos (D-010) no debe vivirse como una amenaza sino como un objetivo que el agente ayuda a alcanzar. El agente muestra en "Hoy" el estado del periodo ("2 de 3 referidos válidos · quedan 19 días"), propone candidatos concretos desde el grafo de relaciones y la prospección pública, y avisa con antelación. Solo cuentan los referidos que el receptor cualifica como válidos. Escalera de consecuencias propuesta: aviso del agente → conversación con la Directiva → plan de contribución de un periodo → plaza en revisión → baja. Un miembro que no aporta libera una plaza valiosa para otro que sí lo hará.
+
+### B9 · Cero retribución, tolerancia cero
+
+El Trust & Compliance Agent vigila cualquier indicio de dinero, comisión, descuento o favor condicionado a un referido (mensajes, notas de introducción, resultados). Un indicio abre expediente; una confirmación supone expulsión. Existe un canal confidencial para que un miembro denuncie que le han pedido o le han ofrecido contraprestación. Las relaciones comerciales normales entre miembros (ser cliente o proveedor uno de otro) son bienvenidas; lo prohibido es condicionar el referido.
+
 ## D · Tensiones que hay que resolver (no ignorar)
 
 | Tensión | Riesgo | Respuesta de diseño |
 | --- | --- | --- |
 | Reparto ilimitado vs. calidad | inflación de referidos flojos para sumar puntos | los puntos solo nacen de la cualificación del receptor y de resultados verificados; un referido mal cualificado resta |
+| Mínimo obligatorio vs. calidad | referidos de relleno para cumplir cuota | solo cuentan los referidos cualificados como válidos por el receptor; el agente ayuda a llegar al mínimo con candidatos reales; el relleno reiterado se trata como incumplimiento |
 | Receptor que infrapuntúa | evita "deber" reciprocidad | B2 + B3: el receptor también tiene reputación y coherencia como evaluador |
 | Colusión | dos empresas se inflan mutuamente | detección de anillos, auditoría muestral, peso decreciente de pares repetidos |
 | Grafo de relaciones | GDPR, contactos de terceros | base jurídica B2B (interés legítimo), minimización, el contacto nunca se revela sin permiso del dueño, derecho de exclusión |
@@ -142,7 +151,7 @@ Antes de recibir su primer referido, el agente de un miembro nuevo genera candid
 
 ## E · Qué entra en el MVP y qué no
 
-**Entra (demuestra la tesis):** A3, A4, A5, B1, B2, B7, C1, C6.
+**Entra (demuestra la tesis):** A3, A4, A5, B1, B2, B7, B8, B9, C1, C6.
 **Se diseña ahora, se activa en Fase 2:** A1, A2, B3, B4 (niveles), C2.
 **Fase 3+:** B5, B6, C3, C4, C5.
 
