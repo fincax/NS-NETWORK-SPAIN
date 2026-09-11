@@ -236,3 +236,50 @@ La arquitectura conserva la capacidad de soportar en el futuro: niveles de membr
 **Consequences.** El primer vertical slice implementa NS-ARP v0.1 de extremo a extremo con datos demo de NS Sevilla.
 
 **Revisit when.** Se complete el primer vertical slice y existan aprendizajes reales del matching.
+
+---
+
+## D-009 · Identidad "El Encuentro" y sistema visual Modernist; sustituyen a la foundation cromática del brief
+
+**Status:** PROPOSED
+**Date:** 2026-09-11
+
+**Context.** El brief de diseño (`05_DESIGN_BRIEF.md` §4.3) proponía una foundation obsidian / porcelain / azul institucional con verde señal y ámbar oportunidad como colores semánticos. Claude Design exploró cinco turnos (`NS Hoy.dc.html`) y el fundador aprobó la identidad **"El Encuentro"** en línea gruesa (4b), su guía de uso (3a) y la home Hoy (5a) con el arranque (5b). El sistema resultante es **Modernist**: plano, retícula visible, radio 0, Archivo como única familia, un solo acento (rojo) y tinta sobre fondo claro.
+
+**Options.**
+
+1. Mantener la foundation del brief y forzar la identidad aprobada dentro de ella.
+2. Adoptar íntegramente el sistema entregado por Claude Design (tokens, marca, estados del agente) y retirar la paleta del brief.
+3. Híbrido: marca aprobada + colores semánticos verde/ámbar del brief.
+
+**Choice.** Opción 2. La marca "El Encuentro" (círculo partido en dos mitades que se tocan sin fundirse; el hueco de contacto es lo único que la app anima) y los tokens Modernist son el design system oficial. Documentado en `docs/05_DESIGN_SYSTEM.md`; código en `src/app/globals.css` y `src/components/brand/`.
+
+**Why.** La marca resuelve el territorio "la reunión permanente" del brief con un elemento animable con significado (estados en reposo / analizando / ha encontrado algo / espera tu decisión) y aguanta 16 px. Un único acento que solo aparece como estado ("si no hay referido, no hay rojo") es más disciplinado que dos colores semánticos y refuerza la regla "la IA se percibe por comportamiento" de D-007. Mezclar paletas (opción 3) diluiría ambas.
+
+**Consequences.** D-007 sigue vigente en personalidad de marca (institucional-premium, sin clichés de IA), pero su párrafo de foundation cromática queda superado por esta decisión. El verde/ámbar semántico no se usa: el acento, el peso y las reglas llevan la semántica. El texto en acento usa `accent-700` por contraste. Sello de miembro, negativo y modo oscuro cálido quedan pendientes.
+
+**Revisit when.** Se prueben la landing pública y el Radar con la paleta de un solo acento; si la web pública necesita más registro cromático, se ampliará la escala sin añadir un segundo acento en la app.
+
+---
+
+## D-010 · Stack: TypeScript + Next.js; la app de miembro nace como web móvil-first, no como app nativa
+
+**Status:** PROPOSED
+**Date:** 2026-09-11
+
+**Context.** El handoff de diseño sugiere recrear la app en un entorno móvil (React Native, SwiftUI, Flutter…). La constitución (A.9) orienta a TypeScript, framework full-stack moderno, PostgreSQL, type safety y multi-tenancy desde el principio. El MVP debe demostrar una tesis (agentes que encuentran oportunidades útiles), no cubrir tiendas de aplicaciones.
+
+**Options.**
+
+1. App nativa o React Native para miembros + web aparte para Directiva y pública.
+2. Un único proyecto Next.js (App Router, React Server Components) con la app de miembro diseñada móvil-first y preparada para instalarse como PWA; Directiva y web pública en el mismo proyecto.
+3. Monorepo con paquetes compartidos y clientes separados desde el día uno.
+
+**Choice.** Opción 2. `package.json` en la raíz con Next 16, React 19, TypeScript 5.9 estricto, Vitest y ESLint. CSS plano con tokens (sin Tailwind ni librería de componentes: el design system es CSS sobre HTML). Los estados de carga y error de cada ruta se implementan con `loading.tsx` / `error.tsx`.
+
+**Why.** Un solo código base para miembro, Directiva y web pública acelera el vertical slice (CLAUDE.md · A.6) y mantiene un único modelo de dominio tipado alineado con NS-ARP. Server Components permiten que "Hoy" se sirva ya calculado (la síntesis del agente), lo que encaja con "la experiencia debe sentirse instantánea". La decisión móvil (CLAUDE.md · 22) es de diseño, no de plataforma: las pantallas se diseñan para 402 px primero.
+
+**Consequences.** Sin acceso a APIs nativas (notificaciones push nativas, micrófono en segundo plano) hasta que exista una app nativa; la captura de señal por voz usará Web APIs. Los datos demo viven en `src/demo/` hasta que exista persistencia (PostgreSQL) y autenticación. La ruta `/hoy` acepta `?demo=` para mostrar sus estados mientras no hay backend.
+
+**Revisit when.** El primer vertical slice funcione de extremo a extremo y los miembros pidan capacidades que la web no pueda dar (push nativo, widget, voz siempre activa).
+

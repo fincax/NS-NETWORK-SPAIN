@@ -1,0 +1,41 @@
+.mark {
+  flex: none;
+  overflow: visible;
+}
+
+.mark path {
+  transform-box: view-box;
+}
+
+/* Con reduced-motion: sin animación, posición abierta estática. */
+@media (prefers-reduced-motion: reduce) {
+  .analyzing path { animation: none !important; }
+  .analyzing path:first-of-type { transform: translate(-1.75px, 4px); }
+  .analyzing path:last-of-type { transform: translate(1.75px, -4px); }
+}
+
+.lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-text);
+}
+
+.wordmark {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.circle {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-neutral-700);
+  padding-left: 8px;
+  border-left: 2px solid var(--color-divider);
+  white-space: nowrap;
+  line-height: 1.2;
+}
