@@ -434,3 +434,16 @@ Reglas derivadas:
 **Consequences.** Los documentos vivos adoptan el léxico en su próxima revisión. El brief de diseño lo usa en todo el microcopy. Se comprueba la disponibilidad registral de "NS" + término para los principales.
 
 **Revisit when.** El fundador ratifique o sustituya términos; antes de la primera zona fuera de España.
+
+---
+
+## D-017 · Definición del referido: un Interesado (empresa, persona, asociación o cualquier entidad) que busca un producto o servicio de confianza, propuesto por el Agente del cedente al titular de la especialidad en su Sala
+
+**Status:** CONFIRMED (definición validada por el fundador)
+**Date:** 2026-09-11
+
+**Choice.** El objeto de toda Cesión es un **Interesado**: empresa, persona física, autónomo, asociación, fundación, comunidad de propietarios, administración, club u otra entidad con una necesidad real de un producto o servicio de confianza. El miembro que lo conoce (cedente) lo entrega a su Agente; el Agente lo estructura como Indicio y lo propone, a través de la Mesa Permanente, al titular de esa especialidad en la Sala. Un Interesado con varias necesidades origina varias Cesiones. Si no hay titular, Embajada.
+
+**Consequences.** NS-ARP incorpora `ThirdParty` con `kind: COMPANY | PERSON | SOLE_TRADER | ASSOCIATION | PUBLIC_BODY | OTHER`. Cuando el Interesado es persona física, la Apertura exige base jurídica y consentimiento (NS-ARP §8.2.3); el sector regulado del titular puede añadir restricciones (§8.2.5). El léxico (`docs/13_LEXICO_NS.md` §5bis) recoge el reparto de papeles.
+
+**Revisit when.** Se produzca la primera Cesión con Interesado persona física en el piloto.

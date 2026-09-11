@@ -27,14 +27,15 @@ Criterios de cada nombre: castellano; una palabra siempre que sea posible; insti
 
 | Término NS | Qué es | Identificador técnico | Sustituye a |
 | --- | --- | --- | --- |
-| **Indicio** | Señal estructurada de que puede existir una necesidad empresarial. Es la materia prima. | `OpportunitySignal` | "señal", "lead" |
+| **Interesado** | Quien busca un producto o servicio de confianza: empresa, persona física, autónomo, asociación, fundación, comunidad de propietarios, administración, club deportivo… Cualquier entidad o persona con una necesidad real. Es el objeto de toda Cesión; nunca es miembro de NS por el hecho de serlo. Si es persona física, su identidad solo se revela con base jurídica y consentimiento (NS-ARP §8). | `ThirdParty` | "tercero", "prospecto", "lead" |
+| **Indicio** | Señal estructurada de que un Interesado puede tener una necesidad. Es la materia prima. | `OpportunitySignal` | "señal", "lead" |
 | **Pista** | Hipótesis de encaje entre un Indicio y una plaza, formulada por los agentes y aún sin cualificar. | `MatchCandidate` | "match" |
 | **Encaje** | Grado de ajuste explicable entre necesidad y titular (0–100 %). | `NSMatchScore` | "score" |
 | **Fundamento** | Explicación obligatoria de una Pista: por qué, evidencia, confianza, incógnitas, siguiente paso. | `Explanation` | "why this match" |
 | **Salvoconducto** | Veredicto del Trust & Compliance Agent que autoriza a una Pista a llegar a personas. | `ComplianceVerdict` | "compliance check" |
 | **Visto bueno** | Decisión humana de aprobar (originador, receptor o Directiva). | `HumanDecision.APPROVE` | "aprobar" |
 | **Apertura** | Momento en que el originador autoriza revelar identidad y contexto al receptor. | `INTRO_AUTHORIZED` + `reveal_scope` | "reveal" |
-| **Cesión** | El referido NS: un contacto o necesidad concreta que un miembro (cedente) entrega a un titular (cesionario) de su Sala. Es la unidad que se cualifica, se contrasta y genera Mérito. | `Referral` | "referido", "referencia" |
+| **Cesión** | El referido NS: un Interesado con una necesidad concreta que un miembro (cedente) entrega al titular de esa especialidad en su Sala (cesionario). Un mismo Interesado puede originar varias Cesiones si su necesidad abarca varias especialidades. Es la unidad que se cualifica, se contrasta y genera Mérito. | `Referral` | "referido", "referencia" |
 | **Embajada** | Propuesta Fuera de la Sala: cesión extraordinaria que el miembro propone a un titular de **otra Sala de la zona** cuando la plaza está vacante en la suya. Prima de Mérito para el cedente. Ver D-015. "Hacer una Embajada". | `Referral{ route: ZONE, embassy: true }` | — |
 | **Embajadora** | La empresa de otra Sala que acoge la Embajada. Representa esa especialidad en la Sala del cedente mientras la plaza siga vacante: sin plaza, sin voto, con mención en su Hoja de Méritos. Máximo dos Salas a la vez. | `EmbassyRole` | — |
 | **Embajada en Red** | El mismo acto extendido a otra zona cuando ninguna Sala de la zona cubre la necesidad. | `Referral{ route: NETWORK, embassy: true }` | "global routing" |
@@ -86,6 +87,22 @@ Criterios de cada nombre: castellano; una palabra siempre que sea posible; insti
 | **Reglas inmutables** | Nunca se cobra por una Cesión (expulsión); Compromiso obligatorio; calidad sobre cantidad (D-010). |
 
 ---
+
+## 5bis. Quién hace qué en una Cesión (definición confirmada por el fundador)
+
+```text
+1. Un miembro conoce a un Interesado (empresa, persona, asociación…) que busca un producto o servicio de confianza.
+   Lo cuenta a su Agente en el Despacho, o su Agente lo detecta en un Rastreo o en un Sondeo.
+2. El Agente del miembro lo estructura como Indicio y lo lleva a la Mesa Permanente de la Sala.
+3. La Mesa identifica la plaza (o plazas) de la Sala que cubre la necesidad y formula la Pista con su Fundamento.
+   Si la plaza está vacante: Embajada.
+4. El Agente del titular cualifica; Compliance emite Salvoconducto.
+5. Vistos buenos: el cedente autoriza la Apertura; el titular acepta.
+6. El cedente tiende el Puente al Interesado. Desde aquí es una Cesión en curso.
+7. El titular emite Veredicto por hitos; NS hace Contraste; el cedente suma Mérito y cumple Compromiso.
+```
+
+El Agente del cedente no "vende" el referido: lo estructura, lo protege y lo propone. El Agente del titular no "compra": cualifica y prepara. Las personas deciden en los pasos 5 y 6.
 
 ## 6. El flujo completo dicho en léxico NS
 
