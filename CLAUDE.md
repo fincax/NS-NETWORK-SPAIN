@@ -589,6 +589,15 @@ Reglas del core:
 
 La Embajada recompensa la generosidad exactamente donde más cuesta, evita que un buen referido se pierda y convierte cada hueco en una señal de captación.
 
+### Los dos protocolos obligatorios de Sala (D-018)
+
+```text
+Protocolo I  · GENERAR NEGOCIO   Ceder referidos de calidad.       Unidad: la Cesión.     Especificación: NS-ARP.
+Protocolo II · DAR A CONOCER     Comunicar tu trabajo a la Sala.   Unidad: el Comunicado. Especificación: NS-ADP.
+```
+
+**Protocolo II · Dar a Conocer.** Nadie puede ceder bien lo que no conoce bien. Cada semana, el Agente de cada empresa informa a los Agentes de las demás empresas de la Sala de su especialidad y plaza, de las funciones, servicios y productos que trabaja, y de las actualizaciones, novedades y cualquier dato importante ocurrido esa semana (**Comunicado**). El Chapter Intelligence Agent los compila en la **Gaceta** semanal de la Sala, con una vista "relevante para ti" por gerente. Todo gerente debe conocer, o poder consultar en segundos, el **Dossier**, el histórico y las novedades de cada miembro de su Sala. El gerente aprueba su Comunicado en el Despacho con un toque; el cumplimiento es verificable y sigue la misma escalera que el Compromiso. Especificación completa en `docs/14_PROTOCOLOS_DE_SALA.md`.
+
 ## 15. Privacidad como ventaja competitiva
 
 NS puede acceder en el futuro, con autorización, a fuentes como: CRM; correo; calendario; ERP; formularios; notas; contactos; conversaciones comerciales; documentación; sitios web; APIs empresariales.
@@ -1306,6 +1315,7 @@ Estas tres reglas están por encima de cualquier feature, decisión de diseño o
 1. **Nunca se cobra por un referido.** Ningún miembro puede pedir, ofrecer, aceptar o condicionar un referido a dinero, comisión, descuento, contraprestación o favor. NS tampoco cobra por referido (D-005). Hacerlo es **motivo de expulsión** de la Sala y de la red. El espíritu de NS es un network colaborativo: se da porque se pertenece.
 2. **Toda empresa debe aportar un número mínimo de referidos en los plazos que se estipulen.** Pertenecer a NS es contribuir. El mínimo y el plazo se fijan por Sala y se aplican con una escalera de consecuencias que termina en la pérdida de la plaza. El agente de cada empresa trabaja para que su miembro lo cumpla sin esfuerzo.
 3. **La calidad importa más que la cantidad.** Un referido cuenta cuando el receptor lo cualifica como válido y NS puede auditarlo. Un referido flojo no cumple el mínimo ni suma reputación; puede restar.
+4. **Toda empresa da a conocer su trabajo a la Sala cada semana** (D-018). El Agente redacta el Comunicado; el gerente lo aprueba. Sin conocimiento mutuo no hay referidos de calidad.
 
 # NORTH STAR
 

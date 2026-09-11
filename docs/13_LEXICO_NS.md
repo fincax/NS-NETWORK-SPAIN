@@ -77,11 +77,24 @@ Criterios de cada nombre: castellano; una palabra siempre que sea posible; insti
 | **Carta de Presentación** | Página que ve el tercero cuando recibe un Puente: quién lo recomienda, por qué, agenda en un clic, opción de valorar. | `IntroLandingPage` |
 | **NS Radar** | Visualización icónica de Indicios, Pistas y Cesiones de la Sala y de la zona. Nunca sobre un mapa. | `Radar` |
 
+## 4bis. Protocolo II · Dar a Conocer
+
+| Término NS | Qué es | Identificador técnico |
+| --- | --- | --- |
+| **Comunicado** | Informe semanal estructurado que el Agente de una empresa envía a los Agentes de la Sala: lo estable (qué hace) y el delta (qué ha cambiado esta semana). El gerente lo aprueba en el Despacho. | `Communique` |
+| **Comunicado de continuidad** | El que envía el Agente cuando el gerente no aprueba a tiempo: solo lo estable ya validado, sin nuevas afirmaciones. | `Communique{ approved_by: CONTINUITY }` |
+| **Gaceta** | Digesto semanal de la Sala compilado por el Chapter Intelligence Agent a partir de los Comunicados, con vista general y "relevante para ti" por gerente. En el Pleno sustituye la ronda de presentaciones. | `ChapterGazette` |
+| **Dossier** | Ficha viva de cada miembro: qué hace, a quién sirve, Cesión perfecta, capacidad ahora, Encargos, cómo presentarla, Hoja de Méritos, histórico de Comunicados. Dos toques desde cualquier pantalla. | `MemberDossier` |
+| **Conocimiento mutuo** | Métrica de salud de la Sala: proporción de gerentes que consultan la Gaceta o un Dossier cada semana. | `MutualKnowledgeRate` |
+
 ## 5. Protocolos y clasificaciones
 
 | Término | Qué es |
 | --- | --- |
+| **Protocolo I · Generar Negocio** | Deber de ceder referidos de calidad. Unidad: la Cesión. Especificación técnica: NS-ARP. |
+| **Protocolo II · Dar a Conocer** | Deber de comunicar el trabajo propio a la Sala cada semana. Unidad: el Comunicado. Especificación técnica: NS-ADP. |
 | **NS-ARP** | NS Agentic Referral Protocol: cómo los agentes descubren, comparten, cualifican, puntúan, autorizan y trazan Cesiones. |
+| **NS-ADP** | NS Agentic Disclosure Protocol: cómo los agentes redactan, filtran, envían, acusan y compilan Comunicados, Gaceta y Dossier. |
 | **NS-CAT** | Clasificación NS de Actividades: base CNAE + Especialidad NS, ampliable y versionada. |
 | **Especialidad** | Nivel de NS-CAT que otorga plaza. |
 | **Reglas inmutables** | Nunca se cobra por una Cesión (expulsión); Compromiso obligatorio; calidad sobre cantidad (D-010). |

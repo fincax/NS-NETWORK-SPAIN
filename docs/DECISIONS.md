@@ -447,3 +447,26 @@ Reglas derivadas:
 **Consequences.** NS-ARP incorpora `ThirdParty` con `kind: COMPANY | PERSON | SOLE_TRADER | ASSOCIATION | PUBLIC_BODY | OTHER`. Cuando el Interesado es persona física, la Apertura exige base jurídica y consentimiento (NS-ARP §8.2.3); el sector regulado del titular puede añadir restricciones (§8.2.5). El léxico (`docs/13_LEXICO_NS.md` §5bis) recoge el reparto de papeles.
 
 **Revisit when.** Se produzca la primera Cesión con Interesado persona física en el piloto.
+
+---
+
+## D-018 · Dos protocolos obligatorios de Sala: Generar Negocio (Cesión) y Dar a Conocer (Comunicado semanal, Gaceta y Dossier)
+
+**Status:** CONFIRMED en su obligación (decisión directa del fundador); nombres y parámetros PROPOSED
+**Date:** 2026-09-11
+
+**Context.** El fundador fija que todo lo relativo a referidos pertenece al primer protocolo, Generar Negocio, y establece un segundo protocolo obligatorio, Dar a Conocer: igual que semanalmente los Agentes deben proponer el máximo de referidos posibles, cada Agente debe informar al Agente del resto de empresas de la Sala del sector, funciones, servicios y productos que trabaja su empresa y de las actualizaciones, novedades y datos importantes de esa semana; y todo gerente debe conocer o poder acceder fácilmente al dossier, histórico y novedades de cada miembro de su Sala.
+
+**Choice.**
+
+- **Protocolo I · Generar Negocio.** Unidad: la Cesión. Especificación NS-ARP. Cadencia semanal de propuesta máxima de Cesiones válidas; cumplimiento por Compromiso (D-010).
+- **Protocolo II · Dar a Conocer.** Unidad: el **Comunicado** semanal (estable + delta) que el Agente redacta a partir del ADN de Empresa y de lo que el gerente aporta en el Despacho, y que el gerente aprueba con un toque. Sin aprobación en 48 h, Comunicado de continuidad (solo lo estable). El Chapter Intelligence Agent compila la **Gaceta** semanal con vista general y "relevante para ti". Cada miembro tiene un **Dossier** vivo accesible en dos toques desde Mi Sala, cualquier Cesión, la búsqueda y la Gaceta. Los Agentes receptores acusan recibo y actualizan su índice de capabilities y sus criterios de Rastreo.
+- **Visibilidad.** Solo capas `PUBLIC` y `CHAPTER`. Nunca `COMPANY_ONLY`, `NEVER_SHARE` ni datos personales de terceros. Cada afirmación del delta lleva origen: declarada, inferida o verificada.
+- **Cumplimiento.** Un Comunicado por semana. Propuesta: dos de continuidad seguidos generan aviso del Agente; tres, aviso de la Directiva; el incumplimiento reiterado sigue la escalera del Compromiso. `TrustEvent` `COMMUNIQUE_MET` / `COMMUNIQUE_MISSED`. Métrica de salud: conocimiento mutuo.
+- Se incorpora como cuarta regla inmutable en `CLAUDE.md`.
+
+**Why.** Nadie puede ceder bien lo que no conoce bien. El Comunicado es lo que hace que los Agentes conozcan de verdad a los demás miembros; la Gaceta y el Dossier hacen que las personas también lo sepan sin esfuerzo. Sustituye las presentaciones repetitivas por información de trabajo con delta.
+
+**Consequences.** Nuevo `docs/14_PROTOCOLOS_DE_SALA.md` con la especificación agentic de NS-ADP v0.1. NS-ARP S4 (Agent Discovery) consume el índice de capabilities actualizado por los Comunicados. El Despacho, Hoy, Mi Sala, el Pleno y el Parte incorporan Comunicado, Gaceta y Dossier. Léxico ampliado (`docs/13_LEXICO_NS.md` §4bis).
+
+**Revisit when.** Tras cuatro semanas de Comunicados en la Sala piloto, con datos de conocimiento mutuo y de precisión de Pistas.
