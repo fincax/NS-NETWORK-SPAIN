@@ -61,6 +61,8 @@ Trato       ¿Cómo fue el trato de las personas?
 
 (Versión confirmada por el fundador, D-020. Los cinco ejes iniciales pasan a ser evidencia que el Agente aporta bajo estos tres.)
 
+La Cesión vale en dos momentos (D-021): la **Promesa** a priori, calculada por los Agentes al aceptarse y confirmada por el cesionario, ya da Mérito al cedente; el Veredicto a posteriori la completa. Un buen referido cuenta aunque quien lo recibe no lo convierta.
+
 El receptor puntúa en 3 toques en cada hito. El agente rellena la evidencia (fechas, mensajes enviados, reuniones confirmadas). NS audita el conjunto.
 
 ### B2 · Responsabilidad bilateral

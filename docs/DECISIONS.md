@@ -515,3 +515,27 @@ Reglas derivadas:
 **Consequences.** `ReferralQualification{ease, business, treatment}` y `Recognition{axis, reason}` en NS-ARP v0.2. El core (`CLAUDE.md` §14), el léxico y el banco de ideas quedan actualizados. PDF del léxico regenerado como v0.3.
 
 **Revisit when.** Se disponga de 100 Veredictos en la Sala piloto, para calibrar la escasez de la Distinción.
+
+---
+
+## D-021 · La Cesión vale en dos momentos: Promesa a priori (calculada por los Agentes, confirmada por el cesionario, con Mérito inmediato para el cedente) y Veredicto a posteriori
+
+**Status:** CONFIRMED (criterio fijado por el fundador); parámetros PROPOSED
+**Date:** 2026-09-11
+
+**Context.** El fundador no quiere que toda la carga de la valoración de la Cesión recaiga sobre el cesionario: si un referido indica a priori un buen negocio en el Indicio, eso debe aparecer y contar, y se completa con la valoración a posteriori una vez prestado el servicio.
+
+**Choice.**
+
+- **Promesa**: valor a priori de la Cesión, fijado en el momento de la aceptación a partir de datos estructurados (valor estimado del Indicio, necesidad real, información completa, decisor identificado, plazo, fuerza de la relación del cedente con el Interesado). La calculan los Agentes con el Fundamento y las comprobaciones de NS-ARP; el cesionario la confirma o la ajusta con un toque al aceptar. No es una opinión libre del cedente.
+- **Mérito en tres momentos**: Mérito de Promesa (al aceptarse la Cesión), Mérito de Veredicto (al valorarla el cesionario en Facilidad, Negocio y Trato) y Mérito de Cierre (al contrastarse el valor). Pesos propuestos: 30 % Promesa, 30 % Veredicto, 40 % Cierre, calibrables tras el piloto.
+- **Protección del cedente**: si la Cesión no prospera por causa del cesionario (respuesta tardía, sin seguimiento, sin Veredicto en plazo), el cedente conserva su Mérito de Promesa y el cesionario responde en su reputación de cesionario (D-009).
+- **Protección de la Sala**: si el Veredicto demuestra con evidencia que el Indicio era falso (el Interesado no tenía la necesidad), el Mérito de Promesa se retira. El Contraste vigila Promesas infladas, ajustes a la baja sistemáticos de un cesionario y discrepancias repetidas entre Promesa y Veredicto.
+- **Dónde se ve**: la Promesa aparece en la tarjeta de la Cesión (valor estimado y confianza) y en la Hoja de Méritos ("Promesa media de tus Cesiones"). La Balanza sigue mostrando solo valor contrastado.
+- La Cesión cuenta para el Compromiso y el Ritmo en el momento de la aceptación (Cesión válida), como ya estaba previsto.
+
+**Why.** Reconoce la calidad del referido en el momento en que se entrega, no solo cuando otro lo convierte. Reparte la responsabilidad: el cedente responde de la Promesa, el cesionario del Veredicto y del seguimiento. Evita que un buen referido quede sin Mérito por causa ajena al cedente.
+
+**Consequences.** `ReferralPromise` y `TrustEvent{PROMISE_EARNED, PROMISE_WITHDRAWN}` en NS-ARP v0.2. Core (`CLAUDE.md` §14), léxico, banco de ideas y PDF del léxico (v0.4) actualizados. La tarjeta de Cesión del diseño ya muestra el valor estimado; pasa a etiquetarse como Promesa.
+
+**Revisit when.** Tras 100 Cesiones con Promesa y Veredicto en la Sala piloto, para calibrar los pesos y la correlación entre ambas.

@@ -572,15 +572,21 @@ Medir preferentemente: valor generado; calidad; aceptación; conversiones; tiemp
 
 La reputación debe basarse en comportamiento verificable. No crear un "número mágico" opaco que pueda destruir injustamente la reputación de una empresa.
 
-### Veredicto y Distinción: quien recibe, valora (D-020)
+### Promesa, Veredicto y Distinción: la Cesión vale en dos momentos (D-020, D-021)
 
-Toda Cesión resuelta termina en el **Veredicto** del cesionario sobre tres ejes, en tres toques:
+La valoración de una Cesión no recae solo en el cesionario. Vale **a priori**, por lo que el Indicio promete, y **a posteriori**, por lo que ocurrió una vez prestado el servicio.
+
+**Promesa (a priori).** Cuando la Cesión se acepta, el sistema fija su Promesa a partir de datos estructurados, no de una opinión: valor estimado, necesidad real, información completa, decisor identificado, plazo, fuerza de la relación del cedente con el Interesado. La calculan los Agentes con el Fundamento; el cesionario la confirma o la ajusta con un toque al aceptar. La Promesa da al cedente **Mérito de Promesa** en el momento de la aceptación, sin esperar al cierre. Así un buen referido cuenta aunque después el cesionario no lo convierta.
+
+**Veredicto (a posteriori).** Toda Cesión resuelta termina en el **Veredicto** del cesionario sobre tres ejes, en tres toques:
 
 ```text
 FACILIDAD   ¿Fue fácil prestar el servicio?  (información completa, momento real, decisor identificado, encaje)
 NEGOCIO     ¿Cuánto negocio generó?          (oportunidad, cierre, valor contrastado)
 TRATO       ¿Cómo fue el trato de las personas?  (del cedente en el Puente, del Interesado en la relación)
 ```
+
+El Veredicto completa la Promesa: confirma o matiza Facilidad y Trato, y aporta Negocio con el cierre y el valor contrastado. El Mérito total del cedente es Mérito de Promesa + Mérito de Veredicto + Mérito de Cierre. Si la Cesión no prospera por causa del cesionario (respuesta tardía, sin seguimiento), el cedente conserva su Mérito de Promesa y el cesionario responde en su reputación de cesionario. Si el Veredicto demuestra que el Indicio era falso (el Interesado no tenía la necesidad), el Mérito de Promesa se retira. El Contraste vigila las Promesas infladas y los ajustes a la baja sistemáticos.
 
 Además del Veredicto, el cesionario puede otorgar una **Distinción** al cedente por esa Cesión. Es un acto deliberado y escaso: como máximo una por titular y mes. Debe nombrar el eje que destacó (Facilidad, Negocio o Trato) y una línea de motivo, que se publica en la Crónica. Las Distinciones alimentan el Mérito y la Hoja de Méritos del cedente, que muestra por qué le valoran ("12 Distinciones: 5 por Trato, 4 por Facilidad, 3 por Negocio"). El Contraste verifica que cada Distinción corresponde a una Cesión con Veredicto válido y vigila los pares que se distinguen mutuamente. Nadie se distingue a sí mismo ni distingue por cantidad: solo quien recibe, y solo por calidad.
 

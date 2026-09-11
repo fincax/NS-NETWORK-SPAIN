@@ -50,9 +50,10 @@ Criterios de cada nombre: castellano; una palabra siempre que sea posible; insti
 
 | Término NS | Qué es | Identificador técnico |
 | --- | --- | --- |
-| **Veredicto** | Cualificación de la Cesión por el cesionario en tres ejes, en tres toques: **Facilidad** (qué fácil fue prestar el servicio), **Negocio** (cuánto negocio generó) y **Trato** (cómo fue el trato de las personas). El Agente aporta la evidencia de cada eje. | `ReferralQualification{ease, business, treatment}` |
+| **Promesa** | Valor a priori de una Cesión, fijado al aceptarse a partir de datos estructurados del Indicio y del Fundamento: valor estimado, necesidad real, información completa, decisor identificado, plazo, relación del cedente con el Interesado. La calculan los Agentes; el cesionario la confirma o ajusta con un toque. Da Mérito de Promesa al cedente sin esperar al cierre. | `ReferralPromise` |
+| **Veredicto** | Valor a posteriori: cualificación de la Cesión por el cesionario en tres ejes, en tres toques: **Facilidad** (qué fácil fue prestar el servicio), **Negocio** (cuánto negocio generó) y **Trato** (cómo fue el trato de las personas). El Agente aporta la evidencia de cada eje. | `ReferralQualification{ease, business, treatment}` |
 | **Contraste** | Auditoría de NS: comparación entre el Veredicto declarado y la evidencia recogida por los agentes. | `Audit` |
-| **Mérito** | Unidad de reputación verificable. Solo nace de Veredictos y Cierres contrastados. Nunca de cantidad. | `TrustEvent.weight` |
+| **Mérito** | Unidad de reputación verificable. Nace en tres momentos: Mérito de Promesa (al aceptarse la Cesión), Mérito de Veredicto (al valorarla el cesionario) y Mérito de Cierre (al contrastarse el valor). Nunca de cantidad. | `TrustEvent.weight` |
 | **Hoja de Méritos** | Panel público (dentro de la red) de comportamientos verificables de una empresa: cesiones, calidad media, valor contrastado, tiempo de respuesta, fiabilidad como cesionario. Nunca un número opaco. | `ReputationProfile` |
 | **Distinción** | Reconocimiento que el cesionario otorga al cedente por una Cesión concreta, nombrando el eje que destacó (Facilidad, Negocio o Trato) y una línea de motivo. Escasa: máximo una por titular y mes. Se publica en la Crónica y alimenta el Mérito. De entre las Distinciones del mes sale la **Cesión del mes** de la Sala. | `Recognition{axis, reason}` |
 | **Compromiso** | Mínimo de Cesiones válidas por Ejercicio que toda empresa debe aportar (D-010). | `ContributionQuota` |
