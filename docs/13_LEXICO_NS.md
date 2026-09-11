@@ -1,6 +1,6 @@
 # 13 · Léxico NS
 
-**Estado:** propuesta fundacional (D-016, PROPOSED). Cada término se adopta o se sustituye por decisión del fundador.
+**Estado:** léxico oficial (D-016, CONFIRMED por el fundador). Cambios posteriores se registran en DECISIONS.
 **Por qué existe.** NS debe tener lenguaje propio (constitución, sección 2). Un producto que crea una categoría nueva necesita nombrar sus objetos y sus rituales con palabras que nadie más use. El léxico es propiedad intelectual y es producto: el microcopy, la web pública y la app hablan con él. Ningún término copia terminología de otras organizaciones de networking.
 
 Criterios de cada nombre: castellano; una palabra siempre que sea posible; institucional y sobrio; con sentido literal reconocible; sin pistas territoriales; traducible sin perder el concepto; registrable con el prefijo NS.
@@ -35,8 +35,9 @@ Criterios de cada nombre: castellano; una palabra siempre que sea posible; insti
 | **Visto bueno** | Decisión humana de aprobar (originador, receptor o Directiva). | `HumanDecision.APPROVE` | "aprobar" |
 | **Apertura** | Momento en que el originador autoriza revelar identidad y contexto al receptor. | `INTRO_AUTHORIZED` + `reveal_scope` | "reveal" |
 | **Cesión** | El referido NS: un contacto o necesidad concreta que un miembro (cedente) entrega a un titular (cesionario) de su Sala. Es la unidad que se cualifica, se contrasta y genera Mérito. | `Referral` | "referido", "referencia" |
-| **Extramuros** | Propuesta Fuera de la Sala: cesión extraordinaria que el miembro propone a un titular de **otra Sala de la zona** cuando la plaza está vacante en la suya. Prima de Mérito. Ver D-015. Se usa como sustantivo: "hacer un Extramuros". | `Referral{ route: ZONE, extramuros: true }` | — |
-| **Extramuros en Red** | El mismo acto extendido a otra zona cuando ninguna Sala de la zona cubre la necesidad. | `Referral{ route: NETWORK, extramuros: true }` | "global routing" |
+| **Embajada** | Propuesta Fuera de la Sala: cesión extraordinaria que el miembro propone a un titular de **otra Sala de la zona** cuando la plaza está vacante en la suya. Prima de Mérito para el cedente. Ver D-015. "Hacer una Embajada". | `Referral{ route: ZONE, embassy: true }` | — |
+| **Embajadora** | La empresa de otra Sala que acoge la Embajada. Representa esa especialidad en la Sala del cedente mientras la plaza siga vacante: sin plaza, sin voto, con mención en su Hoja de Méritos. Máximo dos Salas a la vez. | `EmbassyRole` | — |
+| **Embajada en Red** | El mismo acto extendido a otra zona cuando ninguna Sala de la zona cubre la necesidad. | `Referral{ route: NETWORK, embassy: true }` | "global routing" |
 | **Cedente / Cesionario** | Quien entrega la Cesión / quien la recibe. | `originator` / `receiver` | "giver / receiver" |
 | **Puente** | La introducción cálida: el mensaje o reunión que conecta al cesionario con el tercero, preparado por el agente y enviado por la persona. | `Introduction`, `IntroPackage` | "intro" |
 | **Oportunidad** | Negociación abierta confirmada por el cesionario tras el Puente. | `Opportunity` | — |
@@ -55,7 +56,7 @@ Criterios de cada nombre: castellano; una palabra siempre que sea posible; insti
 | **Distinción** | Reconocimiento periódico por calidad: "Cesión de la semana", "Cierre del mes", memoria anual. La otorga quien recibe. | `Recognition` |
 | **Compromiso** | Mínimo de Cesiones válidas por Ejercicio que toda empresa debe aportar (D-010). | `ContributionQuota` |
 | **Ejercicio** | Periodo de cómputo del Compromiso (por estipular: mes o trimestre). | `QuotaPeriod` |
-| **Niveles** | Miembro · Contribuidor · Referente · Embajador · Fundador. Se ganan con Mérito; amplían acceso, nunca lo restringen. | `MembershipTier` |
+| **Niveles** | Miembro · Contribuidor · Referente · Consejero · Fundador. Se ganan con Mérito; amplían acceso, nunca lo restringen. ("Embajador" queda reservado a la Embajada.) | `MembershipTier` |
 | **Arbitraje** | Resolución de disputas entre cedente y cesionario por la Directiva. | `Dispute` |
 
 ## 4. Los agentes y el día a día
@@ -96,21 +97,13 @@ Apertura: se revela la identidad. Carlos tiende el Puente; el tercero ve la Cart
 La Cesión avanza a Oportunidad y a Cierre ganado. Ambos confirman: 38.000 € de valor contrastado en el Libro de Valor.
 Lucía emite su Veredicto; NS hace Contraste. Híspalis suma Mérito y cumple su Compromiso del Ejercicio.
 La Crónica de NS Cumbre lo publica; la Cesión recibe la Distinción de la semana.
-La plaza de Mobiliario estaba vacante en NS Cumbre: Carlos hizo un Extramuros a un titular de NS Ágora y obtuvo prima de Mérito.
+La plaza de Mobiliario estaba vacante en NS Cumbre: Carlos hizo una Embajada a un titular de NS Ágora, que pasó a ser Embajadora de Mobiliario en NS Cumbre; Carlos obtuvo prima de Mérito.
 El Parte del Consejo de Zona anota que Mobiliario debería cubrirse desde la Antesala.
 ```
 
-## 6bis. Alternativas de nombre para la Propuesta Fuera de la Sala
+## 6bis. Por qué "Embajada"
 
-Recomendado: **Extramuros**. Alternativas consideradas, por si el fundador prefiere otro registro:
-
-| Nombre | Registro | Por qué sí | Por qué no |
-| --- | --- | --- | --- |
-| **Extramuros** | institucional, histórico | una palabra; literal (fuera de los muros de la Sala); sin pista territorial; "NS Extramuros" registrable; funciona como sustantivo y como adjetivo | ninguna objeción de peso |
-| **Cesión de Honor** | ceremonial | subraya la generosidad y el prestigio del acto | dos palabras; "honor" puede sonar solemne en la interfaz diaria |
-| **Embajada** | diplomático | enlaza con el nivel Embajador; el cedente representa a su Sala ante otra | puede confundirse con el nivel de membresía |
-| **Cesión Abierta** | funcional | describe el mecanismo sin metáfora | genérico; poco memorable |
-| **Puente Largo** | metafórico | continúa la metáfora del Puente | "largo" insinúa distancia geográfica, que no es el punto |
+El fundador descartó "Extramuros" por agresivo. "Embajada" describe el acto con exactitud diplomática: la Sala del cedente envía una cesión a otra Sala, y la empresa que la acoge queda acreditada como **Embajadora** de esa especialidad en la Sala que no la tiene. Es sobria, cálida, castellana, sin pista territorial y registrable como "NS Embajada". Para evitar colisión, el antiguo nivel de membresía "Embajador" pasa a llamarse "Consejero".
 
 ## 7. Palabras que NS no usa
 

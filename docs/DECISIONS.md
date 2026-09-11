@@ -394,9 +394,9 @@ Reglas derivadas:
 
 ---
 
-## D-015 · Extramuros (Propuesta Fuera de la Sala): cuando la plaza está vacante en la Sala, el miembro puede ceder el referido a un titular de otra Sala como acto extraordinario con prima de Mérito
+## D-015 · Embajada (Propuesta Fuera de la Sala): cuando la plaza está vacante en la Sala, el miembro puede ceder el referido a un titular de otra Sala como acto extraordinario con prima de Mérito
 
-**Status:** CONFIRMED en su idea e integrada en el core de `CLAUDE.md` (propuesta directa del fundador); nombre "Extramuros" y parámetros PROPOSED
+**Status:** CONFIRMED, integrada en el core de `CLAUDE.md`. Nombre "Embajada" confirmado por el fundador (se descartó "Embajada" por agresivo). Parámetros de la prima PROPOSED
 **Date:** 2026-09-11
 
 **Context.** El fundador propone que, cuando una empresa de una Sala disponga de un buen referido y no haya en su Sala ninguna empresa de alta con ese CNAE o especialidad, NS ofrezca la posibilidad de proponerlo a una empresa de otra Sala, como algo extraordinario, y que si resuelve proporcione muchos puntos al cedente. El enrutamiento Sala → Zona → Red (D-013) ya prevé que el referido no se pierda; esta decisión lo convierte en un acto del miembro, reconocido y recompensado.
@@ -405,28 +405,29 @@ Reglas derivadas:
 
 - **Condición.** La especialidad necesaria no tiene titular en la Sala del cedente (plaza vacante o especialidad sin representar en esa Sala). El sistema lo verifica; no es una opción libre cuando la plaza está ocupada, para no vaciar la prioridad de la propia Sala.
 - **Acto.** El cedente propone un titular concreto de otra Sala de la zona. Su Agente le presenta candidatos ordenados por Hoja de Méritos, tiempo de respuesta y encaje; el cedente puede elegir uno que ya conozca. La Cesión sigue el ciclo NS-ARP completo (Salvoconducto, vistos buenos, Apertura, Puente, Veredicto, Contraste).
-- **Prima de Mérito (propuesta).** Veredicto válido del cesionario: ×2 respecto a una Cesión ordinaria. Valor contrastado: ×3. La Extramuros cuenta para el Compromiso del cedente como una Cesión ordinaria y media.
-- **Efecto sobre la Sala.** Cada Extramuros registra una plaza que la Sala del cedente debería cubrir. El Parte del Consejo de Zona la muestra como prioridad de captación desde la Antesala. Si una especialidad acumula tres Extramuros en un Ejercicio, se abre candidatura preferente para esa plaza.
+- **Prima de Mérito (propuesta).** Veredicto válido del cesionario: ×2 respecto a una Cesión ordinaria. Valor contrastado: ×3. La Embajada cuenta para el Compromiso del cedente como una Cesión ordinaria y media.
+- **Efecto sobre la Sala.** Cada Embajada registra una plaza que la Sala del cedente debería cubrir. El Parte del Consejo de Zona la muestra como prioridad de captación desde la Antesala. Si una especialidad acumula tres Embajada en un Ejercicio, se abre candidatura preferente para esa plaza.
 - **Salvaguardas.** El cesionario de otra Sala no adquiere derecho alguno sobre la Sala del cedente. Se aplican todas las reglas inmutables (D-010): nunca contraprestación. El Contraste vigila anillos de cesiones cruzadas entre dos empresas de Salas distintas. El cedente necesita consentimiento del tercero según NS-ARP como en cualquier Cesión.
-- **Extramuros en Red.** Si ninguna Sala de la zona cubre la especialidad, el mismo mecanismo se extiende a otra zona con la misma prima.
-- **Nombre.** Recomendado "Extramuros" (alternativas en `docs/13_LEXICO_NS.md` §6bis). Etiqueta descriptiva: Propuesta Fuera de la Sala.
+- **Embajadora.** La empresa de otra Sala que acoge la Embajada queda acreditada como Embajadora de esa especialidad en la Sala del cedente mientras la plaza siga vacante: sin plaza, sin voto, sin derecho ni prioridad sobre la plaza; mención en su Hoja de Méritos; Mérito ordinario por la cesión. Condición temporal (termina al cubrirse la plaza o al cierre del Ejercicio siguiente sin nuevas Embajadas). Máximo dos Salas a la vez por empresa.
+- **Embajada en Red.** Si ninguna Sala de la zona cubre la especialidad, el mismo mecanismo se extiende a otra zona con la misma prima.
+- **Nombre.** "Embajada" (acto) y "Embajadora" (empresa que acoge). El nivel de membresía antes llamado "Embajador" pasa a "Consejero".
 
 **Why.** Recompensa la generosidad exactamente donde más cuesta (fuera de la propia Sala), evita que un buen referido se pierda, y convierte cada hueco en una señal de captación para la Sala.
 
-**Consequences.** `Referral.route: CHAPTER | ZONE | NETWORK` y `Referral.extramuros: true` en NS-ARP v0.2; `TrustEvent` con multiplicador; el Parte incorpora "plazas reclamadas por Extramuros". Léxico en `docs/13_LEXICO_NS.md`.
+**Consequences.** `Referral.route: CHAPTER | ZONE | NETWORK` y `Referral.extramuros: true` en NS-ARP v0.2; `TrustEvent` con multiplicador; el Parte incorpora "plazas reclamadas por Embajada". Léxico en `docs/13_LEXICO_NS.md`.
 
-**Revisit when.** Se disponga de 20 Extramuros contrastadas, para calibrar la prima.
+**Revisit when.** Se disponga de 20 Embajadas contrastadas, para calibrar la prima y el límite de dos Salas por Embajadora.
 
 ---
 
 ## D-016 · Léxico NS: nombres propios para la estructura, el flujo, la reputación y el día a día
 
-**Status:** PROPOSED (a ratificar término a término por el fundador)
+**Status:** CONFIRMED por el fundador (2026-09-11), con un cambio: "Extramuros" → "Embajada" / "Embajadora"; el nivel "Embajador" pasa a "Consejero".
 **Date:** 2026-09-11
 
 **Context.** El fundador pide nombres originales para las acciones del protocolo y del día a día de NS. La constitución exige lenguaje propio y prohíbe terminología de otras organizaciones.
 
-**Choice.** Se adopta `docs/13_LEXICO_NS.md` como léxico oficial. Núcleo: Red NS · Zona · Sala · Plaza · Titular · Antesala · Candidatura · Directiva · Consejo de Zona · Pleno · Confluencia; Indicio · Pista · Encaje · Fundamento · Salvoconducto · Visto bueno · Apertura · Cesión · Extramuros · Extramuros en Red · Cedente/Cesionario · Puente · Oportunidad · Cierre · Valor contrastado · Libro de Valor; Veredicto · Contraste · Mérito · Hoja de Méritos · Distinción · Compromiso · Ejercicio · Niveles · Arbitraje; Agente NS · ADN de Empresa · Mesa Permanente · Despacho · Encargo · Rastreo · Sondeo · Hoy · Parte · Crónica · Carta de Presentación · NS Radar; NS-ARP · NS-CAT · Especialidad. Los identificadores técnicos del protocolo se mantienen en inglés y se mapean en el léxico.
+**Choice.** Se adopta `docs/13_LEXICO_NS.md` como léxico oficial. Núcleo: Red NS · Zona · Sala · Plaza · Titular · Antesala · Candidatura · Directiva · Consejo de Zona · Pleno · Confluencia; Indicio · Pista · Encaje · Fundamento · Salvoconducto · Visto bueno · Apertura · Cesión · Embajada · Embajadora · Embajada en Red · Cedente/Cesionario · Puente · Oportunidad · Cierre · Valor contrastado · Libro de Valor; Veredicto · Contraste · Mérito · Hoja de Méritos · Distinción · Compromiso · Ejercicio · Niveles · Arbitraje; Agente NS · ADN de Empresa · Mesa Permanente · Despacho · Encargo · Rastreo · Sondeo · Hoy · Parte · Crónica · Carta de Presentación · NS Radar; NS-ARP · NS-CAT · Especialidad. Los identificadores técnicos del protocolo se mantienen en inglés y se mapean en el léxico.
 
 **Why.** El léxico es propiedad intelectual y es producto: microcopy, web y app hablan con él. Palabras castellanas, sobrias, de una sola pieza, sin pistas territoriales.
 

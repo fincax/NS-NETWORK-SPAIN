@@ -187,9 +187,9 @@ Necesidad detectada por un agente de NS Cumbre
 
 El originador acumula reputación en todos los casos (D-009). La tasa de referidos exportados por Sala es, además, la señal principal de saturación de la zona (§2.3).
 
-### 5.1 Extramuros · Propuesta Fuera de la Sala (D-015)
+### 5.1 Embajada · Propuesta Fuera de la Sala (D-015)
 
-Cuando un miembro dispone de un buen referido y **en su Sala no hay titular de esa especialidad** (plaza vacante o especialidad aún sin representar), NS le ofrece un acto extraordinario: proponer él mismo a un titular de otra Sala de la zona. El agente le presenta candidatos ordenados por Hoja de Méritos y tiempo de respuesta, o el miembro elige uno que ya conoce. Si la Cesión resuelve (Veredicto válido del cesionario, y más aún si llega a valor contrastado), el cedente recibe una **prima de Mérito** muy superior a la de una Cesión ordinaria. Cada Extramuros deja constancia de una plaza que la Sala debería cubrir desde la Antesala. Reglas completas en D-015.
+Cuando un miembro dispone de un buen referido y **en su Sala no hay titular de esa especialidad** (plaza vacante o especialidad aún sin representar), NS le ofrece un acto extraordinario, la **Embajada**: proponer él mismo a un titular de otra Sala de la zona, que pasa a ser **Embajadora** de esa especialidad en la Sala del cedente mientras la plaza siga vacante. El agente le presenta candidatos ordenados por Hoja de Méritos y tiempo de respuesta, o el miembro elige uno que ya conoce. Si la Cesión resuelve (Veredicto válido del cesionario, y más aún si llega a valor contrastado), el cedente recibe una **prima de Mérito** muy superior a la de una Cesión ordinaria. Cada Embajada deja constancia de una plaza que la Sala debería cubrir desde la Antesala. Reglas completas en D-015.
 
 
 ---

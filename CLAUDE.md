@@ -572,19 +572,22 @@ Medir preferentemente: valor generado; calidad; aceptación; conversiones; tiemp
 
 La reputación debe basarse en comportamiento verificable. No crear un "número mágico" opaco que pueda destruir injustamente la reputación de una empresa.
 
-### Extramuros · Propuesta Fuera de la Sala (D-015)
+### Embajada · Propuesta Fuera de la Sala (D-015)
 
-Cuando un miembro dispone de un buen referido y **en su Sala no hay titular de esa especialidad** (plaza vacante o especialidad sin representar), NS le ofrece un acto extraordinario: proponer él mismo a un titular de **otra Sala de la zona**. Su Agente le presenta candidatos ordenados por Hoja de Méritos, tiempo de respuesta y encaje; el miembro puede elegir uno que ya conozca. La cesión sigue el ciclo completo de NS-ARP.
+Cuando un miembro dispone de un buen referido y **en su Sala no hay titular de esa especialidad** (plaza vacante o especialidad sin representar), NS le ofrece un acto extraordinario: la **Embajada**. El miembro propone él mismo a un titular de **otra Sala de la zona**. Su Agente le presenta candidatos ordenados por Hoja de Méritos, tiempo de respuesta y encaje; el miembro puede elegir uno que ya conozca. La cesión sigue el ciclo completo de NS-ARP.
+
+La empresa que acoge la cesión se convierte en **Embajadora** de esa especialidad en la Sala del cedente mientras la plaza siga vacante: representa esa especialidad ante la Sala sin ser miembro de ella, sin plaza y sin voto.
 
 Reglas del core:
 
 - Solo procede cuando la plaza está vacante en la Sala del cedente. El sistema lo verifica. Con la plaza ocupada, la prioridad es siempre de la propia Sala.
-- Si resuelve (veredicto válido del cesionario, y más aún si llega a valor contrastado), el cedente recibe una **prima de Mérito muy superior** a la de una cesión ordinaria. Parámetros propuestos en D-015.
-- Cada Extramuros deja constancia de una plaza que la Sala debería cubrir desde la Antesala. Tres Extramuros de una misma especialidad en un Ejercicio abren candidatura preferente para esa plaza.
+- Si resuelve (veredicto válido de la Embajadora, y más aún si llega a valor contrastado), el cedente recibe una **prima de Mérito muy superior** a la de una cesión ordinaria. La Embajadora recibe Mérito como en cualquier cesión y la mención "Embajadora de [especialidad] en [Sala]" en su Hoja de Méritos. Parámetros propuestos en D-015.
+- La condición de Embajadora es temporal: termina cuando la plaza se cubre o al cierre del Ejercicio siguiente si no hay nuevas Embajadas. Una empresa puede ser Embajadora en un máximo de dos Salas a la vez, para que la figura no se convierta en una membresía múltiple encubierta. La Embajadora no adquiere derecho ni prioridad sobre la plaza.
+- Cada Embajada deja constancia de una plaza que la Sala debería cubrir desde la Antesala. Tres Embajadas de una misma especialidad en un Ejercicio abren candidatura preferente para esa plaza.
 - Se aplican todas las reglas inmutables: nunca contraprestación. El Contraste vigila cesiones cruzadas entre dos empresas de Salas distintas.
-- Si ninguna Sala de la zona cubre la especialidad, el mismo acto se extiende a otra zona (Extramuros en Red) con la misma prima.
+- Si ninguna Sala de la zona cubre la especialidad, el mismo acto se extiende a otra zona (Embajada en Red) con la misma prima.
 
-Extramuros recompensa la generosidad exactamente donde más cuesta, evita que un buen referido se pierda y convierte cada hueco en una señal de captación.
+La Embajada recompensa la generosidad exactamente donde más cuesta, evita que un buen referido se pierda y convierte cada hueco en una señal de captación.
 
 ## 15. Privacidad como ventaja competitiva
 
