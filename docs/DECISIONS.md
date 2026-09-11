@@ -391,3 +391,44 @@ Reglas derivadas:
 **Consequences.** `Chapter` incorpora `name` único en la red y `name_status`. El ciclo de vida de la Sala (`docs/12_SALAS.md` §6) incluye la autorización del nombre antes de ACTIVA. La arquitectura de marca (brief de diseño) prevé lockups de zona y de Sala. Los datos demo pasan a "NS Sevilla · NS Cumbre".
 
 **Revisit when.** Se abra la primera zona fuera de España (idiomas y topónimos distintos).
+
+---
+
+## D-015 · Cesión Extramuros: cuando la plaza está vacante en la Sala, el miembro puede ceder el referido a un titular de otra Sala como acto extraordinario con prima de Mérito
+
+**Status:** CONFIRMED en su idea (propuesta directa del fundador); parámetros PROPOSED
+**Date:** 2026-09-11
+
+**Context.** El fundador propone que, cuando una empresa de una Sala disponga de un buen referido y no haya en su Sala ninguna empresa de alta con ese CNAE o especialidad, NS ofrezca la posibilidad de proponerlo a una empresa de otra Sala, como algo extraordinario, y que si resuelve proporcione muchos puntos al cedente. El enrutamiento Sala → Zona → Red (D-013) ya prevé que el referido no se pierda; esta decisión lo convierte en un acto del miembro, reconocido y recompensado.
+
+**Choice.**
+
+- **Condición.** La especialidad necesaria no tiene titular en la Sala del cedente (plaza vacante o especialidad sin representar en esa Sala). El sistema lo verifica; no es una opción libre cuando la plaza está ocupada, para no vaciar la prioridad de la propia Sala.
+- **Acto.** El cedente propone un titular concreto de otra Sala de la zona. Su Agente le presenta candidatos ordenados por Hoja de Méritos, tiempo de respuesta y encaje; el cedente puede elegir uno que ya conozca. La Cesión sigue el ciclo NS-ARP completo (Salvoconducto, vistos buenos, Apertura, Puente, Veredicto, Contraste).
+- **Prima de Mérito (propuesta).** Veredicto válido del cesionario: ×2 respecto a una Cesión ordinaria. Valor contrastado: ×3. La Cesión Extramuros cuenta para el Compromiso del cedente como una Cesión ordinaria y media.
+- **Efecto sobre la Sala.** Cada Cesión Extramuros registra una plaza que la Sala del cedente debería cubrir. El Parte del Consejo de Zona la muestra como prioridad de captación desde la Antesala. Si una especialidad acumula tres Cesiones Extramuros en un Ejercicio, se abre candidatura preferente para esa plaza.
+- **Salvaguardas.** El cesionario de otra Sala no adquiere derecho alguno sobre la Sala del cedente. Se aplican todas las reglas inmutables (D-010): nunca contraprestación. El Contraste vigila anillos de cesiones cruzadas entre dos empresas de Salas distintas. El cedente necesita consentimiento del tercero según NS-ARP como en cualquier Cesión.
+- **Cesión en Red.** Si ninguna Sala de la zona cubre la especialidad, el mismo mecanismo se extiende a otra zona con la misma prima.
+
+**Why.** Recompensa la generosidad exactamente donde más cuesta (fuera de la propia Sala), evita que un buen referido se pierda, y convierte cada hueco en una señal de captación para la Sala.
+
+**Consequences.** `Referral.route: CHAPTER | ZONE | NETWORK` y `Referral.extramuros: true` en NS-ARP v0.2; `TrustEvent` con multiplicador; el Parte incorpora "plazas reclamadas por Cesiones Extramuros". Léxico en `docs/13_LEXICO_NS.md`.
+
+**Revisit when.** Se disponga de 20 Cesiones Extramuros contrastadas, para calibrar la prima.
+
+---
+
+## D-016 · Léxico NS: nombres propios para la estructura, el flujo, la reputación y el día a día
+
+**Status:** PROPOSED (a ratificar término a término por el fundador)
+**Date:** 2026-09-11
+
+**Context.** El fundador pide nombres originales para las acciones del protocolo y del día a día de NS. La constitución exige lenguaje propio y prohíbe terminología de otras organizaciones.
+
+**Choice.** Se adopta `docs/13_LEXICO_NS.md` como léxico oficial. Núcleo: Red NS · Zona · Sala · Plaza · Titular · Antesala · Candidatura · Directiva · Consejo de Zona · Pleno · Confluencia; Indicio · Pista · Encaje · Fundamento · Salvoconducto · Visto bueno · Apertura · Cesión · Cesión Extramuros · Cesión en Red · Cedente/Cesionario · Puente · Oportunidad · Cierre · Valor contrastado · Libro de Valor; Veredicto · Contraste · Mérito · Hoja de Méritos · Distinción · Compromiso · Ejercicio · Niveles · Arbitraje; Agente NS · ADN de Empresa · Mesa Permanente · Despacho · Encargo · Rastreo · Sondeo · Hoy · Parte · Crónica · Carta de Presentación · NS Radar; NS-ARP · NS-CAT · Especialidad. Los identificadores técnicos del protocolo se mantienen en inglés y se mapean en el léxico.
+
+**Why.** El léxico es propiedad intelectual y es producto: microcopy, web y app hablan con él. Palabras castellanas, sobrias, de una sola pieza, sin pistas territoriales.
+
+**Consequences.** Los documentos vivos adoptan el léxico en su próxima revisión. El brief de diseño lo usa en todo el microcopy. Se comprueba la disponibilidad registral de "NS" + término para los principales.
+
+**Revisit when.** El fundador ratifique o sustituya términos; antes de la primera zona fuera de España.
