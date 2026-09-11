@@ -106,7 +106,7 @@ BNI es una referencia conceptual inicial. NS debe convertirse en una categoría 
 
 ## 3. Principio de exclusividad
 
-Cada grupo local NS funciona como un círculo empresarial privado.
+Cada Sala NS funciona como un círculo empresarial privado.
 
 Dentro de cada grupo solo puede existir **una empresa por categoría/especialidad empresarial definida**.
 
@@ -124,26 +124,26 @@ Ejemplo conceptual:
 
 La taxonomía de categorías debe ser configurable y suficientemente específica para evitar tanto monopolios artificialmente amplios como conflictos competitivos. (Decisión fijada: la plaza corresponde a una **especialidad concreta**, no a un sector amplio. Ver `docs/DECISIONS.md` · D-001.)
 
-La exclusividad se aplica a nivel de grupo, no necesariamente de ciudad.
+La exclusividad se aplica a nivel de Sala, no de ciudad. En una misma zona (por ejemplo, Sevilla) pueden abrirse tantas Salas como permita la saturación de la zona.
 
 ```text
 NS Sevilla
-├── Grupo/Círculo 01
+├── Sala 01
 │   ├── Arquitectura
 │   ├── Seguros
 │   ├── Legal
 │   └── ...
 │
-├── Grupo/Círculo 02
+├── Sala 02
 │   ├── Arquitectura
 │   ├── Seguros
 │   ├── Legal
 │   └── ...
 │
-└── Grupo/Círculo 03
+└── Sala 03
 ```
 
-Puede haber varios grupos en una misma ciudad.
+Puede haber varias Salas en una misma ciudad.
 
 Posteriormente existirán:
 
@@ -224,7 +224,7 @@ Una empresa española está preparando su entrada en Portugal.
 
 Podría interesar a: fiscalidad internacional; legal; recursos humanos; traducción; logística; seguros; financiación; real estate; consultoría; marketing.
 
-El objetivo del sistema es comprender que **una sola señal empresarial puede desencadenar múltiples oportunidades legítimas para empresas diferentes del círculo**.
+El objetivo del sistema es comprender que **una sola señal empresarial puede desencadenar múltiples oportunidades legítimas para empresas diferentes de la Sala**.
 
 ## 6. El gran activo tecnológico: NS Agentic Referral Protocol
 
@@ -391,7 +391,7 @@ Considerar como arquitectura inicial al menos estos roles.
 
 ### Company Agent
 
-Representa a una empresa. Su prioridad es: comprender y defender los intereses comerciales de su empresa mientras ayuda al resto del círculo a encontrar oportunidades legítimas.
+Representa a una empresa. Su prioridad es: comprender y defender los intereses comerciales de su empresa mientras ayuda al resto de la Sala a encontrar oportunidades legítimas.
 
 ### Chapter Intelligence Agent
 
@@ -621,7 +621,7 @@ Hipótesis inicial (miembros):
 Hoy
 Radar
 Referidos
-Mi Círculo
+Mi Sala
 Mi Agente
 Mensajes
 Valor Generado
@@ -751,7 +751,7 @@ CAMBIO
 Ahora una empresa puede disponer de un agente que represente sus intereses.
 ↓
 RED
-Todos los agentes del círculo trabajan juntos.
+Todos los agentes de la Sala trabajan juntos.
 ↓
 RESULTADO
 Oportunidades detectadas y cualificadas 24/7.
@@ -768,7 +768,7 @@ Comprobar disponibilidad de mi sector.
 
 ## 24. Pantallas imprescindibles
 
-**Website:** Landing; Cómo funciona; Para empresas; Para ciudades/círculos; Filosofía; Seguridad; Solicitud de membresía; Disponibilidad de sector.
+**Website:** Landing; Cómo funciona; Para empresas; Para ciudades/Salas; Filosofía; Seguridad; Solicitud de membresía; Disponibilidad de sector.
 
 **Member App:** Home / Today; NS Radar; Referral Inbox; Referral Detail; Opportunities; Agent Room; My Company; Business DNA; My Agent; Agent Permissions; Chapter; Members; Member Profile; Value Generated; Notifications; Settings.
 
@@ -900,7 +900,7 @@ Pilot:
 ```text
 NS Sevilla
 ↓
-1 círculo
+1 Sala
 ↓
 Empresas seleccionadas
 ↓
@@ -1032,7 +1032,7 @@ Debe poder demostrarse de principio a fin.
 
 ## 7. Construye primero una demo extraordinaria de NS Sevilla
 
-Generar datos ficticios realistas para un círculo. Nunca usar únicamente "Company A", "Company B", "Lorem ipsum". Crear compañías demo verosímiles pertenecientes a múltiples sectores. Mostrar varios referral scenarios.
+Generar datos ficticios realistas para una Sala. Nunca usar únicamente "Company A", "Company B", "Lorem ipsum". Crear compañías demo verosímiles pertenecientes a múltiples sectores. Mostrar varios referral scenarios.
 
 ## 8. Escenarios de referencia
 
@@ -1044,7 +1044,7 @@ Generar datos ficticios realistas para un círculo. Nunca usar únicamente "Comp
 
 **Scenario D — confidencialidad.** Un agente descubre una oportunidad excelente a partir de información marcada `COMPANY_ONLY`. Puede utilizarla internamente para razonar cuando la política lo permita, pero no revelar su contenido ni identidad a otros miembros. Debe solicitar autorización.
 
-**Scenario E — competencia.** Un agente intenta proponer como nuevo miembro una empresa cuyo sector entra en conflicto con una categoría existente. El sistema detecta el conflicto y lo deriva a: revisión de categoría; otro capítulo; lista de espera; o rechazo.
+**Scenario E — competencia.** Un agente intenta proponer como nuevo miembro una empresa cuyo sector entra en conflicto con una categoría existente. El sistema detecta el conflicto y lo deriva a: revisión de categoría; otra Sala; lista de espera; o rechazo.
 
 ## 9. Arquitectura técnica
 
@@ -1283,8 +1283,8 @@ Y posteriormente:
 
 Estas tres reglas están por encima de cualquier feature, decisión de diseño o modelo económico. No se revisan; se aplican.
 
-1. **Nunca se cobra por un referido.** Ningún miembro puede pedir, ofrecer, aceptar o condicionar un referido a dinero, comisión, descuento, contraprestación o favor. NS tampoco cobra por referido (D-005). Hacerlo es **motivo de expulsión** del círculo y de la red. El espíritu de NS es un network colaborativo: se da porque se pertenece.
-2. **Toda empresa debe aportar un número mínimo de referidos en los plazos que se estipulen.** Pertenecer a NS es contribuir. El mínimo y el plazo se fijan por círculo y se aplican con una escalera de consecuencias que termina en la pérdida de la plaza. El agente de cada empresa trabaja para que su miembro lo cumpla sin esfuerzo.
+1. **Nunca se cobra por un referido.** Ningún miembro puede pedir, ofrecer, aceptar o condicionar un referido a dinero, comisión, descuento, contraprestación o favor. NS tampoco cobra por referido (D-005). Hacerlo es **motivo de expulsión** de la Sala y de la red. El espíritu de NS es un network colaborativo: se da porque se pertenece.
+2. **Toda empresa debe aportar un número mínimo de referidos en los plazos que se estipulen.** Pertenecer a NS es contribuir. El mínimo y el plazo se fijan por Sala y se aplican con una escalera de consecuencias que termina en la pérdida de la plaza. El agente de cada empresa trabaja para que su miembro lo cumpla sin esfuerzo.
 3. **La calidad importa más que la cantidad.** Un referido cuenta cuando el receptor lo cualifica como válido y NS puede auditarlo. Un referido flojo no cumple el mínimo ni suma reputación; puede restar.
 
 # NORTH STAR

@@ -4,7 +4,7 @@
 
 > Tu empresa no hace networking. Su agente sí. 24/7.
 
-Primera implantación: **NS Sevilla**, un círculo, una empresa por especialidad.
+Primera implantación: **NS Sevilla · Sala 01**, una empresa por especialidad en cada Sala.
 
 ## Estado del proyecto
 
@@ -19,7 +19,7 @@ Primera implantación: **NS Sevilla**, un círculo, una empresa por especialidad
 | [`docs/02_NS_AGENTIC_REFERRAL_PROTOCOL.md`](./docs/02_NS_AGENTIC_REFERRAL_PROTOCOL.md) | NS-ARP v0.1: objetos, mensajes agente-a-agente, visibilidad y permisos, NS Match Score, máquina de estados, puertas humanas, auditoría, escenarios de referencia. |
 | [`docs/05_DESIGN_BRIEF.md`](./docs/05_DESIGN_BRIEF.md) | Brief para Claude Design: identidad, logo, dirección visual, pantallas prioritarias, datos demo y entregables. |
 | [`docs/11_IDEAS_DISRUPTIVAS.md`](./docs/11_IDEAS_DISRUPTIVAS.md) | Banco de ideas disruptivas sobre el núcleo: prospección agentic, calidad verificada, reconocimiento escalable, efecto red. |
-| [`docs/12_TERRITORIALIDAD.md`](./docs/12_TERRITORIALIDAD.md) | Territorialidad: plaza = especialidad × celda, resolución natural por especialidad, viabilidad por profundidad de mercado, territorio ganado por contribución, casuística de sectores, mapa NS. |
+| [`docs/12_SALAS.md`](./docs/12_SALAS.md) | La Sala como eje: zonas y saturación, apertura de nuevas Salas, clasificación NS-CAT (base CNAE ampliable), plazas y casuística de sectores, enrutamiento Sala → Zona → Red, ciclo de vida de la Sala. |
 | [`docs/DECISIONS.md`](./docs/DECISIONS.md) | Registro de decisiones estratégicas y arquitectónicas. |
 
 Documentos pendientes según la constitución: `01_PRODUCT_REQUIREMENTS`, `03_USER_ROLES`, `04_INFORMATION_ARCHITECTURE`, `05_DESIGN_SYSTEM` (se derivará del brief y de los tokens entregados por Claude Design), `06_DATA_MODEL`, `07_AGENT_ARCHITECTURE`, `08_SECURITY_PRIVACY_GDPR`, `09_ANALYTICS`, `10_ROADMAP`.

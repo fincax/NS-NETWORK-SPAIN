@@ -1,0 +1,219 @@
+# 12 · La Sala: eje de NS Network
+
+**Estado:** especificación fundacional (D-013, CONFIRMED por el fundador).
+**Sustituye a:** la propuesta territorial (D-011, superada).
+**Premisas del fundador:** el modelo de sala. En un mismo territorio (por ejemplo, Sevilla) se pueden crear todas las Salas que permita la saturación de la zona. La sectorización toma como eje una clasificación parecida a la CNAE, pero no inmutable: cuando la casuística hace surgir una nueva profesión, NS la contempla antes que la administración.
+
+---
+
+## 0. Qué es una Sala
+
+Una **Sala NS** es un grupo cerrado de empresas seleccionadas, con **una empresa por especialidad**, cuyos agentes trabajan juntos 24/7 y cuyas personas se conocen y se reúnen. Es el equivalente permanente y agentic de la reunión de un club de referidos.
+
+```text
+NS Network
+└── NS España
+    └── Zona NS Sevilla
+        ├── Sala 01   (25–35 empresas, una por especialidad)
+        ├── Sala 02
+        ├── Sala 03
+        └── ...       tantas como permita la saturación de la zona
+```
+
+Vocabulario oficial:
+
+| Término NS | Qué es | Identificador técnico |
+| --- | --- | --- |
+| **Sala** | Unidad fundamental. Exclusividad, comunidad, cuota de contribución, rituales. | `Chapter`, `chapter_id`, visibilidad `CHAPTER` |
+| **Zona** | Ámbito geográfico (ciudad o área metropolitana) que aloja Salas. Definida con unidades INE. | `Zone`, `zone_id` |
+| **Plaza** | Posición única de una especialidad dentro de una Sala. | `CategorySeat` |
+| **Especialidad NS** | Nivel de la clasificación NS-CAT que otorga plaza. | `Specialty` |
+| **Directiva de Sala** | Presidencia y consejo de la Sala. | `Director` |
+| **Directiva de Zona** | Gobierna apertura, escisión y fusión de Salas en la zona. | `ZoneDirector` |
+
+No se usa "capítulo" ni "grupo": son términos de otros modelos. "Sala" es lenguaje propio de NS.
+
+---
+
+## 1. Lo que enseña el mercado
+
+| Modelo | Cómo funciona | Qué toma NS |
+| --- | --- | --- |
+| **BNI / LeTip** | Un profesional por clasificación por capítulo. Varios capítulos por ciudad. Cuotas altas (BNI España ≈ 450 € alta + ≈ 1.249 € anuales + cuota semanal de reunión) porque cada capítulo es pequeño y presencial. | La sala como unidad de exclusividad y pertenencia. NS la mantiene y le añade agentes 24/7, muchas más Salas por zona y cuotas bajas. |
+| **Franquicias** | Zonas diseñadas con potencial de mercado equivalente y volumen mínimo garantizado, sin exceder ese volumen para maximizar el número de zonas. | El criterio de **saturación por profundidad de mercado**: una zona abre Salas mientras cada una pueda alimentar a sus miembros. |
+| **Thumbtack / Angi** | Un mismo lead vendido a 2–4 competidores. | El anti-modelo. En NS un referido nunca se reparte entre competidores. |
+| **INE / CNAE / DIRCE** | Clasificación oficial de actividades, cartografía sin huecos y censo de empresas por municipio, actividad y tamaño. | La **base** de la clasificación (NS-CAT) y de la medición de saturación. NS no inventa lo que ya existe; lo amplía. |
+
+---
+
+## 2. Zonas y saturación: cuántas Salas caben en Sevilla
+
+### 2.1 La zona
+
+Una **Zona NS** es una ciudad o área metropolitana definida por una lista de municipios (códigos INE). Sevilla: capital y área metropolitana (Dos Hermanas, Alcalá de Guadaíra, Aljarafe, etc.), a validar por el fundador. La zona **no** es unidad de exclusividad: dos Salas de la misma zona pueden tener, cada una, su empresa de reformas.
+
+Una empresa pertenece a **una sola Sala por zona**. Una empresa con unidades locales en varias zonas puede solicitar plaza en una Sala de cada zona, con cuota de contribución independiente.
+
+### 2.2 Cuándo se abre una Sala nueva
+
+La Directiva de Zona abre la Sala N+1 cuando se cumplen las tres condiciones:
+
+1. **Demanda real.** Existe una lista de espera de solicitantes **ya admitidos** (D-004) que no caben en las Salas existentes porque su especialidad está ocupada, y suman al menos 12–15 empresas fundadoras (D-006) que cubren las especialidades más demandadas de la zona (construcción/reforma, legal, fiscal, seguros, IT, marketing, RR.HH., financiación, inmobiliario, consultoría).
+2. **Profundidad de mercado.** El censo de empresas objetivo de la zona (DIRCE por CNAE y tamaño, filtrado por los ICP de las especialidades fundadoras) soporta una Sala más sin que el flujo esperado de referidos válidos por miembro caiga por debajo del umbral configurado (propuesta: ≥ 3× la cuota mínima de D-010).
+3. **Salud de las Salas existentes.** Las Salas activas están en o por encima del objetivo de 25–35 plazas y su tasa de cumplimiento de cuota es sana. No se abre una Sala nueva para descargar una Sala que no funciona.
+
+### 2.3 Cuándo la zona está saturada
+
+Señales que detienen la apertura y que el Chapter Intelligence Agent vigila:
+
+- el flujo de referidos válidos por miembro y periodo en las Salas existentes baja dos periodos seguidos;
+- la tasa de referidos **exportados** (que ninguna plaza de la Sala originadora cubre y se enrutan a otra Sala de la zona) cae por debajo de un mínimo: si casi nada sale de las Salas, la zona ya está cubierta;
+- la tasa de aceptación de referidos por parte de los receptores baja (señal de referidos de peor calidad por sobreoferta);
+- la lista de espera de calidad deja de crecer.
+
+La saturación **no es un número fijo de Salas**: es una lectura continua de datos. Sevilla puede sostener 3 Salas o 12; lo dirán la lista de espera y el flujo de referidos.
+
+### 2.4 Sub-zonas de gravedad (opcional)
+
+Cuando una zona tiene varias Salas, cada una puede declarar una **sub-zona de gravedad** (Sevilla Este, Aljarafe, Centro) para facilitar la reunión presencial y la afinidad de clientela. Es una preferencia de asignación, no una frontera: la exclusividad sigue siendo por Sala.
+
+---
+
+## 3. Sectorización: NS-CAT, base CNAE ampliable
+
+### 3.1 Estructura
+
+**NS-CAT** (Clasificación NS de Actividades) toma como índice la estructura de la CNAE vigente y añade un nivel propio:
+
+```text
+Sección  (CNAE)        M   Actividades profesionales, científicas y técnicas
+División (CNAE)        69  Actividades jurídicas y de contabilidad
+Grupo    (CNAE)        69.1 Actividades jurídicas
+Clase    (CNAE)        69.10 Actividades jurídicas
+Especialidad NS        69.10-NS-03  Derecho laboral
+                       69.10-NS-04  Derecho mercantil y societario
+                       69.10-NS-07  Compliance y protección de datos
+```
+
+- La **plaza se otorga a nivel de Especialidad NS**. Nunca a nivel de clase CNAE (demasiado ancho: "Actividades jurídicas" bloquearía a diez despachos que no compiten).
+- Cada Especialidad NS tiene: código, nombre comprensible, descripción en lenguaje de negocio, `overlaps_with[]` (matriz de solapamiento, D-001), ejemplos de referido perfecto y de referido que no le corresponde, y estado.
+- Un solicitante elige su especialidad con ayuda del agente durante la solicitud; el agente propone la especialidad a partir del CNAE declarado, la web y la entrevista, y detecta solapamientos antes de enviar la solicitud.
+
+### 3.2 Estados de una especialidad
+
+| Estado | Origen | Qué implica |
+| --- | --- | --- |
+| `OFICIAL` | Derivada directamente de una clase CNAE. | Base estable de la taxonomía. |
+| `NS_EXTENDIDA` | Creada por NS por debajo de una clase CNAE porque el mercado la distingue (por ejemplo, "Paid Media B2B" dentro de publicidad). | Otorga plaza como cualquier otra. |
+| `PROVISIONAL` | Nueva profesión que la administración aún no recoge (por ejemplo, un perfil emergente de servicios de IA, sostenibilidad o nuevas formas de financiación). | Otorga plaza en periodo de prueba de dos periodos de contribución. Se consolida como `NS_EXTENDIDA` si genera y recibe referidos válidos; si no, se fusiona con la más cercana. |
+| `RETIRADA` | Fusionada o eliminada. | Las plazas existentes migran a la especialidad sucesora con preaviso. |
+
+### 3.3 Cómo nace una profesión nueva en NS
+
+```text
+Solicitud de plaza con actividad no contemplada
+  → el agente de admisión propone la Especialidad NS más cercana y la marca como posible hueco
+  → el Comité de Clasificación (Directiva de Zona + NS España) decide en ≤ 10 días:
+      · asignar a una especialidad existente, o
+      · crear una especialidad PROVISIONAL con su matriz de solapamiento provisional
+  → se registra en DECISIONS (cambio menor de taxonomía) y en el changelog de NS-CAT
+  → tras dos periodos con datos: consolidar, fusionar o retirar
+```
+
+NS-CAT lleva versión propia (`nscat_version`). Cada Sala opera sobre una versión; los cambios se aplican con migración de plazas explícita.
+
+### 3.4 La prueba del referido
+
+La CNAE es el índice; la regla de conflicto es de producto:
+
+> **Dos empresas son de la misma especialidad si un mismo referido válido debería enviarse legítimamente a las dos.**
+
+Con datos reales, la taxonomía se corrige sola: si los referidos de dos especialidades "distintas" acaban de forma sistemática en las mismas empresas, el Comité las fusiona; si una especialidad recibe referidos heterogéneos que su titular declina por sistema, se divide (como prevé D-001 para "Marketing" → "Paid Media", "Branding", "SEO/Contenido").
+
+---
+
+## 4. La plaza dentro de la Sala
+
+Reglas (integran D-001 y D-004):
+
+1. Una empresa, una plaza principal por Sala. Capabilities secundarias sin exclusividad.
+2. Especialidad ocupada en la Sala solicitada → el solicitante admitido elige: otra Sala de la zona con la plaza libre, lista de espera de esa Sala, o lista de fundadores de la próxima Sala.
+3. Solapamiento `ADJACENT` → revisión de la Directiva de Sala antes de admitir. `CONFLICT` → no en esa Sala.
+4. La plaza se conserva cumpliendo la cuota de contribución (D-010) y las reglas inmutables. Se pierde por incumplimiento reiterado o expulsión.
+5. Una plaza liberada se ofrece primero a la lista de espera de esa Sala, después a la de la zona.
+
+### Casuística
+
+| Caso | Regla |
+| --- | --- |
+| Empresa multiservicio (legal + fiscal + laboral) | Una plaza principal. Puede solicitar una segunda plaza en la misma Sala solo si esa especialidad lleva ≥ 2 periodos vacante sin lista de espera, y asume cuota completa por cada plaza. Pierde la segunda en cuanto aparece un solicitante admitido para ella. |
+| Generalista frente a especialista | El generalista ocupa una especialidad concreta, nunca la clase CNAE. Un especialista posterior tiene prioridad en las especialidades que el generalista no ocupa. |
+| Franquicia o red de oficinas | La plaza la ocupa la unidad local, no la marca. Dos oficinas de la misma marca no pueden estar en la misma Sala; sí en dos Salas de la zona. |
+| Empresa nacional o 100 % remota | Puede ocupar plaza en una Sala de la zona donde tenga equipo o clientes verificables. No puede ocupar la misma especialidad en dos Salas de la misma zona. |
+| Dos solicitantes admitidos para la misma plaza | Rúbrica de admisión (D-004) y calidad del Business DNA deciden. El otro pasa a lista de espera con prioridad para la siguiente Sala o para la primera vacante. |
+| Miembro que cambia de especialidad | Nueva solicitud; la plaza anterior se libera con preaviso de un periodo. |
+| Traslado entre Salas de la zona | Permitido una vez por año con vacante en destino y sin cuota pendiente; la reputación viaja con la empresa. |
+| Profesión no contemplada | §3.3: especialidad `PROVISIONAL`. |
+
+---
+
+## 5. Enrutamiento: Sala → Zona → Red
+
+La Sala tiene prioridad sobre los referidos que nacen en ella. Cuando ninguna plaza de la Sala cubre la necesidad, el referido no se pierde:
+
+```text
+Necesidad detectada por un agente de la Sala 01
+  → plaza de la especialidad en Sala 01          (titular recibe)
+  → si vacante: otras Salas de la Zona Sevilla    (rotación por reputación y tiempo de respuesta; requiere consentimiento del originador, NS-ARP §13)
+  → si ninguna: red NS (otras zonas, Global Routing)
+```
+
+El originador acumula reputación en todos los casos (D-009). La tasa de referidos exportados por Sala es, además, la señal principal de saturación de la zona (§2.3).
+
+---
+
+## 6. Ciclo de vida de una Sala
+
+```text
+EN_FORMACIÓN   12–15 fundadoras admitidas; Directiva provisional; agentes activados
+  → ACTIVA     ≥ 15 plazas ocupadas; cuota de contribución en vigor
+  → CONSOLIDADA  25–35 plazas; consejo elegido; rituales estables
+  → ESCISIÓN   > 35 plazas con lista de espera: la Directiva de Zona planifica la Sala N+1 y ofrece a los miembros interesados fundarla
+  → FUSIÓN     < 12 plazas activas durante 2 periodos: se fusiona con otra Sala de la zona (las plazas en conflicto se resuelven por antigüedad y reputación)
+  → CIERRE     solo si la fusión no es posible; los miembros pasan a lista de espera prioritaria
+```
+
+Gobierno: Presidencia y consejo de Sala (rotación anual), Directiva de Zona (apertura, escisión, fusión, Comité de Clasificación), NS España (versión de NS-CAT y de NS-ARP).
+
+---
+
+## 7. Producto
+
+- **Web pública.** "Comprobar disponibilidad de mi sector" muestra, para la especialidad elegida, el estado en cada Sala de la zona: Disponible · Ocupada · Lista de espera · Próxima Sala en formación. Genera urgencia honesta y explica el modelo en una pantalla.
+- **Mi Sala.** Mapa de plazas de la Sala, perfiles, cuota de contribución de cada miembro (verificada), muro de victorias.
+- **Command Center de Zona.** Salas con estado, plazas por especialidad, lista de espera por especialidad, flujo de referidos por miembro, tasa de exportación, propuesta automática de apertura o fusión, cola del Comité de Clasificación.
+- **Radar.** Las señales y referidos se representan dentro de la Sala; los exportados aparecen como conexiones entre Salas de la zona.
+
+---
+
+## 8. Modelo de datos (extensión de NS-ARP y del Referral Graph)
+
+```text
+Zone          { id, country, name, ine_municipalities[], status, saturation_indicators }
+Chapter(Sala) { id, zone_id, number, name, status: FORMING|ACTIVE|CONSOLIDATED|SPLITTING|MERGING|CLOSED,
+                gravity_subzone?, council[], nscat_version, protocol_version }
+Specialty     { id, nscat_code, cnae_class, name, description, status: OFFICIAL|NS_EXTENDED|PROVISIONAL|RETIRED,
+                overlaps_with[], perfect_referral_examples[], not_for_examples[] }
+CategorySeat  { id, chapter_id, specialty_id, company_id, status: ACTIVE|VACANT|WAITLISTED|RELEASED, granted_at }
+Waitlist      { zone_id, chapter_id?, specialty_id, application_id, priority, founder_candidate: bool }
+ReferralRoute { referral_id, origin_chapter_id, target_chapter_id, level: CHAPTER|ZONE|NETWORK, consent_ref }
+```
+
+---
+
+## 9. Pendientes del fundador
+
+1. Delimitar la Zona NS Sevilla (solo capital, o capital + área metropolitana).
+2. Confirmar la lista de especialidades fundadoras de la Sala 01 (30–40) y su primera versión NS-CAT.
+3. Fijar los umbrales de apertura y saturación (propuesta: ≥ 3× cuota de D-010; dos periodos de caída de flujo).
+4. Decidir si el enrutamiento a otras Salas de la zona requiere consentimiento del originador en cada caso o una preferencia general en su Business DNA.

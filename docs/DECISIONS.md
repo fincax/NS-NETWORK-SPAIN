@@ -8,6 +8,8 @@ Este documento evita que las decisiones estructurales desaparezcan dentro de con
 - `CONFIRMED` — ratificada expresamente por el fundador.
 - `SUPERSEDED` — reemplazada por otra decisión (se indica cuál).
 
+**Terminología (D-013).** La unidad fundamental de NS se denomina **Sala**. Las decisiones anteriores a D-013 usan "círculo" o "grupo" con el mismo significado; no se reescriben para conservar el histórico. En el protocolo y el código el identificador técnico sigue siendo `Chapter` / `chapter_id` / visibilidad `CHAPTER`.
+
 Las siete primeras decisiones (D-001 a D-007) responden a las preguntas estratégicas abiertas al cerrar la v0.1 de la constitución. Todas se registran como `PROPOSED` con la opción recomendada, para desbloquear el diseño del protocolo NS-ARP.
 
 ---
@@ -297,7 +299,9 @@ Reglas derivadas:
 
 ## D-011 · La exclusividad se define como Especialidad × Celda territorial; el círculo es la unidad de comunidad, no de exclusividad
 
-**Status:** PROPOSED
+**Status:** SUPERSEDED por D-013 (el fundador prefiere el modelo de Sala; la exclusividad vuelve a la Sala). Se conserva como registro. Las ideas reutilizables (prueba del referido, casuística de sectores, profundidad de mercado como criterio de saturación) se han trasladado a `docs/12_SALAS.md`.
+
+**Status original:** PROPOSED
 **Date:** 2026-09-11
 
 **Context.** El fundador fija que en cada territorio marcado, por pequeño o grande que sea, solo puede haber una empresa por sector, y que el objetivo es que entre un número abundante de buenas empresas. D-001 situaba la exclusividad en el círculo (herencia del modelo de capítulo presencial). Con agentes 24/7 la sala deja de ser un límite y la unidad natural de exclusividad pasa a ser el mapa. Especificación completa en `docs/12_TERRITORIALIDAD.md`.
@@ -333,10 +337,33 @@ Reglas derivadas:
 
 **Context.** El fundador indica que la posibilidad de suscribir muchas buenas empresas por zona hará que la cuota de alta y la mensual (si la hubiese) sean ínfimas comparadas con asociaciones como BNI (referencia de mercado: ≈ 450 € de alta + ≈ 1.249 € anuales + cuota semanal de reunión).
 
-**Choice.** Se mantiene D-005 (alta + membresía, sin comisión) con dos precisiones: (1) el precio se fija para volumen, muy por debajo del club presencial; (2) la cuota puede escalar con el nivel territorial ocupado, coherente con la cuota de contribución proporcional al territorio (D-011). Los importes concretos quedan pendientes del fundador.
+**Choice.** Se mantiene D-005 (alta + membresía, sin comisión) con dos precisiones: (1) el precio se fija para volumen, muy por debajo del club presencial; (2) la cuota es plana por plaza en una Sala (tras D-013 no existe escalado territorial). Los importes concretos quedan pendientes del fundador.
 
 **Why.** El coste marginal de un miembro en una red agentic es bajo y el valor de la red crece con la densidad. Un precio bajo maximiza la densidad de buenas empresas, que es parte del moat.
 
 **Consequences.** El modelo financiero se construye sobre número de plazas por ciudad × cuota media, no sobre pocas plazas caras. La selección (D-004) sigue siendo la barrera, no el precio.
 
 **Revisit when.** Se fijen los importes del piloto de Sevilla.
+
+---
+
+## D-013 · La Sala es el eje de NS: exclusividad por Sala, tantas Salas por zona como permita su saturación, sectorización NS-CAT con base CNAE ampliable
+
+**Status:** CONFIRMED (decisión directa del fundador)
+**Date:** 2026-09-11
+
+**Context.** Tras estudiar la alternativa territorial (D-011), el fundador decide que prefiere el modelo de sala: en un mismo territorio, por ejemplo Sevilla, se pueden crear todas las Salas que permita la saturación de la zona. El criterio de sectorización toma como eje una clasificación parecida a la CNAE, pero no inmutable: la casuística puede hacer surgir una nueva profesión y NS debe contemplarla antes que la administración. Especificación completa en `docs/12_SALAS.md`.
+
+**Choice.**
+
+- **Sala** es la unidad fundamental de NS y el término oficial del producto (sustituye a "círculo"/"grupo"; nunca "capítulo"). Una Sala reúne 12–15 empresas fundadoras, objetivo 25–35, tope 40 (D-006), con una empresa por especialidad (D-001).
+- **Zona** es el ámbito geográfico (ciudad o área metropolitana, definido con unidades INE) que aloja Salas. Una zona abre una Sala nueva cuando existe una lista de espera de solicitantes admitidos que no caben en las Salas existentes, con al menos 12–15 fundadoras que cubran las especialidades más demandadas, y la profundidad de mercado de la zona lo sostiene. Deja de abrirlas (saturación) cuando el flujo de referidos válidos por miembro en las Salas existentes cae por debajo del umbral o la tasa de exportación de referidos entre Salas indica que la zona ya está cubierta.
+- Una empresa pertenece a **una sola Sala por zona**. Sus agentes cooperan con toda la red, pero el enrutamiento es **Sala → Zona → Red**, de modo que la Sala conserva prioridad sobre los referidos que nacen en ella.
+- **NS-CAT** (Clasificación NS de Actividades) es la taxonomía de plazas: toma como índice la estructura de la CNAE vigente (sección, división, grupo, clase) y añade el nivel **Especialidad NS**, que es el que otorga plaza. Cada especialidad tiene estado `OFICIAL` (derivada de CNAE), `NS_EXTENDIDA` (creada por NS) o `PROVISIONAL` (nueva profesión en periodo de prueba). Un Comité de Clasificación puede crear, dividir o fusionar especialidades a partir de solicitudes y de datos de enrutamiento; la definición operativa de conflicto sigue siendo la prueba del referido.
+- Las cuotas son planas por plaza y bajas (D-012); nunca por referido (D-010).
+
+**Why.** La Sala conserva lo mejor del club de referidos (pertenencia, confianza cara a cara, exclusividad comprensible) y NS le añade agentes 24/7 y tantas Salas como aguante la zona, lo que permite un número abundante de buenas empresas sin monopolios de ciudad. La clasificación con base administrativa es defendible y comunicable; la capa NS evita que una profesión nueva quede fuera.
+
+**Consequences.** D-011 queda superada. D-001 y D-006 se mantienen íntegras con "Sala" como término. Se sustituye `docs/12_TERRITORIALIDAD.md` por `docs/12_SALAS.md`. NS-ARP v0.2 incorpora `Zone`, `Sala` (identificador técnico `Chapter`), el enrutamiento Sala → Zona → Red y `NS-CAT` como origen de `Specialty`. La web pública muestra disponibilidad por Sala dentro de la zona. La Directiva de zona gestiona apertura, escisión y fusión de Salas.
+
+**Revisit when.** La primera zona alcance tres Salas activas y se disponga de datos de exportación de referidos entre Salas.

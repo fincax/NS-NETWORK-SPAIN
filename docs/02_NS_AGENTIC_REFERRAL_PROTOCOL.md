@@ -9,7 +9,7 @@
 
 ## 0. Qué es NS-ARP y por qué existe
 
-NS-ARP es el protocolo que gobierna cómo los agentes empresariales de un círculo NS **descubren, comparten, cualifican, puntúan, autorizan y trazan** oportunidades de negocio entre sus empresas.
+NS-ARP es el protocolo que gobierna cómo los agentes empresariales de una Sala NS **descubren, comparten, cualifican, puntúan, autorizan y trazan** oportunidades de negocio entre sus empresas.
 
 No es un formato de chat entre bots. Es un **protocolo de estado tipado**: define los objetos que existen, quién puede crearlos, qué mensajes pueden intercambiarse, qué información viaja en cada mensaje según su nivel de visibilidad, cómo se calcula el encaje y en qué puntos exactos la decisión pasa a una persona.
 
@@ -19,7 +19,7 @@ Principio rector:
 
 Todo lo importante (señal, necesidad, interés, cualificación, score, decisión, introducción, resultado) es un objeto persistido y auditado. El razonamiento del modelo produce y transforma esos objetos; nunca los sustituye.
 
-NS-ARP es propiedad intelectual de NS Network. Debe evolucionar con versiones explícitas. Un círculo puede operar únicamente sobre una versión de protocolo a la vez.
+NS-ARP es propiedad intelectual de NS Network. Debe evolucionar con versiones explícitas. Una Sala puede operar únicamente sobre una versión de protocolo a la vez.
 
 ---
 
@@ -34,7 +34,7 @@ NS-ARP es propiedad intelectual de NS Network. Debe evolucionar con versiones ex
 7. **Puertas humanas exactas.** El protocolo enumera los estados en los que una persona decide. Fuera de ellos, los agentes actúan solos.
 8. **Fail safe.** Ante duda de permiso, visibilidad o conflicto, el protocolo degrada a la acción más conservadora: no compartir, no revelar, no contactar, escalar.
 9. **Todo se audita.** Cada transición produce un `AuditEvent`. No se registran razonamientos internos; se registran decisiones, evidencia y políticas aplicadas.
-10. **Local first, global by architecture.** Todo objeto lleva `chapter_id`; el enrutamiento fuera del círculo es una extensión explícita (§13), no un caso implícito.
+10. **Local first, global by architecture.** Todo objeto lleva `chapter_id`; el enrutamiento fuera de la Sala es una extensión explícita (§13), no un caso implícito.
 
 ---
 
@@ -47,9 +47,9 @@ Notación TypeScript orientativa. Los tipos definitivos se fijarán en `06_DATA_
 ```ts
 type Visibility =
   | "PUBLIC"          // visible fuera de NS
-  | "CHAPTER"         // visible para todos los miembros y agentes del círculo
+  | "CHAPTER"         // visible para todos los miembros y agentes de la Sala
   | "MATCHED_PARTY"   // visible solo para la contraparte de un match concreto
-  | "DIRECTORS"       // visible para la Directiva del círculo
+  | "DIRECTORS"       // visible para la Directiva de la Sala
   | "COMPANY_ONLY"    // visible solo dentro de la empresa propietaria (su agente puede razonar con ello)
   | "NEVER_SHARE";    // el agente lo conoce pero no puede usarlo para razonar hacia fuera ni inferir sobre ello
 
@@ -70,7 +70,7 @@ Regla de orden: los verbos son independientes, no acumulativos. `SHARE` no impli
 
 ```ts
 interface SignalEnvelope {
-  // Capa 0 · siempre visible en el círculo
+  // Capa 0 · siempre visible en la Sala
   chapter_layer: {
     need_summary: string;          // "Empresa industrial abrirá nueva sede en Sevilla"
     industry: IndustryCode;
@@ -237,13 +237,13 @@ interface TrustEvent {                  // alimenta la reputación verificable
 | Agente | Responsabilidad en NS-ARP | Puede crear |
 | --- | --- | --- |
 | **Company Agent** (uno por empresa) | Extraer señales de su empresa, clasificarlas, publicar la capa 0, declarar interés en necesidades ajenas, responder cualificaciones, preparar introducciones. | `OpportunitySignal`, `Need`, `InterestClaim`, `QualificationTurn`, `IntroPackage` |
-| **Matchmaker Agent** (uno por círculo) | Descubrir agentes relevantes, orquestar cualificaciones, calcular NS Match Score, producir `MatchCandidate`. | `MatchCandidate`, `Explanation` |
-| **Trust & Compliance Agent** (uno por círculo) | Verificar permisos, visibilidad, conflictos de plaza, duplicidad, normas profesionales, base jurídica de datos personales. Emitir veredicto y excepciones. | `ComplianceVerdict`, `TrustEvent` |
+| **Matchmaker Agent** (uno por Sala) | Descubrir agentes relevantes, orquestar cualificaciones, calcular NS Match Score, producir `MatchCandidate`. | `MatchCandidate`, `Explanation` |
+| **Trust & Compliance Agent** (uno por Sala) | Verificar permisos, visibilidad, conflictos de plaza, duplicidad, normas profesionales, base jurídica de datos personales. Emitir veredicto y excepciones. | `ComplianceVerdict`, `TrustEvent` |
 | **Chapter Intelligence Agent** | Observar patrones: necesidades sin cobertura, plazas inactivas, señales repetidas. No participa en el flujo de un referral concreto. | `ChapterInsight` |
 | **Executive Briefing Agent** | Sintetizar actividad para miembros (Hoy) y Directiva (Command Center). Solo lee. | `Briefing` |
-| **Global Routing Agent** (futuro) | Enrutar necesidades sin cobertura local a otros círculos. | `RoutingProposal` |
+| **Global Routing Agent** (futuro) | Enrutar necesidades sin cobertura local a otras Salas. | `RoutingProposal` |
 
-Cada agente actúa con la identidad de su `agent_id` y los permisos de la empresa/círculo que representa. Ningún agente puede leer objetos de otra empresa por debajo del nivel `CHAPTER` salvo en el marco de un match donde el estado lo autorice.
+Cada agente actúa con la identidad de su `agent_id` y los permisos de la empresa/Sala que representa. Ningún agente puede leer objetos de otra empresa por debajo del nivel `CHAPTER` salvo en el marco de un match donde el estado lo autorice.
 
 ---
 
@@ -254,7 +254,7 @@ Cada agente actúa con la identidad de su `agent_id` y los permisos de la empres
  │  S0  BUSINESS SIGNAL         (entrada bruta, permisos de la fuente)       │
  │  S1  CONTEXT EXTRACTION      (agente originador estructura)               │
  │  S2  PRIVACY CLASSIFICATION  (capas + visibilidad; compliance valida)     │
- │  S3  OPPORTUNITY SIGNAL      (publicación de capa 0 al círculo)           │
+ │  S3  OPPORTUNITY SIGNAL      (publicación de capa 0 a la Sala)           │
  │  S4  AGENT DISCOVERY         (matchmaker localiza capabilities)           │
  │  S5  CAPABILITY MATCHING     (interest claims con fit preliminar)         │
  │  S6  A2A QUALIFICATION       (intercambio tipado; capa 1)                 │
@@ -279,7 +279,7 @@ Cada agente actúa con la identidad de su `agent_id` y los permisos de la empres
 
 **S3 · Opportunity Signal.** Se publica **solo la capa 0**. El miembro originador ve una previsualización de lo que verán los demás y puede editar, restringir o retirar antes de publicar. Publicación con visibilidad `CHAPTER` por defecto. Si el miembro elige `COMPANY_ONLY`, la señal no se publica pero su agente puede seguir buscando internamente (§12, Scenario D).
 
-**S4 · Agent Discovery.** El Matchmaker consulta el índice de `Capability` del círculo por `specialty_hints`, geografía y tamaño. Usa búsqueda semántica solo como **recall**, nunca como decisión. Produce una lista corta (≤ 8) de capabilities candidatas por necesidad.
+**S4 · Agent Discovery.** El Matchmaker consulta el índice de `Capability` de la Sala por `specialty_hints`, geografía y tamaño. Usa búsqueda semántica solo como **recall**, nunca como decisión. Produce una lista corta (≤ 8) de capabilities candidatas por necesidad.
 
 **S5 · Capability Matching.** Cada Company Agent candidato recibe la capa 0 y responde con un `InterestClaim` o `NO_INTEREST` con motivo. El fit preliminar se calcula con las puertas duras de §7.1. Las claims con fit preliminar `< 0.35` se descartan sin cualificar.
 
@@ -447,7 +447,7 @@ Suma de pesos: 1.00.
 | Penalización | Peso | Fuente |
 | --- | --- | --- |
 | `privacy_risk` | −0.15 | el match requiere revelar datos por encima del permiso actual |
-| `conflict_risk` | −0.15 | solapamiento `ADJACENT` con otra plaza del círculo (D-001) |
+| `conflict_risk` | −0.15 | solapamiento `ADJACENT` con otra plaza de la Sala (D-001) |
 | `duplicate_risk` | −0.10 | referral similar en los últimos 180 días (fuera de la ventana de la puerta dura) |
 | `disqualification_signals` | −0.20 | cualquier respuesta de S6 que contradiga el ICP o los disqualifiers sin llegar a puerta dura |
 | `uncertainty_penalty` | −0.10 | proporción de `unknowns` críticos sin resolver |
@@ -469,7 +469,7 @@ function computeNSMatchScore(need, claim, q, ctx): NSMatchScore {
 }
 ```
 
-Los pesos viven en configuración versionada por círculo (`ScoringProfile`) y se recalibran a partir de S14. Todo cambio de pesos se registra en `DECISIONS.md`.
+Los pesos viven en configuración versionada por Sala (`ScoringProfile`) y se recalibran a partir de S14. Todo cambio de pesos se registra en `DECISIONS.md`.
 
 ### 7.5 Objeto `Explanation` (obligatorio)
 
@@ -530,7 +530,7 @@ interface ComplianceVerdict {
 5. **Sector regulado:** consulta la tabla `RegulatedSpecialty` (abogacía, auditoría, sanidad, seguros, servicios financieros…); si hay restricción de captación o comisión, produce excepción y bloquea cualquier campo de retribución.
 6. **Duplicidad y disputas:** referrals activos y disputas abiertas.
 7. **Periodo de prueba:** miembros con < 3 referrals completados.
-8. **Umbral de valor:** `value_band` por encima del umbral del círculo.
+8. **Umbral de valor:** `value_band` por encima del umbral de la Sala.
 9. **Reputación:** `TrustEvent` de tipo `POLICY_VIOLATION` reciente en cualquiera de las partes.
 10. **Retribución por referido (regla inmutable D-010):** cualquier indicio de dinero, comisión, descuento o contraprestación condicionada al referido en mensajes, notas, `IntroPackage` o `learning_notes` produce `FAIL`, emite `REFERRAL_FEE_VIOLATION` y abre expediente de expulsión ante la Directiva. No existe campo de retribución en ningún objeto del protocolo.
 
@@ -573,7 +573,7 @@ Estados terminales laterales desde cualquier estado previo a INTRODUCED:
 | COMPLIANCE_CHECK → MEMBER_REVIEW | Compliance | verdict ≠ BLOCK | — |
 | ORIGINATOR_PENDING → RECEIVER_PENDING | Miembro originador | `HUMAN_DECISION.APPROVE` | 72 h → recordatorio; 7 d → EXPIRED |
 | RECEIVER_PENDING → APPROVED / DIRECTOR_PENDING | Miembro receptor | `APPROVE` | 72 h → recordatorio; 7 d → EXPIRED |
-| DIRECTOR_PENDING → APPROVED | Director | `APPROVE` | 5 d → escalado a Presidencia del círculo |
+| DIRECTOR_PENDING → APPROVED | Director | `APPROVE` | 5 d → escalado a Presidencia de la Sala |
 | APPROVED → INTRO_AUTHORIZED | Miembro originador | `reveal_scope` definido | — |
 | INTRO_AUTHORIZED → INTRODUCED | Miembro (persona) | introducción enviada | 14 d → recordatorio |
 | INTRODUCED → MEETING → … | Miembro receptor | actualización | check-in del agente cada 14 d |
@@ -640,7 +640,7 @@ El **Agent Room** se construye únicamente a partir de `AuditEvent` con `kind` m
 
 ## 13. Enrutamiento global (extensión futura, no en v0.1)
 
-Cuando una `Need` termina S5 sin ninguna claim, el Matchmaker emite `ROUTING_PROPOSAL`. En fases posteriores, el Global Routing Agent evaluará otros círculos de la ciudad, otras ciudades y otros países, reutilizando S4–S9 con `chapter_id` de destino y una capa 0 aún más restringida (`geography` a nivel de país, sin `value_band`). Requiere consentimiento expreso del originador para salir del círculo. Todo lo demás del protocolo se mantiene.
+Cuando una `Need` termina S5 sin ninguna claim, el Matchmaker emite `ROUTING_PROPOSAL`. Orden de enrutamiento (D-013): **Sala del originador → otras Salas de la misma Zona → red NS**. El originador acumula reputación en todos los casos. En fases posteriores, el Global Routing Agent evaluará otras Salas de la ciudad, otras ciudades y otros países, reutilizando S4–S9 con `chapter_id` de destino y una capa 0 aún más restringida (`geography` a nivel de país, sin `value_band`). Requiere consentimiento expreso del originador para salir de la Sala. Todo lo demás del protocolo se mantiene.
 
 ---
 
@@ -703,7 +703,7 @@ S5  hardGates(need, Branding Atelier):
 S0  Fuente: notas internas del miembro (Consultora Fiscal Triana) marcadas COMPANY_ONLY.
     Contenido: cliente prepara venta de la empresa; necesitará due diligence legal y valoración.
 S1  Agente Triana extrae needs (Legal M&A 0.9 · Valoración 0.85). Permisos: READ, INFER. Sin SHARE.
-S3  No se publica. El agente puede buscar internamente qué plazas del círculo cubrirían la necesidad
+S3  No se publica. El agente puede buscar internamente qué plazas de la Sala cubrirían la necesidad
     (Discovery sobre índice de capabilities, que es CHAPTER) sin emitir ningún mensaje.
     Resultado: "Bufete Alameda (Legal M&A) y Valoraciones Ibéricas cubrirían esta necesidad."
     → Se presenta SOLO al miembro de Triana:
@@ -724,12 +724,13 @@ Se documenta en `01_PRODUCT_REQUIREMENTS.md` (flujo de Application). NS-ARP solo
 ## 15. Preguntas abiertas para v0.2
 
 1. ¿Debe el receptor ver `relationship_strength` del originador con el tercero antes de aceptar, o solo tras `INTRO_AUTHORIZED`? (Propuesta: antes, es parte del valor del referral.)
-2. Ventana de duplicidad: 90 días como puerta dura y 180 como penalización. Validar con el círculo piloto.
+2. Ventana de duplicidad: 90 días como puerta dura y 180 como penalización. Validar con la Sala piloto.
 3. Cómo tratar señales multilaterales (una obra que requiere arquitectura + reforma + instalaciones coordinadas). Propuesta: `ReferralBundle` en v0.3.
 4. Política de expiración de `OpportunitySignal` por tipo de trigger (una expansión internacional dura más que una sustitución de proveedor).
 5. Calibración inicial de pesos con datos demo antes del piloto real.
-6. Objeto `ContributionQuota` (D-010): mínimo de referidos válidos por periodo y círculo, cómputo solo de referidos cualificados por el receptor, escalera de consecuencias y papel del agente en el cumplimiento. Parámetros por estipular por el fundador.
+6. Objeto `ContributionQuota` (D-010): mínimo de referidos válidos por periodo y Sala, cómputo solo de referidos cualificados por el receptor, escalera de consecuencias y papel del agente en el cumplimiento. Parámetros por estipular por el fundador.
 7. Objeto `ReferralQualification` (D-009): rúbrica del receptor y reputación bilateral.
+8. Objetos `Zone` y `Sala` (D-013): saturación de zona, apertura de nuevas Salas y enrutamiento Sala → Zona → Red en S4/§13. Clasificación `NS-CAT` como origen de `Specialty`.
 
 ---
 
@@ -738,4 +739,4 @@ Se documenta en `01_PRODUCT_REQUIREMENTS.md` (flujo de Application). NS-ARP solo
 - `protocol_version` en cada objeto.
 - Cambios compatibles (nuevos campos opcionales, nuevos códigos): incremento menor.
 - Cambios de estados, capas, verbos o fórmula del score: incremento mayor, registrado en `DECISIONS.md`, con migración explícita de referrals abiertos.
-- Un círculo migra de versión de forma atómica; los referrals en curso conservan la versión en la que nacieron hasta cerrarse.
+- Una Sala migra de versión de forma atómica; los referrals en curso conservan la versión en la que nacieron hasta cerrarse.
