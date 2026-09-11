@@ -135,6 +135,10 @@ El mínimo obligatorio de referidos (D-010) no debe vivirse como una amenaza sin
 
 El Trust & Compliance Agent vigila cualquier indicio de dinero, comisión, descuento o favor condicionado a un referido (mensajes, notas de introducción, resultados). Un indicio abre expediente; una confirmación supone expulsión. Existe un canal confidencial para que un miembro denuncie que le han pedido o le han ofrecido contraprestación. Las relaciones comerciales normales entre miembros (ser cliente o proveedor uno de otro) son bienvenidas; lo prohibido es condicionar el referido.
 
+### C7 · La exclusividad vive en el mapa, no en la sala
+
+Ver `docs/12_TERRITORIALIDAD.md` y D-011. La plaza es Especialidad × Celda territorial, con resolución natural por especialidad. Multiplica las plazas útiles por ciudad, mantiene "nadie compite conmigo en mi territorio" y convierte el mapa de disponibilidad en el principal argumento de captación.
+
 ## D · Tensiones que hay que resolver (no ignorar)
 
 | Tensión | Riesgo | Respuesta de diseño |

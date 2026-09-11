@@ -290,3 +290,53 @@ Reglas derivadas:
 **Consequences.** `CLAUDE.md` y `00_NORTH_STAR.md` incorporan una sección "Reglas inmutables". NS-ARP v0.2 añade la comprobación 10 de Compliance, los nuevos `TrustEvent` y el objeto `ContributionQuota`. La solicitud de membresía y el onboarding incluyen aceptación expresa. El banco de ideas (`11_IDEAS_DISRUPTIVAS.md`) reformula el pilar 2 como "con suelo, sin techo".
 
 **Revisit when.** Nunca en cuanto a las tres reglas. Los parámetros de la cuota (número, periodo, consecuencias) se revisan tras el primer periodo completo de NS Sevilla.
+
+**Aclaración del fundador (2026-09-11).** Los referidos NS son ajenos a la circulación de negocio ordinaria entre empresas miembro. Que dos miembros se contraten entre sí no es un referido ni está sujeto a estas reglas; lo prohibido es condicionar un referido a cualquier contraprestación.
+
+---
+
+## D-011 · La exclusividad se define como Especialidad × Celda territorial; el círculo es la unidad de comunidad, no de exclusividad
+
+**Status:** PROPOSED
+**Date:** 2026-09-11
+
+**Context.** El fundador fija que en cada territorio marcado, por pequeño o grande que sea, solo puede haber una empresa por sector, y que el objetivo es que entre un número abundante de buenas empresas. D-001 situaba la exclusividad en el círculo (herencia del modelo de capítulo presencial). Con agentes 24/7 la sala deja de ser un límite y la unidad natural de exclusividad pasa a ser el mapa. Especificación completa en `docs/12_TERRITORIALIDAD.md`.
+
+**Options.**
+
+1. Mantener exclusividad por círculo (una plaza por especialidad y círculo, varios círculos por ciudad).
+2. Exclusividad territorial con celda fija para todas las especialidades (por ejemplo, municipio).
+3. Exclusividad territorial con **resolución natural por especialidad** sobre unidades oficiales INE, viabilidad por profundidad de mercado, territorio ganado por contribución, y círculo como comunidad humana.
+
+**Choice.** Opción 3.
+
+- `CategorySeat = Specialty × TerritoryUnit[]`. Escala oficial L0 país … L6 barrio, sin huecos, con códigos INE. H3 solo para cálculo interno.
+- Cada especialidad tiene nivel natural y rango permitido. Las de proximidad juegan en distrito/barrio; las provinciales o nacionales, en su nivel. Esto multiplica las plazas útiles sin solapamiento.
+- Una celda es viable para una especialidad si su profundidad de mercado (empresas objetivo × triggers estimados × densidad de originadores) cubre con holgura la cuota de D-010; si no, se agrega con vecinas.
+- El territorio se conserva contribuyendo: cuota proporcional al territorio, ampliación solo a celdas vacantes adyacentes, cobertura provisional de vacantes, "úsalo o libéralo", subdivisión por demanda con consentimiento previo del titular.
+- Sector definido por la prueba del referido: dos empresas son del mismo sector si un mismo referido válido debería enviarse a ambas. Taxonomía Sector → Especialidad → Segmento (opcional, como válvula para admitir más empresas sin fingir que no compiten).
+- El referido se enruta por la ubicación de la necesidad, no por la del miembro. Sin titular → cobertura provisional → nivel superior → Global Routing.
+- El círculo pasa a ser la comunidad humana de 25–35 empresas (D-006 se mantiene para ese fin); los agentes cooperan con toda la red.
+
+**Why.** Es la única forma de cumplir simultáneamente "una empresa por sector en cada territorio" y "muchas buenas empresas". Adopta lo que funciona en franquicias (zonas con potencial equivalente, demarcación inequívoca) y en plataformas locales (área de servicio declarada y plausible), y descarta el reparto de un mismo lead entre competidores.
+
+**Consequences.** D-001 queda parcialmente superada: la plaza sigue siendo por especialidad y la matriz de solapamiento se mantiene, pero el ámbito de exclusividad es la celda, no el círculo. NS-ARP v0.2 añade `TerritoryUnit`, `SeatCoverage`, `MarketDepth`, `Waitlist` y el enrutamiento territorial en S4. La web pública incorpora el mapa de disponibilidad. La Directiva necesita el mapa territorial con propuestas de subdivisión y liberación.
+
+**Revisit when.** El fundador valide la escala L0–L6 y los niveles naturales del piloto; y tras el primer periodo con datos de territorio efectivo en NS Sevilla.
+
+---
+
+## D-012 · Modelo de volumen: cuotas muy inferiores a los clubes presenciales, escaladas por nivel territorial
+
+**Status:** PROPOSED (sobre indicación del fundador)
+**Date:** 2026-09-11
+
+**Context.** El fundador indica que la posibilidad de suscribir muchas buenas empresas por zona hará que la cuota de alta y la mensual (si la hubiese) sean ínfimas comparadas con asociaciones como BNI (referencia de mercado: ≈ 450 € de alta + ≈ 1.249 € anuales + cuota semanal de reunión).
+
+**Choice.** Se mantiene D-005 (alta + membresía, sin comisión) con dos precisiones: (1) el precio se fija para volumen, muy por debajo del club presencial; (2) la cuota puede escalar con el nivel territorial ocupado, coherente con la cuota de contribución proporcional al territorio (D-011). Los importes concretos quedan pendientes del fundador.
+
+**Why.** El coste marginal de un miembro en una red agentic es bajo y el valor de la red crece con la densidad. Un precio bajo maximiza la densidad de buenas empresas, que es parte del moat.
+
+**Consequences.** El modelo financiero se construye sobre número de plazas por ciudad × cuota media, no sobre pocas plazas caras. La selección (D-004) sigue siendo la barrera, no el precio.
+
+**Revisit when.** Se fijen los importes del piloto de Sevilla.
