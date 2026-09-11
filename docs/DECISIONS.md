@@ -405,17 +405,17 @@ Reglas derivadas:
 
 - **Condición.** La especialidad necesaria no tiene titular en la Sala del cedente (plaza vacante o especialidad sin representar en esa Sala). El sistema lo verifica; no es una opción libre cuando la plaza está ocupada, para no vaciar la prioridad de la propia Sala.
 - **Acto.** El cedente propone un titular concreto de otra Sala de la zona. Su Agente le presenta candidatos ordenados por Hoja de Méritos, tiempo de respuesta y encaje; el cedente puede elegir uno que ya conozca. La Cesión sigue el ciclo NS-ARP completo (Salvoconducto, vistos buenos, Apertura, Puente, Veredicto, Contraste).
-- **Prima de Mérito (propuesta).** Veredicto válido del cesionario: ×2 respecto a una Cesión ordinaria. Valor contrastado: ×3. La Cesión Extramuros cuenta para el Compromiso del cedente como una Cesión ordinaria y media.
-- **Efecto sobre la Sala.** Cada Cesión Extramuros registra una plaza que la Sala del cedente debería cubrir. El Parte del Consejo de Zona la muestra como prioridad de captación desde la Antesala. Si una especialidad acumula tres Cesiones Extramuros en un Ejercicio, se abre candidatura preferente para esa plaza.
+- **Prima de Mérito (propuesta).** Veredicto válido del cesionario: ×2 respecto a una Cesión ordinaria. Valor contrastado: ×3. La Extramuros cuenta para el Compromiso del cedente como una Cesión ordinaria y media.
+- **Efecto sobre la Sala.** Cada Extramuros registra una plaza que la Sala del cedente debería cubrir. El Parte del Consejo de Zona la muestra como prioridad de captación desde la Antesala. Si una especialidad acumula tres Extramuros en un Ejercicio, se abre candidatura preferente para esa plaza.
 - **Salvaguardas.** El cesionario de otra Sala no adquiere derecho alguno sobre la Sala del cedente. Se aplican todas las reglas inmutables (D-010): nunca contraprestación. El Contraste vigila anillos de cesiones cruzadas entre dos empresas de Salas distintas. El cedente necesita consentimiento del tercero según NS-ARP como en cualquier Cesión.
 - **Extramuros en Red.** Si ninguna Sala de la zona cubre la especialidad, el mismo mecanismo se extiende a otra zona con la misma prima.
 - **Nombre.** Recomendado "Extramuros" (alternativas en `docs/13_LEXICO_NS.md` §6bis). Etiqueta descriptiva: Propuesta Fuera de la Sala.
 
 **Why.** Recompensa la generosidad exactamente donde más cuesta (fuera de la propia Sala), evita que un buen referido se pierda, y convierte cada hueco en una señal de captación para la Sala.
 
-**Consequences.** `Referral.route: CHAPTER | ZONE | NETWORK` y `Referral.extramuros: true` en NS-ARP v0.2; `TrustEvent` con multiplicador; el Parte incorpora "plazas reclamadas por Cesiones Extramuros". Léxico en `docs/13_LEXICO_NS.md`.
+**Consequences.** `Referral.route: CHAPTER | ZONE | NETWORK` y `Referral.extramuros: true` en NS-ARP v0.2; `TrustEvent` con multiplicador; el Parte incorpora "plazas reclamadas por Extramuros". Léxico en `docs/13_LEXICO_NS.md`.
 
-**Revisit when.** Se disponga de 20 Cesiones Extramuros contrastadas, para calibrar la prima.
+**Revisit when.** Se disponga de 20 Extramuros contrastadas, para calibrar la prima.
 
 ---
 
