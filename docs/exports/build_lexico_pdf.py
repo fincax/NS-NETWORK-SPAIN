@@ -67,19 +67,19 @@ def cover(c, doc):
     c.setFillColor(PORCELAIN); c.setFont('Serif',15); c.drawCentredString(M+8*mm,H-64.5*mm,'NS')
     c.setFillColor(AMBER); c.rect(M,52*mm,28*mm,1.2,fill=1,stroke=0)
     c.setFillColor(colors.HexColor('#8A9098')); c.setFont('Mono',7.5)
-    c.drawString(M,44*mm,'NS NETWORK SPAIN · LÉXICO OFICIAL · v0.1 · 11 SEPTIEMBRE 2026')
-    c.drawString(M,39*mm,'DECISIONES D-013 A D-018 · DOCUMENTO INTERNO DEL EQUIPO FUNDADOR')
+    c.drawString(M,44*mm,'NS NETWORK SPAIN · LÉXICO OFICIAL · v0.2 · 11 SEPTIEMBRE 2026')
+    c.drawString(M,39*mm,'DECISIONES D-013 A D-019 · DOCUMENTO INTERNO DEL EQUIPO FUNDADOR')
     c.restoreState()
 
 def later(c, doc):
     c.saveState()
     c.setFillColor(BLUE); c.rect(0,H-6*mm,W,6*mm,fill=1,stroke=0)
     c.setFont('Mono',7); c.setFillColor(GREY)
-    c.drawString(M,10*mm,'NS Network Spain · Léxico oficial v0.1')
+    c.drawString(M,10*mm,'NS Network Spain · Léxico oficial v0.2')
     c.drawRightString(W-M,10*mm,'%d' % doc.page)
     c.restoreState()
 
-doc=SimpleDocTemplate('NS_Lexico_v0.1.pdf', pagesize=A4, leftMargin=M, rightMargin=M, topMargin=16*mm, bottomMargin=18*mm,
+doc=SimpleDocTemplate('NS_Lexico_v0.2.pdf', pagesize=A4, leftMargin=M, rightMargin=M, topMargin=16*mm, bottomMargin=18*mm,
                       title='NS Network · Léxico oficial', author='NS Network Spain', subject='Naming de estructura, protocolos, reputación y día a día')
 S=[]
 # Cover
@@ -175,6 +175,18 @@ S.append(table([
  ('Conocimiento mutuo','Métrica de salud de la Sala: proporción de gerentes que consultan la Gaceta o un Dossier cada semana.','MutualKnowledgeRate'),
 ], WIDTHS))
 
+# 5bis Protocolo III
+S.append(Paragraph('5bis · Protocolo III · Cuentas Claras (NS-ATP)', sH1))
+S.append(Paragraph('«Lo que se da y lo que se recibe se ve. Lo que hay que hacer para mejorar, solo lo ve quien tiene que hacerlo.»', sQuote))
+S.append(Spacer(1,2*mm))
+S.append(table([
+ ('Balanza','Panel público en la Sala con lo que cada titular ha dado y recibido: Cesiones hechas y recibidas, valor contrastado generado y recibido, del mes y acumulado, y estado frente al Ritmo. Ordenada por plaza, nunca un ranking. Solo lo válido y contrastado.','MemberBalance'),
+ ('Balanza de Sala','Agregado de la Sala: Cesiones y valor contrastado del mes y acumulado, Distinciones, mejor semana.','ChapterBalance'),
+ ('Ritmo','Objetivo semanal de Cesiones válidas fijado por la Sala o, en su defecto, por NS. Estados: En Ritmo · Por encima · Por debajo. Visible en la Balanza.','WeeklyPace'),
+ ('Brújula','Cuadro privado del titular, recalculado cada noche por su Agente: dónde estás, por qué, qué ganas y qué hacer. Solo lo ven el titular y su Agente.','MemberCompass'),
+ ('Movimiento','Acción concreta que la Brújula propone para la semana: ceder, ofrecer, proponer, sondear, Embajada. Tres por semana; cinco si el titular va Por debajo. Un toque para ejecutar.','CompassMove'),
+], WIDTHS))
+
 # 6 Agentes y día a día
 S.append(Paragraph('6 · Los agentes y el día a día', sH1))
 S.append(table([
@@ -198,16 +210,19 @@ S.append(table([
  ('Protocolo I · Generar Negocio','Deber de ceder referidos de calidad. Unidad: la Cesión. Especificación técnica: NS-ARP.','NS-ARP'),
  ('Protocolo II · Dar a Conocer','Deber de comunicar el trabajo propio a la Sala cada semana. Unidad: el Comunicado. Especificación técnica: NS-ADP.','NS-ADP'),
  ('NS-ARP','NS Agentic Referral Protocol: cómo los agentes descubren, comparten, cualifican, puntúan, autorizan y trazan Cesiones.','protocol_version'),
+ ('Protocolo III · Cuentas Claras','Deber de NS de hacer visible en la Sala el valor dado y recibido por cada titular. Unidad: la Balanza. Especificación técnica: NS-ATP.','NS-ATP'),
  ('NS-ADP','NS Agentic Disclosure Protocol: cómo los agentes redactan, filtran, envían, acusan y compilan Comunicados, Gaceta y Dossier.','ADP-0.1'),
+ ('NS-ATP','NS Agentic Transparency Protocol: cómo se calculan, contrastan y publican la Balanza y el Ritmo, y cómo el Agente genera la Brújula y sus Movimientos.','ATP-0.1'),
  ('NS-CAT','Clasificación NS de Actividades: base CNAE (sección, división, grupo, clase) más el nivel Especialidad NS, ampliable y versionada. Estados: OFICIAL, NS_EXTENDIDA, PROVISIONAL, RETIRADA.','nscat_version'),
  ('Especialidad','Nivel de NS-CAT que otorga plaza. Definición de conflicto: dos empresas son de la misma especialidad si un mismo referido válido debería enviarse a las dos.','Specialty'),
 ], WIDTHS, header=('TÉRMINO','QUÉ ES','ID')))
 S.append(Spacer(1,3*mm))
-S.append(Paragraph('Reglas inmutables (D-010 y D-018)', sH2))
+S.append(Paragraph('Reglas inmutables (D-010, D-018 y D-019)', sH2))
 for r in ['<b>Nunca se cobra por una Cesión.</b> Pedir, ofrecer, aceptar o condicionar un referido a dinero, comisión, descuento o favor es motivo de expulsión. NS tampoco cobra por referido.',
           '<b>Toda empresa cumple su Compromiso:</b> un mínimo de Cesiones válidas por Ejercicio. Pertenecer es contribuir.',
           '<b>La calidad importa más que la cantidad.</b> Solo cuenta la Cesión que el cesionario cualifica como válida y NS puede contrastar.',
-          '<b>Toda empresa da a conocer su trabajo a la Sala cada semana.</b> El Agente redacta el Comunicado; el gerente lo aprueba.']:
+          '<b>Toda empresa da a conocer su trabajo a la Sala cada semana.</b> El Agente redacta el Comunicado; el gerente lo aprueba.',
+          '<b>Lo que se da y lo que se recibe se ve.</b> La Balanza de cada titular es pública en su Sala, exacta y contrastada. La Brújula, privada.']:
     S.append(Paragraph('• '+r, sBody))
 
 # 8 flujo narrado
@@ -221,6 +236,7 @@ flow=['El Agente de Híspalis detecta un <b>Indicio</b> en su <b>Rastreo</b>: un
  'La <b>Crónica</b> de NS Cumbre lo publica; la Cesión recibe la <b>Distinción</b> de la semana.',
  'La plaza de Mobiliario estaba vacante en NS Cumbre: Carlos hizo una <b>Embajada</b> a un titular de NS Ágora, que pasó a ser <b>Embajadora</b> de Mobiliario en NS Cumbre; Carlos obtuvo prima de Mérito.',
  'El domingo, el Agente de Híspalis envía su <b>Comunicado</b>; el lunes, la <b>Gaceta</b> lo resume para toda la Sala y el <b>Dossier</b> de Híspalis queda actualizado.',
+ 'La <b>Balanza</b> de NS Cumbre muestra a Híspalis En <b>Ritmo</b>: 2 de 2 esta semana. Su <b>Brújula</b> le propone tres <b>Movimientos</b> para la próxima.',
  'El <b>Parte</b> del Consejo de Zona anota que Mobiliario debería cubrirse desde la <b>Antesala</b>.']
 for i,f in enumerate(flow,1):
     S.append(Paragraph('%d. %s' % (i,f), sBody))
@@ -229,7 +245,7 @@ for i,f in enumerate(flow,1):
 S.append(Paragraph('9 · Palabras que NS no usa', sH1))
 S.append(Paragraph('«Lead», «referencia» (en el sentido de referido), «capítulo», «grupo», «círculo», «networking» como sustantivo del producto, «sinergia», «match» en la interfaz, «ranking», «puntos», «compliance» y «ticket» en el copy de la app. Y ninguna expresión, lema o formato protegido de otras organizaciones de networking. Los identificadores técnicos del protocolo se mantienen en inglés y se mapean en este léxico.', sBody))
 S.append(Spacer(1,6*mm))
-S.append(Paragraph('Fuentes: docs/13_LEXICO_NS.md · docs/12_SALAS.md · docs/14_PROTOCOLOS_DE_SALA.md · docs/DECISIONS.md (D-013 a D-018). Términos confirmados por el fundador el 11 de septiembre de 2026; «Extramuros» descartado en favor de «Embajada»; el nivel «Embajador» pasa a «Consejero».', sSmall))
+S.append(Paragraph('Fuentes: docs/13_LEXICO_NS.md · docs/12_SALAS.md · docs/14_PROTOCOLOS_DE_SALA.md · docs/DECISIONS.md (D-013 a D-019). Términos confirmados por el fundador el 11 de septiembre de 2026; «Extramuros» descartado en favor de «Embajada»; el nivel «Embajador» pasa a «Consejero».', sSmall))
 
 doc.build(S, onFirstPage=cover, onLaterPages=later)
 print('ok')
