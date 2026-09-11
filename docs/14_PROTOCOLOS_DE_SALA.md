@@ -1,15 +1,16 @@
-# 14 · Los dos protocolos obligatorios de Sala
+# 14 · Los tres protocolos obligatorios de Sala
 
-**Estado:** D-018 (CONFIRMED en su obligación por el fundador; nombres y parámetros PROPOSED).
+**Estado:** D-018 y D-019 (CONFIRMED en su obligación por el fundador; nombres y parámetros PROPOSED).
 
-Pertenecer a una Sala NS implica dos deberes que los Agentes ejecutan y las personas validan:
+Pertenecer a una Sala NS implica tres deberes que los Agentes ejecutan y las personas validan:
 
 ```text
 Protocolo I  · GENERAR NEGOCIO      Ceder referidos de calidad.          Unidad: la Cesión.      Especificación: NS-ARP (docs/02).
 Protocolo II · DAR A CONOCER        Comunicar tu trabajo a la Sala.      Unidad: el Comunicado.  Especificación: NS-ADP (este documento).
+Protocolo III · CUENTAS CLARAS      Hacer visible el valor dado y recibido. Unidad: la Balanza.  Especificación: NS-ATP (este documento).
 ```
 
-Ambos tienen cadencia semanal, cumplimiento verificable y consecuencias (D-010). Ambos los realiza el Agente; el gerente decide en segundos.
+Los tres tienen cadencia semanal, cumplimiento verificable y consecuencias (D-010). Los tres los realiza el Agente; el gerente decide en segundos.
 
 ---
 
@@ -147,3 +148,132 @@ Accesos: desde Mi Sala (lista de miembros), desde cualquier Cesión o Pista ("ve
 1. Día y hora del cierre semanal.
 2. Si el Comunicado de continuidad cumple indefinidamente o tiene tope (propuesta: dos seguidos).
 3. Si la Gaceta se comparte también entre Salas de la zona (propuesta: solo en Confluencias).
+
+---
+
+## Protocolo III · Cuentas Claras · NS-ATP (NS Agentic Transparency Protocol)
+
+### 1. Principio
+
+> Lo que se da y lo que se recibe se ve. Lo que hay que hacer para mejorar, solo lo ve quien tiene que hacerlo.
+
+En una Sala es visible, para todos sus miembros, el **valor de negocio generado y recibido por cada titular**: el del mes y el acumulado. La transparencia sostiene la reciprocidad sin necesidad de discursos. Pero la transparencia tiene dos caras y el protocolo las separa con precisión:
+
+- **Balanza** (pública dentro de la Sala): qué ha dado y qué ha recibido cada titular, y en qué punto del objetivo semanal se encuentra.
+- **Brújula** (privada, solo el titular y su Agente): si está consiguiendo sus objetivos, por qué, qué le motiva a seguir, qué puede ofrecer a otros, qué puede proponer y qué referidos posibles tiene a mano para ceder.
+
+### 2. Objetos
+
+| Término NS | Qué es | Visibilidad | Identificador técnico |
+| --- | --- | --- | --- |
+| **Balanza** | Panel de valor dado y recibido de cada titular de la Sala: Cesiones hechas y recibidas (número), valor contrastado generado para otros y recibido, del mes y acumulado, más el estado frente al Ritmo. Nunca un ranking. | `CHAPTER` | `MemberBalance` |
+| **Balanza de Sala** | Agregado de la Sala: Cesiones del mes, valor contrastado del mes y acumulado, Distinciones, mejor semana. | `CHAPTER` | `ChapterBalance` |
+| **Ritmo** | Objetivo semanal de Cesiones válidas fijado por la Sala; si la Sala no lo fija, el de NS por defecto. Es el paso semanal que lleva al Compromiso del Ejercicio. | `CHAPTER` | `WeeklyPace` |
+| **Brújula** | Cuadro privado en el que el Agente muestra al titular si consigue sus objetivos (Ritmo, Compromiso, Comunicado), por qué, qué le motiva, qué ofrecer, qué proponer y qué referidos posibles tiene para ceder. | `COMPANY_ONLY` | `MemberCompass` |
+| **Movimiento** | Cada acción concreta que la Brújula propone para la semana: una Cesión candidata, un Sondeo, un Encargo de la Sala que el titular puede atender, una Embajada. Tres por semana. | `COMPANY_ONLY` | `CompassMove` |
+
+### 3. La Balanza (pública en la Sala)
+
+Se consulta desde Mi Sala y desde cualquier Dossier. Una fila por titular, ordenada por plaza (nunca por valor), con la Balanza de Sala en cabecera.
+
+```text
+BALANZA · NS Cumbre · Septiembre 2026
+Sala: 41 Cesiones válidas este mes · 312.000 € contrastados · acumulado 2,1 M€ · Ritmo de Sala: 1 Cesión válida / semana
+
+Plaza                       Dadas      Recibidas   Contrastado dado   Contrastado recibido   Ritmo
+                            mes · acum mes · acum  mes · acum         mes · acum
+Obra industrial · Híspalis   3 · 27     2 · 19     38.000 · 410.000   61.000 · 520.000       En Ritmo (2 de 2)
+Seguros · Guadalquivir       5 · 44     1 · 12     92.000 · 780.000   9.000 · 96.000         Por encima (4 de 2)
+Mobiliario · vacante         —          —          —                  —                      Plaza vacante
+```
+
+Reglas:
+
+1. **Solo cuenta lo válido y lo contrastado.** "Dadas" y "Recibidas" son Cesiones con Veredicto válido. Las Cesiones en curso se muestran aparte, en gris, como "en curso". El valor es siempre valor contrastado (confirmado por ambas partes). El valor potencial y el pipeline nunca aparecen en la Balanza.
+2. **Nunca es un ranking.** El orden es por plaza. No hay medallas, posiciones ni "top". Las Distinciones se otorgan por calidad y las decide quien recibe (D-009).
+3. **El Ritmo se ve.** Cada titular muestra su estado semanal frente al Ritmo: **En Ritmo**, **Por encima**, **Por debajo**, con la cifra (hechas de objetivo). Es el único indicador de "cómo va" que la Sala ve de cada miembro, y es el que el Consejo de Zona usa en el Parte.
+4. **Reciprocidad explicada, no juzgada.** Junto a cada titular, un indicador de balance con explicación del Agente de Sala: "Da más de lo que recibe: su especialidad genera muchas señales para otros" o "Recibe más de lo que da: especialidad de destino frecuente". Nunca un número de reciprocidad a secas.
+5. **El valor de una Cesión concreta nunca se muestra en la Balanza.** Solo agregados por titular. Las dos partes de una Cesión conocen su valor; el resto de la Sala ve sumas.
+6. **Doce semanas de historia** en una línea por titular (sparkline) para que el patrón se entienda sin leer números.
+
+### 4. La Brújula (privada)
+
+El Agente del titular la recalcula cada noche y la presenta en el Despacho y en Hoy. Es el lugar donde el Agente "estudia constantemente cómo mejorar sus estadísticas". Cuatro bloques:
+
+```text
+BRÚJULA · Híspalis · Semana 37
+
+1 · Dónde estás
+    Ritmo         En Ritmo · 2 de 2 esta semana · racha de 5 semanas
+    Compromiso    2 de 3 en el Ejercicio · quedan 19 días · a tiempo
+    Comunicado    Aprobado el domingo · 3 semanas seguidas
+    Recibes       61.000 € contrastados este mes · 2 Cesiones aceptadas de 2 (100 %)
+    Das           38.000 € · tus Cesiones se aceptan al 87 % (media de la Sala 74 %)
+
+2 · Por qué
+    + Tus Cesiones a Guadalquivir y Triana cierran en menos de 30 días.
+    – Tus dos últimas Cesiones a SecureNet fueron declinadas: "sin decisor identificado". Tu Agente pedirá ese dato antes de proponer.
+    · Las señales que mejor conviertes: "nueva sede" y "cambio de dirección financiera".
+
+3 · Qué ganas
+    Mérito        1.420 · a 180 del nivel Referente (acceso a Cesiones de otras Salas)
+    Distinción    Tu Cesión a Triana es candidata a Cesión del mes
+    Embajada      La plaza de Mobiliario sigue vacante: cada Embajada que resuelva vale prima ×2
+
+4 · Tres Movimientos para esta semana
+    1  Ceder: tu cliente Logística Bética renueva flota (12 vehículos) → Torre Seguros tiene un Encargo abierto exacto. Borrador listo.
+    2  Ofrecer: PRL Andaluza busca naves con licencia en trámite → tienes 3 obras en curso que encajan. Sondeo preparado.
+    3  Proponer: Rastreo público: licencia de obra mayor en Alcalá para "Cerámicas del Sur" → posible Cesión para ti vía Bufete Alameda, que conoce a la propiedad. ¿Pedimos Sondeo?
+```
+
+Reglas:
+
+1. La Brújula nunca sale de la empresa: visibilidad `COMPANY_ONLY`. Ni la Directiva ni la Sala la ven; el Parte solo recibe agregados y el estado de Ritmo.
+2. Cada Movimiento es accionable en un toque desde el Despacho (ceder, sondear, aprobar borrador, descartar con motivo). Lo descartado con motivo entrena al Agente.
+3. El bloque "Por qué" usa evidencia real: Veredictos recibidos, tiempos de respuesta, tipos de Indicio que convierten. Nunca consejos genéricos.
+4. El bloque "Qué ganas" enlaza cada objetivo con una consecuencia concreta (nivel, Distinción, prima de Embajada, plaza que se abre). La motivación es tangible o no se muestra.
+5. Si el titular va Por debajo del Ritmo dos semanas, la Brújula sube de tono: el Agente propone cinco Movimientos en lugar de tres y ofrece agendar un Despacho de 10 minutos. Si van tres, avisa de que la Directiva lo verá en el Parte.
+
+### 5. El Ritmo
+
+- Lo fija la Sala (Directiva, ratificado en Pleno) al inicio de cada Ejercicio; si no lo fija, rige el Ritmo de NS por defecto (propuesta inicial: 1 Cesión válida por semana y titular).
+- El Ritmo es el paso semanal; el Compromiso (D-010) es el mínimo del Ejercicio. Un titular puede cumplir el Compromiso sin ir siempre En Ritmo, y la Balanza lo muestra con honestidad.
+- Un Ritmo de Sala no puede ser inferior al que garantiza el Compromiso del Ejercicio.
+- El Chapter Intelligence Agent propone ajustar el Ritmo cuando más del 60 % de los titulares está Por encima (subirlo) o más del 40 % está Por debajo dos semanas seguidas (revisarlo o revisar la captación de Indicios).
+
+### 6. Especificación agentic (NS-ATP v0.1)
+
+| Campo | Especificación |
+| --- | --- |
+| **Trigger** | Cierre diario (Brújula) y cierre semanal (Balanza y Ritmo). Recalculo inmediato al confirmarse un Veredicto o un valor contrastado. |
+| **Inputs** | Cesiones y Veredictos; valor contrastado; Compromiso y Ritmo vigentes; Comunicados; Encargos de la Sala; Rastreo y Sondeos del Agente; Hoja de Méritos; historial de 12 semanas. |
+| **Agente** | Company Agent (Brújula y Movimientos); Chapter Intelligence Agent (Balanza de Sala, explicación de reciprocidad, propuesta de Ritmo); Trust & Compliance (Contraste de lo que entra en la Balanza). |
+| **Permisos** | Balanza: `CHAPTER`, solo agregados por titular y solo valor contrastado. Brújula: `COMPANY_ONLY`. Los Movimientos que impliquen a un tercero respetan NS-ARP: nada sale de la empresa hasta el visto bueno. |
+| **Objetivo de razonamiento** | Balanza: mostrar con exactitud y sin juicio. Brújula: encontrar las tres acciones con mayor probabilidad de producir una Cesión válida esta semana, explicar por qué, y conectar cada objetivo con una consecuencia real. |
+| **Salida estructurada** | `MemberBalance{ given{month,total}, received{month,total}, value_given{month,total}, value_received{month,total}, in_progress, pace_status, pace_done, pace_target, reciprocity_note, history_12w[] }` · `MemberCompass{ status{pace,quota,communique}, why[], gains[], moves[3..5] }`. |
+| **Confianza** | Todo dato de la Balanza es contrastado o no aparece. En la Brújula, cada Movimiento lleva confianza y origen (Encargo de la Sala, Rastreo, Sondeo, cliente propio). |
+| **Puerta humana** | Ninguna para ver la Balanza. Cada Movimiento requiere un toque del titular para ejecutarse. |
+| **Efecto** | Balanza publicada en Mi Sala y Dossier; Brújula en Despacho y Hoy; Ritmo en el Parte del Consejo de Zona. |
+| **Auditoría** | `BALANCE_PUBLISHED`, `PACE_STATUS_CHANGED`, `COMPASS_GENERATED`, `MOVE_ACCEPTED`, `MOVE_DISMISSED{reason}`. |
+| **Fallo** | Si falta un Veredicto o un valor no está contrastado, la Balanza muestra "en curso", nunca un dato provisional. Si el Agente no puede generar Movimientos con confianza suficiente, la Brújula lo dice y pide dos datos al titular en el Despacho. |
+
+### 7. Cumplimiento y salud
+
+- No hay obligación nueva sobre el miembro: Cuentas Claras hace visibles las obligaciones de los Protocolos I y II. La obligación recae en NS: la Balanza es siempre pública en la Sala, exacta y contrastada.
+- Métricas: proporción de titulares En Ritmo; tasa de aceptación de Movimientos; conversión de Movimientos en Cesiones válidas; tiempo entre Movimiento y Cesión.
+- El Parte del Consejo de Zona recibe: distribución de Ritmo, titulares Por debajo dos semanas, propuesta de ajuste de Ritmo y plazas cuya Balanza recibida es alta con Balanza dada baja (candidatas a conversación de reciprocidad).
+
+### 8. Interfaz
+
+- **Mi Sala → Balanza**: tabla por plaza, Balanza de Sala en cabecera, sparkline de 12 semanas, filtro mes / acumulado.
+- **Dossier**: Balanza del titular y estado de Ritmo.
+- **Hoy**: estado de Ritmo y el primer Movimiento de la Brújula.
+- **Despacho**: Brújula completa; cada Movimiento con un toque.
+- **Parte**: distribución de Ritmo y alertas.
+- **Móvil**: Ritmo y Movimientos primero; la Balanza completa, en escritorio.
+
+### 9. Pendientes del fundador
+
+1. Ritmo de NS por defecto (propuesta: 1 Cesión válida por semana y titular).
+2. Si la Balanza muestra el valor contrastado en euros por titular o solo el número de Cesiones (la propuesta muestra ambos, solo agregados).
+3. Nombres: Cuentas Claras (protocolo), Balanza (público), Brújula (privado), Ritmo (objetivo semanal), Movimiento (acción propuesta). Alternativas en `docs/13_LEXICO_NS.md`.

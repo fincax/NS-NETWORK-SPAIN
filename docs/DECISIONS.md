@@ -470,3 +470,25 @@ Reglas derivadas:
 **Consequences.** Nuevo `docs/14_PROTOCOLOS_DE_SALA.md` con la especificación agentic de NS-ADP v0.1. NS-ARP S4 (Agent Discovery) consume el índice de capabilities actualizado por los Comunicados. El Despacho, Hoy, Mi Sala, el Pleno y el Parte incorporan Comunicado, Gaceta y Dossier. Léxico ampliado (`docs/13_LEXICO_NS.md` §4bis).
 
 **Revisit when.** Tras cuatro semanas de Comunicados en la Sala piloto, con datos de conocimiento mutuo y de precisión de Pistas.
+
+---
+
+## D-019 · Protocolo III · Cuentas Claras: Balanza pública por titular en la Sala (dado, recibido, mes y acumulado, estado frente al Ritmo) y Brújula privada generada por el Agente
+
+**Status:** CONFIRMED en su obligación (decisión directa del fundador); nombres y parámetros PROPOSED
+**Date:** 2026-09-11
+
+**Context.** El fundador fija un tercer protocolo: en una Sala será visible el valor de negocio generado y recibido por cada titular, del mes y acumulado. En la parte pública se ven los números (Cesiones hechas y recibidas) y en qué punto del objetivo semanal, marcado por la Sala o en su defecto por NS, se encuentra cada titular. En la parte privada, como su Agente estudia constantemente cómo mejorar sus estadísticas, qué ofrecer a otros y qué proponer, el titular ve un cuadro con si está consiguiendo los objetivos, motivaciones para hacerlo y el rastreo de posibles referidos para ceder.
+
+**Choice.**
+
+- **Balanza** (visibilidad `CHAPTER`): por titular, Cesiones hechas y recibidas (solo con Veredicto válido; las demás como "en curso"), valor contrastado generado para otros y recibido (solo agregados, nunca el valor de una Cesión concreta), del mes y acumulado, historial de 12 semanas, y estado frente al **Ritmo**: En Ritmo · Por encima · Por debajo, con la cifra. Ordenada por plaza; nunca un ranking; reciprocidad explicada por el Agente de Sala, no juzgada. **Balanza de Sala** en cabecera.
+- **Ritmo**: objetivo semanal de Cesiones válidas fijado por la Sala al inicio de cada Ejercicio; en su defecto, el de NS (propuesta: 1 por semana y titular). Nunca inferior al que garantiza el Compromiso. El Chapter Intelligence Agent propone ajustes con datos.
+- **Brújula** (visibilidad `COMPANY_ONLY`): recalculada cada noche por el Agente del titular con cuatro bloques: dónde estás (Ritmo, Compromiso, Comunicado, dado y recibido), por qué (evidencia: Veredictos, tiempos, señales que convierten), qué ganas (Mérito hasta el siguiente nivel, Distinción, Embajada) y tres **Movimientos** accionables en un toque (ceder, ofrecer, proponer, sondear, Embajada), cinco si va Por debajo. Nunca sale de la empresa; la Directiva solo recibe agregados y el estado de Ritmo en el Parte.
+- La obligación recae en NS: Balanza siempre pública en la Sala, exacta y contrastada. Se incorpora como quinta regla inmutable en `CLAUDE.md`.
+
+**Why.** La transparencia del valor dado y recibido sostiene la reciprocidad sin discursos y sin rankings tóxicos (constitución §14). Separar lo público (pesar) de lo privado (orientar) convierte el dato en acción: el Agente no solo informa, propone la siguiente Cesión.
+
+**Consequences.** `docs/14_PROTOCOLOS_DE_SALA.md` incorpora NS-ATP v0.1 con especificación agentic. Objetos `MemberBalance`, `ChapterBalance`, `WeeklyPace`, `MemberCompass`, `CompassMove`. Mi Sala, Dossier, Hoy, Despacho y Parte incorporan Balanza, Ritmo y Brújula. Léxico ampliado (`docs/13_LEXICO_NS.md` §4ter). PDF del léxico regenerado como v0.2.
+
+**Revisit when.** Tras el primer Ejercicio completo con Balanza pública en la Sala piloto, con datos de aceptación y conversión de Movimientos.

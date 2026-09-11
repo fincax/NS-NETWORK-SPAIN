@@ -87,14 +87,28 @@ Criterios de cada nombre: castellano; una palabra siempre que sea posible; insti
 | **Dossier** | Ficha viva de cada miembro: qué hace, a quién sirve, Cesión perfecta, capacidad ahora, Encargos, cómo presentarla, Hoja de Méritos, histórico de Comunicados. Dos toques desde cualquier pantalla. | `MemberDossier` |
 | **Conocimiento mutuo** | Métrica de salud de la Sala: proporción de gerentes que consultan la Gaceta o un Dossier cada semana. | `MutualKnowledgeRate` |
 
+## 4ter. Protocolo III · Cuentas Claras
+
+| Término NS | Qué es | Identificador técnico |
+| --- | --- | --- |
+| **Balanza** | Panel público en la Sala con lo que cada titular ha dado y recibido: Cesiones hechas y recibidas, valor contrastado generado y recibido, del mes y acumulado, y estado frente al Ritmo. Ordenada por plaza, nunca un ranking. | `MemberBalance` |
+| **Balanza de Sala** | Agregado de la Sala: Cesiones y valor contrastado del mes y acumulado, Distinciones, mejor semana. | `ChapterBalance` |
+| **Ritmo** | Objetivo semanal de Cesiones válidas fijado por la Sala o, en su defecto, por NS. Estados: En Ritmo · Por encima · Por debajo. | `WeeklyPace` |
+| **Brújula** | Cuadro privado del titular: si consigue sus objetivos, por qué, qué gana, qué ofrecer, qué proponer y qué referidos posibles tiene para ceder. Solo lo ven el titular y su Agente. | `MemberCompass` |
+| **Movimiento** | Acción concreta que la Brújula propone para la semana (ceder, ofrecer, proponer, sondear, Embajada). Tres por semana; cinco si el titular va Por debajo. Un toque para ejecutar. | `CompassMove` |
+
+Alternativas consideradas: para el protocolo, "Rendir Cuentas" y "Transparencia"; para Balanza, "Tablón" y "Cuadro"; para Brújula, "Bitácora" y "Plan". Se recomienda Cuentas Claras · Balanza · Brújula · Ritmo · Movimiento por sobriedad, literalidad y contraste entre lo público (pesar) y lo privado (orientar).
+
 ## 5. Protocolos y clasificaciones
 
 | Término | Qué es |
 | --- | --- |
 | **Protocolo I · Generar Negocio** | Deber de ceder referidos de calidad. Unidad: la Cesión. Especificación técnica: NS-ARP. |
 | **Protocolo II · Dar a Conocer** | Deber de comunicar el trabajo propio a la Sala cada semana. Unidad: el Comunicado. Especificación técnica: NS-ADP. |
+| **Protocolo III · Cuentas Claras** | Deber de NS de hacer visible en la Sala el valor dado y recibido por cada titular. Unidad: la Balanza. Especificación técnica: NS-ATP. |
 | **NS-ARP** | NS Agentic Referral Protocol: cómo los agentes descubren, comparten, cualifican, puntúan, autorizan y trazan Cesiones. |
 | **NS-ADP** | NS Agentic Disclosure Protocol: cómo los agentes redactan, filtran, envían, acusan y compilan Comunicados, Gaceta y Dossier. |
+| **NS-ATP** | NS Agentic Transparency Protocol: cómo se calculan, contrastan y publican la Balanza y el Ritmo, y cómo el Agente genera la Brújula y sus Movimientos. |
 | **NS-CAT** | Clasificación NS de Actividades: base CNAE + Especialidad NS, ampliable y versionada. |
 | **Especialidad** | Nivel de NS-CAT que otorga plaza. |
 | **Reglas inmutables** | Nunca se cobra por una Cesión (expulsión); Compromiso obligatorio; calidad sobre cantidad (D-010). |

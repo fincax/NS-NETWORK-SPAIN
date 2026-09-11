@@ -589,14 +589,17 @@ Reglas del core:
 
 La Embajada recompensa la generosidad exactamente donde más cuesta, evita que un buen referido se pierda y convierte cada hueco en una señal de captación.
 
-### Los dos protocolos obligatorios de Sala (D-018)
+### Los tres protocolos obligatorios de Sala (D-018, D-019)
 
 ```text
-Protocolo I  · GENERAR NEGOCIO   Ceder referidos de calidad.       Unidad: la Cesión.     Especificación: NS-ARP.
-Protocolo II · DAR A CONOCER     Comunicar tu trabajo a la Sala.   Unidad: el Comunicado. Especificación: NS-ADP.
+Protocolo I   · GENERAR NEGOCIO   Ceder referidos de calidad.                 Unidad: la Cesión.     Especificación: NS-ARP.
+Protocolo II  · DAR A CONOCER     Comunicar tu trabajo a la Sala.             Unidad: el Comunicado. Especificación: NS-ADP.
+Protocolo III · CUENTAS CLARAS    Hacer visible el valor dado y recibido.     Unidad: la Balanza.    Especificación: NS-ATP.
 ```
 
 **Protocolo II · Dar a Conocer.** Nadie puede ceder bien lo que no conoce bien. Cada semana, el Agente de cada empresa informa a los Agentes de las demás empresas de la Sala de su especialidad y plaza, de las funciones, servicios y productos que trabaja, y de las actualizaciones, novedades y cualquier dato importante ocurrido esa semana (**Comunicado**). El Chapter Intelligence Agent los compila en la **Gaceta** semanal de la Sala, con una vista "relevante para ti" por gerente. Todo gerente debe conocer, o poder consultar en segundos, el **Dossier**, el histórico y las novedades de cada miembro de su Sala. El gerente aprueba su Comunicado en el Despacho con un toque; el cumplimiento es verificable y sigue la misma escalera que el Compromiso. Especificación completa en `docs/14_PROTOCOLOS_DE_SALA.md`.
+
+**Protocolo III · Cuentas Claras.** Lo que se da y lo que se recibe se ve. En cada Sala es visible, para todos sus miembros, la **Balanza** de cada titular: Cesiones hechas y recibidas, valor contrastado generado para otros y recibido, del mes y acumulado, y en qué punto del **Ritmo** (objetivo semanal fijado por la Sala o, en su defecto, por NS) se encuentra. Nunca es un ranking: se ordena por plaza, solo muestra lo válido y contrastado, y la reciprocidad se explica, no se juzga. En privado, cada titular tiene su **Brújula**: el Agente estudia constantemente cómo mejorar sus resultados y le muestra si consigue sus objetivos, por qué, qué gana con ello, qué puede ofrecer a otros, qué puede proponer y qué referidos posibles tiene para ceder, en forma de tres **Movimientos** semanales accionables con un toque. La Brújula nunca sale de la empresa. Especificación completa en `docs/14_PROTOCOLOS_DE_SALA.md`.
 
 ## 15. Privacidad como ventaja competitiva
 
@@ -1316,6 +1319,7 @@ Estas tres reglas están por encima de cualquier feature, decisión de diseño o
 2. **Toda empresa debe aportar un número mínimo de referidos en los plazos que se estipulen.** Pertenecer a NS es contribuir. El mínimo y el plazo se fijan por Sala y se aplican con una escalera de consecuencias que termina en la pérdida de la plaza. El agente de cada empresa trabaja para que su miembro lo cumpla sin esfuerzo.
 3. **La calidad importa más que la cantidad.** Un referido cuenta cuando el receptor lo cualifica como válido y NS puede auditarlo. Un referido flojo no cumple el mínimo ni suma reputación; puede restar.
 4. **Toda empresa da a conocer su trabajo a la Sala cada semana** (D-018). El Agente redacta el Comunicado; el gerente lo aprueba. Sin conocimiento mutuo no hay referidos de calidad.
+5. **Lo que se da y lo que se recibe se ve** (D-019). La Balanza de cada titular es pública en su Sala, exacta y contrastada. Lo que hay que hacer para mejorar solo lo ve quien tiene que hacerlo.
 
 # NORTH STAR
 
