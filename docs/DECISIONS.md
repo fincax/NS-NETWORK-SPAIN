@@ -520,7 +520,7 @@ Reglas derivadas:
 
 ## D-021 · La Cesión vale en dos momentos: Promesa a priori (calculada por los Agentes, confirmada por el cesionario, con Mérito inmediato para el cedente) y Veredicto a posteriori
 
-**Status:** CONFIRMED (criterio fijado por el fundador); parámetros PROPOSED
+**Status:** CONFIRMED (criterio y nombre "Promesa" ratificados por el fundador el 2026-09-12); pesos PROPOSED
 **Date:** 2026-09-11
 
 **Context.** El fundador no quiere que toda la carga de la valoración de la Cesión recaiga sobre el cesionario: si un referido indica a priori un buen negocio en el Indicio, eso debe aparecer y contar, y se completa con la valoración a posteriori una vez prestado el servicio.
