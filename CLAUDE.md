@@ -106,7 +106,7 @@ BNI es una referencia conceptual inicial. NS debe convertirse en una categoría 
 
 ## 3. Principio de exclusividad
 
-Cada grupo local NS funciona como un círculo empresarial privado.
+Cada Sala NS funciona como un círculo empresarial privado.
 
 Dentro de cada grupo solo puede existir **una empresa por categoría/especialidad empresarial definida**.
 
@@ -124,26 +124,28 @@ Ejemplo conceptual:
 
 La taxonomía de categorías debe ser configurable y suficientemente específica para evitar tanto monopolios artificialmente amplios como conflictos competitivos. (Decisión fijada: la plaza corresponde a una **especialidad concreta**, no a un sector amplio. Ver `docs/DECISIONS.md` · D-001.)
 
-La exclusividad se aplica a nivel de grupo, no necesariamente de ciudad.
+La exclusividad se aplica a nivel de Sala, no de ciudad. En una misma zona (por ejemplo, Sevilla) pueden abrirse tantas Salas como permita la saturación de la zona.
 
 ```text
 NS Sevilla
-├── Grupo/Círculo 01
+├── NS Cumbre        (Sala)
 │   ├── Arquitectura
 │   ├── Seguros
 │   ├── Legal
 │   └── ...
 │
-├── Grupo/Círculo 02
+├── NS Ágora         (Sala)
 │   ├── Arquitectura
 │   ├── Seguros
 │   ├── Legal
 │   └── ...
 │
-└── Grupo/Círculo 03
+└── NS Meridiana     (Sala)
 ```
 
-Puede haber varios grupos en una misma ciudad.
+Puede haber varias Salas en una misma ciudad.
+
+**La Sala no es territorial (D-014).** Una Sala se define por sus empresas, no por un mapa. No tiene barrio, distrito ni radio. Su nombre no debe dar ninguna pista territorial: el nombre de la ciudad o municipio está reservado a NS para agrupar las Salas de la zona ("NS Sevilla"), y ninguna Sala puede llevar el nombre de una ciudad, municipio, provincia, comunidad autónoma, país, barrio o distrito. Cada Sala elige un nombre propio, con el prefijo NS, autorizado por NS y único en toda la red: "NS Cumbre", "NS Ágora". Las Salas de una zona se encuentran entre sí (encuentros entre Salas) porque generan negocio, no porque compartan territorio.
 
 Posteriormente existirán:
 
@@ -224,7 +226,7 @@ Una empresa española está preparando su entrada en Portugal.
 
 Podría interesar a: fiscalidad internacional; legal; recursos humanos; traducción; logística; seguros; financiación; real estate; consultoría; marketing.
 
-El objetivo del sistema es comprender que **una sola señal empresarial puede desencadenar múltiples oportunidades legítimas para empresas diferentes del círculo**.
+El objetivo del sistema es comprender que **una sola señal empresarial puede desencadenar múltiples oportunidades legítimas para empresas diferentes de la Sala**.
 
 ## 6. El gran activo tecnológico: NS Agentic Referral Protocol
 
@@ -391,7 +393,7 @@ Considerar como arquitectura inicial al menos estos roles.
 
 ### Company Agent
 
-Representa a una empresa. Su prioridad es: comprender y defender los intereses comerciales de su empresa mientras ayuda al resto del círculo a encontrar oportunidades legítimas.
+Representa a una empresa. Su prioridad es: comprender y defender los intereses comerciales de su empresa mientras ayuda al resto de la Sala a encontrar oportunidades legítimas.
 
 ### Chapter Intelligence Agent
 
@@ -570,6 +572,53 @@ Medir preferentemente: valor generado; calidad; aceptación; conversiones; tiemp
 
 La reputación debe basarse en comportamiento verificable. No crear un "número mágico" opaco que pueda destruir injustamente la reputación de una empresa.
 
+### Promesa, Veredicto y Distinción: la Cesión vale en dos momentos (D-020, D-021)
+
+La valoración de una Cesión no recae solo en el cesionario. Vale **a priori**, por lo que el Indicio promete, y **a posteriori**, por lo que ocurrió una vez prestado el servicio.
+
+**Promesa (a priori).** Cuando la Cesión se acepta, el sistema fija su Promesa a partir de datos estructurados, no de una opinión: valor estimado, necesidad real, información completa, decisor identificado, plazo, fuerza de la relación del cedente con el Interesado. La calculan los Agentes con el Fundamento; el cesionario la confirma o la ajusta con un toque al aceptar. La Promesa da al cedente **Mérito de Promesa** en el momento de la aceptación, sin esperar al cierre. Así un buen referido cuenta aunque después el cesionario no lo convierta.
+
+**Veredicto (a posteriori).** Toda Cesión resuelta termina en el **Veredicto** del cesionario sobre tres ejes, en tres toques:
+
+```text
+FACILIDAD   ¿Fue fácil prestar el servicio?  (información completa, momento real, decisor identificado, encaje)
+NEGOCIO     ¿Cuánto negocio generó?          (oportunidad, cierre, valor contrastado)
+TRATO       ¿Cómo fue el trato de las personas?  (del cedente en el Puente, del Interesado en la relación)
+```
+
+El Veredicto completa la Promesa: confirma o matiza Facilidad y Trato, y aporta Negocio con el cierre y el valor contrastado. El Mérito total del cedente es Mérito de Promesa + Mérito de Veredicto + Mérito de Cierre. Si la Cesión no prospera por causa del cesionario (respuesta tardía, sin seguimiento), el cedente conserva su Mérito de Promesa y el cesionario responde en su reputación de cesionario. Si el Veredicto demuestra que el Indicio era falso (el Interesado no tenía la necesidad), el Mérito de Promesa se retira. El Contraste vigila las Promesas infladas y los ajustes a la baja sistemáticos.
+
+Además del Veredicto, el cesionario puede otorgar una **Distinción** al cedente por esa Cesión. Es un acto deliberado y escaso: como máximo una por titular y mes. Debe nombrar el eje que destacó (Facilidad, Negocio o Trato) y una línea de motivo, que se publica en la Crónica. Las Distinciones alimentan el Mérito y la Hoja de Méritos del cedente, que muestra por qué le valoran ("12 Distinciones: 5 por Trato, 4 por Facilidad, 3 por Negocio"). El Contraste verifica que cada Distinción corresponde a una Cesión con Veredicto válido y vigila los pares que se distinguen mutuamente. Nadie se distingue a sí mismo ni distingue por cantidad: solo quien recibe, y solo por calidad.
+
+### Embajada · Propuesta Fuera de la Sala (D-015)
+
+Cuando un miembro dispone de un buen referido y **en su Sala no hay titular de esa especialidad** (plaza vacante o especialidad sin representar), NS le ofrece un acto extraordinario: la **Embajada**. El miembro propone él mismo a un titular de **otra Sala de la zona**. Su Agente le presenta candidatos ordenados por Hoja de Méritos, tiempo de respuesta y encaje; el miembro puede elegir uno que ya conozca. La cesión sigue el ciclo completo de NS-ARP.
+
+La empresa que acoge la cesión se convierte en **Embajadora** de esa especialidad en la Sala del cedente mientras la plaza siga vacante: representa esa especialidad ante la Sala sin ser miembro de ella, sin plaza y sin voto.
+
+Reglas del core:
+
+- Solo procede cuando la plaza está vacante en la Sala del cedente. El sistema lo verifica. Con la plaza ocupada, la prioridad es siempre de la propia Sala.
+- Si resuelve (veredicto válido de la Embajadora, y más aún si llega a valor contrastado), el cedente recibe una **prima de Mérito muy superior** a la de una cesión ordinaria. La Embajadora recibe Mérito como en cualquier cesión y la mención "Embajadora de [especialidad] en [Sala]" en su Hoja de Méritos. Parámetros propuestos en D-015.
+- La condición de Embajadora es temporal: termina cuando la plaza se cubre o al cierre del Ejercicio siguiente si no hay nuevas Embajadas. Una empresa puede ser Embajadora en un máximo de dos Salas a la vez, para que la figura no se convierta en una membresía múltiple encubierta. La Embajadora no adquiere derecho ni prioridad sobre la plaza.
+- Cada Embajada deja constancia de una plaza que la Sala debería cubrir desde la Antesala. Tres Embajadas de una misma especialidad en un Ejercicio abren candidatura preferente para esa plaza.
+- Se aplican todas las reglas inmutables: nunca contraprestación. El Contraste vigila cesiones cruzadas entre dos empresas de Salas distintas.
+- Si ninguna Sala de la zona cubre la especialidad, el mismo acto se extiende a otra zona (Embajada en Red) con la misma prima.
+
+La Embajada recompensa la generosidad exactamente donde más cuesta, evita que un buen referido se pierda y convierte cada hueco en una señal de captación.
+
+### Los tres protocolos obligatorios de Sala (D-018, D-019)
+
+```text
+Protocolo I   · GENERAR NEGOCIO   Ceder referidos de calidad.                 Unidad: la Cesión.     Especificación: NS-ARP.
+Protocolo II  · DAR A CONOCER     Comunicar tu trabajo a la Sala.             Unidad: el Comunicado. Especificación: NS-ADP.
+Protocolo III · CUENTAS CLARAS    Hacer visible el valor dado y recibido.     Unidad: la Balanza.    Especificación: NS-ATP.
+```
+
+**Protocolo II · Dar a Conocer.** Nadie puede ceder bien lo que no conoce bien. Cada semana, el Agente de cada empresa informa a los Agentes de las demás empresas de la Sala de su especialidad y plaza, de las funciones, servicios y productos que trabaja, y de las actualizaciones, novedades y cualquier dato importante ocurrido esa semana (**Comunicado**). El Chapter Intelligence Agent los compila en la **Gaceta** semanal de la Sala, con una vista "relevante para ti" por gerente. Todo gerente debe conocer, o poder consultar en segundos, el **Dossier**, el histórico y las novedades de cada miembro de su Sala. El gerente aprueba su Comunicado en el Despacho con un toque; el cumplimiento es verificable y sigue la misma escalera que el Compromiso. Especificación completa en `docs/14_PROTOCOLOS_DE_SALA.md`.
+
+**Protocolo III · Cuentas Claras.** Lo que se da y lo que se recibe se ve. En cada Sala es visible, para todos sus miembros, la **Balanza** de cada titular: Cesiones hechas y recibidas, valor contrastado generado para otros y recibido, del mes y acumulado, y en qué punto del **Ritmo** (objetivo semanal fijado por la Sala o, en su defecto, por NS) se encuentra. Nunca es un ranking: se ordena por plaza, solo muestra lo válido y contrastado, y la reciprocidad se explica, no se juzga. En privado, cada titular tiene su **Brújula**: el Agente estudia constantemente cómo mejorar sus resultados y le muestra si consigue sus objetivos, por qué, qué gana con ello, qué puede ofrecer a otros, qué puede proponer y qué referidos posibles tiene para ceder, en forma de tres **Movimientos** semanales accionables con un toque. La Brújula nunca sale de la empresa. Especificación completa en `docs/14_PROTOCOLOS_DE_SALA.md`.
+
 ## 15. Privacidad como ventaja competitiva
 
 NS puede acceder en el futuro, con autorización, a fuentes como: CRM; correo; calendario; ERP; formularios; notas; contactos; conversaciones comerciales; documentación; sitios web; APIs empresariales.
@@ -621,7 +670,7 @@ Hipótesis inicial (miembros):
 Hoy
 Radar
 Referidos
-Mi Círculo
+Mi Sala
 Mi Agente
 Mensajes
 Valor Generado
@@ -751,7 +800,7 @@ CAMBIO
 Ahora una empresa puede disponer de un agente que represente sus intereses.
 ↓
 RED
-Todos los agentes del círculo trabajan juntos.
+Todos los agentes de la Sala trabajan juntos.
 ↓
 RESULTADO
 Oportunidades detectadas y cualificadas 24/7.
@@ -768,7 +817,7 @@ Comprobar disponibilidad de mi sector.
 
 ## 24. Pantallas imprescindibles
 
-**Website:** Landing; Cómo funciona; Para empresas; Para ciudades/círculos; Filosofía; Seguridad; Solicitud de membresía; Disponibilidad de sector.
+**Website:** Landing; Cómo funciona; Para empresas; Para ciudades/Salas; Filosofía; Seguridad; Solicitud de membresía; Disponibilidad de sector.
 
 **Member App:** Home / Today; NS Radar; Referral Inbox; Referral Detail; Opportunities; Agent Room; My Company; Business DNA; My Agent; Agent Permissions; Chapter; Members; Member Profile; Value Generated; Notifications; Settings.
 
@@ -900,7 +949,7 @@ Pilot:
 ```text
 NS Sevilla
 ↓
-1 círculo
+1 Sala
 ↓
 Empresas seleccionadas
 ↓
@@ -1032,7 +1081,7 @@ Debe poder demostrarse de principio a fin.
 
 ## 7. Construye primero una demo extraordinaria de NS Sevilla
 
-Generar datos ficticios realistas para un círculo. Nunca usar únicamente "Company A", "Company B", "Lorem ipsum". Crear compañías demo verosímiles pertenecientes a múltiples sectores. Mostrar varios referral scenarios.
+Generar datos ficticios realistas para una Sala. Nunca usar únicamente "Company A", "Company B", "Lorem ipsum". Crear compañías demo verosímiles pertenecientes a múltiples sectores. Mostrar varios referral scenarios.
 
 ## 8. Escenarios de referencia
 
@@ -1044,7 +1093,7 @@ Generar datos ficticios realistas para un círculo. Nunca usar únicamente "Comp
 
 **Scenario D — confidencialidad.** Un agente descubre una oportunidad excelente a partir de información marcada `COMPANY_ONLY`. Puede utilizarla internamente para razonar cuando la política lo permita, pero no revelar su contenido ni identidad a otros miembros. Debe solicitar autorización.
 
-**Scenario E — competencia.** Un agente intenta proponer como nuevo miembro una empresa cuyo sector entra en conflicto con una categoría existente. El sistema detecta el conflicto y lo deriva a: revisión de categoría; otro capítulo; lista de espera; o rechazo.
+**Scenario E — competencia.** Un agente intenta proponer como nuevo miembro una empresa cuyo sector entra en conflicto con una categoría existente. El sistema detecta el conflicto y lo deriva a: revisión de categoría; otra Sala; lista de espera; o rechazo.
 
 ## 9. Arquitectura técnica
 
@@ -1278,6 +1327,17 @@ Y posteriormente:
 13. Crear propiedad intelectual propia de NS.
 14. El producto debe generar negocio medible.
 15. Cada mejora debe fortalecer el Network Effect.
+16. La Sala no es territorial: se define por sus empresas, no por su mapa.
+
+## Reglas inmutables (D-010)
+
+Estas tres reglas están por encima de cualquier feature, decisión de diseño o modelo económico. No se revisan; se aplican.
+
+1. **Nunca se cobra por un referido.** Ningún miembro puede pedir, ofrecer, aceptar o condicionar un referido a dinero, comisión, descuento, contraprestación o favor. NS tampoco cobra por referido (D-005). Hacerlo es **motivo de expulsión** de la Sala y de la red. El espíritu de NS es un network colaborativo: se da porque se pertenece.
+2. **Toda empresa debe aportar un número mínimo de referidos en los plazos que se estipulen.** Pertenecer a NS es contribuir. El mínimo y el plazo se fijan por Sala y se aplican con una escalera de consecuencias que termina en la pérdida de la plaza. El agente de cada empresa trabaja para que su miembro lo cumpla sin esfuerzo.
+3. **La calidad importa más que la cantidad.** Un referido cuenta cuando el receptor lo cualifica como válido y NS puede auditarlo. Un referido flojo no cumple el mínimo ni suma reputación; puede restar.
+4. **Toda empresa da a conocer su trabajo a la Sala cada semana** (D-018). El Agente redacta el Comunicado; el gerente lo aprueba. Sin conocimiento mutuo no hay referidos de calidad.
+5. **Lo que se da y lo que se recibe se ve** (D-019). La Balanza de cada titular es pública en su Sala, exacta y contrastada. Lo que hay que hacer para mejorar solo lo ve quien tiene que hacerlo.
 
 # NORTH STAR
 

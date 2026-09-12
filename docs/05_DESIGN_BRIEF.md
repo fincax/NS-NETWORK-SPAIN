@@ -44,12 +44,12 @@ La inteligencia se demuestra con **comportamiento** (explicaciones, precisión, 
 
 | Decisión | Implicación para diseño |
 | --- | --- |
-| **D-001** Plaza por especialidad (taxonomía Sector → Especialidad) | El selector de disponibilidad de la web y el mapa de plazas del círculo son piezas centrales. Mostrar "Ciberseguridad · Plaza ocupada" / "Paid Media B2B · Disponible" a nivel de especialidad. |
+| **D-001** Plaza por especialidad (taxonomía Sector → Especialidad) | El selector de disponibilidad de la web y el mapa de plazas de la Sala son piezas centrales. Mostrar "Ciberseguridad · Plaza ocupada" / "Paid Media B2B · Disponible" a nivel de especialidad. |
 | **D-002** El agente se alimenta de Business DNA + señales que el miembro introduce | La entrada de señal ("He sabido que…") debe ser la acción más fácil del producto: móvil, 30 segundos, voz o texto. El check-in semanal del agente es un ritual con diseño propio. |
 | **D-003** Doble consentimiento del empresario; Directiva solo por excepción | La referral card tiene dos caras (originador y receptor). Las excepciones de Directiva se explican en la propia card. |
 | **D-004** Admisión con umbrales + rúbrica + entrevista | El flujo público es "Solicitar plaza", nunca "Sign up". Debe sentirse como solicitar acceso a un club, no como registrarse en una app. |
 | **D-005** Cuota de incorporación + membresía anual, sin comisión | La página de membresía comunica pertenencia y ROI, no "pricing tiers" de SaaS. |
-| **D-006** Círculos de 25–35 plazas, arranque con 12–15 fundadoras | El círculo cabe en una sola vista. Diseñar para 30 empresas, no para 3.000. |
+| **D-006** Salas de 25–35 plazas, arranque con 12–15 fundadoras | La Sala cabe en una sola vista. Diseñar para 30 empresas, no para 3.000. |
 | **D-007** Marca institucional-premium, "el club empresarial del futuro" | Ver §4. |
 
 ---
@@ -125,13 +125,17 @@ Diseñar el sistema de identidad completo:
 
 1. **Monograma NS** que funcione desde 16 px (favicon) hasta una fachada.
 2. **Wordmark** "NS Network".
-3. **Lockups jerárquicos:** NS Network · NS España · NS Sevilla · NS Sevilla · Círculo 01. La arquitectura de marca es global → país → ciudad → círculo y el sistema debe escalar sin rediseño.
+3. **Lockups jerárquicos:** NS Network · NS España · NS Sevilla · NS Cumbre. La arquitectura de marca es global → país → zona (ciudad) → Sala y el sistema debe escalar sin rediseño. El nombre de ciudad pertenece a la zona; cada Sala tiene nombre propio con prefijo NS, autorizado por NS (D-014). El sistema de identidad debe prever un lockup de Sala que conviva con el de zona sin competir con él.
 4. Versiones: positivo sobre porcelain, negativo sobre obsidian, monocromo, azul institucional, y una versión "activa" donde un único elemento adopta signal green (para estados de la app: "tu agente está trabajando").
 5. App icon, favicon, avatar de agente (ver 5.3), marca de agua para documentos, sello de "Miembro NS Sevilla" para que las empresas lo usen en sus webs y firmas de correo.
 
-### 5.2 Territorios conceptuales (explora al menos tres, propón uno)
+### 5.2 Territorios conceptuales · DECIDIDO (D-022)
 
-- **La plaza.** Un círculo con un hueco o segmento: cada empresa ocupa una posición única e irrepetible. Habla de exclusividad y de pertenencia.
+**Decisión del fundador (2026-09-12):** territorio "la reunión permanente", ejecución **B · Desplazado**: dos medios discos sobre un eje vertical, desplazados, que se tocan en un segmento (el Puente). Geometría y archivos en `brand/`. Lo que sigue se conserva como registro de la exploración.
+
+#### Territorios explorados
+
+- **La plaza.** Una Sala con un hueco o segmento: cada empresa ocupa una posición única e irrepetible. Habla de exclusividad y de pertenencia.
 - **La reunión permanente.** Dos formas que se tocan sin fundirse: dos empresas, dos agentes, un punto de contacto. Habla de cooperación y de confianza.
 - **El radar / la órbita.** Un barrido, un arco, un punto que aparece: la red detecta algo mientras tú no miras. Habla del 24/7 y conecta con NS Radar, el elemento icónico del producto.
 - **El sello.** Una marca de calidad, casi notarial, construida con geometría precisa. Habla de admisión y prestigio.
@@ -184,7 +188,7 @@ Pendiente
 
 Diseñar la card en sus dos caras (originador: "autorizar revelar"; receptor: "aceptar") y en sus estados: nueva, en revisión, requiere Directiva (con explicación), aprobada, introducida, expirada, baja confianza.
 
-**3. NS Radar.** El elemento visual icónico de la marca. Muestra empresas del círculo, señales activas, matches en investigación e intensidad. Cada elemento visual corresponde a un dato real; ninguna animación decorativa. Debe funcionar como pantalla completa (desktop), como widget en "Hoy" y como fragmento en la landing. Explora: disposición circular por plazas (la geometría del círculo NS), barrido temporal, señales que emergen desde la empresa originadora hacia las especialidades relevantes.
+**3. NS Radar.** El elemento visual icónico de la marca. Muestra empresas de la Sala, señales activas, matches en investigación e intensidad. Cada elemento visual corresponde a un dato real; ninguna animación decorativa. Debe funcionar como pantalla completa (desktop), como widget en "Hoy" y como fragmento en la landing. Explora: disposición circular por plazas (la geometría de la Sala NS), barrido temporal, señales que emergen desde la empresa originadora hacia las especialidades relevantes.
 
 **4. Agent Room.** La reunión 24/7 hecha tangible. Un timeline de eventos significativos, no un chat de bots:
 
@@ -197,7 +201,7 @@ Diseñar la card en sus dos caras (originador: "autorizar revelar"; receptor: "a
 10:51  Referido preparado para revisión.
 ```
 
-Diseñar densidad, ritmo, filtros (mi empresa / todo el círculo), estado "en vivo" y estado "resumen de la noche".
+Diseñar densidad, ritmo, filtros (mi empresa / toda la Sala), estado "en vivo" y estado "resumen de la noche".
 
 **5. Hoy (home autenticada).** Responde a "¿Qué ha hecho mi red por mi empresa desde la última vez que entré?":
 
@@ -213,7 +217,7 @@ Con acceso inmediato a: nueva señal ("He sabido que…"), referidos pendientes,
 
 ### Prioridad 2 · Flujo público y admisión
 
-- Comprobar disponibilidad de mi sector (selector Sector → Especialidad, resultado "Disponible / Ocupada / Lista de espera" en NS Sevilla · Círculo 01).
+- Comprobar disponibilidad de mi sector (selector Sector → Especialidad, resultado "Disponible / Ocupada / Lista de espera" en NS Sevilla, por Sala: NS Cumbre, NS Ágora…).
 - Solicitar plaza (formulario que se siente como candidatura, no como registro).
 - Cómo funciona · Para empresas · Filosofía · Seguridad y privacidad · Membresía.
 
@@ -224,9 +228,9 @@ Con acceso inmediato a: nueva señal ("He sabido que…"), referidos pendientes,
 - Mi Agente: estado, permisos (READ · INFER · STORE · SHARE · REVEAL IDENTITY · CONTACT · WRITE · EXECUTE) como controles claros, nunca como un muro de toggles.
 - Nueva señal (móvil, 30 segundos, voz o texto) y previsualización de "qué verán los demás" antes de publicar.
 
-### Prioridad 4 · Círculo, valor y Directiva
+### Prioridad 4 · Sala, valor y Directiva
 
-- Mi Círculo: mapa de plazas (ocupadas, disponibles, en admisión), perfiles de miembros.
+- Mi Sala: mapa de plazas (ocupadas, disponibles, en admisión), perfiles de miembros.
 - Valor Generado: siempre separado en Potencial · Pipeline · Verificado.
 - Command Center de Directiva: admisiones, conflictos de plaza, salud de miembros, actividad agentic, compliance, métricas.
 
@@ -238,11 +242,11 @@ No es el escritorio encogido. Prioridad: **Nuevo match → Ver por qué → Revi
 
 ## 7. Estados que toda pantalla debe contemplar
 
-loading · empty · first use · error · partial data · offline/retry · permission denied · low confidence · stale data · completed. Nunca diseñar solo el happy path. Los empty states de un círculo recién creado con 12 empresas deben inspirar, no avergonzar.
+loading · empty · first use · error · partial data · offline/retry · permission denied · low confidence · stale data · completed. Nunca diseñar solo el happy path. Los empty states de una Sala recién creada con 12 empresas deben inspirar, no avergonzar.
 
 ---
 
-## 8. Datos demo: NS Sevilla · Círculo 01
+## 8. Datos demo: NS Sevilla · NS Cumbre
 
 Usa siempre empresas verosímiles. Nunca "Empresa A" ni lorem ipsum. Nombres ya establecidos en el protocolo (mantenlos para coherencia):
 
@@ -267,7 +271,7 @@ Escenarios a ilustrar:
 - **C · Falso positivo:** Branding Atelier descartada por ticket mínimo incompatible (demuestra que NS entiende negocios, no palabras).
 - **D · Confidencialidad:** Consultora Fiscal Triana recibe "Tu agente ha identificado dos miembros que podrían ayudar a un cliente tuyo en una operación confidencial. Nada se ha compartido."
 
-Personas: Carlos (miembro, CEO de Híspalis), Lucía (miembro, socia de Guadalquivir), Directiva: Presidencia del círculo.
+Personas: Carlos (miembro, CEO de Híspalis), Lucía (miembro, socia de Guadalquivir), Directiva: Presidencia de la Sala.
 
 ---
 
@@ -278,7 +282,7 @@ Lenguaje empresarial, claro, en español de España, tuteo profesional. Nada de 
 - "Hemos encontrado una posible oportunidad para tu empresa."
 - "Tu agente no tiene información suficiente para valorar esta señal. ¿Puedes responder a dos preguntas?"
 - "Nada se ha compartido todavía. Tú decides."
-- "Este referido requiere revisión de la Directiva porque la especialidad es colindante con otra plaza del círculo."
+- "Este referido requiere revisión de la Directiva porque la especialidad es colindante con otra plaza de la Sala."
 
 ---
 
