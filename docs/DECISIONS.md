@@ -558,3 +558,25 @@ Reglas derivadas:
 **Consequences.** El brief de diseño pasa de "explorar" a "desarrollar el sistema": wordmark definitivo, espacio de protección, app icon, sello de miembro, avatar del Agente derivado del medio disco, marca de agua y guía de usos incorrectos. El diseño de Hoy adopta el monograma. Las ejecuciones A y C se conservan en el lienzo como descartadas.
 
 **Revisit when.** Nunca en cuanto a la ejecución; el wordmark y la tipografía se cierran en el design system (`docs/05_DESIGN_SYSTEM.md`).
+
+---
+
+## D-023 · Sistema de identidad: tipografía (pendiente de elección), wordmark y lockups, sello de miembro, avatar del Agente, marca de agua y usos incorrectos
+
+**Status:** PROPOSED (tipografía pendiente del fundador); el resto construido sobre la pareja recomendada
+**Date:** 2026-09-12
+
+**Context.** Tras D-022 (monograma B), el brief pide cerrar el sistema de identidad. Lienzo "Identidad NS" con seis artboards.
+
+**Choice.**
+
+- **Tipografía**: tres parejas presentadas. Recomendada: Newsreader + IBM Plex Sans + IBM Plex Mono (editorial con carácter, sans muy legible con cifras tabulares, mono para identificadores; todas SIL OFL). Alternativas: Instrument Serif + Instrument Sans (más editorial, un solo peso) y Bricolage Grotesque + Source Sans 3 (más tecnológica, pierde el registro de club).
+- **Wordmark**: "NS Network" en Newsreader 500; lockup horizontal con monograma a 1,55× y separación 0,42×; jerarquía Red → Zona → Sala con etiquetas en mono; versión apilada solo para cuadrados; estados solo en la app.
+- **Sello de miembro**: anillo doble con MIEMBRO · zona / Sala · año, monograma centrado; emitido y revocable por NS; enlaza al Dossier; insignia horizontal para firmas; variante Embajadora.
+- **Avatar del Agente**: medio disco superior del monograma con cinco estados (reposo, analizando, ha encontrado algo, esperando tu decisión, sin información suficiente); estados privados del titular.
+- **Marca de agua**: centrada al 6 % para documentos de Sala; esquina en azul institucional para documentos a Interesados; pie obligatorio con visibilidad, Sala, zona y fecha.
+- **Usos incorrectos**: doce prohibiciones documentadas en `brand/README.md`.
+
+**Consequences.** Archivos SVG en `brand/sello/`, `brand/agente/`, `brand/documentos/`. `docs/05_DESIGN_SYSTEM.md` se derivará de `brand/README.md` y de los tokens de Hoy cuando el fundador elija la tipografía.
+
+**Revisit when.** El fundador elija la pareja tipográfica; y tras las primeras pruebas de percepción de marca con empresarios sevillanos (D-007).
