@@ -539,3 +539,22 @@ Reglas derivadas:
 **Consequences.** `ReferralPromise` y `TrustEvent{PROMISE_EARNED, PROMISE_WITHDRAWN}` en NS-ARP v0.2. Core (`CLAUDE.md` §14), léxico, banco de ideas y PDF del léxico (v0.4) actualizados. La tarjeta de Cesión del diseño ya muestra el valor estimado; pasa a etiquetarse como Promesa.
 
 **Revisit when.** Tras 100 Cesiones con Promesa y Veredicto en la Sala piloto, para calibrar los pesos y la correlación entre ambas.
+
+---
+
+## D-022 · Monograma NS: ejecución B · Desplazado (dos medios discos sobre un eje, desplazados; el segmento de contacto es el Puente)
+
+**Status:** CONFIRMED (elección directa del fundador)
+**Date:** 2026-09-12
+
+**Context.** El brief de diseño (§5) pedía explorar cuatro territorios conceptuales y proponer uno. El fundador prefirió el de "dos semicírculos" (la reunión permanente) y pidió verlo en tres ejecuciones para decidir.
+
+**Options.** A · Encuentro (dos medios discos enfrentados con hueco). B · Desplazado (dos medios discos sobre un eje, desplazados, con S implícita y contacto en un segmento). C · Enlace (dos arcos de trazo entrelazados con una lente).
+
+**Choice.** B · Desplazado. Geometría, versiones y reglas en `brand/README.md`; archivos SVG en `brand/monograma/`.
+
+**Why.** Es la única ejecución que contiene la lectura NS sin letras, la más difícil de confundir con marcas existentes, y la que mejor anima con significado: el segmento de contacto se ilumina en verde cuando el Agente está en la Mesa y en ámbar cuando hay una Cesión esperando visto bueno. Se reconoce a 16 px, funciona en monocromo, metal y tela, y escala a cualquier zona.
+
+**Consequences.** El brief de diseño pasa de "explorar" a "desarrollar el sistema": wordmark definitivo, espacio de protección, app icon, sello de miembro, avatar del Agente derivado del medio disco, marca de agua y guía de usos incorrectos. El diseño de Hoy adopta el monograma. Las ejecuciones A y C se conservan en el lienzo como descartadas.
+
+**Revisit when.** Nunca en cuanto a la ejecución; el wordmark y la tipografía se cierran en el design system (`docs/05_DESIGN_SYSTEM.md`).

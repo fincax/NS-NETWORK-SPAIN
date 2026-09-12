@@ -129,7 +129,11 @@ Diseñar el sistema de identidad completo:
 4. Versiones: positivo sobre porcelain, negativo sobre obsidian, monocromo, azul institucional, y una versión "activa" donde un único elemento adopta signal green (para estados de la app: "tu agente está trabajando").
 5. App icon, favicon, avatar de agente (ver 5.3), marca de agua para documentos, sello de "Miembro NS Sevilla" para que las empresas lo usen en sus webs y firmas de correo.
 
-### 5.2 Territorios conceptuales (explora al menos tres, propón uno)
+### 5.2 Territorios conceptuales · DECIDIDO (D-022)
+
+**Decisión del fundador (2026-09-12):** territorio "la reunión permanente", ejecución **B · Desplazado**: dos medios discos sobre un eje vertical, desplazados, que se tocan en un segmento (el Puente). Geometría y archivos en `brand/`. Lo que sigue se conserva como registro de la exploración.
+
+#### Territorios explorados
 
 - **La plaza.** Una Sala con un hueco o segmento: cada empresa ocupa una posición única e irrepetible. Habla de exclusividad y de pertenencia.
 - **La reunión permanente.** Dos formas que se tocan sin fundirse: dos empresas, dos agentes, un punto de contacto. Habla de cooperación y de confianza.
