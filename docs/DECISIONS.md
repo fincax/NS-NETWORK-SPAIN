@@ -580,3 +580,22 @@ Reglas derivadas:
 **Consequences.** Archivos SVG en `brand/sello/`, `brand/agente/`, `brand/documentos/`. `docs/05_DESIGN_SYSTEM.md` se derivará de `brand/README.md` y de los tokens de Hoy cuando el fundador elija la tipografía.
 
 **Revisit when.** El fundador elija la pareja tipográfica; y tras las primeras pruebas de percepción de marca con empresarios sevillanos (D-007).
+
+---
+
+## D-024 · Tarjeta de Cesión a dos caras: comportamiento, plazos y estados
+
+**Status:** CONFIRMED (diseño y detalles validados por el fundador)
+**Date:** 2026-09-12
+
+**Choice.** La tarjeta de Cesión se especifica en `docs/15_TARJETA_DE_CESION.md`, con la Promesa como pieza central de ambas caras. Detalles validados expresamente:
+
+- Al aceptar, el cesionario se compromete a responder al Interesado en 48 h tras el Puente y a emitir Veredicto al cerrar.
+- Una Cesión caduca a los 7 días sin respuesta (recordatorio a las 72 h). Vuelve al cedente, que puede proponerla a otra Sala. El silencio del cesionario cuenta en su Hoja de Méritos.
+- Declinar con motivo no afecta a la reputación del que declina y el cedente conserva su Mérito de Promesa.
+- En la cara B, lo marcado COMPANY_ONLY o NEVER_SHARE se muestra bloqueado, no oculto.
+- El Puente lo redacta el Agente y lo envía la persona. Ningún Agente contacta con el Interesado.
+
+**Consequences.** NS-ARP §9.1 mantiene los timeouts (72 h recordatorio, 7 d caducidad) y añade el compromiso de 48 h tras `INTRODUCED` como `TrustEvent{RESPONSE_ON_TIME | RESPONSE_LATE}` del cesionario. Diseño publicado en el lienzo "Cesión NS" (cara A, cara B, móvil, estados, Veredicto).
+
+**Revisit when.** Tras las primeras 50 Cesiones en la Sala piloto, para revisar los plazos con datos.

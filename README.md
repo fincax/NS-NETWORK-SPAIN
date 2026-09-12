@@ -22,6 +22,7 @@ Primera implantación: **NS Sevilla · NS Cumbre** (primera Sala de la zona), un
 | [`docs/12_SALAS.md`](./docs/12_SALAS.md) | La Sala como eje: zonas y saturación, apertura de nuevas Salas, clasificación NS-CAT (base CNAE ampliable), plazas y casuística de sectores, enrutamiento Sala → Zona → Red, ciclo de vida de la Sala. |
 | [`docs/13_LEXICO_NS.md`](./docs/13_LEXICO_NS.md) | Léxico oficial de NS: nombres propios para la estructura (Sala, Plaza, Antesala, Pleno, Confluencia), el flujo (Indicio, Pista, Cesión, Embajada, Puente, Valor contrastado), la reputación (Veredicto, Contraste, Mérito, Compromiso) y el día a día (Mesa Permanente, Despacho, Encargo, Rastreo, Sondeo, Parte, Crónica). |
 | [`docs/14_PROTOCOLOS_DE_SALA.md`](./docs/14_PROTOCOLOS_DE_SALA.md) | Los tres protocolos obligatorios: Generar Negocio (Cesión, NS-ARP), Dar a Conocer (Comunicado, Gaceta, Dossier, NS-ADP) y Cuentas Claras (Balanza, Ritmo, Brújula, Movimiento, NS-ATP), con especificación agentic completa. |
+| [`docs/15_TARJETA_DE_CESION.md`](./docs/15_TARJETA_DE_CESION.md) | La tarjeta de Cesión a dos caras: objetivo, acciones, jerarquía, Promesa, capa 2, plazos, estados, Veredicto y Distinción. |
 | [`brand/README.md`](./brand/README.md) | Monograma NS decidido (D-022): geometría, versiones SVG, reglas de uso y lockups. |
 | [`docs/DECISIONS.md`](./docs/DECISIONS.md) | Registro de decisiones estratégicas y arquitectónicas. |
 
