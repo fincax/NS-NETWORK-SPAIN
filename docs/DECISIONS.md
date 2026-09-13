@@ -691,3 +691,24 @@ La cuota mensual, aunque varíe por Tramos, pertenece al segundo plano. Nunca es
 **Revisit when.** Haga falta cola de trabajos en segundo plano para la Mesa con proveedor real, búsqueda vectorial para el recall de S4, o extraer `src/core` a un paquete compartido.
 
 **Razón de la confirmación.** Tres criterios: (1) es la base más simple que cumple la constitución (§A.9: tipado, PostgreSQL, validación, auditoría) y ya demuestra el recorrido completo con 25 pruebas automáticas; (2) no compromete el futuro, porque el dominio (`src/core`) no depende del framework ni de la base de datos y cada pieza se puede sustituir por separado; (3) permite enseñar el producto a empresarios sin infraestructura ni coste de modelo, con un solo comando. Lo que sigue pendiente (autenticación, Mesa en segundo plano con proveedor real, búsqueda vectorial) se decide en su momento como decisiones nuevas, no como revisión de esta.
+
+---
+
+## D-027 · La persona que representa a la empresa en NS se llama Timonel; el Timonel manda
+
+**Status:** CONFIRMED (elección directa del fundador)
+**Date:** 2026-09-13
+
+**Context.** El léxico tenía nombre para la empresa (Titular) pero no para la persona que decide por ella; los documentos usaban "gerente" de forma informal. El fundador pidió una palabra cercana y coloquial, no un cargo administrativo.
+
+**Options.** Portavoz · Salense / Salano (de Sala) · Mesario (de Mesa) · Personia / Personero / Personado (de persona) · Manitas · Copiloto · Piloto · Capitán · Timonel.
+
+**Choice.** **Timonel.** Invariable en género (el Timonel, la Timonel). Cada Titular designa un Timonel y puede designar un Timonel suplente. Descartes razonados: Portavoz (administrativo); Personia y Personero (colisión con marcas de software de recursos humanos y registro poco natural); Manitas (nombra a quien ejecuta con las manos, no a quien decide, y suena a bricolaje); Copiloto (hoy significa la inteligencia artificial y sitúa al humano como ayudante de la máquina, además de la colisión con Microsoft); Piloto (choca con "el piloto de NS Sevilla" como fase de lanzamiento).
+
+**Why.** Cuenta la relación persona-Agente en una sola imagen: el Agente rema y vigila el horizonte 24/7; el Timonel decide el rumbo. Es cercana sin ser vulgar y hace familia con Brújula y Puente. Y describe la verdad del protocolo: nada llega a un tercero sin su visto bueno, nadie revela una identidad sin su Apertura, ningún Puente sale sin que lo envíe, y el Veredicto lo emite ella.
+
+**Principio que fija el fundador.** *La persona debe sentir siempre que es quien dirige.* No es una cortesía de interfaz para que el humano "se sienta bien": es la descripción exacta de las puertas humanas de NS-ARP. Todo diseño que convierta al Timonel en espectador de su Agente es un error de producto. Se incorpora a la constitución (§7, Human-in-the-Loop).
+
+**Consequences.** "Gerente" se sustituye por "Timonel" en la constitución, el North Star, el léxico y los Protocolos de Sala. En el modelo de datos, `members.is_primary` marca al Timonel. La app usa "Timonel" en el alta, el selector de demo, el Dossier y la tarjeta de Cesión. Pendiente: comprobación de marca en OEPM y EUIPO antes de usarlo en la web pública.
+
+**Revisit when.** Nunca en cuanto al principio. El nombre, solo si la comprobación de marca lo impide.

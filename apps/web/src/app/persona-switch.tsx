@@ -6,8 +6,8 @@ export function PersonaSwitch({ members, currentId }: { members: { id: string; f
   const [pending, start] = useTransition();
   return (
     <label>
-      <span style={{ marginRight: 8 }}>Actúas como</span>
-      <select value={currentId} disabled={pending} onChange={(e) => start(() => setPersona(e.target.value))} aria-label="Persona activa (demo)">
+      <span style={{ marginRight: 8 }}>Timonel</span>
+      <select value={currentId} disabled={pending} onChange={(e) => start(() => setPersona(e.target.value))} aria-label="Timonel activo (demo)">
         {members.map((m) => (
           <option key={m.id} value={m.id}>
             {m.fullName} · {m.companyName}{m.isDirector ? " · Directiva" : ""}

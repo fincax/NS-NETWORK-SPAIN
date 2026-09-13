@@ -30,11 +30,11 @@ export default async function AltaPage({ searchParams }: { searchParams: Promise
           </div>
         </fieldset>
         <fieldset>
-          <legend>Empresa y persona</legend>
+          <legend>Empresa y Timonel</legend>
           <div className="form-grid">
             <div className="field"><label htmlFor="n">Nombre comercial</label><input id="n" name="name" required /></div>
             <div className="field"><label htmlFor="w">Web</label><input id="w" name="website" type="url" placeholder="https://" /></div>
-            <div className="field"><label htmlFor="pn">Persona que decide</label><input id="pn" name="personName" required /></div>
+            <div className="field"><label htmlFor="pn">Timonel (la persona que decide por la empresa)</label><input id="pn" name="personName" required /></div>
             <div className="field"><label htmlFor="pr">Cargo</label><input id="pr" name="personRole" required /></div>
             <div className="field"><label htmlFor="pe">Correo</label><input id="pe" name="personEmail" type="email" required /></div>
           </div>

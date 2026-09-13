@@ -82,6 +82,7 @@ export const companies = pgTable("companies", {
   createdAt: createdAt(),
 });
 
+/** Timonel (D-027): la persona que decide por la empresa. is_primary = Timonel; otro registro = Timonel suplente. */
 export const members = pgTable("members", {
   id: id(),
   companyId: uuid("company_id").notNull().references(() => companies.id),

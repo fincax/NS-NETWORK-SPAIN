@@ -1,5 +1,5 @@
 /**
- * Sesión de demo: la persona activa se guarda en una cookie (sin autenticación en el vertical slice).
+ * Sesión de demo: el Timonel activo se guarda en una cookie (sin autenticación en el vertical slice).
  * En producción esto lo sustituye la autenticación real y el RBAC por Sala/empresa.
  */
 import { cookies } from "next/headers";

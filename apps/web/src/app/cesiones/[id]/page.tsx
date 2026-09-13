@@ -191,7 +191,7 @@ export default async function CesionPage({ params }: { params: Promise<{ id: str
       {face === "B" && state === "INTRO_AUTHORIZED" && intro ? (
         <section className="card green">
           <h2>El Puente</h2>
-          <p className="lead" style={{ fontSize: 14, marginBottom: 12 }}>Lo ha redactado tu Agente. Lo envías tú, desde tu correo o desde NS. Ningún Agente contacta con el Interesado.</p>
+          <p className="lead" style={{ fontSize: 14, marginBottom: 12 }}>Lo ha redactado tu Agente. Lo envías tú, como Timonel, desde tu correo o desde NS. Ningún Agente contacta con el Interesado.</p>
           <form action={puenteAction} className="stack">
             <input type="hidden" name="referralId" value={ref.id} />
             <div className="field"><label>Asunto</label><input readOnly value={intro.preparedByAgent.subject} /></div>

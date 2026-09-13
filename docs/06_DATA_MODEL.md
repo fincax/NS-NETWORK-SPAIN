@@ -31,7 +31,7 @@ AUDITORÍA             audit_events · agent_interactions
 | Especialidad (NS-CAT) | `specialties` | `nscat_code`, `cnae_class`, `status` OFFICIAL/NS_EXTENDED/PROVISIONAL, `regulated`, `overlaps_with[]`. Catálogo inicial en `src/db/nscat.ts`. |
 | Plaza | `category_seats` | Única por (Sala, especialidad). `status` ACTIVE/VACANT/WAITLISTED/RELEASED. |
 | Titular | `companies` | `status`, `tier` (Niveles), `fee_tier` (Tramo, D-025). |
-| Persona | `members` | `is_primary`, `is_director` (Directiva). El nombre del rol de la persona está pendiente de decisión del fundador. |
+| Timonel | `members` | La persona que decide por la empresa (D-027). `is_primary` marca al Timonel; un segundo registro con `is_primary = false` es el Timonel suplente. `is_director` marca a la Directiva. |
 | ADN de Empresa | `business_dna` | JSONB validado por `BusinessDNA` (zod), versionado, `validated_by/at`. |
 | Capability | `capabilities` | Lo que la empresa cubre; `is_primary_seat` marca la plaza (prioridad D-001). |
 | Agente NS | `agents` | `kind` COMPANY (uno por empresa) o de Sala: MATCHMAKER, COMPLIANCE, CHAPTER_INTELLIGENCE, BRIEFING. |
