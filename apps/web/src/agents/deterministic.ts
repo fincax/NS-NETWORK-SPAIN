@@ -8,7 +8,7 @@ import type { ExtractionInput, ExtractionOutput, IntroInput, LLMProvider, Qualif
 
 const TRIGGER_RULES: { trigger: BusinessTrigger; re: RegExp }[] = [
   { trigger: "NEW_SITE", re: /nueva (sede|planta|nave|oficina|f[aá]brica|delegaci[oó]n)|abr(e|ir[aá]|ir|iendo) (una |otra |su )?(nueva )?(planta|sede|nave|oficina|delegaci[oó]n|f[aá]brica)|traslad(a|o|ar[aá]) (la|su) (sede|planta)/i },
-  { trigger: "HEADCOUNT_GROWTH", re: /\d+\s*(empleados|personas|trabajadores|puestos) (nuevos|m[aá]s)|contratar|ampliar (la )?plantilla|crecimiento de plantilla|incorporar[aá]n? \d+/i },
+  { trigger: "HEADCOUNT_GROWTH", re: /\d+\s*(empleados|personas|trabajadores|puestos) (nuevos|m[aá]s)|contratar|ampliar (la )?plantilla|crecimiento de plantilla|incorporar[aá]n? \d+|ofertas? de (empleo|trabajo)|\d+ vacantes/i },
   { trigger: "INTERNATIONAL_EXPANSION", re: /portugal|francia|marruecos|italia|internacional|exportar|entrada en [A-ZÁ]/i },
   { trigger: "FUNDING_ROUND", re: /ronda (seed|serie|de financiaci[oó]n)|inversor|ampliaci[oó]n de capital/i },
   { trigger: "COMPANY_SALE", re: /venta de la empresa|vender (la|su) empresa|sucesi[oó]n|entrada de (un )?socio|operaci[oó]n societaria/i },
