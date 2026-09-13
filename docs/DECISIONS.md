@@ -178,6 +178,8 @@ La arquitectura conserva la capacidad de soportar en el futuro: niveles de membr
 
 **Revisit when.** Se disponga de 12 meses de datos de valor verificado en NS Sevilla.
 
+**Precisado por D-025 (2026-09-13).** La membresía no es plana: se estructura en Tramos ligados al valor contrastado recibido. Sigue sin existir porcentaje sobre negocio ni cargo por Cesión: la cuota es el precio de la suscripción a NS, no una contrapartida por referidos. La cuota de incorporación queda pendiente de decidir (existe o no).
+
 ---
 
 ## D-006 · Tamaño del círculo: objetivo 25–35 plazas activas; lanzamiento con 12–15 fundadoras; máximo 40
@@ -344,6 +346,8 @@ Reglas derivadas:
 **Consequences.** El modelo financiero se construye sobre número de plazas por ciudad × cuota media, no sobre pocas plazas caras. La selección (D-004) sigue siendo la barrera, no el precio.
 
 **Revisit when.** Se fijen los importes del piloto de Sevilla.
+
+**Precisado por D-025 (2026-09-13).** La cuota es plana dentro de cada Tramo, no plana para siempre: empieza en un Tramo de entrada bajo y sube solo cuando el miembro recibe más negocio contrastado.
 
 ---
 
@@ -599,3 +603,195 @@ Reglas derivadas:
 **Consequences.** NS-ARP §9.1 mantiene los timeouts (72 h recordatorio, 7 d caducidad) y añade el compromiso de 48 h tras `INTRODUCED` como `TrustEvent{RESPONSE_ON_TIME | RESPONSE_LATE}` del cesionario. Diseño publicado en el lienzo "Cesión NS" (cara A, cara B, móvil, estados, Veredicto).
 
 **Revisit when.** Tras las primeras 50 Cesiones en la Sala piloto, para revisar los plazos con datos.
+
+---
+
+## D-025 · La cuota mensual cubre con creces el coste del Agente y no es fija: empieza baja y sube por Tramos solo cuando el miembro recibe más negocio contrastado gracias a NS
+
+**Status:** CONFIRMED en el principio (input directo del fundador); PROPOSED en el mecanismo de Tramos y en los nombres
+**Date:** 2026-09-13
+
+**Context.** El fundador fija un principio interno de sostenibilidad antes de seguir con el desarrollo: la cuota mensual de cada miembro de una Sala debe cubrir con creces el gasto en tokens de su Agente. El miembro debe saber desde el principio que la cuota no es fija: si la actividad de su Agente es potente, la cuota puede variar, pero a la vez su Agente le estará generando mucho más negocio. La cuota comienza en un importe razonable, para que entrar sea fácil, y sube solo cuando NS le genera más negocio.
+
+**Aclaración del fundador (2026-09-13): la cuota no es una comisión.** Hay dos planos que no se mezclan:
+
+```text
+ENTRE MIEMBROS        Prohibido dar un referido por una contrapartida económica (D-010, expulsión).
+                      Se comparte para que te compartan. Es generación de negocio, no comercio de referidos.
+
+ENTRE MIEMBRO Y NS    Suscribirse y pertenecer a NS tiene un coste: un coste inicial (o no, por decidir)
+                      y un coste mensual. Esos son los ingresos de NS. Es el precio de la plaza y del Agente.
+```
+
+La cuota mensual, aunque varíe por Tramos, pertenece al segundo plano. Nunca es una comisión, nunca es un pago por un referido y nunca circula entre miembros. El mecanismo de Tramos solo decide **cuánto vale la suscripción** de cada empresa en cada Ejercicio.
+
+**Options.**
+
+1. Cuota plana para siempre, fijada para cubrir el coste medio del Agente. Simple, pero o es cara para entrar o pierde dinero con los miembros más activos.
+2. Cuota base + facturación por consumo de tokens del Agente. Cubre el coste, pero el miembro paga la actividad del Agente aunque no le haya generado nada, y castiga la prospección para otros (Rastreo, Sondeo), que es el corazón del sistema.
+3. Cuota base + porcentaje del valor contrastado. Alinea ingresos y valor, pero convierte la suscripción en un porcentaje sobre negocio, descartado en D-005 por fricción de trazabilidad y por restricciones legales en sectores regulados.
+4. **Cuota por Tramos ligada al negocio recibido.** Cuota mensual en tramos fijos y públicos. Se entra en el Tramo de entrada. El paso a un Tramo superior se produce solo cuando el valor contrastado recibido por el miembro en el Ejercicio anterior supera el umbral del Tramo. Cada Tramo cubre con margen el presupuesto de tokens de su Agente.
+
+**Choice.** Opción 4. Reglas:
+
+- **Cobertura.** Todo Tramo se fija de modo que el coste esperado de tokens del Agente en ese Tramo sea una fracción minoritaria de la cuota (propuesta: nunca más de un tercio). NS mide el coste real del Agente de cada miembro; si el coste supera la fracción de forma sostenida, se ajusta el presupuesto de actividad del Agente en ese Tramo, no la cuota del miembro.
+- **Entrada fácil.** El Tramo de entrada es una cuota baja y razonable (D-012: muy por debajo de los clubes presenciales). El importe concreto lo fija el fundador con el piloto de Sevilla. La existencia de una cuota de incorporación queda abierta ("o no, ya veremos"): se decidirá con los importes del piloto.
+- **Solo sube con negocio contrastado recibido.** El único disparador de subida es el **valor contrastado recibido** por el miembro (`VALUE_CONFIRMED`, confirmado por ambas partes y contrastado por NS) en el Ejercicio anterior. No sube por actividad del Agente, por número de Cesiones, por tamaño de la empresa ni por antigüedad. Si el Agente trabaja mucho y no genera negocio contrastado, el miembro sigue en su Tramo.
+- **Importes fijos por Tramo, nunca un porcentaje ni un cargo por Cesión.** Los Tramos son importes fijos escalonados. Ningún cálculo de cuota toma una Cesión concreta ni un porcentaje del negocio como base. El valor contrastado sirve solo para determinar el Tramo del Ejercicio siguiente. No existe ningún cargo asociado a una Cesión, un Puente o un Cierre. Así la suscripción es una suscripción, y la regla entre miembros (D-010) queda en su propio plano, intacta.
+- **Proporción sana.** Los umbrales de cada Tramo se fijan de modo que la cuota anual del Tramo sea siempre una fracción pequeña del valor contrastado que lo activa (propuesta: menos del 5 %). El miembro que sube de Tramo está, por construcción, ganando mucho más de lo que paga.
+- **Predecible y con aviso.** Los Tramos y sus umbrales son públicos desde la web y la Candidatura. El paso de Tramo se revisa una vez por Ejercicio, con aviso del Agente al menos un Ejercicio antes, mostrando el valor contrastado recibido, el Tramo resultante y qué habría que recibir para el siguiente. Nunca hay una subida sorpresa a mitad de Ejercicio.
+- **También baja.** Si el valor contrastado recibido en un Ejercicio cae por debajo del umbral del Tramo actual, el miembro baja de Tramo en el siguiente. La cuota sigue al negocio en los dos sentidos.
+- **Presupuesto del Agente por Tramo.** Cada Tramo lleva un presupuesto de actividad del Agente (frecuencia de Rastreo, profundidad de cualificación, número de Sondeos). El Agente prioriza siempre dentro de su presupuesto lo que más negocio contrastado puede producir. Un miembro puede pedir voluntariamente un Tramo superior para tener un Agente más intenso; nunca se le obliga.
+- **Transparencia interna.** En su Brújula el miembro ve su cuota, su Tramo, el valor contrastado recibido en el Ejercicio y la relación entre ambos. La Balanza pública de la Sala no muestra el Tramo de nadie: la cuota es un asunto entre cada empresa y NS.
+- **Aceptación expresa.** La regla "la cuota no es fija: empieza baja y sube solo cuando NS te genera más negocio" se comunica en la web pública, en la Candidatura y en el onboarding, y el solicitante la acepta expresamente, como las reglas inmutables.
+
+**Why.** Los ingresos de NS son las suscripciones de sus miembros; la sostenibilidad depende de que cada Agente se pague a sí mismo con margen. Cobrar por consumo castigaría precisamente la actividad que hace funcionar la red (prospectar para otros). Cobrar un porcentaje sobre negocio ya se descartó en D-005. Los Tramos ligados al valor contrastado recibido consiguen las tres cosas a la vez: entrada fácil, cobertura del coste y cuota que crece solo cuando el miembro ya ha ganado. Y refuerzan la métrica primaria: NS solo factura más cuando ha demostrado valor contrastado.
+
+**Consequences.**
+
+- D-005 y D-012 se mantienen y se precisan: la membresía deja de ser "plana por plaza" y pasa a ser "por Tramos, plana dentro de cada Tramo". La cuota de incorporación pasa a estar pendiente de decisión (existe o no).
+- `MembershipPlan` incorpora `FeeTier` (Tramo) con `monthly_fee`, `value_threshold`, `agent_budget`. Cada empresa tiene `current_tier`, `next_review_at` y el histórico de cambios de Tramo como eventos auditables.
+- Se registra el coste de tokens por Agente y por Ejercicio (`AgentCostLedger`) para comprobar la cobertura. Es dato interno de NS; nunca se muestra como "consumo" al miembro para no convertir la relación en una factura de tokens.
+- La Brújula (NS-ATP) añade el bloque "Tu cuota y tu negocio recibido". El Parte de la Directiva y del Consejo de Zona añade el margen de cobertura agregado por Sala.
+- La web pública, la Candidatura y el onboarding incluyen los Tramos y la aceptación expresa.
+- `CLAUDE.md` §28 y `docs/13_LEXICO_NS.md` incorporan Cuota y Tramo.
+
+**Pendiente del fundador.** Si existe cuota de incorporación y su importe; importe del Tramo de entrada; número de Tramos y sus umbrales (propuesta inicial: tres o cuatro Tramos); fracción máxima de coste sobre cuota (propuesta: un tercio); proporción máxima cuota/valor (propuesta: 5 %); y si el Ejercicio de revisión de Tramo es mensual o trimestral (propuesta: trimestral, para amortiguar meses aislados).
+
+**Revisit when.** Se disponga de dos Ejercicios completos de coste real de tokens y valor contrastado en NS Sevilla.
+
+---
+
+## D-026 · Stack técnico del vertical slice: TypeScript, Next.js, Drizzle sobre PostgreSQL (PGlite en local), zod, Vitest; razonamiento LLM detrás de un contrato con proveedor determinista y proveedor Anthropic
+
+**Status:** CONFIRMED (por delegación expresa del fundador, 2026-09-13: "decide tú qué hacer con D-026"; el equipo fundador la confirma)
+**Date:** 2026-09-13
+
+**Context.** Cerrados el modelo de datos (`docs/06`) y la arquitectura de agentes (`docs/07`), hay que fijar el stack del primer recorrido ejecutable sin complejidad prematura y sin dependencia de red para la demo y los tests. La constitución (§A.9) orienta a TypeScript, framework full-stack, PostgreSQL, validación de esquemas y APIs tipadas.
+
+**Options.**
+
+1. Next.js + Prisma + Postgres servidor obligatorio. Cómodo, pero la demo exigiría un servidor Postgres y el JSON tipado es más rígido.
+2. Next.js + Drizzle (pg-core) + PostgreSQL, con PGlite (Postgres embebido en WASM) para local, demo y tests. Un solo dialecto real, mismas migraciones en todos los entornos.
+3. Backend separado (Nest/Fastify) + SPA. Más piezas antes de haber demostrado la tesis.
+
+**Choice.** Opción 2.
+
+- **Monorepo pnpm** con `apps/web`. El dominio (`src/core`) no importa nada del framework y se puede extraer a paquete cuando haga falta.
+- **Drizzle ORM** sobre `pg-core`; `DATABASE_URL` → node-postgres; sin ella → PGlite en `.data/`. Migraciones generadas con drizzle-kit y aplicadas al arrancar.
+- **zod** como fuente de verdad de los objetos del protocolo (`src/core/types.ts`), usada también para validar las salidas estructuradas del modelo.
+- **Contrato `LLMProvider`** con dos implementaciones: determinista (reglas, sin red) y Anthropic (`@anthropic-ai/sdk`, `messages.parse` con `zodOutputFormat`, modelo `claude-opus-5` por defecto). El sistema nunca deja que una salida de modelo cambie estado sin validar.
+- **Vitest** para funciones puras y para el slice completo sobre PGlite en memoria.
+- **Sin autenticación en el slice**: cookie de persona para la demo. La autenticación y el RBAC por Sala/empresa son el primer trabajo de la fase siguiente.
+
+**Why.** Un solo dialecto Postgres de verdad en todos los entornos elimina la deriva entre local y producción. PGlite permite demo y tests reproducibles sin infraestructura. El contrato de proveedor mantiene la promesa del protocolo ("los LLM razonan, el sistema mantiene estado") y permite ejecutar la Mesa sin coste ni red.
+
+**Consequences.** `apps/web` con 25 tests que cubren los escenarios A, C y D. `docs/06` y `docs/07` describen lo implementado. Cada cambio de esquema exige `pnpm db:generate` y migración versionada.
+
+**Revisit when.** Haga falta cola de trabajos en segundo plano para la Mesa con proveedor real, búsqueda vectorial para el recall de S4, o extraer `src/core` a un paquete compartido.
+
+**Razón de la confirmación.** Tres criterios: (1) es la base más simple que cumple la constitución (§A.9: tipado, PostgreSQL, validación, auditoría) y ya demuestra el recorrido completo con 25 pruebas automáticas; (2) no compromete el futuro, porque el dominio (`src/core`) no depende del framework ni de la base de datos y cada pieza se puede sustituir por separado; (3) permite enseñar el producto a empresarios sin infraestructura ni coste de modelo, con un solo comando. Lo que sigue pendiente (autenticación, Mesa en segundo plano con proveedor real, búsqueda vectorial) se decide en su momento como decisiones nuevas, no como revisión de esta.
+
+---
+
+## D-027 · La persona que representa a la empresa en NS se llama Timonel; el Timonel manda
+
+**Status:** CONFIRMED (elección directa del fundador)
+**Date:** 2026-09-13
+
+**Context.** El léxico tenía nombre para la empresa (Titular) pero no para la persona que decide por ella; los documentos usaban "gerente" de forma informal. El fundador pidió una palabra cercana y coloquial, no un cargo administrativo.
+
+**Options.** Portavoz · Salense / Salano (de Sala) · Mesario (de Mesa) · Personia / Personero / Personado (de persona) · Manitas · Copiloto · Piloto · Capitán · Timonel.
+
+**Choice.** **Timonel.** Invariable en género (el Timonel, la Timonel). Cada Titular designa un Timonel y puede designar un Timonel suplente. Descartes razonados: Portavoz (administrativo); Personia y Personero (colisión con marcas de software de recursos humanos y registro poco natural); Manitas (nombra a quien ejecuta con las manos, no a quien decide, y suena a bricolaje); Copiloto (hoy significa la inteligencia artificial y sitúa al humano como ayudante de la máquina, además de la colisión con Microsoft); Piloto (choca con "el piloto de NS Sevilla" como fase de lanzamiento).
+
+**Why.** Cuenta la relación persona-Agente en una sola imagen: el Agente rema y vigila el horizonte 24/7; el Timonel decide el rumbo. Es cercana sin ser vulgar y hace familia con Brújula y Puente. Y describe la verdad del protocolo: nada llega a un tercero sin su visto bueno, nadie revela una identidad sin su Apertura, ningún Puente sale sin que lo envíe, y el Veredicto lo emite ella.
+
+**Principio que fija el fundador.** *La persona debe sentir siempre que es quien dirige.* No es una cortesía de interfaz para que el humano "se sienta bien": es la descripción exacta de las puertas humanas de NS-ARP. Todo diseño que convierta al Timonel en espectador de su Agente es un error de producto. Se incorpora a la constitución (§7, Human-in-the-Loop).
+
+**Consequences.** "Gerente" se sustituye por "Timonel" en la constitución, el North Star, el léxico y los Protocolos de Sala. En el modelo de datos, `members.is_primary` marca al Timonel. La app usa "Timonel" en el alta, el selector de demo, el Dossier y la tarjeta de Cesión. No requiere comprobación de marca (D-028).
+
+**Revisit when.** Nunca en cuanto al principio.
+
+---
+
+## D-028 · La única marca registrada es NS Network Spain; los términos del léxico no tienen que ser registrables
+
+**Status:** CONFIRMED (indicación directa del fundador)
+**Date:** 2026-09-13
+
+**Context.** El equipo fundador venía condicionando cada término nuevo del léxico (Embajada, Tramo, Timonel) a una comprobación de marca en la OEPM y la EUIPO. El fundador aclara que la marca registrada es **NS Network Spain** y que las denominaciones menores no pretenden ser registrables.
+
+**Choice.** Los términos del léxico (Sala, Plaza, Titular, Timonel, Cesión, Embajada, Promesa, Veredicto, Balanza, Brújula, Tramo, etc.) son **lenguaje de producto**, no marcas. Se eligen por claridad, sobriedad y coherencia con el imaginario NS; no se exige ni se comprueba que sean registrables, y no se vuelve a plantear esa comprobación al proponer nombres. La protección de la propiedad intelectual de NS descansa en la marca NS Network Spain, en el protocolo NS-ARP y en el conjunto del léxico y la metodología como obra, no en el registro de cada palabra.
+
+**Consequences.** Se elimina el criterio "registrable con el prefijo NS" del léxico (`docs/13`). Las decisiones anteriores que mencionaban comprobaciones de marca pendientes (D-015, D-025, D-027) quedan libres de esa condición. Si en el futuro conviene registrar algún término concreto (por ejemplo, el nombre de un producto o servicio de pago), se abrirá una decisión propia.
+
+**Revisit when.** NS salga de España o lance una línea de producto con nombre propio.
+
+---
+
+## D-029 · "Interesado avisado": el Indicio y la Promesa registran si el tercero sabe que le van a llamar
+
+**Status:** CONFIRMED (decisión del equipo fundador por delegación del fundador: "mira qué hace la competencia, mejóralo y toma tú las decisiones")
+**Date:** 2026-09-13
+
+**Context.** El análisis de competencia (`docs/16`) muestra que la mejor definición operativa de calidad de un referido en el sector es la de BNI: un referido es real cuando el miembro "le ha dicho al tercero que le llamarán" y el tercero espera la llamada. NS medía la relación del cedente con el Interesado pero no este hecho concreto.
+
+**Choice.** El Indicio incorpora `third_party_expects_contact` en la capa 0 (no es identidad). El Agente lo detecta en el texto ("le he dicho que le llamarán", "espera vuestra llamada"), el formulario lo pregunta con una casilla, la tarjeta de Cesión lo muestra como distintivo "Interesado avisado", la Promesa lo incluye como componente propio y el Encaje lo usa como evidencia (eleva la fuerza de relación a 0,85 como mínimo).
+
+**Why.** Es el dato que separa una pista de una Cesión de verdad. Mejora sobre BNI: no es una casilla, es un dato contrastado por el Agente que pesa en el Mérito y que el cesionario ve antes de aceptar.
+
+**Consequences.** Cambios en `core/types`, `core/scoring`, `core/merit`, proveedor determinista, formulario de Indicio, tarjeta. Los Indicios de Rastreo (D-031) nunca llevan Interesado avisado.
+
+**Revisit when.** Tras 50 Cesiones cerradas, para medir si el aviso predice la conversión.
+
+---
+
+## D-030 · El Reloj de la Sala ejecuta los plazos y el Agente empuja cuando el hilo pierde impulso
+
+**Status:** CONFIRMED (por delegación del fundador)
+**Date:** 2026-09-13
+
+**Context.** Boardy Pro demuestra que el seguimiento activo (empujar el hilo cuando pierde impulso, recordar, agendar) es lo que convierte introducciones en negocio. NS tenía los plazos diseñados en D-024 pero ningún mecanismo los ejecutaba.
+
+**Choice.** Un servicio determinista e idempotente, el **Reloj de la Sala** (`services/clock.ts`), que: recuerda a las 72 horas de revisión; caduca a los 7 días con `RESPONSE_LATE` para quien calló (la Cesión vuelve al cedente); marca la respuesta tardía a las 48 horas del Puente sin hito; y pregunta por el seguimiento cada 14 días. Cada acción deja un evento en la Mesa (privado para el afectado) y su Mérito. Se ejecuta al cargar Hoy (máximo una vez cada 10 minutos por proceso) y con `pnpm clock`; en el servidor será una tarea programada diaria.
+
+**Why.** Sin plazos ejecutados, el compromiso de 48 h y la caducidad de 7 días eran texto. Mejora sobre Boardy: el empujón lo recibe siempre el Timonel, nunca el Interesado; ningún Agente contacta con terceros.
+
+**Consequences.** Columnas `reminder_sent_at`, `late_flagged_at`, `last_nudge_at` en Cesiones (migración 0001). Nuevos eventos `REMINDER`, `EXPIRED`, `RESPONSE_LATE`, `CHECK_IN`. El léxico incorpora "Reloj de la Sala".
+
+**Revisit when.** Se mida el efecto de los recordatorios en el tiempo de respuesta real.
+
+---
+
+## D-031 · Rastreo público: el Agente convierte señales de fuentes públicas en Indicios en borrador para otros titulares
+
+**Status:** CONFIRMED (por delegación del fundador)
+**Date:** 2026-09-13
+
+**Context.** Clay, Common Room y similares viven de señales de compra (nueva sede, contrataciones, financiación, cambio de dirección) que en España están en fuentes públicas: BORME, licitaciones (PLACE), licencias de obra municipales, ofertas de empleo y prensa local. Ninguna de esas herramientas termina en una introducción cálida dentro de un club. El banco de ideas (`docs/11`, A1) ya lo preveía como "Rastreo".
+
+**Choice.** El Agente de cada empresa rastrea una fuente (`PublicFeed`) y crea Indicios en borrador con fuente `PUBLIC_RECORD`, relación "débil" y sin Interesado avisado, para otros titulares de la Sala. El Timonel los ve en Hoy ("Rastreo") y decide si los publica: si lo hace, es el cedente y gana Mérito si la Cesión prospera. Deduplicación por referencia externa (`public_records`). En v0.1 la fuente es un lote de ejemplo verosímil (`SampleFeed`); los adaptadores reales (BORME vía datos.gob.es, PLACE, portales municipales, empleo) implementan la misma interfaz y se añaden uno a uno.
+
+**Why.** Convierte a cada Agente en prospector para los demás, que es la promesa central de NS ("mientras tú trabajabas, tu red seguía trabajando"). Mejora sobre Clay: la señal acaba en una Cesión con doble visto bueno, no en un correo frío.
+
+**Consequences.** `agents/rastreo.ts`, tabla `public_records`, sección Rastreo en Hoy, botón "Rastrear fuentes públicas ahora" (en el servidor lo lanza el Reloj cada mañana). Un Indicio de Rastreo publicado que no genera ninguna Pista queda como necesidad sin cobertura, útil para la Antesala.
+
+**Revisit when.** Se conecte la primera fuente real; entonces se fijan frecuencia, filtros por zona y límites de volumen por Agente (para no inundar la Mesa).
+
+---
+
+## D-032 · Encargo: lo que cada titular busca ahora es un objeto visible en la Sala que los Agentes usan para priorizar
+
+**Status:** CONFIRMED (por delegación del fundador)
+**Date:** 2026-09-13
+
+**Context.** En BNI cada miembro dice cada semana "el referido que busco es..." y se pierde al terminar la reunión. El léxico ya tenía "Encargo" (`DemandPosting`) sin implementación.
+
+**Choice.** Tabla `demands`: texto, señal (trigger) opcional, industria opcional, vigencia (90 días por defecto), estado. El titular los publica y cierra desde su Dossier; la Sala los ve en Mi Sala. La Mesa consulta los Encargos abiertos del cesionario candidato: si uno coincide con el Indicio, la componente de prioridad estratégica del Encaje sube al máximo y el Fundamento lo dice ("Responde a tu Encargo abierto: ...").
+
+**Why.** El Encargo trabaja los siete días, no solo en el Pleno, y da a los Agentes una señal de demanda explícita que el ADN estático no tiene.
+
+**Consequences.** `services/demands.ts`, migración 0001, UI en Dossier y Mi Sala, evento `DEMAND_POSTED`. El Comunicado semanal (Protocolo II) incluirá los Encargos vigentes cuando se implemente.
+
+**Revisit when.** Haya datos sobre cuántas Cesiones responden a Encargos frente a las que nacen del ADN.

@@ -10,7 +10,7 @@ Protocolo II · DAR A CONOCER        Comunicar tu trabajo a la Sala.      Unidad
 Protocolo III · CUENTAS CLARAS      Hacer visible el valor dado y recibido. Unidad: la Balanza.  Especificación: NS-ATP (este documento).
 ```
 
-Los tres tienen cadencia semanal, cumplimiento verificable y consecuencias (D-010). Los tres los realiza el Agente; el gerente decide en segundos.
+Los tres tienen cadencia semanal, cumplimiento verificable y consecuencias (D-010). Los tres los realiza el Agente; el Timonel decide en segundos.
 
 ---
 
@@ -26,14 +26,14 @@ Cada semana el Agente de cada empresa propone el máximo de Cesiones válidas po
 
 > Nadie puede ceder bien lo que no conoce bien.
 
-La calidad de las Cesiones depende de cuánto sabe cada Agente (y cada gerente) sobre los demás miembros de la Sala. Por eso **cada semana, el Agente de cada empresa informa a los Agentes de las demás empresas de la Sala** de: su especialidad y plaza; funciones, servicios y productos que trabaja; y las actualizaciones, novedades y cualquier dato importante ocurrido esa semana. Y **todo gerente debe conocer, o poder consultar en segundos, el Dossier, el histórico y las novedades de cada miembro de su Sala**.
+La calidad de las Cesiones depende de cuánto sabe cada Agente (y cada Timonel) sobre los demás miembros de la Sala. Por eso **cada semana, el Agente de cada empresa informa a los Agentes de las demás empresas de la Sala** de: su especialidad y plaza; funciones, servicios y productos que trabaja; y las actualizaciones, novedades y cualquier dato importante ocurrido esa semana. Y **todo Timonel debe conocer, o poder consultar en segundos, el Dossier, el histórico y las novedades de cada miembro de su Sala**.
 
 ### 2. Objetos
 
 | Término NS | Qué es | Identificador técnico |
 | --- | --- | --- |
 | **Comunicado** | Informe semanal estructurado que el Agente de una empresa envía a los Agentes de la Sala. Contiene lo estable (qué hace) y el delta (qué ha cambiado esta semana). | `Communique` |
-| **Gaceta** | Digesto semanal de la Sala que compila el Chapter Intelligence Agent a partir de todos los Comunicados, con una vista general y una vista "relevante para ti" por gerente. | `ChapterGazette` |
+| **Gaceta** | Digesto semanal de la Sala que compila el Chapter Intelligence Agent a partir de todos los Comunicados, con una vista general y una vista "relevante para ti" por Timonel. | `ChapterGazette` |
 | **Dossier** | Ficha viva de cada miembro: quién es, qué hace, a quién sirve, cómo es su Cesión perfecta, qué busca ahora (Encargos), su Hoja de Méritos y el histórico de Comunicados. Accesible desde Mi Sala, desde cualquier Cesión y por búsqueda. | `MemberDossier` |
 
 ### 3. Especificación agentic
@@ -41,17 +41,17 @@ La calidad de las Cesiones depende de cuánto sabe cada Agente (y cada gerente) 
 | Campo | Especificación |
 | --- | --- |
 | **Trigger** | Cierre semanal de la Sala (día y hora configurables por Sala; propuesta: domingo 20:00, para que la Gaceta esté lista el lunes a primera hora). También bajo demanda cuando el ADN de Empresa cambia de forma relevante. |
-| **Inputs** | ADN de Empresa (capas `PUBLIC` y `CHAPTER`); Encargos vigentes; cambios de la semana (servicios, productos, capacidad, equipo, certificaciones, sedes, casos ganados anonimizables); Cesiones cerradas contrastadas; lo que el gerente añada en el Despacho. |
+| **Inputs** | ADN de Empresa (capas `PUBLIC` y `CHAPTER`); Encargos vigentes; cambios de la semana (servicios, productos, capacidad, equipo, certificaciones, sedes, casos ganados anonimizables); Cesiones cerradas contrastadas; lo que el Timonel añada en el Despacho. |
 | **Agente** | Company Agent redacta; Chapter Intelligence Agent compila la Gaceta; Trust & Compliance filtra visibilidad. |
 | **Tools** | Lectura del ADN; diff de la semana; generador de Comunicado; índice de capabilities de la Sala; personalizador de relevancia. |
 | **Permisos** | Solo capas `PUBLIC` y `CHAPTER`. Nada marcado `COMPANY_ONLY` o `NEVER_SHARE` entra jamás en un Comunicado. Datos personales de terceros: nunca. Casos de cliente: anonimizados salvo autorización expresa. |
-| **Objetivo de razonamiento** | Que cada Agente de la Sala actualice su modelo de la empresa: qué ofrece, qué no, a quién, con qué capacidad ahora, y qué señales debe buscar para ella. Que el gerente lea en 90 segundos lo que le importa. |
+| **Objetivo de razonamiento** | Que cada Agente de la Sala actualice su modelo de la empresa: qué ofrece, qué no, a quién, con qué capacidad ahora, y qué señales debe buscar para ella. Que el Timonel lea en 90 segundos lo que le importa. |
 | **Salida estructurada** | Ver §4. |
-| **Confianza** | Cada afirmación del delta lleva origen: `DECLARED_BY_MEMBER` (lo dijo el gerente), `INFERRED_FROM_DNA` (cambio en el ADN), `VERIFIED` (Cesión contrastada, certificación comprobada). Nada inferido se publica como hecho sin visto bueno. |
-| **Puerta humana** | El gerente revisa y aprueba el Comunicado en su Despacho (un toque). Si en 48 h no lo aprueba, el Agente envía un **Comunicado de continuidad**: solo la parte estable ya validada, sin nuevas afirmaciones, y lo marca como no revisado. |
-| **Efecto** | Los Agentes receptores actualizan su índice de capabilities y sus criterios de Rastreo; el Dossier se actualiza; la Gaceta se publica; cada gerente recibe su vista "relevante para ti". |
+| **Confianza** | Cada afirmación del delta lleva origen: `DECLARED_BY_MEMBER` (lo dijo el Timonel), `INFERRED_FROM_DNA` (cambio en el ADN), `VERIFIED` (Cesión contrastada, certificación comprobada). Nada inferido se publica como hecho sin visto bueno. |
+| **Puerta humana** | El Timonel revisa y aprueba el Comunicado en su Despacho (un toque). Si en 48 h no lo aprueba, el Agente envía un **Comunicado de continuidad**: solo la parte estable ya validada, sin nuevas afirmaciones, y lo marca como no revisado. |
+| **Efecto** | Los Agentes receptores actualizan su índice de capabilities y sus criterios de Rastreo; el Dossier se actualiza; la Gaceta se publica; cada Timonel recibe su vista "relevante para ti". |
 | **Evento de auditoría** | `COMMUNIQUE_SENT`, `COMMUNIQUE_CONTINUITY`, `COMMUNIQUE_ACKED` (por cada Agente receptor), `GAZETTE_PUBLISHED`, `DOSSIER_VIEWED`. |
-| **Fallo** | Si el Agente no puede generar el Comunicado (ADN incompleto, error), avisa al gerente y a la Directiva; la ausencia cuenta como incumplimiento solo si el gerente no responde al aviso en el plazo. |
+| **Fallo** | Si el Agente no puede generar el Comunicado (ADN incompleto, error), avisa al Timonel y a la Directiva; la ausencia cuenta como incumplimiento solo si el Timonel no responde al aviso en el plazo. |
 
 ### 4. Estructura del Comunicado
 
@@ -85,7 +85,7 @@ La calidad de las Cesiones depende de cuánto sabe cada Agente (y cada gerente) 
 }
 ```
 
-Regla de estilo: el Comunicado no es un anuncio. Es información de trabajo para agentes y gerentes: concreto, corto, sin adjetivos. El Agente lo redacta así por defecto.
+Regla de estilo: el Comunicado no es un anuncio. Es información de trabajo para agentes y Timoneles: concreto, corto, sin adjetivos. El Agente lo redacta así por defecto.
 
 ### 5. La Gaceta
 
@@ -123,7 +123,7 @@ Encargos vigentes
 Cómo presentarla (texto de Puente sugerido por su Agente)
 Hoja de Méritos
 Histórico de Comunicados (semana a semana)
-Contacto del gerente · Preferencias de introducción
+Contacto del Timonel · Preferencias de introducción
 ```
 
 Accesos: desde Mi Sala (lista de miembros), desde cualquier Cesión o Pista ("ver Dossier del titular"), desde la búsqueda ("¿quién de mi Sala hace X?") y desde la Gaceta. Cada acceso queda registrado (`DOSSIER_VIEWED`) para medir conocimiento mutuo, nunca para vigilar.
@@ -133,7 +133,7 @@ Accesos: desde Mi Sala (lista de miembros), desde cualquier Cesión o Pista ("ve
 - Un Comunicado aprobado por semana es obligatorio. Un Comunicado de continuidad cumple, pero dos de continuidad seguidos generan aviso del Agente y tres, aviso de la Directiva.
 - `TrustEvent`: `COMMUNIQUE_MET` / `COMMUNIQUE_MISSED`. El incumplimiento reiterado sigue la misma escalera que el Compromiso (D-010).
 - Cada Agente receptor debe acusar recibo (`COMMUNIQUE_ACKED`) y actualizar su índice. Es automático; su ausencia es un fallo técnico, no del miembro.
-- Métrica de salud de la Sala: **conocimiento mutuo** = proporción de gerentes que han consultado la Gaceta o algún Dossier en la semana. Métrica de eficacia: mejora de la precisión de las Pistas tras los Comunicados.
+- Métrica de salud de la Sala: **conocimiento mutuo** = proporción de Timoneles que han consultado la Gaceta o algún Dossier en la semana. Métrica de eficacia: mejora de la precisión de las Pistas tras los Comunicados.
 
 ### 8. Interfaz
 
@@ -219,6 +219,8 @@ BRÚJULA · Híspalis · Semana 37
     Mérito        1.420 · a 180 del nivel Referente (acceso a Cesiones de otras Salas)
     Distinción    Tu Cesión a Triana es candidata a Cesión del mes
     Embajada      La plaza de Mobiliario sigue vacante: cada Embajada que resuelva vale prima ×2
+    Cuota         Tramo de entrada · has recibido 61.000 € contrastados en el Ejercicio · tu cuota es el 1,2 %
+                  Si el Ejercicio cierra por encima de 75.000 €, pasarás al Tramo 2 el trimestre que viene. Te avisaré antes.
 
 4 · Tres Movimientos para esta semana
     1  Ceder: tu cliente Logística Bética renueva flota (12 vehículos) → Torre Seguros tiene un Encargo abierto exacto. Borrador listo.
@@ -232,7 +234,8 @@ Reglas:
 2. Cada Movimiento es accionable en un toque desde el Despacho (ceder, sondear, aprobar borrador, descartar con motivo). Lo descartado con motivo entrena al Agente.
 3. El bloque "Por qué" usa evidencia real: Veredictos recibidos, tiempos de respuesta, tipos de Indicio que convierten. Nunca consejos genéricos.
 4. El bloque "Qué ganas" enlaza cada objetivo con una consecuencia concreta (nivel, Distinción, prima de Embajada, plaza que se abre). La motivación es tangible o no se muestra.
-5. Si el titular va Por debajo del Ritmo dos semanas, la Brújula sube de tono: el Agente propone cinco Movimientos en lugar de tres y ofrece agendar un Despacho de 10 minutos. Si van tres, avisa de que la Directiva lo verá en el Parte.
+5. El bloque "Cuota" (D-025) muestra el Tramo actual, el valor contrastado recibido en el Ejercicio, la relación cuota/valor y el umbral del siguiente Tramo. Es la única pantalla donde aparece la cuota; la Balanza pública nunca la muestra. Cualquier cambio de Tramo se anuncia aquí al menos un Ejercicio antes.
+6. Si el titular va Por debajo del Ritmo dos semanas, la Brújula sube de tono: el Agente propone cinco Movimientos en lugar de tres y ofrece agendar un Despacho de 10 minutos. Si van tres, avisa de que la Directiva lo verá en el Parte.
 
 ### 5. El Ritmo
 

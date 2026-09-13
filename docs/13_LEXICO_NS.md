@@ -3,7 +3,7 @@
 **Estado:** léxico oficial (D-016, CONFIRMED por el fundador). Cambios posteriores se registran en DECISIONS.
 **Por qué existe.** NS debe tener lenguaje propio (constitución, sección 2). Un producto que crea una categoría nueva necesita nombrar sus objetos y sus rituales con palabras que nadie más use. El léxico es propiedad intelectual y es producto: el microcopy, la web pública y la app hablan con él. Ningún término copia terminología de otras organizaciones de networking.
 
-Criterios de cada nombre: castellano; una palabra siempre que sea posible; institucional y sobrio; con sentido literal reconocible; sin pistas territoriales; traducible sin perder el concepto; registrable con el prefijo NS.
+Criterios de cada nombre: castellano; una palabra siempre que sea posible; institucional y sobrio; con sentido literal reconocible; sin pistas territoriales; traducible sin perder el concepto. **La única marca registrada es NS Network Spain (D-028).** Los términos del léxico son lenguaje de producto, no marcas: no se exige ni se comprueba que sean registrables.
 
 ---
 
@@ -16,6 +16,7 @@ Criterios de cada nombre: castellano; una palabra siempre que sea posible; insti
 | **Sala** | Unidad fundamental: empresas seleccionadas, una por especialidad. No es territorial. Nombre propio autorizado: "NS Cumbre". | `Chapter` | "Soy miembro de NS Cumbre." |
 | **Plaza** | Posición única de una especialidad dentro de una Sala. | `CategorySeat` | "La plaza de Derecho laboral está vacante." |
 | **Titular** | Empresa que ocupa una plaza. | `seat.company_id` | "El titular de Climatización recibe la cesión." |
+| **Timonel** | La persona que lleva el rumbo de su empresa en NS: da los vistos buenos, autoriza la Apertura, tiende el Puente y emite el Veredicto. El Agente trabaja 24/7; el Timonel manda (D-027). Invariable en género: el Timonel, la Timonel. Cada Titular designa un Timonel y puede designar un **Timonel suplente**. | `Member{ is_primary }` | "Carlos es el Timonel de Híspalis." "Los Timoneles de NS Cumbre se ven en el Pleno." |
 | **Antesala** | Lista de espera de empresas admitidas que aguardan plaza o fundan la siguiente Sala. | `Waitlist` | "Hay doce empresas en la Antesala de NS Sevilla." |
 | **Candidatura** | Solicitud de plaza y proceso de admisión. | `Application` | "Presentar candidatura" es el paso tras "Solicitar plaza". |
 | **Directiva** | Presidencia y consejo de una Sala. | `Director` | "La Directiva revisa las excepciones." |
@@ -60,6 +61,8 @@ Criterios de cada nombre: castellano; una palabra siempre que sea posible; insti
 | **Ejercicio** | Periodo de cómputo del Compromiso (por estipular: mes o trimestre). | `QuotaPeriod` |
 | **Niveles** | Miembro · Contribuidor · Referente · Consejero · Fundador. Se ganan con Mérito; amplían acceso, nunca lo restringen. ("Embajador" queda reservado a la Embajada.) | `MembershipTier` |
 | **Arbitraje** | Resolución de disputas entre cedente y cesionario por la Directiva. | `Dispute` |
+| **Cuota** | El precio de la suscripción a NS: lo que paga una empresa a NS por su plaza y su Agente. Coste inicial (por decidir si existe) y cuota mensual por Tramos. Son los ingresos de NS. Es un plano distinto de la regla entre miembros: nunca es un porcentaje del negocio ni un cargo por Cesión (D-005, D-025). | `MembershipPlan` |
+| **Tramo** | Nivel de cuota mensual. Se entra en el Tramo de entrada y se sube solo cuando el valor contrastado recibido en el Ejercicio anterior supera el umbral del Tramo; también se baja. Importes fijos y públicos; el Tramo de cada empresa es privado. Cada Tramo lleva un presupuesto de actividad del Agente que cubre con creces su coste (D-025). | `FeeTier` |
 
 ## 4. Los agentes y el día a día
 
@@ -69,8 +72,10 @@ Criterios de cada nombre: castellano; una palabra siempre que sea posible; insti
 | **ADN de Empresa** | El conocimiento estructurado que entrena al Agente (Business DNA). | `BusinessDNA` |
 | **Mesa Permanente** | La reunión 24/7 de los agentes de una Sala. Lo que en la app se ve como cronología de eventos significativos. | `AgentRoom` |
 | **Despacho** | Sesión breve y periódica del miembro con su Agente: tres cosas ya preparadas, decisiones de 30 segundos. | `AgentCheckIn` |
-| **Encargo** | Lo que una empresa busca ahora (ICP + trigger + ticket + plazo). Los agentes prospectan contra los Encargos de la Sala. | `DemandPosting` |
-| **Rastreo** | Prospección del Agente en fuentes públicas (registros, licitaciones, licencias, empleo, noticias) para generar Indicios para otros. | `PublicProspecting` |
+| **Encargo** | Lo que una empresa busca ahora (texto, señal, industria, vigencia). Visible en la Sala; los Agentes priorizan las Pistas que responden a un Encargo abierto y lo dicen en el Fundamento (D-032). | `Demand` |
+| **Rastreo** | Prospección del Agente en fuentes públicas (BORME, licitaciones, licencias de obra, empleo, prensa local) para generar Indicios en borrador para otros titulares. El Timonel decide si los publica (D-031). | `PublicProspecting` |
+| **Interesado avisado** | Hecho que distingue una Cesión de verdad: el Interesado sabe que le van a llamar. Va en la capa 0, lo detecta el Agente, lo confirma el cedente y pesa en la Promesa y en el Encaje (D-029). | `third_party_expects_contact` |
+| **Reloj de la Sala** | Mecanismo que ejecuta los plazos: recuerda a las 72 h, caduca a los 7 días, marca la respuesta tardía a las 48 h del Puente y pregunta cada 14 días. El empujón lo recibe el Timonel, nunca el Interesado (D-030). | `ChapterClock` |
 | **Sondeo** | Pregunta discreta al grafo de relaciones de la Sala: "¿alguien tiene relación con la dirección financiera de Z?". Nadie ve contactos hasta que su dueño da el visto bueno. | `RelationshipProbe` |
 | **Hoy** | Pantalla de inicio del miembro: qué ha hecho la red por su empresa desde la última vez. | `TodayView` |
 | **Parte** | Informe ejecutivo de la Directiva y del Consejo de Zona: indicios, pistas, cesiones, compromiso, antesala, saturación. | `ExecutiveBriefing` |
@@ -82,11 +87,11 @@ Criterios de cada nombre: castellano; una palabra siempre que sea posible; insti
 
 | Término NS | Qué es | Identificador técnico |
 | --- | --- | --- |
-| **Comunicado** | Informe semanal estructurado que el Agente de una empresa envía a los Agentes de la Sala: lo estable (qué hace) y el delta (qué ha cambiado esta semana). El gerente lo aprueba en el Despacho. | `Communique` |
-| **Comunicado de continuidad** | El que envía el Agente cuando el gerente no aprueba a tiempo: solo lo estable ya validado, sin nuevas afirmaciones. | `Communique{ approved_by: CONTINUITY }` |
-| **Gaceta** | Digesto semanal de la Sala compilado por el Chapter Intelligence Agent a partir de los Comunicados, con vista general y "relevante para ti" por gerente. En el Pleno sustituye la ronda de presentaciones. | `ChapterGazette` |
+| **Comunicado** | Informe semanal estructurado que el Agente de una empresa envía a los Agentes de la Sala: lo estable (qué hace) y el delta (qué ha cambiado esta semana). El Timonel lo aprueba en el Despacho. | `Communique` |
+| **Comunicado de continuidad** | El que envía el Agente cuando el Timonel no aprueba a tiempo: solo lo estable ya validado, sin nuevas afirmaciones. | `Communique{ approved_by: CONTINUITY }` |
+| **Gaceta** | Digesto semanal de la Sala compilado por el Chapter Intelligence Agent a partir de los Comunicados, con vista general y "relevante para ti" por Timonel. En el Pleno sustituye la ronda de presentaciones. | `ChapterGazette` |
 | **Dossier** | Ficha viva de cada miembro: qué hace, a quién sirve, Cesión perfecta, capacidad ahora, Encargos, cómo presentarla, Hoja de Méritos, histórico de Comunicados. Dos toques desde cualquier pantalla. | `MemberDossier` |
-| **Conocimiento mutuo** | Métrica de salud de la Sala: proporción de gerentes que consultan la Gaceta o un Dossier cada semana. | `MutualKnowledgeRate` |
+| **Conocimiento mutuo** | Métrica de salud de la Sala: proporción de Timoneles que consultan la Gaceta o un Dossier cada semana. | `MutualKnowledgeRate` |
 
 ## 4ter. Protocolo III · Cuentas Claras
 
@@ -98,7 +103,7 @@ Criterios de cada nombre: castellano; una palabra siempre que sea posible; insti
 | **Brújula** | Cuadro privado del titular: si consigue sus objetivos, por qué, qué gana, qué ofrecer, qué proponer y qué referidos posibles tiene para ceder. Solo lo ven el titular y su Agente. | `MemberCompass` |
 | **Movimiento** | Acción concreta que la Brújula propone para la semana (ceder, ofrecer, proponer, sondear, Embajada). Tres por semana; cinco si el titular va Por debajo. Un toque para ejecutar. | `CompassMove` |
 
-Alternativas consideradas: para el protocolo, "Rendir Cuentas" y "Transparencia"; para Balanza, "Tablón" y "Cuadro"; para Brújula, "Bitácora" y "Plan". Se recomienda Cuentas Claras · Balanza · Brújula · Ritmo · Movimiento por sobriedad, literalidad y contraste entre lo público (pesar) y lo privado (orientar).
+Alternativas consideradas para Tramo: "Escalón" y "Nivel de cuota" (descartado "Nivel" por colisión con los Niveles de membresía). Alternativas consideradas: para el protocolo, "Rendir Cuentas" y "Transparencia"; para Balanza, "Tablón" y "Cuadro"; para Brújula, "Bitácora" y "Plan". Se recomienda Cuentas Claras · Balanza · Brújula · Ritmo · Movimiento por sobriedad, literalidad y contraste entre lo público (pesar) y lo privado (orientar).
 
 ## 5. Protocolos y clasificaciones
 
@@ -146,9 +151,13 @@ La plaza de Mobiliario estaba vacante en NS Cumbre: Carlos hizo una Embajada a u
 El Parte del Consejo de Zona anota que Mobiliario debería cubrirse desde la Antesala.
 ```
 
-## 6bis. Por qué "Embajada"
+## 6bis. Por qué "Timonel" (D-027)
 
-El fundador descartó "Extramuros" por agresivo. "Embajada" describe el acto con exactitud diplomática: la Sala del cedente envía una cesión a otra Sala, y la empresa que la acoge queda acreditada como **Embajadora** de esa especialidad en la Sala que no la tiene. Es sobria, cálida, castellana, sin pista territorial y registrable como "NS Embajada". Para evitar colisión, el antiguo nivel de membresía "Embajador" pasa a llamarse "Consejero".
+El fundador quería una palabra cercana, no un cargo administrativo. Se descartaron "Portavoz" (administrativo), "Personia" y "Personero" (colisión de marca y registro), "Manitas" (describe a quien ejecuta, no a quien decide, y suena a bricolaje), "Copiloto" (hoy significa la IA y coloca al humano como ayudante de la máquina) y "Piloto" (choca con "el piloto de NS Sevilla" como fase de lanzamiento). "Timonel" cuenta la relación en una imagen: el Agente rema y vigila el horizonte 24/7; el Timonel decide el rumbo. Hace familia con **Brújula** (lo que el Agente le muestra para orientarse) y **Puente** (desde donde se manda un barco). Principio que fija el fundador: **la persona debe sentir siempre que es quien dirige**. El nombre no es una cortesía: es la descripción exacta de las puertas humanas de NS-ARP.
+
+## 6ter. Por qué "Embajada"
+
+El fundador descartó "Extramuros" por agresivo. "Embajada" describe el acto con exactitud diplomática: la Sala del cedente envía una cesión a otra Sala, y la empresa que la acoge queda acreditada como **Embajadora** de esa especialidad en la Sala que no la tiene. Es sobria, cálida, castellana y sin pista territorial. Para evitar colisión, el antiguo nivel de membresía "Embajador" pasa a llamarse "Consejero".
 
 ## 7. Palabras que NS no usa
 

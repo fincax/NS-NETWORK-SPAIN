@@ -282,6 +282,8 @@ NS debe maximizar automatización sin eliminar responsabilidad humana.
 
 El objetivo no es reducir la autonomía. El objetivo es situar la aprobación humana exactamente donde genera valor.
 
+**El Timonel manda (D-027).** La persona que representa a cada empresa en NS se llama **Timonel**. El Agente rema y vigila el horizonte 24/7; el Timonel decide el rumbo: da los vistos buenos, autoriza la Apertura, tiende el Puente y emite el Veredicto. Principio fijado por el fundador: la persona debe sentir siempre que es quien dirige. No es una cortesía de interfaz: es la descripción exacta de las puertas humanas de NS-ARP, y todo diseño que convierta al Timonel en un espectador de su Agente es un error de producto.
+
 ## 8. NS debe ser una red de confianza, no una red abierta
 
 No cualquier organización entra automáticamente.
@@ -615,7 +617,7 @@ Protocolo II  · DAR A CONOCER     Comunicar tu trabajo a la Sala.             U
 Protocolo III · CUENTAS CLARAS    Hacer visible el valor dado y recibido.     Unidad: la Balanza.    Especificación: NS-ATP.
 ```
 
-**Protocolo II · Dar a Conocer.** Nadie puede ceder bien lo que no conoce bien. Cada semana, el Agente de cada empresa informa a los Agentes de las demás empresas de la Sala de su especialidad y plaza, de las funciones, servicios y productos que trabaja, y de las actualizaciones, novedades y cualquier dato importante ocurrido esa semana (**Comunicado**). El Chapter Intelligence Agent los compila en la **Gaceta** semanal de la Sala, con una vista "relevante para ti" por gerente. Todo gerente debe conocer, o poder consultar en segundos, el **Dossier**, el histórico y las novedades de cada miembro de su Sala. El gerente aprueba su Comunicado en el Despacho con un toque; el cumplimiento es verificable y sigue la misma escalera que el Compromiso. Especificación completa en `docs/14_PROTOCOLOS_DE_SALA.md`.
+**Protocolo II · Dar a Conocer.** Nadie puede ceder bien lo que no conoce bien. Cada semana, el Agente de cada empresa informa a los Agentes de las demás empresas de la Sala de su especialidad y plaza, de las funciones, servicios y productos que trabaja, y de las actualizaciones, novedades y cualquier dato importante ocurrido esa semana (**Comunicado**). El Chapter Intelligence Agent los compila en la **Gaceta** semanal de la Sala, con una vista "relevante para ti" por Timonel. Todo Timonel debe conocer, o poder consultar en segundos, el **Dossier**, el histórico y las novedades de cada miembro de su Sala. El Timonel aprueba su Comunicado en el Despacho con un toque; el cumplimiento es verificable y sigue la misma escalera que el Compromiso. Especificación completa en `docs/14_PROTOCOLOS_DE_SALA.md`.
 
 **Protocolo III · Cuentas Claras.** Lo que se da y lo que se recibe se ve. En cada Sala es visible, para todos sus miembros, la **Balanza** de cada titular: Cesiones hechas y recibidas, valor contrastado generado para otros y recibido, del mes y acumulado, y en qué punto del **Ritmo** (objetivo semanal fijado por la Sala o, en su defecto, por NS) se encuentra. Nunca es un ranking: se ordena por plaza, solo muestra lo válido y contrastado, y la reciprocidad se explica, no se juzga. En privado, cada titular tiene su **Brújula**: el Agente estudia constantemente cómo mejorar sus resultados y le muestra si consigue sus objetivos, por qué, qué gana con ello, qué puede ofrecer a otros, qué puede proponer y qué referidos posibles tiene para ceder, en forma de tres **Movimientos** semanales accionables con un toque. La Brújula nunca sale de la empresa. Especificación completa en `docs/14_PROTOCOLOS_DE_SALA.md`.
 
@@ -935,6 +937,31 @@ NS Business Agent
 Potencialmente: diferentes niveles de membresía; servicios premium; conexiones internacionales; enterprise integrations; advanced agent capabilities.
 
 No introducir automáticamente comisiones por referral en sectores donde puedan existir restricciones legales o profesionales. El modelo financiero definitivo se definirá posteriormente.
+
+### La cuota no es fija: cubre al Agente y sube solo con el negocio recibido (D-025)
+
+Dos planos que nunca se mezclan:
+
+```text
+ENTRE MIEMBROS        Prohibido dar un referido por una contrapartida económica (D-010, expulsión).
+                      Se comparte para que te compartan. Es generación de negocio.
+
+ENTRE MIEMBRO Y NS    Suscribirse y pertenecer a NS tiene un coste inicial (o no, por decidir)
+                      y un coste mensual. Esos son los ingresos de NS. No es una comisión.
+```
+
+Principio interno de sostenibilidad fijado por el fundador: **la cuota mensual de cada miembro debe cubrir con creces el gasto en tokens de su Agente.** El miembro sabe desde la Candidatura que la cuota no es fija. Empieza en un **Tramo de entrada** bajo y razonable, para que entrar sea fácil, y sube de Tramo **solo cuando NS le ha generado más negocio**.
+
+Reglas de diseño de la suscripción:
+
+- El único disparador de subida es el **valor contrastado recibido** por el miembro en el Ejercicio anterior. Nunca la actividad del Agente, el número de Cesiones, el tamaño de la empresa ni la antigüedad.
+- Los Tramos son importes fijos y públicos. **Nunca un porcentaje del negocio, nunca un cargo por Cesión.** El valor contrastado solo sirve para determinar el Tramo del Ejercicio siguiente. Es el precio de la plaza y del Agente, no una contrapartida por referidos.
+- La cuota anual de un Tramo es siempre una fracción pequeña del valor contrastado que lo activa. Quien sube de Tramo ya está ganando mucho más de lo que paga.
+- El paso de Tramo se revisa una vez por Ejercicio, con aviso previo del Agente en la Brújula. También baja si el negocio recibido cae.
+- Cada Tramo lleva un presupuesto de actividad del Agente. NS mide el coste real de tokens por Agente (dato interno, nunca una factura de consumo para el miembro) y ajusta el presupuesto, no la cuota, si el coste se desvía.
+- El Tramo de cada empresa es privado entre la empresa y NS. La Balanza pública no lo muestra.
+
+Los importes, si existe cuota de incorporación, el número de Tramos, los umbrales y el periodo de revisión quedan pendientes del fundador (ver D-025).
 
 ## 29. MVP
 
@@ -1336,7 +1363,7 @@ Estas tres reglas están por encima de cualquier feature, decisión de diseño o
 1. **Nunca se cobra por un referido.** Ningún miembro puede pedir, ofrecer, aceptar o condicionar un referido a dinero, comisión, descuento, contraprestación o favor. NS tampoco cobra por referido (D-005). Hacerlo es **motivo de expulsión** de la Sala y de la red. El espíritu de NS es un network colaborativo: se da porque se pertenece.
 2. **Toda empresa debe aportar un número mínimo de referidos en los plazos que se estipulen.** Pertenecer a NS es contribuir. El mínimo y el plazo se fijan por Sala y se aplican con una escalera de consecuencias que termina en la pérdida de la plaza. El agente de cada empresa trabaja para que su miembro lo cumpla sin esfuerzo.
 3. **La calidad importa más que la cantidad.** Un referido cuenta cuando el receptor lo cualifica como válido y NS puede auditarlo. Un referido flojo no cumple el mínimo ni suma reputación; puede restar.
-4. **Toda empresa da a conocer su trabajo a la Sala cada semana** (D-018). El Agente redacta el Comunicado; el gerente lo aprueba. Sin conocimiento mutuo no hay referidos de calidad.
+4. **Toda empresa da a conocer su trabajo a la Sala cada semana** (D-018). El Agente redacta el Comunicado; el Timonel lo aprueba. Sin conocimiento mutuo no hay referidos de calidad.
 5. **Lo que se da y lo que se recibe se ve** (D-019). La Balanza de cada titular es pública en su Sala, exacta y contrastada. Lo que hay que hacer para mejorar solo lo ve quien tiene que hacerlo.
 
 # NORTH STAR
