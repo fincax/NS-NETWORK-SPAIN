@@ -60,7 +60,7 @@ Criterios de cada nombre: castellano; una palabra siempre que sea posible; insti
 | **Ejercicio** | Periodo de cómputo del Compromiso (por estipular: mes o trimestre). | `QuotaPeriod` |
 | **Niveles** | Miembro · Contribuidor · Referente · Consejero · Fundador. Se ganan con Mérito; amplían acceso, nunca lo restringen. ("Embajador" queda reservado a la Embajada.) | `MembershipTier` |
 | **Arbitraje** | Resolución de disputas entre cedente y cesionario por la Directiva. | `Dispute` |
-| **Cuota** | Lo que paga una empresa a NS por su plaza y su Agente: cuota de incorporación única y cuota mensual por Tramos. Nunca incluye comisión ni cargo por Cesión (D-005, D-010, D-025). | `MembershipPlan` |
+| **Cuota** | El precio de la suscripción a NS: lo que paga una empresa a NS por su plaza y su Agente. Coste inicial (por decidir si existe) y cuota mensual por Tramos. Son los ingresos de NS. Es un plano distinto de la regla entre miembros: nunca es un porcentaje del negocio ni un cargo por Cesión (D-005, D-025). | `MembershipPlan` |
 | **Tramo** | Nivel de cuota mensual. Se entra en el Tramo de entrada y se sube solo cuando el valor contrastado recibido en el Ejercicio anterior supera el umbral del Tramo; también se baja. Importes fijos y públicos; el Tramo de cada empresa es privado. Cada Tramo lleva un presupuesto de actividad del Agente que cubre con creces su coste (D-025). | `FeeTier` |
 
 ## 4. Los agentes y el día a día

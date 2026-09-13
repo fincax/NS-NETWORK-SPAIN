@@ -178,7 +178,7 @@ La arquitectura conserva la capacidad de soportar en el futuro: niveles de membr
 
 **Revisit when.** Se disponga de 12 meses de datos de valor verificado en NS Sevilla.
 
-**Precisado por D-025 (2026-09-13).** La membresía no es plana: se estructura en Tramos ligados al valor contrastado recibido. Sigue sin existir comisión ni cargo por Cesión.
+**Precisado por D-025 (2026-09-13).** La membresía no es plana: se estructura en Tramos ligados al valor contrastado recibido. Sigue sin existir porcentaje sobre negocio ni cargo por Cesión: la cuota es el precio de la suscripción a NS, no una contrapartida por referidos. La cuota de incorporación queda pendiente de decidir (existe o no).
 
 ---
 
@@ -613,21 +613,31 @@ Reglas derivadas:
 
 **Context.** El fundador fija un principio interno de sostenibilidad antes de seguir con el desarrollo: la cuota mensual de cada miembro de una Sala debe cubrir con creces el gasto en tokens de su Agente. El miembro debe saber desde el principio que la cuota no es fija: si la actividad de su Agente es potente, la cuota puede variar, pero a la vez su Agente le estará generando mucho más negocio. La cuota comienza en un importe razonable, para que entrar sea fácil, y sube solo cuando NS le genera más negocio.
 
-Este principio convive con dos decisiones anteriores que hay que precisar, no revocar: D-005 (sin porcentaje sobre negocio) y D-010 (nunca se cobra por un referido). Una cuota que "sube con el negocio" puede confundirse con una comisión si no se diseña con cuidado. El diseño siguiente hace que sea imposible leerla así.
+**Aclaración del fundador (2026-09-13): la cuota no es una comisión.** Hay dos planos que no se mezclan:
+
+```text
+ENTRE MIEMBROS        Prohibido dar un referido por una contrapartida económica (D-010, expulsión).
+                      Se comparte para que te compartan. Es generación de negocio, no comercio de referidos.
+
+ENTRE MIEMBRO Y NS    Suscribirse y pertenecer a NS tiene un coste: un coste inicial (o no, por decidir)
+                      y un coste mensual. Esos son los ingresos de NS. Es el precio de la plaza y del Agente.
+```
+
+La cuota mensual, aunque varíe por Tramos, pertenece al segundo plano. Nunca es una comisión, nunca es un pago por un referido y nunca circula entre miembros. El mecanismo de Tramos solo decide **cuánto vale la suscripción** de cada empresa en cada Ejercicio.
 
 **Options.**
 
 1. Cuota plana para siempre, fijada para cubrir el coste medio del Agente. Simple, pero o es cara para entrar o pierde dinero con los miembros más activos.
 2. Cuota base + facturación por consumo de tokens del Agente. Cubre el coste, pero el miembro paga la actividad del Agente aunque no le haya generado nada, y castiga la prospección para otros (Rastreo, Sondeo), que es el corazón del sistema.
-3. Cuota base + porcentaje del valor contrastado. Alinea ingresos y valor, pero es una comisión: choca con D-005 y con el espíritu de D-010.
+3. Cuota base + porcentaje del valor contrastado. Alinea ingresos y valor, pero convierte la suscripción en un porcentaje sobre negocio, descartado en D-005 por fricción de trazabilidad y por restricciones legales en sectores regulados.
 4. **Cuota por Tramos ligada al negocio recibido.** Cuota mensual en tramos fijos y públicos. Se entra en el Tramo de entrada. El paso a un Tramo superior se produce solo cuando el valor contrastado recibido por el miembro en el Ejercicio anterior supera el umbral del Tramo. Cada Tramo cubre con margen el presupuesto de tokens de su Agente.
 
 **Choice.** Opción 4. Reglas:
 
 - **Cobertura.** Todo Tramo se fija de modo que el coste esperado de tokens del Agente en ese Tramo sea una fracción minoritaria de la cuota (propuesta: nunca más de un tercio). NS mide el coste real del Agente de cada miembro; si el coste supera la fracción de forma sostenida, se ajusta el presupuesto de actividad del Agente en ese Tramo, no la cuota del miembro.
-- **Entrada fácil.** El Tramo de entrada es una cuota baja y razonable (D-012: muy por debajo de los clubes presenciales). El importe concreto lo fija el fundador con el piloto de Sevilla.
+- **Entrada fácil.** El Tramo de entrada es una cuota baja y razonable (D-012: muy por debajo de los clubes presenciales). El importe concreto lo fija el fundador con el piloto de Sevilla. La existencia de una cuota de incorporación queda abierta ("o no, ya veremos"): se decidirá con los importes del piloto.
 - **Solo sube con negocio contrastado recibido.** El único disparador de subida es el **valor contrastado recibido** por el miembro (`VALUE_CONFIRMED`, confirmado por ambas partes y contrastado por NS) en el Ejercicio anterior. No sube por actividad del Agente, por número de Cesiones, por tamaño de la empresa ni por antigüedad. Si el Agente trabaja mucho y no genera negocio contrastado, el miembro sigue en su Tramo.
-- **Nunca un porcentaje ni nunca por Cesión.** Los Tramos son importes fijos escalonados. Ningún cálculo de cuota toma una Cesión concreta ni un porcentaje del negocio como base. El valor contrastado sirve solo para determinar el Tramo del Ejercicio siguiente. No existe ningún cargo asociado a una Cesión, un Puente o un Cierre (D-010 intacta).
+- **Importes fijos por Tramo, nunca un porcentaje ni un cargo por Cesión.** Los Tramos son importes fijos escalonados. Ningún cálculo de cuota toma una Cesión concreta ni un porcentaje del negocio como base. El valor contrastado sirve solo para determinar el Tramo del Ejercicio siguiente. No existe ningún cargo asociado a una Cesión, un Puente o un Cierre. Así la suscripción es una suscripción, y la regla entre miembros (D-010) queda en su propio plano, intacta.
 - **Proporción sana.** Los umbrales de cada Tramo se fijan de modo que la cuota anual del Tramo sea siempre una fracción pequeña del valor contrastado que lo activa (propuesta: menos del 5 %). El miembro que sube de Tramo está, por construcción, ganando mucho más de lo que paga.
 - **Predecible y con aviso.** Los Tramos y sus umbrales son públicos desde la web y la Candidatura. El paso de Tramo se revisa una vez por Ejercicio, con aviso del Agente al menos un Ejercicio antes, mostrando el valor contrastado recibido, el Tramo resultante y qué habría que recibir para el siguiente. Nunca hay una subida sorpresa a mitad de Ejercicio.
 - **También baja.** Si el valor contrastado recibido en un Ejercicio cae por debajo del umbral del Tramo actual, el miembro baja de Tramo en el siguiente. La cuota sigue al negocio en los dos sentidos.
@@ -635,17 +645,17 @@ Este principio convive con dos decisiones anteriores que hay que precisar, no re
 - **Transparencia interna.** En su Brújula el miembro ve su cuota, su Tramo, el valor contrastado recibido en el Ejercicio y la relación entre ambos. La Balanza pública de la Sala no muestra el Tramo de nadie: la cuota es un asunto entre cada empresa y NS.
 - **Aceptación expresa.** La regla "la cuota no es fija: empieza baja y sube solo cuando NS te genera más negocio" se comunica en la web pública, en la Candidatura y en el onboarding, y el solicitante la acepta expresamente, como las reglas inmutables.
 
-**Why.** La sostenibilidad de NS depende de que cada Agente se pague a sí mismo con margen. Cobrar por consumo castigaría precisamente la actividad que hace funcionar la red (prospectar para otros). Cobrar un porcentaje sería una comisión y rompería la neutralidad y la regla inmutable. Los Tramos ligados al valor contrastado recibido consiguen las tres cosas a la vez: entrada fácil, cobertura del coste y cuota que crece solo cuando el miembro ya ha ganado. Y refuerzan la métrica primaria: NS solo factura más cuando ha demostrado valor contrastado.
+**Why.** Los ingresos de NS son las suscripciones de sus miembros; la sostenibilidad depende de que cada Agente se pague a sí mismo con margen. Cobrar por consumo castigaría precisamente la actividad que hace funcionar la red (prospectar para otros). Cobrar un porcentaje sobre negocio ya se descartó en D-005. Los Tramos ligados al valor contrastado recibido consiguen las tres cosas a la vez: entrada fácil, cobertura del coste y cuota que crece solo cuando el miembro ya ha ganado. Y refuerzan la métrica primaria: NS solo factura más cuando ha demostrado valor contrastado.
 
 **Consequences.**
 
-- D-005 y D-012 se mantienen y se precisan: la membresía deja de ser "plana por plaza" y pasa a ser "por Tramos, plana dentro de cada Tramo, sin comisión". La cuota de incorporación no cambia.
+- D-005 y D-012 se mantienen y se precisan: la membresía deja de ser "plana por plaza" y pasa a ser "por Tramos, plana dentro de cada Tramo". La cuota de incorporación pasa a estar pendiente de decisión (existe o no).
 - `MembershipPlan` incorpora `FeeTier` (Tramo) con `monthly_fee`, `value_threshold`, `agent_budget`. Cada empresa tiene `current_tier`, `next_review_at` y el histórico de cambios de Tramo como eventos auditables.
 - Se registra el coste de tokens por Agente y por Ejercicio (`AgentCostLedger`) para comprobar la cobertura. Es dato interno de NS; nunca se muestra como "consumo" al miembro para no convertir la relación en una factura de tokens.
 - La Brújula (NS-ATP) añade el bloque "Tu cuota y tu negocio recibido". El Parte de la Directiva y del Consejo de Zona añade el margen de cobertura agregado por Sala.
 - La web pública, la Candidatura y el onboarding incluyen los Tramos y la aceptación expresa.
 - `CLAUDE.md` §28 y `docs/13_LEXICO_NS.md` incorporan Cuota y Tramo.
 
-**Pendiente del fundador.** Importe del Tramo de entrada; número de Tramos y sus umbrales (propuesta inicial: tres o cuatro Tramos); fracción máxima de coste sobre cuota (propuesta: un tercio); proporción máxima cuota/valor (propuesta: 5 %); y si el Ejercicio de revisión de Tramo es mensual o trimestral (propuesta: trimestral, para amortiguar meses aislados).
+**Pendiente del fundador.** Si existe cuota de incorporación y su importe; importe del Tramo de entrada; número de Tramos y sus umbrales (propuesta inicial: tres o cuatro Tramos); fracción máxima de coste sobre cuota (propuesta: un tercio); proporción máxima cuota/valor (propuesta: 5 %); y si el Ejercicio de revisión de Tramo es mensual o trimestral (propuesta: trimestral, para amortiguar meses aislados).
 
 **Revisit when.** Se disponga de dos Ejercicios completos de coste real de tokens y valor contrastado en NS Sevilla.
