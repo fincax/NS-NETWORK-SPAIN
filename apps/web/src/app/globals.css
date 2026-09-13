@@ -232,3 +232,20 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 .agent.esperando .contact, .agent.encontrado .contact { transform-origin: 50% 100%; animation: ns-pulse 1.8s ease-in-out infinite; }
 .agent.esperando svg { filter: drop-shadow(0 0 6px rgba(232, 163, 61, 0.45)); }
 .install { display: flex; justify-content: space-between; gap: 16px; align-items: center; flex-wrap: wrap; border-color: rgba(47, 191, 113, 0.4); }
+
+/* ── Entrevista del Agente (D-040) ── */
+.interview { display: grid; gap: 20px; grid-template-columns: minmax(0, 1.4fr) minmax(280px, 1fr); align-items: start; }
+.chat { display: grid; gap: 12px; }
+.bubble { padding: 14px 16px; border-radius: 14px; max-width: 92%; display: grid; gap: 6px; }
+.bubble .who { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.bubble.agent { background: var(--graphite); border: 1px solid var(--line); border-top-left-radius: 4px; justify-self: start; }
+.bubble.timonel { background: var(--graphite-2); border-top-right-radius: 4px; justify-self: end; }
+.bubble .learned { margin-top: 4px; font-size: 13px; color: var(--muted-2); }
+.answer textarea { font-size: 16px; }
+.progress { width: 160px; height: 6px; border-radius: 999px; background: var(--graphite-2); overflow: hidden; }
+.progress span { display: block; height: 100%; background: var(--green); transition: width 300ms ease; }
+.dna-preview { position: sticky; top: 84px; }
+.dna-rows { display: grid; gap: 8px; }
+.dna-rows li { display: grid; grid-template-columns: 96px 1fr; gap: 10px; font-size: 14px; align-items: start; }
+.dna-rows .mono { padding-top: 2px; }
+@media (max-width: 860px) { .interview { grid-template-columns: 1fr; } .dna-preview { position: static; } .bubble { max-width: 100%; } }

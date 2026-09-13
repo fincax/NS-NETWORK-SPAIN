@@ -19,6 +19,7 @@ Hay dos "servidores" distintos y conviene no confundirlos:
 - Portada pública en `/` con la narrativa en modo beta, la disponibilidad real de plazas y la candidatura "Solicitar plaza en la beta" (se guarda en la base de datos).
 - Puerta de la demo en `/acceso`: usuario y contraseña compartidos, definidos por variables de entorno. Todo lo que no es portada exige esa sesión.
 - Aviso permanente "Beta privada · datos ficticios" dentro de la app, con salida.
+- **Entrevista del Agente** (D-040): desde el Dossier de la propia empresa, "Ampliar mi ADN con la entrevista del Agente", o automáticamente tras dar de alta una empresa. Sin `ANTHROPIC_API_KEY` conduce el guion fijo; con ella, Claude.
 - **App instalable** (D-039): en el móvil, la demo se instala desde el navegador (Android: "Instalar aplicación"; iPhone: Compartir → "Añadir a pantalla de inicio"). Hoy lo sugiere la primera vez. El icono muestra el número de decisiones pendientes.
 - **Apunte** (D-037): botón flotante "Apuntar" en toda la app. En el móvil, con la demo abierta en el navegador, "Añadir a pantalla de inicio" crea un icono NS cuyo menú ofrece "Apuntar un referido".
 - **Fuentes propias** (D-038): en el Dossier de la propia empresa, "Fuentes de mi Agente". La Ronda las lee cada mañana; en local se prueban con "Leer mis fuentes ahora" (requiere salida a internet).
@@ -49,7 +50,7 @@ Estas son las cinco cosas que faltan hoy y que hacen imprudente abrir la puerta 
 | 2 | **Los Agentes en segundo plano con el modelo real** | Hoy la Mesa se ejecuta al publicar, en segundos, con reglas fijas. Con Claude cada Indicio tarda más y no puede bloquear la pantalla; hace falta una cola de trabajo y reintentos. | 1 semana |
 | 3 | **Copias de seguridad y registro de accesos** | Sin copias diarias un fallo borra la Sala. Sin registro de accesos no se puede demostrar quién vio qué (y NS promete trazabilidad). | 2 días |
 | 4 | **Textos legales y GDPR** | Aviso de privacidad, condiciones de la plaza (con las reglas inmutables y la cuota por Tramos), base jurídica de los datos de terceros, retención y borrado. Es `docs/08_SECURITY_PRIVACY_GDPR.md`, que aún no existe. | 1 semana con un abogado |
-| 5 | **La entrevista del ADN por el Agente** | Hoy el alta es un formulario mínimo. Con empresas reales, la calidad de las Cesiones depende de un ADN completo, y eso lo hace la entrevista inteligente del Agente. | 1 semana |
+| 5 | **La entrevista del ADN por el Agente** | Hecha en su primera versión (D-040): el alta desemboca en la entrevista, el ADN se construye conversando y se valida al final. Falta afinarla con Timoneles reales y con la clave del modelo en el servidor. | Hecha · afinar 2 días |
 
 A esto se suman las decisiones de producto que siguen esperándote y que la web pública y el onboarding necesitan: importes de la cuota y Tramos (D-025), parámetros del Compromiso (D-010), lista de especialidades fundadoras de NS Cumbre, tipografía (D-023).
 

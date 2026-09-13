@@ -382,6 +382,23 @@ export const demands = pgTable(
 );
 
 // ───────────── Beta privada (D-033): solicitudes de plaza desde la portada ─────────────
+/** Entrevista del Agente para el ADN de Empresa (D-040). Una abierta por empresa como máximo. */
+export const dnaInterviews = pgTable("dna_interviews", {
+  id: id(),
+  chapterId: uuid("chapter_id").notNull().references(() => chapters.id),
+  companyId: uuid("company_id").notNull().references(() => companies.id),
+  memberId: uuid("member_id").notNull(),
+  status: text("status").notNull().default("OPEN"), // OPEN | READY (todo preguntado, falta validar) | DONE | ABANDONED
+  topic: text("topic").notNull().default("COMPANY"),
+  progress: integer("progress").notNull().default(0), // 0..100
+  transcript: jsonb("transcript").$type<{ role: "agent" | "timonel"; text: string; topic?: string; learned?: string[] }[]>().notNull().default([]),
+  draftDna: jsonb("draft_dna").$type<BusinessDNA>().notNull(),
+  websiteText: text("website_text"),
+  provider: text("provider"),
+  createdAt: createdAt(),
+  updatedAt: updatedAt(),
+});
+
 /** Fuentes propias del Agente (D-038): direcciones que el Timonel añade para que su Agente las rastree cada mañana. */
 export const agentSources = pgTable("agent_sources", {
   id: id(),

@@ -73,6 +73,7 @@ Criterios de cada nombre: castellano; una palabra siempre que sea posible; insti
 | **Mesa Permanente** | La reunión 24/7 de los agentes de una Sala. Lo que en la app se ve como cronología de eventos significativos. | `AgentRoom` |
 | **Despacho** | Sesión breve y periódica del miembro con su Agente: tres cosas ya preparadas, decisiones de 30 segundos. | `AgentCheckIn` |
 | **Encargo** | Lo que una empresa busca ahora (texto, señal, industria, vigencia). Visible en la Sala; los Agentes priorizan las Pistas que responden a un Encargo abierto y lo dicen en el Fundamento (D-032). | `Demand` |
+| **Entrevista** | Conversación del Agente con su Timonel para construir o ampliar el ADN de Empresa: diez preguntas, respuestas en lenguaje natural, ADN a la vista y validación humana al final (D-040). | `DnaInterview` |
 | **Apunte** | Lo que el Timonel anota en treinta segundos, en la calle, sobre un posible referido: quién, qué necesita, relación y contacto. Entra en la memoria de su Agente como Indicio en borrador; nunca se publica solo (D-037). | `FieldNote` |
 | **Fuente propia** | Dirección (RSS o Atom) que un Timonel añade a su Agente para que la lea cada mañana en la Ronda, además de las fuentes públicas de NS (D-038). | `AgentSource` |
 | **Ronda** | La pasada de cada mañana de los Agentes, para todas las Salas: Reloj de la Sala y Rastreo, con un resumen en la Mesa Permanente. Ocurre sola, sin que nadie abra la aplicación (D-036). | `DailyRun` |

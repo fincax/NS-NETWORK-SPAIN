@@ -4,11 +4,12 @@
  * lo que no está en el texto se devuelve como insuficiente o con confianza baja.
  */
 import type { BusinessTrigger, IntroPackage, NeedDraft, SizeBand, TimingBand, ValueBand } from "@/core/types";
-import type { ExtractionInput, ExtractionOutput, IntroInput, LLMProvider, QualificationAnswer, QualificationInput } from "./provider";
+import type { ExtractionInput, ExtractionOutput, InterviewInput, InterviewStep, IntroInput, LLMProvider, QualificationAnswer, QualificationInput } from "./provider";
+import { scriptedInterview } from "./interview-script";
 
-const TRIGGER_RULES: { trigger: BusinessTrigger; re: RegExp }[] = [
+export const TRIGGER_RULES: { trigger: BusinessTrigger; re: RegExp }[] = [
   { trigger: "NEW_SITE", re: /nueva (sede|planta|nave|oficina|f[aá]brica|delegaci[oó]n)|abr(e|ir[aá]|ir|iendo) (una |otra |su )?(nueva )?(planta|sede|nave|oficina|delegaci[oó]n|f[aá]brica)|traslad(a|o|ar[aá]) (la|su) (sede|planta)/i },
-  { trigger: "HEADCOUNT_GROWTH", re: /\d+\s*(empleados|personas|trabajadores|puestos) (nuevos|m[aá]s)|contratar|ampliar (la )?plantilla|crecimiento de plantilla|incorporar[aá]n? \d+|ofertas? de (empleo|trabajo)|\d+ vacantes/i },
+  { trigger: "HEADCOUNT_GROWTH", re: /\d+\s*(empleados|personas|trabajadores|puestos) (nuevos|m[aá]s)|contrat(ar|an|ando|aci[oó]n)( a)? (mucha gente|personal|gente|\d+)|contratar|ampliar (la )?plantilla|crecimiento de plantilla|incorporar[aá]n? \d+|ofertas? de (empleo|trabajo)|\d+ vacantes/i },
   { trigger: "INTERNATIONAL_EXPANSION", re: /portugal|francia|marruecos|italia|internacional|exportar|entrada en [A-ZÁ]/i },
   { trigger: "FUNDING_ROUND", re: /ronda (seed|serie|de financiaci[oó]n)|inversor|ampliaci[oó]n de capital/i },
   { trigger: "COMPANY_SALE", re: /venta de la empresa|vender (la|su) empresa|sucesi[oó]n|entrada de (un )?socio|operaci[oó]n societaria/i },
@@ -94,7 +95,7 @@ const INDUSTRY_RULES: { re: RegExp; industry: string }[] = [
   { re: /empresa familiar|familiar/i, industry: "Servicios" },
 ];
 
-const CITIES = ["Dos Hermanas", "Alcalá de Guadaíra", "Utrera", "Sevilla", "Córdoba", "Cádiz", "Huelva", "Málaga", "Madrid", "Lisboa", "Oporto"];
+export const CITIES = ["Dos Hermanas", "Alcalá de Guadaíra", "Utrera", "Sevilla", "Córdoba", "Cádiz", "Huelva", "Málaga", "Madrid", "Lisboa", "Oporto"];
 
 function sizeBand(text: string): { band: SizeBand; conf: number } {
   const m = text.match(/(\d{1,4})\s*(empleados|personas|trabajadores)( nuevos| m[aá]s)?/i);
@@ -258,6 +259,10 @@ export class DeterministicProvider implements LLMProvider {
       case "FREE":
         return { answer: "Sin información adicional en el Indicio.", confidence: 0.3, insufficient: true };
     }
+  }
+
+  async interview(input: InterviewInput): Promise<InterviewStep> {
+    return scriptedInterview(input);
   }
 
   async draftIntro(input: IntroInput): Promise<IntroPackage> {
