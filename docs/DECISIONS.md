@@ -709,6 +709,21 @@ La cuota mensual, aunque varíe por Tramos, pertenece al segundo plano. Nunca es
 
 **Principio que fija el fundador.** *La persona debe sentir siempre que es quien dirige.* No es una cortesía de interfaz para que el humano "se sienta bien": es la descripción exacta de las puertas humanas de NS-ARP. Todo diseño que convierta al Timonel en espectador de su Agente es un error de producto. Se incorpora a la constitución (§7, Human-in-the-Loop).
 
-**Consequences.** "Gerente" se sustituye por "Timonel" en la constitución, el North Star, el léxico y los Protocolos de Sala. En el modelo de datos, `members.is_primary` marca al Timonel. La app usa "Timonel" en el alta, el selector de demo, el Dossier y la tarjeta de Cesión. Pendiente: comprobación de marca en OEPM y EUIPO antes de usarlo en la web pública.
+**Consequences.** "Gerente" se sustituye por "Timonel" en la constitución, el North Star, el léxico y los Protocolos de Sala. En el modelo de datos, `members.is_primary` marca al Timonel. La app usa "Timonel" en el alta, el selector de demo, el Dossier y la tarjeta de Cesión. No requiere comprobación de marca (D-028).
 
-**Revisit when.** Nunca en cuanto al principio. El nombre, solo si la comprobación de marca lo impide.
+**Revisit when.** Nunca en cuanto al principio.
+
+---
+
+## D-028 · La única marca registrada es NS Network Spain; los términos del léxico no tienen que ser registrables
+
+**Status:** CONFIRMED (indicación directa del fundador)
+**Date:** 2026-09-13
+
+**Context.** El equipo fundador venía condicionando cada término nuevo del léxico (Embajada, Tramo, Timonel) a una comprobación de marca en la OEPM y la EUIPO. El fundador aclara que la marca registrada es **NS Network Spain** y que las denominaciones menores no pretenden ser registrables.
+
+**Choice.** Los términos del léxico (Sala, Plaza, Titular, Timonel, Cesión, Embajada, Promesa, Veredicto, Balanza, Brújula, Tramo, etc.) son **lenguaje de producto**, no marcas. Se eligen por claridad, sobriedad y coherencia con el imaginario NS; no se exige ni se comprueba que sean registrables, y no se vuelve a plantear esa comprobación al proponer nombres. La protección de la propiedad intelectual de NS descansa en la marca NS Network Spain, en el protocolo NS-ARP y en el conjunto del léxico y la metodología como obra, no en el registro de cada palabra.
+
+**Consequences.** Se elimina el criterio "registrable con el prefijo NS" del léxico (`docs/13`). Las decisiones anteriores que mencionaban comprobaciones de marca pendientes (D-015, D-025, D-027) quedan libres de esa condición. Si en el futuro conviene registrar algún término concreto (por ejemplo, el nombre de un producto o servicio de pago), se abrirá una decisión propia.
+
+**Revisit when.** NS salga de España o lance una línea de producto con nombre propio.

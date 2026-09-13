@@ -3,7 +3,7 @@
 **Estado:** léxico oficial (D-016, CONFIRMED por el fundador). Cambios posteriores se registran en DECISIONS.
 **Por qué existe.** NS debe tener lenguaje propio (constitución, sección 2). Un producto que crea una categoría nueva necesita nombrar sus objetos y sus rituales con palabras que nadie más use. El léxico es propiedad intelectual y es producto: el microcopy, la web pública y la app hablan con él. Ningún término copia terminología de otras organizaciones de networking.
 
-Criterios de cada nombre: castellano; una palabra siempre que sea posible; institucional y sobrio; con sentido literal reconocible; sin pistas territoriales; traducible sin perder el concepto; registrable con el prefijo NS.
+Criterios de cada nombre: castellano; una palabra siempre que sea posible; institucional y sobrio; con sentido literal reconocible; sin pistas territoriales; traducible sin perder el concepto. **La única marca registrada es NS Network Spain (D-028).** Los términos del léxico son lenguaje de producto, no marcas: no se exige ni se comprueba que sean registrables.
 
 ---
 
@@ -155,7 +155,7 @@ El fundador quería una palabra cercana, no un cargo administrativo. Se descarta
 
 ## 6ter. Por qué "Embajada"
 
-El fundador descartó "Extramuros" por agresivo. "Embajada" describe el acto con exactitud diplomática: la Sala del cedente envía una cesión a otra Sala, y la empresa que la acoge queda acreditada como **Embajadora** de esa especialidad en la Sala que no la tiene. Es sobria, cálida, castellana, sin pista territorial y registrable como "NS Embajada". Para evitar colisión, el antiguo nivel de membresía "Embajador" pasa a llamarse "Consejero".
+El fundador descartó "Extramuros" por agresivo. "Embajada" describe el acto con exactitud diplomática: la Sala del cedente envía una cesión a otra Sala, y la empresa que la acoge queda acreditada como **Embajadora** de esa especialidad en la Sala que no la tiene. Es sobria, cálida, castellana y sin pista territorial. Para evitar colisión, el antiguo nivel de membresía "Embajador" pasa a llamarse "Consejero".
 
 ## 7. Palabras que NS no usa
 
