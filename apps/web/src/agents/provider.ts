@@ -3,7 +3,7 @@
  * y reciben salidas validadas con zod. Ninguna salida de modelo cambia estado sin pasar por el sistema.
  */
 import { z } from "zod";
-import { BusinessTrigger, ChapterLayer, IdentityLayer, IntroPackage, NeedDraft, QualificationLayer, type BusinessDNA, type QualificationQuestionKind } from "@/core/types";
+import { BusinessDNA, BusinessTrigger, ChapterLayer, IdentityLayer, IntroPackage, NeedDraft, QualificationLayer, type QualificationQuestionKind } from "@/core/types";
 
 export const ExtractionOutput = z.object({
   chapter_layer: ChapterLayer,
@@ -48,11 +48,45 @@ export interface IntroInput {
   introductionPreferences: string;
 }
 
+// ───────────── Entrevista del Agente para el ADN de Empresa (D-040) ─────────────
+export const InterviewTopic = z.enum(["COMPANY", "SERVICES", "IDEAL_CUSTOMER", "TRIGGERS", "COMMERCIAL", "PERFECT_REFERRAL", "DISQUALIFIERS", "INTRO_PREFERENCES", "KNOWLEDGE", "OBJECTIVES", "DONE"]);
+export type InterviewTopic = z.infer<typeof InterviewTopic>;
+
+export const INTERVIEW_ORDER: InterviewTopic[] = ["COMPANY", "SERVICES", "IDEAL_CUSTOMER", "TRIGGERS", "COMMERCIAL", "PERFECT_REFERRAL", "DISQUALIFIERS", "INTRO_PREFERENCES", "KNOWLEDGE", "OBJECTIVES", "DONE"];
+
+export const InterviewTurn = z.object({
+  role: z.enum(["agent", "timonel"]),
+  text: z.string(),
+  topic: InterviewTopic.optional(),
+});
+export type InterviewTurn = z.infer<typeof InterviewTurn>;
+
+/** Un paso de la entrevista: lo que dice el Agente, el tema que pregunta ahora, el ADN actualizado y lo aprendido. */
+export const InterviewStep = z.object({
+  message: z.string(),
+  topic: InterviewTopic,
+  dna: BusinessDNA,
+  learned: z.array(z.string()),
+  progress: z.number().min(0).max(1),
+});
+export type InterviewStep = z.infer<typeof InterviewStep>;
+
+export interface InterviewInput {
+  companyName: string;
+  specialtyName: string;
+  timonelName: string;
+  websiteText?: string;
+  dna: BusinessDNA;
+  transcript: InterviewTurn[]; // la última entrada es la respuesta del Timonel (o vacío al empezar)
+  availableTriggers: { code: string; label: string }[];
+}
+
 export interface LLMProvider {
   readonly name: string;
   extractSignal(input: ExtractionInput): Promise<ExtractionOutput>;
   answerQualification(input: QualificationInput): Promise<QualificationAnswer>;
   draftIntro(input: IntroInput): Promise<IntroPackage>;
+  interview(input: InterviewInput): Promise<InterviewStep>;
 }
 
 let cached: LLMProvider | undefined;

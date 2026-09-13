@@ -12,6 +12,7 @@ import { runClockThrottled } from "@/services/clock";
 import { SOURCE_LABEL } from "@/agents/rastreo";
 import { candidacyCounts } from "@/services/antesala";
 import { InstallHint } from "../install-hint";
+import { activeInterview } from "@/services/entrevista";
 
 export default async function HoyPage() {
   await requireDemo();
@@ -51,6 +52,8 @@ export default async function HoyPage() {
   const ownDrafts = drafts.filter((d) => !recordBySignal.has(d.id) && !apuntes.includes(d) && d.visibility !== "COMPANY_ONLY");
   const agentState = forMe.length ? "esperando" : summary.matches ? "encontrado" : "analizando";
   const candidacies = member.isDirector ? await candidacyCounts(db) : null;
+  const dnaRow = await db.query.businessDna.findFirst({ where: eq(schema.businessDna.companyId, company.id), columns: { validatedAt: true } });
+  const interview = dnaRow?.validatedAt ? null : await activeInterview(db, company.id);
 
   return (
     <div className="stack" style={{ gap: 28 }}>
@@ -73,6 +76,13 @@ export default async function HoyPage() {
       </div>
 
       <InstallHint />
+
+      {dnaRow && !dnaRow.validatedAt ? (
+        <Link href="/entrevista" className="card amber row" style={{ justifyContent: "space-between", textDecoration: "none" }}>
+          <span><strong>Tu Agente quiere conocerte.</strong> {interview ? `Entrevista al ${interview.progress} %: retómala cuando quieras.` : "Diez preguntas y tu ADN queda listo para la Mesa."}</span>
+          <span className="mono">{interview ? "Continuar →" : "Empezar →"}</span>
+        </Link>
+      ) : null}
 
       {candidacies && candidacies.pendientes > 0 ? (
         <Link href="/antesala" className="card amber row" style={{ justifyContent: "space-between", textDecoration: "none" }}>

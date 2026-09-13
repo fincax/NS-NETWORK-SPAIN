@@ -964,3 +964,27 @@ La Ronda es idempotente: se puede lanzar varias veces al día sin efectos dobles
 **Consequences.** `manifest.ts` con iconos PNG, `public/icon-192.png`, `icon-512.png`, `apple-touch-icon.png`, `scripts/icons.mjs` para regenerarlos, `app-badge.tsx`, `install-hint.tsx`, `api/pending`, `pendingDecisions` en `services/today.ts`, animación del avatar, pruebas.
 
 **Revisit when.** Se implementen las notificaciones push (la política de avisos) o se decida la app en tiendas.
+
+---
+
+## D-040 · Entrevista del Agente: el ADN de Empresa se construye conversando, no rellenando un formulario
+
+**Status:** CONFIRMED (delegado por el fundador: "haz magia")
+**Date:** 2026-09-13
+
+**Context.** CLAUDE.md §25 exige un onboarding extraordinario: el Agente entrevista inteligentemente a la empresa en lugar de pedir 80 campos. Hasta hoy el alta era un formulario mínimo, y `docs/17` lo señalaba como condición 5 para producción. La calidad de las Cesiones depende del ADN.
+
+**Choice.**
+
+- **Alta en dos tiempos.** El alta de la plaza pide solo lo imprescindible (plaza, empresa, Timonel, web, una frase de qué hace) y crea un ADN **sin validar**. Inmediatamente empieza la **entrevista** con el Agente. El Dossier y Hoy avisan mientras el ADN siga sin validar.
+- **Entrevista conversacional**, una pregunta por turno, en el orden de §25: qué hace y dónde; servicios y lo que no hace; cliente ideal (sectores, tamaño, zonas, quién decide); señales que anticipan una oportunidad; ticket mínimo y máximo, ciclo y capacidad; el referido perfecto con un ejemplo real; lo que nunca quiere recibir; cómo prefiere que le presenten; qué no se comparte nunca; objetivo del trimestre. El Timonel responde en lenguaje natural, salta lo que no sabe y puede dejarlo para otro día.
+- **El ADN se construye a la vista.** Junto a la conversación, "Lo que tu Agente sabe ya" se actualiza con cada respuesta y dice qué falta. Cada turno del Agente muestra en una línea lo que ha aprendido.
+- **Lectura de la web.** Antes de la primera pregunta, el Agente lee la web de la empresa (título, descripción, texto visible) y no pregunta lo que ya está escrito.
+- **Validación humana.** Nada cambia en el ADN de la empresa hasta que el Timonel pulsa "Validar mi ADN y activar": entonces se crea una versión nueva, validada, y queda un evento significativo en la Mesa. Una entrevista se puede repetir para ampliar un ADN ya validado: parte de lo que se sabe.
+- **Dos conductores, un contrato.** Con clave de Anthropic, Claude conduce la entrevista con salida estructurada validada (pregunta, tema, ADN actualizado, aprendido, progreso), con la instrucción de no inventar nunca cifras ni clientes. Sin clave, un guion determinista con las mismas diez preguntas que entiende listas, cifras en euros, ciudades y señales. La interfaz y las pruebas son idénticas para ambos.
+
+**Why.** Un empresario no rellena ochenta campos, pero sí contesta a un director comercial que pregunta bien. La conversación produce ADN más rico (ejemplos reales, exclusiones, referido perfecto) que ningún formulario, y es el primer momento en que el Timonel siente que su Agente trabaja para él. Mantener el guion determinista garantiza que la demo y las pruebas funcionan sin red y que el producto no depende de un solo proveedor.
+
+**Consequences.** Tabla `dna_interviews` (migración 0005), `agents/interview-script.ts`, método `interview` en el contrato del proveedor y en ambos proveedores, `services/entrevista.ts`, `lib/website.ts`, ruta `/entrevista`, alta simplificada que desemboca en la entrevista, avisos en Dossier y Hoy, pruebas. Condición 5 de `docs/17` cumplida en su primera versión.
+
+**Revisit when.** Se conecte el Agente a fuentes autorizadas (CRM, correo) para preguntar menos y proponer más, o se añada dictado por voz en el móvil.

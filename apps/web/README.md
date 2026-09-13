@@ -6,7 +6,7 @@ Next.js 16 (App Router, server actions) · TypeScript · Drizzle ORM · PostgreS
 src/core        dominio puro, sin framework: types (zod), scoring (puertas + NS Match Score + Explanation),
                 compliance (Salvoconducto), state-machine (Cesión), merit (Promesa, Veredicto, Mérito)
 src/agents      provider (contrato LLM), deterministic, anthropic, mesa (orquestador NS-ARP S4–S9), rastreo (fuentes públicas)
-src/services    onboarding (alta y plaza), signals (S0–S3), referrals (puertas humanas), today (Hoy, Mesa, Balanza), clock (Reloj de la Sala), ronda (pasada de cada mañana: Reloj + Rastreo), demands (Encargos), antesala (candidaturas y veredicto de plaza, Directiva), apunte (captura móvil de un posible referido), sources (fuentes propias del Agente)
+src/services    onboarding (alta y plaza), signals (S0–S3), referrals (puertas humanas), today (Hoy, Mesa, Balanza), clock (Reloj de la Sala), ronda (pasada de cada mañana: Reloj + Rastreo), demands (Encargos), antesala (candidaturas y veredicto de plaza, Directiva), apunte (captura móvil de un posible referido), sources (fuentes propias del Agente), entrevista (el Agente construye el ADN conversando)
 src/db          schema (Drizzle), client (PGlite | Postgres), nscat (NS-CAT), seed-data (NS Cumbre), seed
 src/app         / (portada beta pública) · acceso (puerta de la demo) · (app)/: hoy · mesa · cesiones/[id] · indicio · sala · empresa/[slug]
 src/proxy.ts    exige la sesión de la demo en todo lo que no sea portada o acceso (D-033)

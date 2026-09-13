@@ -6,7 +6,7 @@ import { Empty } from "@/components/ui";
 
 const TONE: Record<string, string> = {
   SIGNAL_PUBLISHED: "green", INTEREST_CLAIM: "green", MATCH_PROPOSED: "green", COMPLIANCE_VERDICT: "", REVIEW_REQUEST: "amber",
-  NO_INTEREST: "", NEED_UNCOVERED: "amber", HUMAN_DECISION: "amber", INTRO_AUTHORIZED: "green", INTRODUCED: "green", VERDICT: "green", VALUE_CONFIRMED: "green", RECOGNITION: "green", INTERNAL_MATCH_FOUND: "amber", REFERRAL_FEE_VIOLATION: "red", REMINDER: "amber", EXPIRED: "red", RESPONSE_LATE: "red", CHECK_IN: "amber", RASTREO: "green", DEMAND_POSTED: "", RONDA: "", CANDIDACY_UPDATED: "amber",
+  NO_INTEREST: "", NEED_UNCOVERED: "amber", HUMAN_DECISION: "amber", INTRO_AUTHORIZED: "green", INTRODUCED: "green", VERDICT: "green", VALUE_CONFIRMED: "green", RECOGNITION: "green", INTERNAL_MATCH_FOUND: "amber", REFERRAL_FEE_VIOLATION: "red", REMINDER: "amber", EXPIRED: "red", RESPONSE_LATE: "red", CHECK_IN: "amber", RASTREO: "green", DEMAND_POSTED: "", RONDA: "", CANDIDACY_UPDATED: "amber", DNA_VALIDATED: "green",
 };
 
 const LABEL: Record<string, string> = {
@@ -14,7 +14,7 @@ const LABEL: Record<string, string> = {
   MATCH_PROPOSED: "Pista", MATCH_BELOW_THRESHOLD: "Pista", COMPLIANCE_VERDICT: "Salvoconducto", REVIEW_REQUEST: "Visto bueno", NEED_UNCOVERED: "Plaza vacante",
   HUMAN_DECISION: "Decisión", INTRO_AUTHORIZED: "Apertura", INTRODUCED: "Puente", OPPORTUNITY_UPDATE: "Seguimiento", VERDICT: "Veredicto", VALUE_CONFIRMED: "Valor", RECOGNITION: "Distinción",
   MEMBER_ACTIVATED: "Plaza", INTERNAL_MATCH_FOUND: "Solo para ti", CLAIM_CLOSED: "Cualificación", REFERRAL_FEE_VIOLATION: "Regla inmutable",
-  REMINDER: "Reloj", EXPIRED: "Reloj", RESPONSE_LATE: "Reloj", CHECK_IN: "Reloj", RASTREO: "Rastreo", DEMAND_POSTED: "Encargo", RONDA: "Ronda", CANDIDACY_UPDATED: "Antesala",
+  REMINDER: "Reloj", EXPIRED: "Reloj", RESPONSE_LATE: "Reloj", CHECK_IN: "Reloj", RASTREO: "Rastreo", DEMAND_POSTED: "Encargo", RONDA: "Ronda", CANDIDACY_UPDATED: "Antesala", DNA_VALIDATED: "ADN", DNA_INTERVIEW_STARTED: "ADN", DNA_UPDATED: "ADN",
 };
 
 export default async function MesaPage() {

@@ -5,7 +5,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { IntroPackage } from "@/core/types";
-import { ExtractionOutput, QualificationAnswer, type ExtractionInput, type IntroInput, type LLMProvider, type QualificationInput } from "./provider";
+import { ExtractionOutput, InterviewStep, QualificationAnswer, type ExtractionInput, type InterviewInput, type IntroInput, type LLMProvider, type QualificationInput } from "./provider";
 
 const MODEL = process.env.NS_LLM_MODEL ?? "claude-opus-5";
 
@@ -74,6 +74,37 @@ Tono: cercano, breve, de empresario a empresario. Sin jerga. Sin mencionar NS ni
       output_config: { format: zodOutputFormat(IntroPackage) },
     });
     if (!res.parsed_output) throw new Error("La salida del modelo no valida contra el esquema del Puente.");
+    return res.parsed_output;
+  }
+
+  async interview(input: InterviewInput): Promise<InterviewStep> {
+    const history = input.transcript.map((t) => `${t.role === "agent" ? "AGENTE" : "TIMONEL"}${t.topic ? ` [${t.topic}]` : ""}: ${t.text}`).join("\n");
+    const res = await this.client.messages.parse({
+      model: MODEL,
+      max_tokens: 8000,
+      system: `${SYSTEM}
+Ahora entrevistas a tu propio Timonel para construir el ADN de Empresa (D-040). Eres su Agente: cercano, concreto, sin jerga.
+Reglas de la entrevista:
+- Una sola pregunta por turno, corta, que se pueda responder en dos frases. Si el Timonel ya lo ha dicho (o lo dice la web), no lo preguntes: confírmalo y pasa al siguiente tema.
+- Orden de temas: COMPANY (qué hace, dónde, desde cuándo), SERVICES (servicios y lo que NO hace), IDEAL_CUSTOMER (sectores, tamaño, zonas, cargos que deciden), TRIGGERS (qué señales anticipan que alguien le necesita), COMMERCIAL (ticket mínimo y máximo en euros, ciclo de venta, capacidad ahora), PERFECT_REFERRAL (pídele una situación real que sería el referido perfecto, con ejemplo), DISQUALIFIERS (lo que nunca quiere recibir), INTRO_PREFERENCES (cómo prefiere que le presenten), KNOWLEDGE (qué no debe compartirse nunca), OBJECTIVES (qué quiere conseguir este trimestre), DONE.
+- En cada paso devuelve el ADN completo actualizado SOLO con lo que el Timonel ha dicho o la web afirma; nunca inventes datos, cifras ni clientes. Deja vacío lo que no sepas.
+- "topic" es el tema de la pregunta que haces en "message". Cuando todos los temas estén cubiertos (o el Timonel pida terminar), topic=DONE y "message" es un cierre breve que resume en tres líneas lo que ahora sabes y le pide validar.
+- "learned": una a tres líneas con lo que has aprendido de la última respuesta, en segunda persona ("Trabajas sobre todo con...").
+- "progress": temas cubiertos / 10.
+- Los triggers del ADN usan solo estos códigos: ${input.availableTriggers.map((t) => `${t.code} (${t.label})`).join(", ")}.`,
+      messages: [
+        {
+          role: "user",
+          content: `Empresa: ${input.companyName}. Plaza: ${input.specialtyName}. Timonel: ${input.timonelName}.
+${input.websiteText ? `Texto de su web (puede estar incompleto): """${input.websiteText.slice(0, 6000)}"""` : "No hay web disponible."}
+ADN actual: ${JSON.stringify(input.dna)}
+Entrevista hasta ahora:
+${history || "(aún no ha empezado: saluda en una frase y haz la primera pregunta)"}`,
+        },
+      ],
+      output_config: { format: zodOutputFormat(InterviewStep) },
+    });
+    if (!res.parsed_output) throw new Error("La salida del modelo no valida contra el esquema de la entrevista.");
     return res.parsed_output;
   }
 }

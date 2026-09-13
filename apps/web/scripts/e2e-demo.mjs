@@ -60,6 +60,21 @@ try {
   await page.waitForURL(/#fuentes/);
   check(await page.locator("text=Diario de prueba").count() > 0, "fuente propia añadida al Agente");
   await page.screenshot({ path: process.env.E2E_SHOT_FUENTES ?? "/tmp/fuentes.png", fullPage: true });
+  // Entrevista del Agente (D-040): ampliar un ADN validado desde el Dossier.
+  await page.goto(`${base}/entrevista`);
+  check(await page.locator("h1:has-text('Amplía lo que tu Agente sabe')").count() > 0, "la entrevista parte de un ADN ya validado");
+  await page.click("button:has-text('Empezar la entrevista')");
+  await page.waitForSelector(".bubble.agent", { timeout: 15000 });
+  check(await page.locator(".bubble.agent").count() === 1, "el Agente hace la primera pregunta");
+  await page.fill("#ans", "Reformamos naves industriales en Sevilla y Alcalá de Guadaíra desde 2008.");
+  await page.click("button:has-text('Responder')");
+  await page.waitForURL(/#turno/);
+  check(await page.locator(".bubble.timonel").count() === 1 && await page.locator(".bubble.agent").count() === 2, "la respuesta entra en la conversación y llega la siguiente pregunta");
+  check(await page.locator(".learned").count() > 0, "el Agente dice qué ha aprendido");
+  await page.screenshot({ path: process.env.E2E_SHOT_ENTREVISTA ?? "/tmp/entrevista.png", fullPage: true });
+  await page.click("button:has-text('Dejarlo para otro día')");
+  await page.waitForURL(/\/empresa\//);
+  check(page.url().includes("/empresa/"), "dejarlo para otro día vuelve al Dossier");
   // Antesala (D-035): solo la Directiva; despacho con un toque.
   await page.goto(`${base}/antesala`);
   check(await page.locator("text=Solo la Directiva").count() > 0, "un Timonel sin Directiva no ve las candidaturas");
@@ -75,6 +90,19 @@ try {
   await page.waitForURL(/vista=pendientes/);
   check(await page.locator(`article.cand:has(h3:text-is("${firstName}")) .badge:has-text("Contactada")`).count() > 0, "candidatura despachada con un toque");
   await page.screenshot({ path: process.env.E2E_SHOT ?? "/tmp/antesala.png", fullPage: true });
+  // Alta en dos tiempos (D-040): la Directiva da de alta una empresa y la sesión pasa a su Timonel, que empieza la entrevista.
+  await page.goto(`${base}/sala/alta`);
+  await page.selectOption("#sp", "FACILITY_MANAGEMENT");
+  await page.fill("#n", "Mantenimiento Integral Guadaíra"); await page.fill("#w", "https://miguadaira.example");
+  await page.fill("#pn", "Manuel Ortiz"); await page.fill("#pr", "Gerente"); await page.fill("#pe", "mortiz@miguadaira.example");
+  await page.fill("#d", "Mantenimiento integral de naves y oficinas: climatización, electricidad y limpieza técnica.");
+  await page.click("button:has-text('Activar la plaza y empezar la entrevista')");
+  await page.waitForURL((u) => new URL(u).pathname === "/entrevista");
+  check(await page.locator("h1:has-text('Tu Agente quiere conocerte')").count() > 0, "el alta desemboca en la entrevista del nuevo Timonel");
+  await page.click("button:has-text('Empezar la entrevista')");
+  await page.waitForSelector(".bubble.agent", { timeout: 15000 });
+  check((await page.locator(".bubble.agent").first().innerText()).includes("Manuel"), "el Agente saluda al nuevo Timonel por su nombre");
+  await page.screenshot({ path: process.env.E2E_SHOT_ALTA ?? "/tmp/entrevista-nueva.png", fullPage: true });
   await page.click("button:has-text('Salir')");
   await page.waitForURL((u) => new URL(u).pathname === "/");
   await page.goto(`${base}/mesa`);
