@@ -659,3 +659,33 @@ La cuota mensual, aunque varíe por Tramos, pertenece al segundo plano. Nunca es
 **Pendiente del fundador.** Si existe cuota de incorporación y su importe; importe del Tramo de entrada; número de Tramos y sus umbrales (propuesta inicial: tres o cuatro Tramos); fracción máxima de coste sobre cuota (propuesta: un tercio); proporción máxima cuota/valor (propuesta: 5 %); y si el Ejercicio de revisión de Tramo es mensual o trimestral (propuesta: trimestral, para amortiguar meses aislados).
 
 **Revisit when.** Se disponga de dos Ejercicios completos de coste real de tokens y valor contrastado en NS Sevilla.
+
+---
+
+## D-026 · Stack técnico del vertical slice: TypeScript, Next.js, Drizzle sobre PostgreSQL (PGlite en local), zod, Vitest; razonamiento LLM detrás de un contrato con proveedor determinista y proveedor Anthropic
+
+**Status:** PROPOSED
+**Date:** 2026-09-13
+
+**Context.** Cerrados el modelo de datos (`docs/06`) y la arquitectura de agentes (`docs/07`), hay que fijar el stack del primer recorrido ejecutable sin complejidad prematura y sin dependencia de red para la demo y los tests. La constitución (§A.9) orienta a TypeScript, framework full-stack, PostgreSQL, validación de esquemas y APIs tipadas.
+
+**Options.**
+
+1. Next.js + Prisma + Postgres servidor obligatorio. Cómodo, pero la demo exigiría un servidor Postgres y el JSON tipado es más rígido.
+2. Next.js + Drizzle (pg-core) + PostgreSQL, con PGlite (Postgres embebido en WASM) para local, demo y tests. Un solo dialecto real, mismas migraciones en todos los entornos.
+3. Backend separado (Nest/Fastify) + SPA. Más piezas antes de haber demostrado la tesis.
+
+**Choice.** Opción 2.
+
+- **Monorepo pnpm** con `apps/web`. El dominio (`src/core`) no importa nada del framework y se puede extraer a paquete cuando haga falta.
+- **Drizzle ORM** sobre `pg-core`; `DATABASE_URL` → node-postgres; sin ella → PGlite en `.data/`. Migraciones generadas con drizzle-kit y aplicadas al arrancar.
+- **zod** como fuente de verdad de los objetos del protocolo (`src/core/types.ts`), usada también para validar las salidas estructuradas del modelo.
+- **Contrato `LLMProvider`** con dos implementaciones: determinista (reglas, sin red) y Anthropic (`@anthropic-ai/sdk`, `messages.parse` con `zodOutputFormat`, modelo `claude-opus-5` por defecto). El sistema nunca deja que una salida de modelo cambie estado sin validar.
+- **Vitest** para funciones puras y para el slice completo sobre PGlite en memoria.
+- **Sin autenticación en el slice**: cookie de persona para la demo. La autenticación y el RBAC por Sala/empresa son el primer trabajo de la fase siguiente.
+
+**Why.** Un solo dialecto Postgres de verdad en todos los entornos elimina la deriva entre local y producción. PGlite permite demo y tests reproducibles sin infraestructura. El contrato de proveedor mantiene la promesa del protocolo ("los LLM razonan, el sistema mantiene estado") y permite ejecutar la Mesa sin coste ni red.
+
+**Consequences.** `apps/web` con 25 tests que cubren los escenarios A, C y D. `docs/06` y `docs/07` describen lo implementado. Cada cambio de esquema exige `pnpm db:generate` y migración versionada.
+
+**Revisit when.** Haga falta cola de trabajos en segundo plano para la Mesa con proveedor real, búsqueda vectorial para el recall de S4, o extraer `src/core` a un paquete compartido.
