@@ -26,6 +26,21 @@ try {
   await card.click();
   await page.waitForURL(/\/cesiones\//);
   check(await page.locator("text=Promesa").count() > 0, "tarjeta de Cesión abierta con Promesa");
+  // Antesala (D-035): solo la Directiva; despacho con un toque.
+  await page.goto(`${base}/antesala`);
+  check(await page.locator("text=Solo la Directiva").count() > 0, "un Timonel sin Directiva no ve las candidaturas");
+  const directorOption = await page.locator("select[aria-label='Timonel activo (demo)'] option:has-text('Directiva')").first().getAttribute("value");
+  await page.selectOption("select[aria-label='Timonel activo (demo)']", directorOption);
+  await page.waitForTimeout(800);
+  await page.goto(`${base}/antesala`);
+  check(await page.locator("h1:has-text('Antesala')").count() > 0, "la Directiva ve la Antesala");
+  check(await page.locator("text=Empresa de Prueba").count() > 0, "la candidatura de la portada aparece en la Antesala");
+  const first = page.locator("article.cand:has(button:has-text('Contactada'))").first();
+  const firstName = await first.locator("h3").innerText();
+  await first.locator("button:has-text('Contactada')").click();
+  await page.waitForURL(/vista=pendientes/);
+  check(await page.locator(`article.cand:has(h3:text-is("${firstName}")) .badge:has-text("Contactada")`).count() > 0, "candidatura despachada con un toque");
+  await page.screenshot({ path: process.env.E2E_SHOT ?? "/tmp/antesala.png", fullPage: true });
   await page.click("button:has-text('Salir')");
   await page.waitForURL((u) => new URL(u).pathname === "/");
   await page.goto(`${base}/mesa`);

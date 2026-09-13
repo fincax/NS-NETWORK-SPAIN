@@ -19,6 +19,7 @@ Hay dos "servidores" distintos y conviene no confundirlos:
 - Portada pública en `/` con la narrativa en modo beta, la disponibilidad real de plazas y la candidatura "Solicitar plaza en la beta" (se guarda en la base de datos).
 - Puerta de la demo en `/acceso`: usuario y contraseña compartidos, definidos por variables de entorno. Todo lo que no es portada exige esa sesión.
 - Aviso permanente "Beta privada · datos ficticios" dentro de la app, con salida.
+- **Antesala** (D-035): la Directiva ve y despacha las candidaturas que llegan desde la portada, con el veredicto de plaza calculado. En la demo, elige a Inés Domínguez (Bufete Alameda · Directiva) en el selector de Timonel.
 
 ## 1. Demo privada: ahora
 

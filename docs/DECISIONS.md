@@ -848,3 +848,28 @@ Pasos fijados, en orden:
 **Consequences.** Ningún cambio de código: la marca ya se presenta como "NS Network" + país. `docs/17` enlaza esta decisión en el apartado de dominio. El léxico no expande las siglas.
 
 **Revisit when.** Se conozca el resultado de la búsqueda en EUIPO (es la bifurcación) o se decida la entrada en el primer país fuera de España.
+
+---
+
+## D-035 · Antesala: la Directiva despacha las candidaturas con el veredicto de plaza ya calculado
+
+**Status:** CONFIRMED (delegado por el fundador: "vamos a por la 2, haz magia")
+**Date:** 2026-09-13
+
+**Context.** Desde D-033 la portada guarda candidaturas ("Solicitar plaza en la beta"), pero no existía ninguna pantalla para verlas ni despacharlas. En cuanto la demo se publique en networkspain.com, llegarán solicitudes reales. La constitución fija el proceso de admisión (§8) y el Escenario E (conflicto de categoría → revisión, otra Sala, lista de espera o rechazo).
+
+**Choice.** Pantalla **Antesala**, visible solo para la Directiva, con estas reglas:
+
+- **Estados de una candidatura:** Nueva → Contactada → Entrevistada → Plaza aprobada → Titular activo; con salidas a En la Antesala (espera plaza) y Declinada (reabrible). Las transiciones válidas están fijadas en código; el alta desde una candidatura aprobada la cierra como "Titular activo" y la enlaza con la empresa creada.
+- **Veredicto de plaza automático**, calculado contra el estado real de la Sala en cada visita: plaza vacante; vacante con reservas (se solapa con una plaza ocupada según NS-CAT, posible duplicado, o ciudad fuera de la zona); plaza ocupada (nombra al titular); sin clasificar. Cada veredicto lleva una recomendación en una línea, en lenguaje de la Directiva.
+- **Nunca se aprueba una plaza ocupada.** El botón se desactiva y el servicio lo rechaza aunque se fuerce. Con la plaza ocupada, las salidas son la Antesala, otra Sala de la zona o revisar la especialidad real (Escenario E).
+- **Solapamiento (Escenario E).** Si la especialidad solicitada se solapa con una plaza ocupada (por ejemplo Telecomunicaciones ↔ Ciberseguridad, Arquitectura ↔ Obra industrial), la plaza sigue siendo aprobable, pero la Antesala pide confirmar con el titular afectado antes de aprobar. Se comprueba en las dos direcciones del solape.
+- **Clasificación y nota privada.** La Directiva puede reclasificar la candidatura en NS-CAT y dejar una nota privada. La nota nunca sale de la Directiva.
+- **Rastro.** Toda decisión escribe un evento de auditoría; aprobar y declinar son significativos y aparecen en la Mesa Permanente.
+- **Aviso.** Hoy muestra a la Directiva cuántas candidaturas esperan; el menú lleva un contador de nuevas.
+
+**Why.** Convierte la puerta de entrada en un proceso con criterio: la exclusividad de plaza se aplica en la admisión, no después. La Directiva decide con un toque porque el sistema ya hizo la comprobación, que es el patrón de todo NS (la IA descubre y comprueba; las personas deciden). Las candidaturas con plaza ocupada alimentan la Antesala de la zona, que es la semilla de la siguiente Sala.
+
+**Consequences.** `services/antesala.ts`, ruta `/antesala` con acciones, columnas nuevas en `beta_requests` (migración 0003), prefijado del alta desde una candidatura aprobada, seis candidaturas de demostración (una por veredicto), pruebas y recorrido de navegador ampliado. En producción, la Antesala será la primera pantalla de la Directiva que exija autenticación real por rol.
+
+**Revisit when.** Exista la entrevista del ADN por el Agente (el paso "Entrevistada" pasará a apoyarse en ella) o haya varias Salas en la zona (la salida "otra Sala" tendrá destino real).

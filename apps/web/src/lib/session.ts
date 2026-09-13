@@ -43,3 +43,9 @@ export async function requireMember() {
   if (!ctx) throw new Error("La Sala no está inicializada. Ejecuta `pnpm db:seed`.");
   return ctx;
 }
+
+/** Solo la Directiva de la Sala. Devuelve null si el Timonel activo no lo es (la página muestra el estado "sin permiso"). */
+export async function requireDirector() {
+  const ctx = await requireMember();
+  return ctx.member.isDirector ? ctx : null;
+}

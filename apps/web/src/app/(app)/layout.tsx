@@ -4,15 +4,19 @@ import { currentMember, listMembers } from "@/lib/session";
 import { PersonaSwitch } from "./persona-switch";
 import { NavLinks } from "./nav-links";
 import { logoutAction } from "../acceso/actions";
+import { getDb } from "@/db/client";
+import { candidacyCounts } from "@/services/antesala";
 
 export const dynamic = "force-dynamic";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   let ctx: Awaited<ReturnType<typeof currentMember>> = null;
   let members: Awaited<ReturnType<typeof listMembers>> = [];
+  let newCandidacies = 0;
   try {
     ctx = await currentMember();
     members = await listMembers();
+    if (ctx?.member.isDirector) newCandidacies = (await candidacyCounts(await getDb())).nuevas;
   } catch {
     ctx = null;
   }
@@ -32,7 +36,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             <span className="lockup">{ctx ? `${ctx.chapter.name} · Sala · NS Sevilla` : "Sala sin inicializar"}</span>
           </span>
         </Link>
-        <NavLinks />
+        <NavLinks director={!!ctx?.member.isDirector} newCandidacies={newCandidacies} />
         <div className="persona">
           {ctx ? <PersonaSwitch members={members} currentId={ctx.member.id} /> : <span>Prepara la Sala desde Hoy</span>}
         </div>
