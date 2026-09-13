@@ -936,6 +936,21 @@ Potencialmente: diferentes niveles de membresía; servicios premium; conexiones 
 
 No introducir automáticamente comisiones por referral en sectores donde puedan existir restricciones legales o profesionales. El modelo financiero definitivo se definirá posteriormente.
 
+### La cuota no es fija: cubre al Agente y sube solo con el negocio recibido (D-025)
+
+Principio interno de sostenibilidad fijado por el fundador: **la cuota mensual de cada miembro debe cubrir con creces el gasto en tokens de su Agente.** El miembro sabe desde la Candidatura que la cuota no es fija. Empieza en un **Tramo de entrada** bajo y razonable, para que entrar sea fácil, y sube de Tramo **solo cuando NS le ha generado más negocio**.
+
+Reglas de diseño que lo hacen compatible con D-005 y con la regla inmutable de D-010:
+
+- El único disparador de subida es el **valor contrastado recibido** por el miembro en el Ejercicio anterior. Nunca la actividad del Agente, el número de Cesiones, el tamaño de la empresa ni la antigüedad.
+- Los Tramos son importes fijos y públicos. **Nunca un porcentaje del negocio, nunca un cargo por Cesión.** El valor contrastado solo sirve para determinar el Tramo del Ejercicio siguiente.
+- La cuota anual de un Tramo es siempre una fracción pequeña del valor contrastado que lo activa. Quien sube de Tramo ya está ganando mucho más de lo que paga.
+- El paso de Tramo se revisa una vez por Ejercicio, con aviso previo del Agente en la Brújula. También baja si el negocio recibido cae.
+- Cada Tramo lleva un presupuesto de actividad del Agente. NS mide el coste real de tokens por Agente (dato interno, nunca una factura de consumo para el miembro) y ajusta el presupuesto, no la cuota, si el coste se desvía.
+- El Tramo de cada empresa es privado entre la empresa y NS. La Balanza pública no lo muestra.
+
+Los importes, el número de Tramos, los umbrales y el periodo de revisión quedan pendientes del fundador (ver D-025).
+
 ## 29. MVP
 
 El MVP debe demostrar una única tesis:

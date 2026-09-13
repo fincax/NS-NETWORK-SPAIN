@@ -219,6 +219,8 @@ BRÚJULA · Híspalis · Semana 37
     Mérito        1.420 · a 180 del nivel Referente (acceso a Cesiones de otras Salas)
     Distinción    Tu Cesión a Triana es candidata a Cesión del mes
     Embajada      La plaza de Mobiliario sigue vacante: cada Embajada que resuelva vale prima ×2
+    Cuota         Tramo de entrada · has recibido 61.000 € contrastados en el Ejercicio · tu cuota es el 1,2 %
+                  Si el Ejercicio cierra por encima de 75.000 €, pasarás al Tramo 2 el trimestre que viene. Te avisaré antes.
 
 4 · Tres Movimientos para esta semana
     1  Ceder: tu cliente Logística Bética renueva flota (12 vehículos) → Torre Seguros tiene un Encargo abierto exacto. Borrador listo.
@@ -232,7 +234,8 @@ Reglas:
 2. Cada Movimiento es accionable en un toque desde el Despacho (ceder, sondear, aprobar borrador, descartar con motivo). Lo descartado con motivo entrena al Agente.
 3. El bloque "Por qué" usa evidencia real: Veredictos recibidos, tiempos de respuesta, tipos de Indicio que convierten. Nunca consejos genéricos.
 4. El bloque "Qué ganas" enlaza cada objetivo con una consecuencia concreta (nivel, Distinción, prima de Embajada, plaza que se abre). La motivación es tangible o no se muestra.
-5. Si el titular va Por debajo del Ritmo dos semanas, la Brújula sube de tono: el Agente propone cinco Movimientos en lugar de tres y ofrece agendar un Despacho de 10 minutos. Si van tres, avisa de que la Directiva lo verá en el Parte.
+5. El bloque "Cuota" (D-025) muestra el Tramo actual, el valor contrastado recibido en el Ejercicio, la relación cuota/valor y el umbral del siguiente Tramo. Es la única pantalla donde aparece la cuota; la Balanza pública nunca la muestra. Cualquier cambio de Tramo se anuncia aquí al menos un Ejercicio antes.
+6. Si el titular va Por debajo del Ritmo dos semanas, la Brújula sube de tono: el Agente propone cinco Movimientos en lugar de tres y ofrece agendar un Despacho de 10 minutos. Si van tres, avisa de que la Directiva lo verá en el Parte.
 
 ### 5. El Ritmo
 
