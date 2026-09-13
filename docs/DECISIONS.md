@@ -664,7 +664,7 @@ La cuota mensual, aunque varíe por Tramos, pertenece al segundo plano. Nunca es
 
 ## D-026 · Stack técnico del vertical slice: TypeScript, Next.js, Drizzle sobre PostgreSQL (PGlite en local), zod, Vitest; razonamiento LLM detrás de un contrato con proveedor determinista y proveedor Anthropic
 
-**Status:** PROPOSED
+**Status:** CONFIRMED (por delegación expresa del fundador, 2026-09-13: "decide tú qué hacer con D-026"; el equipo fundador la confirma)
 **Date:** 2026-09-13
 
 **Context.** Cerrados el modelo de datos (`docs/06`) y la arquitectura de agentes (`docs/07`), hay que fijar el stack del primer recorrido ejecutable sin complejidad prematura y sin dependencia de red para la demo y los tests. La constitución (§A.9) orienta a TypeScript, framework full-stack, PostgreSQL, validación de esquemas y APIs tipadas.
@@ -689,3 +689,5 @@ La cuota mensual, aunque varíe por Tramos, pertenece al segundo plano. Nunca es
 **Consequences.** `apps/web` con 25 tests que cubren los escenarios A, C y D. `docs/06` y `docs/07` describen lo implementado. Cada cambio de esquema exige `pnpm db:generate` y migración versionada.
 
 **Revisit when.** Haga falta cola de trabajos en segundo plano para la Mesa con proveedor real, búsqueda vectorial para el recall de S4, o extraer `src/core` a un paquete compartido.
+
+**Razón de la confirmación.** Tres criterios: (1) es la base más simple que cumple la constitución (§A.9: tipado, PostgreSQL, validación, auditoría) y ya demuestra el recorrido completo con 25 pruebas automáticas; (2) no compromete el futuro, porque el dominio (`src/core`) no depende del framework ni de la base de datos y cada pieza se puede sustituir por separado; (3) permite enseñar el producto a empresarios sin infraestructura ni coste de modelo, con un solo comando. Lo que sigue pendiente (autenticación, Mesa en segundo plano con proveedor real, búsqueda vectorial) se decide en su momento como decisiones nuevas, no como revisión de esta.
