@@ -940,3 +940,27 @@ La Ronda es idempotente: se puede lanzar varias veces al día sin efectos dobles
 **Consequences.** Tabla `agent_sources` (migración 0004), `agents/feeds.ts`, `services/sources.ts`, sección en el Dossier, la Ronda incluye las fuentes propias, pruebas con lectores simulados. En este entorno de desarrollo no hay salida a internet, así que la lectura real solo se comprueba en el servidor.
 
 **Revisit when.** Se conecten las fuentes oficiales (BORME, PLACE) o el volumen exija límites por fuente y filtros por zona o palabras clave.
+
+---
+
+## D-039 · NS se instala en el móvil como una app, con el número de decisiones pendientes en el icono
+
+**Status:** CONFIRMED (petición del fundador: "haz todo lo que me propones")
+**Date:** 2026-09-13
+
+**Context.** El fundador quiere que la versión móvil sea como una app descargable e instalable en el escritorio del móvil, con el icono de NS, y que avise cuando haya algo pendiente, con un número. Sin pasar por App Store ni Google Play en la beta.
+
+**Choice.** NS es una aplicación web instalable (PWA):
+
+- **Instalación** desde el navegador, sin tienda: en Android "Instalar aplicación", en iPhone "Añadir a pantalla de inicio". Iconos PNG de 192 y 512 píxeles (generados del monograma), icono para iOS, pantalla completa, arranque en Hoy y atajo "Apuntar un referido".
+- **Invitación la primera vez**, en Hoy, fuera de la app instalada: en Android un botón "Instalar"; en iPhone las instrucciones de Safari. Se puede descartar y no vuelve a aparecer.
+- **Número en el icono** con lo que espera el toque del Timonel: Cesiones por decidir, Apuntes por publicar y, para la Directiva, candidaturas nuevas (`pendingDecisions`). Se pinta al abrir cualquier pantalla y se refresca cada minuto mientras la app está visible (`GET /api/pending`). Donde el sistema no admite número en el icono, va en el título de la pestaña.
+- **Avatar vivo**: dentro de la app, el segmento de contacto del Agente late cuando espera una decisión o ha encontrado algo, con la animación desactivada si el usuario pide menos movimiento. El icono del escritorio del móvil no se mueve: ningún sistema lo permite, y se le ha explicado al fundador.
+- **Notificaciones push** ("Tu Agente tiene una Cesión para ti"), con sonido y banner aunque la app esté cerrada: decididas, pendientes de implementar después de la entrevista del Agente y del despliegue en networkspain.com, porque exigen el dominio publicado y una política de qué merece aviso.
+- **App nativa en tiendas**: no en la beta. Se podrá envolver la misma aplicación más adelante.
+
+**Why.** Da la experiencia de app (icono, pantalla completa, número, atajo) con cero fricción de instalación y sin revisión de tiendas, y usa la misma aplicación y el mismo código. El número en el icono convierte el móvil en el sitio donde se toman las decisiones de treinta segundos.
+
+**Consequences.** `manifest.ts` con iconos PNG, `public/icon-192.png`, `icon-512.png`, `apple-touch-icon.png`, `scripts/icons.mjs` para regenerarlos, `app-badge.tsx`, `install-hint.tsx`, `api/pending`, `pendingDecisions` en `services/today.ts`, animación del avatar, pruebas.
+
+**Revisit when.** Se implementen las notificaciones push (la política de avisos) o se decida la app en tiendas.

@@ -1,0 +1,14 @@
+import { chromium } from "playwright";
+const base = "http://localhost:3113";
+const browser = await chromium.launch();
+const page = await browser.newPage();
+await page.goto(`${base}/acceso`);
+await page.fill("#u", "demo"); await page.fill("#p", "nscumbre"); await page.click("button:has-text('Entrar')");
+await page.waitForURL(/\/hoy/);
+await page.waitForTimeout(1500);
+console.log("hoy title:", await page.title());
+await page.locator("a[href^='/cesiones/']").first().click();
+await page.waitForURL(/\/cesiones\//);
+await page.waitForTimeout(1500);
+console.log("cesion title:", await page.title(), "| pending:", await (await page.request.get(`${base}/api/pending`)).text());
+await browser.close();

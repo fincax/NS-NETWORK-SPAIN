@@ -11,6 +11,7 @@ import { prepareDemo, runRastreoAction } from "../actions";
 import { runClockThrottled } from "@/services/clock";
 import { SOURCE_LABEL } from "@/agents/rastreo";
 import { candidacyCounts } from "@/services/antesala";
+import { InstallHint } from "../install-hint";
 
 export default async function HoyPage() {
   await requireDemo();
@@ -70,6 +71,8 @@ export default async function HoyPage() {
         <div className="card kpi"><span className="value amber money" style={{ fontSize: 26 }}>{eurRange(summary.potential.min, summary.potential.max)}</span><span className="label">valor potencial en Cesiones abiertas</span></div>
         <div className="card kpi"><span className="value green money" style={{ fontSize: 26 }}>{eur(bal.valueReceived)}</span><span className="label">valor contrastado recibido · Mérito {bal.merit}</span></div>
       </div>
+
+      <InstallHint />
 
       {candidacies && candidacies.pendientes > 0 ? (
         <Link href="/antesala" className="card amber row" style={{ justifyContent: "space-between", textDecoration: "none" }}>

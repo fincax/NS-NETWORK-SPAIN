@@ -35,3 +35,20 @@ export async function balance(db: Db, chapterId: string, companyId: string) {
   const merit = await db.select({ total: sql<number>`coalesce(sum(${schema.trustEvents.weight}), 0)` }).from(schema.trustEvents).where(eq(schema.trustEvents.companyId, companyId));
   return { given: given.filter(valid).length, received: received.filter(valid).length, valueGiven: confirmed(given), valueReceived: confirmed(received), merit: Number(merit[0]?.total ?? 0) };
 }
+
+/** Lo que espera el toque del Timonel (D-039): Cesiones por decidir, Apuntes por publicar y, si es Directiva, candidaturas nuevas. */
+export async function pendingDecisions(db: Db, chapterId: string, companyId: string, member: { isDirector: boolean }) {
+  const open = await db.query.referrals.findMany({
+    where: and(eq(schema.referrals.chapterId, chapterId), inArray(schema.referrals.state, [...REVIEW_STATES, "APPROVED", "INTRO_AUTHORIZED"]), or(eq(schema.referrals.receiverCompanyId, companyId), eq(schema.referrals.originatorCompanyId, companyId))),
+  });
+  const referrals = open.filter((r) => (r.state === "ORIGINATOR_PENDING" && r.originatorCompanyId === companyId) || (r.state === "RECEIVER_PENDING" && r.receiverCompanyId === companyId) || (r.state === "DIRECTOR_PENDING" && member.isDirector) || (["APPROVED", "INTRO_AUTHORIZED"].includes(r.state) && r.originatorCompanyId === companyId)).length;
+  const drafts = await db.query.opportunitySignals.findMany({ where: and(eq(schema.opportunitySignals.originatorCompanyId, companyId), eq(schema.opportunitySignals.status, "DRAFT")), columns: { businessSignalId: true } });
+  const sources = drafts.length ? await db.query.businessSignals.findMany({ where: inArray(schema.businessSignals.id, drafts.map((d) => d.businessSignalId)), columns: { source: true } }) : [];
+  const apuntes = sources.filter((s) => s.source === "APUNTE").length;
+  let candidacies = 0;
+  if (member.isDirector) {
+    const rows = await db.query.betaRequests.findMany({ where: eq(schema.betaRequests.status, "NEW"), columns: { id: true } });
+    candidacies = rows.length;
+  }
+  return { referrals, apuntes, candidacies, total: referrals + apuntes + candidacies };
+}
