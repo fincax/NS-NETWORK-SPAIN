@@ -14,7 +14,8 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "clock": "tsx scripts/clock.ts",
-    "e2e": "node scripts/e2e-demo.mjs"
+    "e2e": "node scripts/e2e-demo.mjs",
+    "icons": "node scripts/icons.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "0.125.0",

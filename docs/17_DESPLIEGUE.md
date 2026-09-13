@@ -19,6 +19,9 @@ Hay dos "servidores" distintos y conviene no confundirlos:
 - Portada pública en `/` con la narrativa en modo beta, la disponibilidad real de plazas y la candidatura "Solicitar plaza en la beta" (se guarda en la base de datos).
 - Puerta de la demo en `/acceso`: usuario y contraseña compartidos, definidos por variables de entorno. Todo lo que no es portada exige esa sesión.
 - Aviso permanente "Beta privada · datos ficticios" dentro de la app, con salida.
+- **App instalable** (D-039): en el móvil, la demo se instala desde el navegador (Android: "Instalar aplicación"; iPhone: Compartir → "Añadir a pantalla de inicio"). Hoy lo sugiere la primera vez. El icono muestra el número de decisiones pendientes.
+- **Apunte** (D-037): botón flotante "Apuntar" en toda la app. En el móvil, con la demo abierta en el navegador, "Añadir a pantalla de inicio" crea un icono NS cuyo menú ofrece "Apuntar un referido".
+- **Fuentes propias** (D-038): en el Dossier de la propia empresa, "Fuentes de mi Agente". La Ronda las lee cada mañana; en local se prueban con "Leer mis fuentes ahora" (requiere salida a internet).
 - **Antesala** (D-035): la Directiva ve y despacha las candidaturas que llegan desde la portada, con el veredicto de plaza calculado. En la demo, elige a Inés Domínguez (Bufete Alameda · Directiva) en el selector de Timonel.
 
 ## 1. Demo privada: ahora
@@ -68,20 +71,20 @@ Los cinco pasos, en orden. Ninguno requiere programar; todos requieren tus cuent
 
 1. **Base de datos.** Crea una cuenta en Neon (neon.tech) y un proyecto en la región de Frankfurt (eu-central-1). Copia la cadena de conexión (empieza por `postgres://`).
 2. **Alojamiento.** Crea una cuenta en Vercel (vercel.com) con tu GitHub, importa el repositorio `fincax/NS-NETWORK-SPAIN` y, en la configuración del proyecto, pon **Root Directory = `apps/web`**. Vercel detecta Next.js solo.
-3. **Variables de entorno** en Vercel (Settings → Environment Variables): `DATABASE_URL` (la cadena de Neon), `DEMO_USER`, `DEMO_PASSWORD` (elige una buena), `DEMO_SESSION_SECRET` (una frase larga y aleatoria), `NS_PUBLIC_URL=https://networkspain.com`. Opcional: `ANTHROPIC_API_KEY`. Pulsa Deploy.
+3. **Variables de entorno** en Vercel (Settings → Environment Variables): `DATABASE_URL` (la cadena de Neon), `DEMO_USER`, `DEMO_PASSWORD` (elige una buena), `DEMO_SESSION_SECRET` (una frase larga y aleatoria), `CRON_SECRET` (otra frase larga y aleatoria; con ella Vercel lanza la Ronda cada mañana), `NS_PUBLIC_URL=https://networkspain.com`. Opcional: `ANTHROPIC_API_KEY`. Pulsa Deploy.
 4. **Datos de la demo.** La primera vez, entra en la dirección que te da Vercel, ve a `/acceso`, entra con el usuario y la contraseña y pulsa "Preparar NS Cumbre (demo)" en Hoy. Eso crea la Sala, los diez titulares y los escenarios en la base de datos de Neon.
 5. **Dominio.** En Vercel, Settings → Domains, añade `networkspain.com` y `www.networkspain.com`. Vercel te dice qué registro DNS crear en el panel donde compraste el dominio (un registro A o CNAME). En unas horas la portada responde en networkspain.com y la demo en networkspain.com/acceso.
 
-Después: en Vercel, Settings → Cron Jobs, programa `GET /api/clock` cada mañana cuando exista esa ruta (hoy el Reloj se ejecuta al abrir Hoy, suficiente para la demo).
+La **Ronda** de cada mañana (D-036) ya viene programada en el código (`vercel.json`): Vercel llama a `GET /api/clock` a las 06:00 UTC con el `CRON_SECRET`, y los Agentes ejecutan el Reloj y el Rastreo de todas las Salas sin que nadie abra la aplicación. Se comprueba en Vercel, Settings → Cron Jobs, donde debe aparecer la tarea y sus últimas ejecuciones. En otro alojamiento, programa una tarea diaria que llame a esa dirección con la cabecera `Authorization: Bearer <CRON_SECRET>`, o ejecuta `pnpm clock`.
 
 ## 4b. Cómo se despliega, técnicamente (para quien lo haga)
 
 ```text
 Alojamiento     Vercel (región fra1) o servidor propio con Node 22 y pnpm.
 Base de datos   PostgreSQL 16 gestionado en la UE. Variable DATABASE_URL. Las migraciones se aplican al arrancar.
-Variables       DATABASE_URL · DEMO_USER · DEMO_PASSWORD · DEMO_SESSION_SECRET · NS_PUBLIC_URL · ANTHROPIC_API_KEY (opcional) · NS_LLM_MODEL · NS_LLM_PROVIDER
-Comandos        pnpm install && pnpm build && pnpm start   ·   pnpm db:seed (solo demo)   ·   pnpm clock (tarea diaria)
-Tareas          El Reloj de la Sala y el Rastreo deben ejecutarse cada mañana (cron del alojamiento o una tarea programada).
+Variables       DATABASE_URL · DEMO_USER · DEMO_PASSWORD · DEMO_SESSION_SECRET · CRON_SECRET · NS_PUBLIC_URL · ANTHROPIC_API_KEY (opcional) · NS_LLM_MODEL · NS_LLM_PROVIDER
+Comandos        pnpm install && pnpm build && pnpm start   ·   pnpm db:seed (solo demo)   ·   pnpm clock (Ronda diaria, equivale a GET /api/clock)
+Tareas          La Ronda (Reloj + Rastreo) cada mañana: vercel.json la programa; en otro alojamiento, un cron que llame a /api/clock con el CRON_SECRET.
 Copias          Copia diaria de la base de datos con retención de 30 días.
 Dominio         Hoy: networkspain.com sirve portada y demo. Con producción: demo.networkspain.com para la demo y networkspain.com para la web y la app reales.
 Marca           Paraguas "NS Network" + país (D-034). Dominios paraguas a reservar y marca europea a registrar antes de salir en prensa con empresas reales.

@@ -11,6 +11,7 @@ import { prepareDemo, runRastreoAction } from "../actions";
 import { runClockThrottled } from "@/services/clock";
 import { SOURCE_LABEL } from "@/agents/rastreo";
 import { candidacyCounts } from "@/services/antesala";
+import { InstallHint } from "../install-hint";
 
 export default async function HoyPage() {
   await requireDemo();
@@ -45,7 +46,9 @@ export default async function HoyPage() {
   const draftRecords = await db.query.publicRecords.findMany({ where: eq(schema.publicRecords.ingestedByCompanyId, company.id) });
   const recordBySignal = new Map(draftRecords.filter((r) => r.opportunitySignalId).map((r) => [r.opportunitySignalId as string, r]));
   const rastreoDrafts = drafts.filter((d) => recordBySignal.has(d.id));
-  const ownDrafts = drafts.filter((d) => !recordBySignal.has(d.id) && d.visibility !== "COMPANY_ONLY");
+  const draftSources = new Map((await db.query.businessSignals.findMany({ where: inArray(schema.businessSignals.id, drafts.map((d) => d.businessSignalId).concat("00000000-0000-0000-0000-000000000000")), columns: { id: true, source: true, rawContent: true } })).map((b) => [b.id, b]));
+  const apuntes = drafts.filter((d) => !recordBySignal.has(d.id) && draftSources.get(d.businessSignalId)?.source === "APUNTE");
+  const ownDrafts = drafts.filter((d) => !recordBySignal.has(d.id) && !apuntes.includes(d) && d.visibility !== "COMPANY_ONLY");
   const agentState = forMe.length ? "esperando" : summary.matches ? "encontrado" : "analizando";
   const candidacies = member.isDirector ? await candidacyCounts(db) : null;
 
@@ -68,6 +71,8 @@ export default async function HoyPage() {
         <div className="card kpi"><span className="value amber money" style={{ fontSize: 26 }}>{eurRange(summary.potential.min, summary.potential.max)}</span><span className="label">valor potencial en Cesiones abiertas</span></div>
         <div className="card kpi"><span className="value green money" style={{ fontSize: 26 }}>{eur(bal.valueReceived)}</span><span className="label">valor contrastado recibido · Mérito {bal.merit}</span></div>
       </div>
+
+      <InstallHint />
 
       {candidacies && candidacies.pendientes > 0 ? (
         <Link href="/antesala" className="card amber row" style={{ justifyContent: "space-between", textDecoration: "none" }}>
@@ -98,6 +103,27 @@ export default async function HoyPage() {
                 </Link>
               );
             })}
+          </div>
+        )}
+      </section>
+
+      <section className="section">
+        <div className="row" style={{ marginBottom: 14 }}>
+          <h2 style={{ margin: 0 }}>Tus Apuntes</h2>
+          <span className="spacer" />
+          <Link href="/apunte" className="btn small">Apuntar un referido</Link>
+        </div>
+        {apuntes.length === 0 ? (
+          <Empty title="Sin Apuntes pendientes.">Cuando en la calle alguien te cuente que necesita algo, apúntalo en treinta segundos. Tu Agente lo guarda y te lo deja aquí para decidir si lo publicas.</Empty>
+        ) : (
+          <div className="stack">
+            {apuntes.map((d) => (
+              <Link key={d.id} href={`/indicio/${d.id}`} className="card amber" style={{ display: "grid", gap: 6 }}>
+                <div className="row"><span className="badge amber">Apunte · borrador</span><span className="mono">{new Intl.DateTimeFormat("es-ES", { day: "2-digit", month: "short" }).format(d.createdAt)}</span><span className="spacer" /><span className="mono">decide si publicar</span></div>
+                <strong>{d.envelope.chapter_layer.need_summary}</strong>
+                <p className="lead" style={{ fontSize: 14 }}>{draftSources.get(d.businessSignalId)?.rawContent.replace(/^Apunte del Timonel\.\s*/, "")}</p>
+              </Link>
+            ))}
           </div>
         )}
       </section>

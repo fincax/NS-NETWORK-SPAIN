@@ -3,6 +3,9 @@ import { Monogram } from "@/components/brand";
 import { currentMember, listMembers } from "@/lib/session";
 import { PersonaSwitch } from "./persona-switch";
 import { NavLinks } from "./nav-links";
+import { ApunteFab } from "./apunte-fab";
+import { AppBadge } from "./app-badge";
+import { pendingDecisions } from "@/services/today";
 import { logoutAction } from "../acceso/actions";
 import { getDb } from "@/db/client";
 import { candidacyCounts } from "@/services/antesala";
@@ -13,10 +16,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   let ctx: Awaited<ReturnType<typeof currentMember>> = null;
   let members: Awaited<ReturnType<typeof listMembers>> = [];
   let newCandidacies = 0;
+  let pendingTotal = 0;
   try {
     ctx = await currentMember();
     members = await listMembers();
     if (ctx?.member.isDirector) newCandidacies = (await candidacyCounts(await getDb())).nuevas;
+    if (ctx) pendingTotal = (await pendingDecisions(await getDb(), ctx.chapter.id, ctx.company.id, ctx.member)).total;
   } catch {
     ctx = null;
   }
@@ -42,6 +47,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         </div>
       </header>
       <main>{children}</main>
+      {ctx ? <ApunteFab /> : null}
+      {ctx ? <AppBadge initial={pendingTotal} /> : null}
     </div>
   );
 }

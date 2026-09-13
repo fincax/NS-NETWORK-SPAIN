@@ -131,7 +131,7 @@ export const businessSignals = pgTable("business_signals", {
   id: id(),
   chapterId: uuid("chapter_id").notNull().references(() => chapters.id),
   companyId: uuid("company_id").notNull().references(() => companies.id),
-  source: text("source").notNull(), // MEMBER_INPUT | AGENT_CHECKIN | WEBSITE | INTEGRATION | PUBLIC_RECORD
+  source: text("source").notNull(), // MEMBER_INPUT | APUNTE | AGENT_CHECKIN | WEBSITE | INTEGRATION | PUBLIC_RECORD
   rawContent: text("raw_content").notNull(),
   visibility: text("visibility").notNull().default("CHAPTER"),
   permissions: jsonb("permissions").$type<string[]>().notNull(),
@@ -382,6 +382,21 @@ export const demands = pgTable(
 );
 
 // ───────────── Beta privada (D-033): solicitudes de plaza desde la portada ─────────────
+/** Fuentes propias del Agente (D-038): direcciones que el Timonel añade para que su Agente las rastree cada mañana. */
+export const agentSources = pgTable("agent_sources", {
+  id: id(),
+  chapterId: uuid("chapter_id").notNull().references(() => chapters.id),
+  companyId: uuid("company_id").notNull().references(() => companies.id),
+  label: text("label").notNull(),
+  url: text("url").notNull(),
+  kind: text("kind").notNull().default("FEED"), // FEED (RSS/Atom) · más adelante: WEB, BORME, PLACE…
+  active: boolean("active").notNull().default(true),
+  lastFetchedAt: timestamp("last_fetched_at", { withTimezone: true }),
+  lastStatus: text("last_status"), // "ok · 12 entradas, 2 nuevas" | "error · …"
+  createdByMemberId: uuid("created_by_member_id"),
+  createdAt: createdAt(),
+});
+
 export const betaRequests = pgTable("beta_requests", {
   id: id(),
   fullName: text("full_name").notNull(),

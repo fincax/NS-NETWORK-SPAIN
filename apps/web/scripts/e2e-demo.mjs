@@ -26,6 +26,40 @@ try {
   await card.click();
   await page.waitForURL(/\/cesiones\//);
   check(await page.locator("text=Promesa").count() > 0, "tarjeta de Cesión abierta con Promesa");
+  // App instalable (D-039): iconos, número pendiente y título de pestaña.
+  check((await page.request.get(`${base}/icon-512.png`)).status() === 200, "icono PNG de la app instalable disponible");
+  const pendingRes = await page.request.get(`${base}/api/pending`);
+  const pending = await pendingRes.json();
+  check(pendingRes.status() === 200 && typeof pending.total === "number", "el número de decisiones pendientes se sirve con sesión");
+  if (pending.total > 0) await page.waitForFunction((t) => document.title.startsWith(`(${t})`), pending.total, { timeout: 5000 }).catch(() => {});
+  check((await page.title()).startsWith(`(${pending.total})`) || pending.total === 0, "el título de la pestaña muestra el número pendiente");
+  // Apunte (D-037): captura en móvil y aparición en Hoy.
+  check((await page.request.get(`${base}/manifest.webmanifest`)).status() === 200, "el manifest para 'añadir a inicio' se sirve sin sesión");
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(`${base}/hoy`);
+  await page.click("a.fab");
+  await page.waitForURL(/\/apunte/);
+  await page.fill("#who", "Metalúrgica del Sur");
+  await page.fill("#need", "abre planta nueva en Dos Hermanas y contrata 40 empleados, busca obra y seguros");
+  await page.click("label:has-text('Es mi cliente')");
+  await page.check("input[name='expectsContact']");
+  await page.screenshot({ path: process.env.E2E_SHOT_APUNTE ?? "/tmp/apunte.png", fullPage: true });
+  await page.click("button:has-text('Guardar en mi Agente')");
+  await page.waitForURL(/ok=/);
+  check(await page.locator("text=Ya está en la memoria de tu Agente").count() > 0, "Apunte guardado con la lectura del Agente");
+  await page.screenshot({ path: process.env.E2E_SHOT_APUNTE_OK ?? "/tmp/apunte-ok.png", fullPage: true });
+  await page.goto(`${base}/hoy`);
+  check(await page.locator("text=Apunte · borrador").count() > 0, "el Apunte aparece en Hoy como borrador");
+  await page.waitForFunction((t) => document.title.startsWith(`(${t})`), pending.total + 1, { timeout: 5000 }).catch(() => {});
+  check((await page.title()).startsWith(`(${pending.total + 1})`), "el Apunte suma uno al número pendiente");
+  await page.setViewportSize({ width: 1280, height: 900 });
+  // Fuentes propias (D-038): alta desde el Dossier.
+  await page.goto(`${base}/empresa/hispalis`);
+  await page.fill("#fl", "Diario de prueba"); await page.fill("#fu", "https://prensa.example.com/rss");
+  await page.click("button:has-text('Añadir fuente')");
+  await page.waitForURL(/#fuentes/);
+  check(await page.locator("text=Diario de prueba").count() > 0, "fuente propia añadida al Agente");
+  await page.screenshot({ path: process.env.E2E_SHOT_FUENTES ?? "/tmp/fuentes.png", fullPage: true });
   // Antesala (D-035): solo la Directiva; despacho con un toque.
   await page.goto(`${base}/antesala`);
   check(await page.locator("text=Solo la Directiva").count() > 0, "un Timonel sin Directiva no ve las candidaturas");

@@ -13,7 +13,7 @@ import { createSignal } from "@/services/signals";
 
 export const PublicRecord = z.object({
   external_ref: z.string(),
-  source: z.enum(["BORME", "LICITACION", "LICENCIA_OBRA", "EMPLEO", "PRENSA"]),
+  source: z.enum(["BORME", "LICITACION", "LICENCIA_OBRA", "EMPLEO", "PRENSA", "FUENTE_PROPIA"]),
   title: z.string(),
   summary: z.string(),
   company_name: z.string().optional(),
@@ -28,7 +28,7 @@ export interface PublicFeed {
   fetch(opts: { zone: string; since: Date }): Promise<PublicRecord[]>;
 }
 
-export const SOURCE_LABEL: Record<PublicRecord["source"], string> = { BORME: "BORME", LICITACION: "Licitación pública", LICENCIA_OBRA: "Licencia de obra", EMPLEO: "Oferta de empleo", PRENSA: "Prensa local" };
+export const SOURCE_LABEL: Record<PublicRecord["source"], string> = { BORME: "BORME", LICITACION: "Licitación pública", LICENCIA_OBRA: "Licencia de obra", EMPLEO: "Oferta de empleo", PRENSA: "Prensa local", FUENTE_PROPIA: "Fuente propia" };
 
 /** Lote de ejemplo para NS Sevilla. Nombres ficticios; formatos y tipos de hecho, reales. */
 export const SAMPLE_FEED: PublicRecord[] = [

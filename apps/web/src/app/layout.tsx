@@ -4,7 +4,9 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "NS Network Spain",
   description: "Tu empresa no hace networking. Su agente sí. 24/7. Beta privada en NS Sevilla.",
-  icons: { icon: "/icon.svg" },
+  icons: { icon: "/icon.svg", apple: "/apple-touch-icon.png" },
+  manifest: "/manifest.webmanifest",
+  appleWebApp: { capable: true, title: "NS", statusBarStyle: "black-translucent" },
   metadataBase: new URL(process.env.NS_PUBLIC_URL ?? "https://networkspain.com"),
 };
 

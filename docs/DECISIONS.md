@@ -873,3 +873,94 @@ Pasos fijados, en orden:
 **Consequences.** `services/antesala.ts`, ruta `/antesala` con acciones, columnas nuevas en `beta_requests` (migración 0003), prefijado del alta desde una candidatura aprobada, seis candidaturas de demostración (una por veredicto), pruebas y recorrido de navegador ampliado. En producción, la Antesala será la primera pantalla de la Directiva que exija autenticación real por rol.
 
 **Revisit when.** Exista la entrevista del ADN por el Agente (el paso "Entrevistada" pasará a apoyarse en ella) o haya varias Salas en la zona (la salida "otra Sala" tendrá destino real).
+
+---
+
+## D-036 · Ronda: los Agentes hacen su pasada cada mañana sin que nadie abra la aplicación
+
+**Status:** CONFIRMED (delegado por el fundador: "sigue con el 4")
+**Date:** 2026-09-13
+
+**Context.** El Reloj de la Sala (D-030) y el Rastreo (D-031) se ejecutaban solo cuando alguien abría Hoy o pulsaba un botón. Eso contradice la promesa central de NS: la red trabaja mientras el Timonel no está. En el servidor hace falta que ocurra sola cada mañana.
+
+**Choice.** Una **Ronda** diaria, para todas las Salas, en este orden:
+
+1. Reloj de la Sala: recordatorios, caducidades, respuestas tardías y check-ins.
+2. Rastreo con el Agente de cada empresa activa. Los registros nuevos se reparten: empieza el Agente que menos ha rastreado hasta ahora, para que los Indicios en borrador no caigan siempre en el mismo Timonel.
+3. Un evento "Ronda" por Sala en la Mesa Permanente, visible para todos, con el resumen de lo hecho. Si no hubo nada que hacer, no se escribe nada.
+
+La Ronda es idempotente: se puede lanzar varias veces al día sin efectos dobles. La lanza el alojamiento cada mañana mediante la ruta `GET /api/clock`, definida en `vercel.json` (06:00 UTC, es decir, a las 8 de la mañana en verano y a las 7 en invierno). La ruta está protegida por `CRON_SECRET`, que el alojamiento envía como cabecera; sin secreto configurado, en producción la ruta no se ejecuta. En local, `pnpm clock` hace lo mismo. El Reloj al abrir Hoy se mantiene como red de seguridad de la demo.
+
+**Why.** Es la pieza mínima que hace verdad "mientras tú trabajabas, tu red seguía trabajando". Separar la Ronda del Reloj permite añadirle más tareas de mañana (Comunicado semanal, Brújula, Gaceta) sin tocar el alojamiento. El reparto equitativo del Rastreo evita que el Mérito de los Indicios públicos se concentre en una empresa por accidente de orden.
+
+**Consequences.** `services/ronda.ts`, `app/api/clock/route.ts`, `vercel.json`, variable `CRON_SECRET`, `pnpm clock` pasa a ejecutar la Ronda, exclusión de la ruta en la puerta de la demo, etiqueta "Ronda" en la Mesa, cinco pruebas nuevas. La entrada en el léxico.
+
+**Revisit when.** Se conecte la primera fuente real de Rastreo (la Ronda deberá limitar el volumen por Agente) o el Protocolo II exija una Ronda semanal además de la diaria.
+
+---
+
+## D-037 · Apunte: el Timonel mete un posible referido en la memoria de su Agente en treinta segundos, desde el móvil
+
+**Status:** CONFIRMED (petición del fundador: "una acción importante")
+**Date:** 2026-09-13
+
+**Context.** Los mejores referidos nacen en la calle: en una visita, en una feria, en una conversación casual. Si el Timonel tiene que esperar a sentarse ante un formulario, se pierden. El fundador pide un apartado, sobre todo en móvil pero no en exclusiva, para anotar de inmediato nombre de empresa o persona, persona de contacto, necesidad y observaciones, y que entre en la memoria del Agente en el acto.
+
+**Choice.** El **Apunte**:
+
+- Pantalla `/apunte` pensada para el móvil: dos campos obligatorios (quién y qué necesita), tres fichas para la relación (es mi cliente, lo conozco, me lo han contado), un interruptor "ya sabe que le llamarán" (D-029) y, plegados, persona de contacto y observaciones. Botón grande "Guardar en mi Agente".
+- Acceso permanente: botón flotante "Apuntar" en todas las pantallas de la app, atajo en Hoy, y acceso directo desde la pantalla de inicio del móvil (la app se puede "añadir a inicio" y el icono ofrece "Apuntar un referido").
+- El Apunte entra en el circuito normal de NS-ARP como Indicio en borrador con fuente `APUNTE`: el Agente lo lee, detecta necesidades y plazas, y lo deja en Hoy ("Tus Apuntes"). La confirmación muestra lo que el Agente ha entendido y ofrece publicar en la Sala con un toque, apuntar otro o ver la previsualización. **Nunca se publica solo.**
+- La relación elegida alimenta la fuerza de relación del Indicio; el nombre de la persona de contacto se guarda solo en la capa 2, sin base jurídica hasta que el Timonel la declare en la Apertura.
+
+**Why.** Es la puerta de entrada más natural del negocio real a la red: convierte el "me acabo de enterar de algo" en trabajo del Agente sin fricción. Reutiliza todo el protocolo (extracción, privacidad, Mesa) en lugar de crear un cajón aparte.
+
+**Consequences.** `services/apunte.ts`, ruta `/apunte`, botón flotante, `manifest.webmanifest` con atajos, sección "Tus Apuntes" en Hoy, fuente `APUNTE` en `business_signals`, pruebas. CLAUDE.md §22 incorpora el Apunte como prioridad móvil.
+
+**Revisit when.** Exista dictado por voz o captura desde una foto de tarjeta, o el Agente pueda hacer preguntas de seguimiento sobre el Apunte (entrevista corta).
+
+---
+
+## D-038 · Fuentes propias: cada Timonel añade direcciones a su Agente y la Ronda las lee cada mañana
+
+**Status:** CONFIRMED (petición del fundador)
+**Date:** 2026-09-13
+
+**Context.** El Rastreo (D-031) lee fuentes públicas de NS. El fundador quiere además que cada Timonel pueda ir incluyendo fuentes a su Agente para que rastree a diario: el medio local que él sigue, el boletín de su asociación, el portal de licitaciones de su sector.
+
+**Choice.**
+
+- Cada empresa tiene una lista de **fuentes propias** (hasta 12): nombre y dirección de un canal RSS o Atom. Se gestionan en el Dossier ("Fuentes de mi Agente"), con el estado de la última lectura y un botón "Leer mis fuentes ahora".
+- La Ronda (D-036) las lee cada mañana después de las fuentes públicas, con el mismo circuito del Rastreo: cada entrada con posible negocio se convierte en Indicio en borrador para el Timonel que añadió la fuente, con fuente `FUENTE_PROPIA` y deduplicada por referencia estable. Las entradas sin necesidad detectable se descartan en silencio.
+- Un fallo de lectura (dirección caída, formato no reconocido) se anota en la fuente y no detiene la Ronda. Solo se admiten direcciones públicas http/https.
+- El lector de RSS/Atom es propio y mínimo, sin dependencias; la misma interfaz (`PublicFeed`) servirá para los adaptadores de BORME, PLACE, licencias y empleo.
+
+**Why.** Convierte al Agente en un lector personalizado del mundo de cada Timonel, y hace que el Rastreo crezca con la red sin esperar a integraciones oficiales. Quien más fuentes buenas aporta, más Indicios genera para los demás y más Mérito acumula.
+
+**Consequences.** Tabla `agent_sources` (migración 0004), `agents/feeds.ts`, `services/sources.ts`, sección en el Dossier, la Ronda incluye las fuentes propias, pruebas con lectores simulados. En este entorno de desarrollo no hay salida a internet, así que la lectura real solo se comprueba en el servidor.
+
+**Revisit when.** Se conecten las fuentes oficiales (BORME, PLACE) o el volumen exija límites por fuente y filtros por zona o palabras clave.
+
+---
+
+## D-039 · NS se instala en el móvil como una app, con el número de decisiones pendientes en el icono
+
+**Status:** CONFIRMED (petición del fundador: "haz todo lo que me propones")
+**Date:** 2026-09-13
+
+**Context.** El fundador quiere que la versión móvil sea como una app descargable e instalable en el escritorio del móvil, con el icono de NS, y que avise cuando haya algo pendiente, con un número. Sin pasar por App Store ni Google Play en la beta.
+
+**Choice.** NS es una aplicación web instalable (PWA):
+
+- **Instalación** desde el navegador, sin tienda: en Android "Instalar aplicación", en iPhone "Añadir a pantalla de inicio". Iconos PNG de 192 y 512 píxeles (generados del monograma), icono para iOS, pantalla completa, arranque en Hoy y atajo "Apuntar un referido".
+- **Invitación la primera vez**, en Hoy, fuera de la app instalada: en Android un botón "Instalar"; en iPhone las instrucciones de Safari. Se puede descartar y no vuelve a aparecer.
+- **Número en el icono** con lo que espera el toque del Timonel: Cesiones por decidir, Apuntes por publicar y, para la Directiva, candidaturas nuevas (`pendingDecisions`). Se pinta al abrir cualquier pantalla y se refresca cada minuto mientras la app está visible (`GET /api/pending`). Donde el sistema no admite número en el icono, va en el título de la pestaña.
+- **Avatar vivo**: dentro de la app, el segmento de contacto del Agente late cuando espera una decisión o ha encontrado algo, con la animación desactivada si el usuario pide menos movimiento. El icono del escritorio del móvil no se mueve: ningún sistema lo permite, y se le ha explicado al fundador.
+- **Notificaciones push** ("Tu Agente tiene una Cesión para ti"), con sonido y banner aunque la app esté cerrada: decididas, pendientes de implementar después de la entrevista del Agente y del despliegue en networkspain.com, porque exigen el dominio publicado y una política de qué merece aviso.
+- **App nativa en tiendas**: no en la beta. Se podrá envolver la misma aplicación más adelante.
+
+**Why.** Da la experiencia de app (icono, pantalla completa, número, atajo) con cero fricción de instalación y sin revisión de tiendas, y usa la misma aplicación y el mismo código. El número en el icono convierte el móvil en el sitio donde se toman las decisiones de treinta segundos.
+
+**Consequences.** `manifest.ts` con iconos PNG, `public/icon-192.png`, `icon-512.png`, `apple-touch-icon.png`, `scripts/icons.mjs` para regenerarlos, `app-badge.tsx`, `install-hint.tsx`, `api/pending`, `pendingDecisions` en `services/today.ts`, animación del avatar, pruebas.
+
+**Revisit when.** Se implementen las notificaciones push (la política de avisos) o se decida la app en tiendas.
