@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import type { Db } from "@/db/client";
 import { schema } from "@/db/client";
 import { NSCAT } from "./nscat";
-import { SEED_COMPANIES } from "./seed-data";
+import { SEED_CANDIDACIES, SEED_COMPANIES } from "./seed-data";
 import { onboardCompany } from "@/services/onboarding";
 
 export async function seedChapter(db: Db) {
@@ -37,6 +37,11 @@ export async function seedChapter(db: Db) {
     const r = await onboardCompany(db, { chapterId: chapter.id, name: c.name, slug: c.slug, legalName: c.legalName, website: c.website, specialtyCode: c.specialty, person: c.person, dna: c.dna });
     companies[c.slug] = { companyId: r.company.id, memberId: r.member.id };
   }
+  const anyCandidacy = await db.query.betaRequests.findFirst();
+  if (!anyCandidacy) {
+    await db.insert(schema.betaRequests).values(SEED_CANDIDACIES.map((c) => { const at = new Date(Date.now() - c.daysAgo * 86_400_000); return { fullName: c.fullName, companyName: c.companyName, email: c.email, specialtyCode: c.specialtyCode, city: c.city, message: c.message, status: c.status, notes: c.notes ?? null, createdAt: at, updatedAt: at }; }));
+  }
+
   return { zone, chapter, companies };
 }
 

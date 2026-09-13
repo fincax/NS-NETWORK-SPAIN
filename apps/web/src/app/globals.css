@@ -192,3 +192,21 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
   .hero { padding: 40px 0 32px; }
   .beta-bar { padding: 6px 16px; }
 }
+
+/* ── Antesala (candidaturas, Directiva) ── */
+.tabs { display: flex; gap: 4px; flex-wrap: wrap; border-bottom: 1px solid var(--line); }
+.tabs a { padding: 8px 12px; color: var(--muted-2); text-decoration: none; border-bottom: 2px solid transparent; margin-bottom: -1px; min-height: 40px; display: inline-flex; align-items: center; gap: 6px; }
+.tabs a:hover { color: var(--porcelain); }
+.tabs a[aria-current="page"] { color: var(--porcelain); border-bottom-color: var(--porcelain); }
+.cand { display: grid; gap: 14px; }
+.cand-head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; flex-wrap: wrap; }
+.cand-head h3 { font-size: 20px; margin: 2px 0; }
+.cand-quote { margin: 0; padding-left: 12px; border-left: 2px solid var(--line); color: var(--muted-2); font-style: italic; }
+.cand-verdict { display: grid; gap: 6px; padding: 12px; border-radius: 8px; background: var(--obsidian); border: 1px solid var(--line); }
+.cand-reco { font-size: 14px; }
+.cand-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.cand-more summary { cursor: pointer; color: var(--muted-2); font-size: 13px; min-height: 32px; display: flex; align-items: center; }
+.cand-counts { display: flex; gap: 18px; }
+.cand-counts div { display: grid; text-align: center; }
+.cand-counts strong { font-size: 26px; line-height: 1; }
+.nav .count { display: inline-block; min-width: 18px; padding: 0 6px; border-radius: 999px; background: var(--amber); color: var(--obsidian); font-family: var(--font-mono); font-size: 11px; text-align: center; margin-left: 6px; }

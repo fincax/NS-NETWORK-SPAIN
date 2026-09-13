@@ -19,6 +19,7 @@ Hay dos "servidores" distintos y conviene no confundirlos:
 - Portada pública en `/` con la narrativa en modo beta, la disponibilidad real de plazas y la candidatura "Solicitar plaza en la beta" (se guarda en la base de datos).
 - Puerta de la demo en `/acceso`: usuario y contraseña compartidos, definidos por variables de entorno. Todo lo que no es portada exige esa sesión.
 - Aviso permanente "Beta privada · datos ficticios" dentro de la app, con salida.
+- **Antesala** (D-035): la Directiva ve y despacha las candidaturas que llegan desde la portada, con el veredicto de plaza calculado. En la demo, elige a Inés Domínguez (Bufete Alameda · Directiva) en el selector de Timonel.
 
 ## 1. Demo privada: ahora
 
@@ -83,6 +84,7 @@ Comandos        pnpm install && pnpm build && pnpm start   ·   pnpm db:seed (so
 Tareas          El Reloj de la Sala y el Rastreo deben ejecutarse cada mañana (cron del alojamiento o una tarea programada).
 Copias          Copia diaria de la base de datos con retención de 30 días.
 Dominio         Hoy: networkspain.com sirve portada y demo. Con producción: demo.networkspain.com para la demo y networkspain.com para la web y la app reales.
+Marca           Paraguas "NS Network" + país (D-034). Dominios paraguas a reservar y marca europea a registrar antes de salir en prensa con empresas reales.
 ```
 
 ## 5. Resumen

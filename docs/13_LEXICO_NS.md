@@ -17,7 +17,7 @@ Criterios de cada nombre: castellano; una palabra siempre que sea posible; insti
 | **Plaza** | Posición única de una especialidad dentro de una Sala. | `CategorySeat` | "La plaza de Derecho laboral está vacante." |
 | **Titular** | Empresa que ocupa una plaza. | `seat.company_id` | "El titular de Climatización recibe la cesión." |
 | **Timonel** | La persona que lleva el rumbo de su empresa en NS: da los vistos buenos, autoriza la Apertura, tiende el Puente y emite el Veredicto. El Agente trabaja 24/7; el Timonel manda (D-027). Invariable en género: el Timonel, la Timonel. Cada Titular designa un Timonel y puede designar un **Timonel suplente**. | `Member{ is_primary }` | "Carlos es el Timonel de Híspalis." "Los Timoneles de NS Cumbre se ven en el Pleno." |
-| **Antesala** | Lista de espera de empresas admitidas que aguardan plaza o fundan la siguiente Sala. | `Waitlist` | "Hay doce empresas en la Antesala de NS Sevilla." |
+| **Antesala** | Lista de espera de empresas que aguardan plaza o fundan la siguiente Sala. También la pantalla donde la Directiva despacha las candidaturas con el veredicto de plaza (D-035). | `Waitlist` / `Candidacy` | "Hay doce empresas en la Antesala de NS Sevilla." |
 | **Candidatura** | Solicitud de plaza y proceso de admisión. | `Application` | "Presentar candidatura" es el paso tras "Solicitar plaza". |
 | **Directiva** | Presidencia y consejo de una Sala. | `Director` | "La Directiva revisa las excepciones." |
 | **Consejo de Zona** | Gobierno de la zona: apertura, escisión y fusión de Salas; clasificación. | `ZoneDirector` | "El Consejo de Zona abre la cuarta Sala." |

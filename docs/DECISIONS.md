@@ -817,3 +817,59 @@ La cuota mensual, aunque varíe por Tramos, pertenece al segundo plano. Nunca es
 **Consequences.** `src/proxy.ts`, `src/lib/auth.ts`, `/acceso`, portada en `/`, grupo de rutas `(app)` con su propio layout y barra de beta, tabla `beta_requests` (migración 0002), `.env.example`. `docs/17` incorpora los pasos concretos para Vercel y Neon con networkspain.com.
 
 **Revisit when.** Se implemente la autenticación real por Timonel (la puerta compartida desaparece) o el número de candidaturas exija una pantalla de Directiva para gestionarlas.
+
+---
+
+## D-034 · Marca fuera de España: "NS Network" como paraguas por defecto; una marca europea nueva solo si la comprobación lo obliga
+
+**Status:** CONFIRMED (el fundador sigue la recomendación del equipo fundador)
+**Date:** 2026-09-13
+
+**Context.** El fundador tiene registrada en España "NS Network Spain" y el dominio networkspain.com. Preguntó qué hacer con la marca si el proyecto sale de España, si tendría sentido un dominio inventado (nsnetworld.com; nsnetwork.com está ocupado) y si, en caso extremo, habría que crear una marca europea nueva que englobe a NS Network Spain.
+
+**Options.**
+
+1. Una sola marca global, "NS Network", con el país como etiqueta (NS Network Spain, NS Network Portugal).
+2. Una marca europea nueva como paraguas, con NS Network Spain como marca de España bajo licencia.
+3. Sustituir NS por completo.
+
+**Choice.** Opción 1 por defecto. La opción 2 queda como vía de escape, y solo se abre por uno de estos dos motivos: que la búsqueda en la oficina europea de marcas (EUIPO) muestre que "NS Network" no puede registrarse por un conflicto serio, o que un socio de otro país exija otra bandera. La opción 3 se descarta.
+
+Pasos fijados, en orden:
+
+- **Ya:** no explicar nunca en público qué significan las siglas NS, para que no queden ancladas a "Network Spain". El logotipo sigue mostrando "NS Network" con el país debajo, como hace la portada.
+- **Próximas semanas (coste casi nulo):** comprobar disponibilidad de "NS Network" en EUIPO (búsqueda gratuita o una tarde de un agente de marcas) y reservar dos o tres dominios paraguas que estén libres, por este orden de preferencia: ns.network, nsnetwork.global, nsnetwork.eu, ns-network.com. Comprobar si nsnetwork.com está simplemente aparcado y en venta a un precio razonable. Todos redirigen a networkspain.com hasta que exista un segundo país. Descartado nsnetworld.com: rompe la marca, "Networld" ya es marca de terceros y no transmite el posicionamiento.
+- **Antes de que NS aparezca en prensa con empresas reales (entre Fase 1 y Fase 3):** registrar la marca de la Unión Europea "NS Network" en las clases de servicios de negocio y networking empresarial y de software como servicio.
+- **Al entrar en cada país fuera de la UE:** extender la marca por el sistema internacional (Madrid) apoyándose en el registro europeo.
+- **Estructura cuando haya varios países:** una sociedad matriz posee la tecnología y la marca paraguas; cada país opera bajo licencia como "NS Network [país]". Decisión societaria y fiscal para su momento, con abogado.
+
+**Why.** Dos letras pierden su origen con el uso (BNI, IBM, SAP): fuera de España "NS" se lee como un nombre, no como "Network Spain". Una sola red con un solo nombre acumula todo el prestigio y evita que una Embajada en Red entre Sevilla y Lisboa muestre dos marcas. Lo que protege el proyecto no es el nombre sino NS-ARP, el método, el ADN acumulado y el grafo: el nombre es lo más barato de cambiar; la red, lo más caro. Los dominios son un complemento; la protección la da el registro.
+
+**Consequences.** Ningún cambio de código: la marca ya se presenta como "NS Network" + país. `docs/17` enlaza esta decisión en el apartado de dominio. El léxico no expande las siglas.
+
+**Revisit when.** Se conozca el resultado de la búsqueda en EUIPO (es la bifurcación) o se decida la entrada en el primer país fuera de España.
+
+---
+
+## D-035 · Antesala: la Directiva despacha las candidaturas con el veredicto de plaza ya calculado
+
+**Status:** CONFIRMED (delegado por el fundador: "vamos a por la 2, haz magia")
+**Date:** 2026-09-13
+
+**Context.** Desde D-033 la portada guarda candidaturas ("Solicitar plaza en la beta"), pero no existía ninguna pantalla para verlas ni despacharlas. En cuanto la demo se publique en networkspain.com, llegarán solicitudes reales. La constitución fija el proceso de admisión (§8) y el Escenario E (conflicto de categoría → revisión, otra Sala, lista de espera o rechazo).
+
+**Choice.** Pantalla **Antesala**, visible solo para la Directiva, con estas reglas:
+
+- **Estados de una candidatura:** Nueva → Contactada → Entrevistada → Plaza aprobada → Titular activo; con salidas a En la Antesala (espera plaza) y Declinada (reabrible). Las transiciones válidas están fijadas en código; el alta desde una candidatura aprobada la cierra como "Titular activo" y la enlaza con la empresa creada.
+- **Veredicto de plaza automático**, calculado contra el estado real de la Sala en cada visita: plaza vacante; vacante con reservas (se solapa con una plaza ocupada según NS-CAT, posible duplicado, o ciudad fuera de la zona); plaza ocupada (nombra al titular); sin clasificar. Cada veredicto lleva una recomendación en una línea, en lenguaje de la Directiva.
+- **Nunca se aprueba una plaza ocupada.** El botón se desactiva y el servicio lo rechaza aunque se fuerce. Con la plaza ocupada, las salidas son la Antesala, otra Sala de la zona o revisar la especialidad real (Escenario E).
+- **Solapamiento (Escenario E).** Si la especialidad solicitada se solapa con una plaza ocupada (por ejemplo Telecomunicaciones ↔ Ciberseguridad, Arquitectura ↔ Obra industrial), la plaza sigue siendo aprobable, pero la Antesala pide confirmar con el titular afectado antes de aprobar. Se comprueba en las dos direcciones del solape.
+- **Clasificación y nota privada.** La Directiva puede reclasificar la candidatura en NS-CAT y dejar una nota privada. La nota nunca sale de la Directiva.
+- **Rastro.** Toda decisión escribe un evento de auditoría; aprobar y declinar son significativos y aparecen en la Mesa Permanente.
+- **Aviso.** Hoy muestra a la Directiva cuántas candidaturas esperan; el menú lleva un contador de nuevas.
+
+**Why.** Convierte la puerta de entrada en un proceso con criterio: la exclusividad de plaza se aplica en la admisión, no después. La Directiva decide con un toque porque el sistema ya hizo la comprobación, que es el patrón de todo NS (la IA descubre y comprueba; las personas deciden). Las candidaturas con plaza ocupada alimentan la Antesala de la zona, que es la semilla de la siguiente Sala.
+
+**Consequences.** `services/antesala.ts`, ruta `/antesala` con acciones, columnas nuevas en `beta_requests` (migración 0003), prefijado del alta desde una candidatura aprobada, seis candidaturas de demostración (una por veredicto), pruebas y recorrido de navegador ampliado. En producción, la Antesala será la primera pantalla de la Directiva que exija autenticación real por rol.
+
+**Revisit when.** Exista la entrevista del ADN por el Agente (el paso "Entrevistada" pasará a apoyarse en ella) o haya varias Salas en la zona (la salida "otra Sala" tendrá destino real).

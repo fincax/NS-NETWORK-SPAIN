@@ -10,6 +10,7 @@ import { AgentAvatar } from "@/components/brand";
 import { prepareDemo, runRastreoAction } from "../actions";
 import { runClockThrottled } from "@/services/clock";
 import { SOURCE_LABEL } from "@/agents/rastreo";
+import { candidacyCounts } from "@/services/antesala";
 
 export default async function HoyPage() {
   await requireDemo();
@@ -46,6 +47,7 @@ export default async function HoyPage() {
   const rastreoDrafts = drafts.filter((d) => recordBySignal.has(d.id));
   const ownDrafts = drafts.filter((d) => !recordBySignal.has(d.id) && d.visibility !== "COMPANY_ONLY");
   const agentState = forMe.length ? "esperando" : summary.matches ? "encontrado" : "analizando";
+  const candidacies = member.isDirector ? await candidacyCounts(db) : null;
 
   return (
     <div className="stack" style={{ gap: 28 }}>
@@ -66,6 +68,13 @@ export default async function HoyPage() {
         <div className="card kpi"><span className="value amber money" style={{ fontSize: 26 }}>{eurRange(summary.potential.min, summary.potential.max)}</span><span className="label">valor potencial en Cesiones abiertas</span></div>
         <div className="card kpi"><span className="value green money" style={{ fontSize: 26 }}>{eur(bal.valueReceived)}</span><span className="label">valor contrastado recibido · Mérito {bal.merit}</span></div>
       </div>
+
+      {candidacies && candidacies.pendientes > 0 ? (
+        <Link href="/antesala" className="card amber row" style={{ justifyContent: "space-between", textDecoration: "none" }}>
+          <span><strong>Antesala:</strong> {candidacies.nuevas} {candidacies.nuevas === 1 ? "candidatura nueva" : "candidaturas nuevas"} y {candidacies.pendientes - candidacies.nuevas} en conversación esperan a la Directiva.</span>
+          <span className="mono">Despachar →</span>
+        </Link>
+      ) : null}
 
       <section className="section">
         <h2>Para tu decisión</h2>

@@ -174,3 +174,14 @@ export const SEED_COMPANIES: SeedCompany[] = [
     }),
   },
 ];
+
+/** Candidaturas de demostración para la Antesala (D-035): una por veredicto de plaza. */
+export const SEED_CANDIDACIES: { fullName: string; companyName: string; email: string; specialtyCode: string | null; city: string; message: string | null; status: string; notes?: string; daysAgo: number }[] = [
+  { fullName: "Manuel Ortiz", companyName: "Mantenimiento Integral Guadaíra", email: "mortiz@miguadaira.es", specialtyCode: "FACILITY_MANAGEMENT", city: "Sevilla", message: "Mantenimiento integral de naves y oficinas: climatización, electricidad, limpieza técnica. 60 técnicos.", status: "NEW", daysAgo: 0 },
+  { fullName: "Lucía Romero", companyName: "Redes del Sur Telecom", email: "lucia@redesdelsur.es", specialtyCode: "TELECOMUNICACIONES", city: "Sevilla", message: "Conectividad y telefonía para sedes industriales de 30 a 300 empleados en Andalucía occidental.", status: "NEW", daysAgo: 1 },
+  { fullName: "Javier Cansino", companyName: "Correduría Giralda", email: "jcansino@corredurigiralda.es", specialtyCode: "SEGUROS_EMPRESA", city: "Sevilla", message: "Seguros para pymes industriales y flotas. Trabajamos con 400 empresas en la provincia.", status: "NEW", daysAgo: 2 },
+  { fullName: "Marta Vidal", companyName: "Estudio Vidal Arquitectos", email: "marta@estudiovidal.com", specialtyCode: "ARQUITECTURA", city: "Sevilla", message: "Proyectos y dirección de obra de naves y oficinas. Colaboramos habitualmente con constructoras.", status: "CONTACTED", notes: "Llamada el lunes. Interesada. Hay que comprobar con Constructora Guadalquivir que no compiten en obra.", daysAgo: 6 },
+  { fullName: "Antonio Beltrán", companyName: "Beltrán Consultores", email: "abeltran@beltranconsultores.es", specialtyCode: null, city: "Sevilla", message: "Consultoría de subvenciones y ayudas públicas para industria.", status: "NEW", daysAgo: 3 },
+  { fullName: "Rosa Aguilar", companyName: "Logística Bética", email: "rosa@logisticabetica.es", specialtyCode: "LOGISTICA", city: "Córdoba", message: "Transporte y almacenaje para industria agroalimentaria. Nave en Córdoba y delegación en Sevilla.", status: "INTERVIEW", notes: "Entrevista hecha. Buen perfil; su base es Córdoba. Ver si prefiere fundar NS Córdoba.", daysAgo: 12 },
+  { fullName: "Pedro Lago", companyName: "Financia Sur", email: "plago@financiasur.es", specialtyCode: "FINANCIACION", city: "Sevilla", message: null, status: "WAITLISTED", notes: "Aprobable, pero pidió esperar al cierre de su ejercicio.", daysAgo: 20 },
+];

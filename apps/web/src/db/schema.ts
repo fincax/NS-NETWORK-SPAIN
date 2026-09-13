@@ -390,6 +390,11 @@ export const betaRequests = pgTable("beta_requests", {
   specialtyCode: text("specialty_code"),
   city: text("city").notNull().default("Sevilla"),
   message: text("message"),
-  status: text("status").notNull().default("NEW"), // NEW | CONTACTED | INVITED | DECLINED
+  status: text("status").notNull().default("NEW"), // CandidacyStatus (services/antesala.ts)
+  notes: text("notes"), // nota privada de la Directiva
+  reviewedBy: uuid("reviewed_by"), // último miembro de la Directiva que la tocó
+  companyId: uuid("company_id"), // empresa creada al activarla
+  decidedAt: timestamp("decided_at", { withTimezone: true }),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   createdAt: createdAt(),
 });
