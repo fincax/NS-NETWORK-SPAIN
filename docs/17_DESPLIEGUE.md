@@ -83,6 +83,7 @@ Comandos        pnpm install && pnpm build && pnpm start   ·   pnpm db:seed (so
 Tareas          El Reloj de la Sala y el Rastreo deben ejecutarse cada mañana (cron del alojamiento o una tarea programada).
 Copias          Copia diaria de la base de datos con retención de 30 días.
 Dominio         Hoy: networkspain.com sirve portada y demo. Con producción: demo.networkspain.com para la demo y networkspain.com para la web y la app reales.
+Marca           Paraguas "NS Network" + país (D-034). Dominios paraguas a reservar y marca europea a registrar antes de salir en prensa con empresas reales.
 ```
 
 ## 5. Resumen
