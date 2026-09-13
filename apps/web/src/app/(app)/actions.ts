@@ -8,10 +8,11 @@ import { createSignal, publishSignal } from "@/services/signals";
 import { decide } from "@/services/referrals";
 import { and, eq } from "drizzle-orm";
 import { schema } from "@/db/client";
-import { requireMember } from "@/lib/session";
+import { requireDemo, requireMember } from "@/lib/session";
 import { runRastreo } from "@/agents/rastreo";
 
 export async function setPersona(memberId: string) {
+  await requireDemo();
   const jar = await cookies();
   jar.set(MEMBER_COOKIE, memberId, { path: "/", sameSite: "lax" });
   revalidatePath("/", "layout");
@@ -19,6 +20,7 @@ export async function setPersona(memberId: string) {
 
 /** Prepara NS Cumbre con los escenarios de referencia si la base de datos está vacía. */
 export async function prepareDemo() {
+  await requireDemo();
   const db = await getDb();
   const { companies } = await seedChapter(db);
   const existing = await db.query.referrals.findFirst();

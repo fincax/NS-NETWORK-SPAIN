@@ -14,6 +14,12 @@ Hay dos "servidores" distintos y conviene no confundirlos:
                        cosas que hoy faltan y que, con empresas de verdad, serían un riesgo legal y de confianza.
 ```
 
+## 0. Lo que ya está hecho en el código (D-033)
+
+- Portada pública en `/` con la narrativa en modo beta, la disponibilidad real de plazas y la candidatura "Solicitar plaza en la beta" (se guarda en la base de datos).
+- Puerta de la demo en `/acceso`: usuario y contraseña compartidos, definidos por variables de entorno. Todo lo que no es portada exige esa sesión.
+- Aviso permanente "Beta privada · datos ficticios" dentro de la app, con salida.
+
 ## 1. Demo privada: ahora
 
 **Qué se consigue.** Enseñar el producto a los primeros empresarios de Sevilla desde cualquier ordenador o móvil, sin instalar nada, con la Sala NS Cumbre, sus diez titulares y los tres escenarios. Y que tú puedas entrar cada día y pulsar botones sin depender de nadie.
@@ -25,7 +31,7 @@ Hay dos "servidores" distintos y conviene no confundirlos:
 - Una contraseña de acceso a toda la demo (protección básica del alojamiento, sin tocar el código) para que no la vea cualquiera.
 - Opcional: la clave de Anthropic (`ANTHROPIC_API_KEY`) para que los Agentes razonen con Claude en lugar de con las reglas fijas. Para enseñar el producto no hace falta; para impresionar con Indicios escritos en lenguaje libre, sí.
 
-**Cuánto tarda.** Una tarde de trabajo del equipo fundador. Puedo prepararlo en la siguiente sesión: crear la configuración, probarla y darte la dirección.
+**Cuánto tarda.** Una hora, siguiendo los pasos del apartado 4. El código ya está preparado; lo que falta son las cuentas (Vercel, Neon) y apuntar el dominio, que solo puedes hacer tú porque exigen tus credenciales.
 
 **Qué no debe pasar en la demo.** No metas datos de clientes reales ni nombres reales de terceros. Todo lo que hay es ficticio y así debe seguir hasta producción.
 
@@ -55,20 +61,32 @@ Pasamos a producción cuando se cumpla todo esto:
 - Las reglas inmutables y la cuota firmadas en la Candidatura.
 - Una Directiva nombrada (Presidencia de la Sala).
 
-## 4. Cómo se despliega, técnicamente (para quien lo haga)
+## 4. Pasos para publicar la demo en networkspain.com
+
+Los cinco pasos, en orden. Ninguno requiere programar; todos requieren tus cuentas.
+
+1. **Base de datos.** Crea una cuenta en Neon (neon.tech) y un proyecto en la región de Frankfurt (eu-central-1). Copia la cadena de conexión (empieza por `postgres://`).
+2. **Alojamiento.** Crea una cuenta en Vercel (vercel.com) con tu GitHub, importa el repositorio `fincax/NS-NETWORK-SPAIN` y, en la configuración del proyecto, pon **Root Directory = `apps/web`**. Vercel detecta Next.js solo.
+3. **Variables de entorno** en Vercel (Settings → Environment Variables): `DATABASE_URL` (la cadena de Neon), `DEMO_USER`, `DEMO_PASSWORD` (elige una buena), `DEMO_SESSION_SECRET` (una frase larga y aleatoria), `NS_PUBLIC_URL=https://networkspain.com`. Opcional: `ANTHROPIC_API_KEY`. Pulsa Deploy.
+4. **Datos de la demo.** La primera vez, entra en la dirección que te da Vercel, ve a `/acceso`, entra con el usuario y la contraseña y pulsa "Preparar NS Cumbre (demo)" en Hoy. Eso crea la Sala, los diez titulares y los escenarios en la base de datos de Neon.
+5. **Dominio.** En Vercel, Settings → Domains, añade `networkspain.com` y `www.networkspain.com`. Vercel te dice qué registro DNS crear en el panel donde compraste el dominio (un registro A o CNAME). En unas horas la portada responde en networkspain.com y la demo en networkspain.com/acceso.
+
+Después: en Vercel, Settings → Cron Jobs, programa `GET /api/clock` cada mañana cuando exista esa ruta (hoy el Reloj se ejecuta al abrir Hoy, suficiente para la demo).
+
+## 4b. Cómo se despliega, técnicamente (para quien lo haga)
 
 ```text
 Alojamiento     Vercel (región fra1) o servidor propio con Node 22 y pnpm.
 Base de datos   PostgreSQL 16 gestionado en la UE. Variable DATABASE_URL. Las migraciones se aplican al arrancar.
-Variables       DATABASE_URL · ANTHROPIC_API_KEY (opcional) · NS_LLM_MODEL (por defecto claude-opus-5) · NS_LLM_PROVIDER
+Variables       DATABASE_URL · DEMO_USER · DEMO_PASSWORD · DEMO_SESSION_SECRET · NS_PUBLIC_URL · ANTHROPIC_API_KEY (opcional) · NS_LLM_MODEL · NS_LLM_PROVIDER
 Comandos        pnpm install && pnpm build && pnpm start   ·   pnpm db:seed (solo demo)   ·   pnpm clock (tarea diaria)
 Tareas          El Reloj de la Sala y el Rastreo deben ejecutarse cada mañana (cron del alojamiento o una tarea programada).
 Copias          Copia diaria de la base de datos con retención de 30 días.
-Dominio         Un subdominio para la demo (por ejemplo demo.nsnetwork.es) y otro para producción, nunca el mismo.
+Dominio         Hoy: networkspain.com sirve portada y demo. Con producción: demo.networkspain.com para la demo y networkspain.com para la web y la app reales.
 ```
 
 ## 5. Resumen
 
 - **Hoy:** fusionamos todo en la rama principal. La aplicación funciona de principio a fin en local con un comando.
-- **Siguiente sesión:** demo privada en internet, protegida por contraseña, para enseñar NS Cumbre.
+- **Ahora:** el código de la demo privada y la portada beta está listo. Publicarla en networkspain.com son los cinco pasos del apartado 4, con tus cuentas.
 - **Producción:** cuando estén las cinco condiciones y la puerta de Fase 1. Unas 4 a 6 semanas de trabajo, y solo entonces con empresas reales.

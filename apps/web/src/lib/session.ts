@@ -4,7 +4,9 @@
  */
 import { cookies } from "next/headers";
 import { asc, eq } from "drizzle-orm";
+import { redirect } from "next/navigation";
 import { getDb, schema } from "@/db/client";
+import { DEMO_COOKIE, isValidSession } from "@/lib/auth";
 
 export const MEMBER_COOKIE = "ns_member";
 
@@ -29,7 +31,14 @@ export async function currentMember() {
   return { member, company, chapter };
 }
 
+/** Comprueba la sesión de la demo (D-033). El proxy ya la exige, pero las Server Functions no deben fiarse solo de él. */
+export async function requireDemo() {
+  const jar = await cookies();
+  if (!(await isValidSession(jar.get(DEMO_COOKIE)?.value))) redirect("/acceso");
+}
+
 export async function requireMember() {
+  await requireDemo();
   const ctx = await currentMember();
   if (!ctx) throw new Error("La Sala no está inicializada. Ejecuta `pnpm db:seed`.");
   return ctx;
