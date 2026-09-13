@@ -795,3 +795,25 @@ La cuota mensual, aunque varíe por Tramos, pertenece al segundo plano. Nunca es
 **Consequences.** `services/demands.ts`, migración 0001, UI en Dossier y Mi Sala, evento `DEMAND_POSTED`. El Comunicado semanal (Protocolo II) incluirá los Encargos vigentes cuando se implemente.
 
 **Revisit when.** Haya datos sobre cuántas Cesiones responden a Encargos frente a las que nacen del ADN.
+
+---
+
+## D-033 · Beta privada en networkspain.com: portada pública en modo beta, demostración tras usuario y contraseña compartidos, candidaturas guardadas
+
+**Status:** CONFIRMED (propuesta del fundador, diseño del equipo fundador)
+**Date:** 2026-09-13
+
+**Context.** El fundador dispone del dominio networkspain.com (sin publicar) y quiere enseñar NS a empresarios sevillanos: una demo con usuario y contraseña, y una pantalla pública en modo beta.
+
+**Choice.**
+
+- **Portada pública** en `/`: la narrativa de la constitución (§23) en modo beta privada, la disponibilidad real de plazas de NS Cumbre leída de la base de datos, y una **candidatura** ("Solicitar plaza en la beta") que se guarda en `beta_requests` para que la Directiva la revise. No crea cuentas ni Agentes.
+- **Puerta de la demo**: todo lo demás exige una sesión creada en `/acceso` con un usuario y una contraseña compartidos definidos por variables de entorno (`DEMO_USER`, `DEMO_PASSWORD`, `DEMO_SESSION_SECRET`). La cookie es un HMAC del secreto y la contraseña vigente: cambiar la contraseña expulsa a todos. La comprobación se hace en el proxy y, además, en cada página y Server Function (`requireDemo`).
+- **Aviso permanente** dentro de la app: "Beta privada · datos ficticios de demostración", con salida.
+- **Un solo despliegue** en networkspain.com sirve portada y demo. Cuando exista producción, la demo pasará a un subdominio (demo.networkspain.com) y networkspain.com será la web pública definitiva.
+
+**Why.** Enseñar el producto en una dirección real cambia la conversación con un empresario. La candidatura desde la portada empieza a llenar la Antesala antes de que exista el producto completo. La puerta compartida es suficiente para una demo con datos ficticios y se sustituye por autenticación real antes de producción (condición 1 de `docs/17`).
+
+**Consequences.** `src/proxy.ts`, `src/lib/auth.ts`, `/acceso`, portada en `/`, grupo de rutas `(app)` con su propio layout y barra de beta, tabla `beta_requests` (migración 0002), `.env.example`. `docs/17` incorpora los pasos concretos para Vercel y Neon con networkspain.com.
+
+**Revisit when.** Se implemente la autenticación real por Timonel (la puerta compartida desaparece) o el número de candidaturas exija una pantalla de Directiva para gestionarlas.

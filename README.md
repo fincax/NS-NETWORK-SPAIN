@@ -21,7 +21,7 @@ Salvoconducto) → tarjeta de Cesión (cara A / cara B) → visto bueno → Aper
 ```bash
 pnpm install
 pnpm db:seed      # crea NS Sevilla · NS Cumbre, 10 titulares con ADN y los escenarios A, C y D
-pnpm dev          # http://localhost:3000 · Hoy, Mesa Permanente, Cesiones, Mi Sala
+pnpm dev          # http://localhost:3000 · portada beta; /acceso con demo / nscumbre · Hoy, Mesa, Cesiones, Mi Sala
 pnpm test         # 30 tests: score, puertas, Salvoconducto, máquina de estados, Promesa, Reloj, Rastreo, Encargos y el slice completo
 ```
 

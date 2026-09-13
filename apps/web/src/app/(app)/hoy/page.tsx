@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { and, desc, eq, inArray, or } from "drizzle-orm";
 import { getDb, schema } from "@/db/client";
-import { currentMember } from "@/lib/session";
+import { currentMember, requireDemo } from "@/lib/session";
 import { todaySummary, balance } from "@/services/today";
 import { REVIEW_STATES } from "@/core/state-machine";
 import { daysAgo, eur, eurRange, firstName, greeting } from "@/lib/format";
@@ -12,6 +12,7 @@ import { runClockThrottled } from "@/services/clock";
 import { SOURCE_LABEL } from "@/agents/rastreo";
 
 export default async function HoyPage() {
+  await requireDemo();
   const ctx = await currentMember();
   if (!ctx) {
     return (

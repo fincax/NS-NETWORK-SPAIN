@@ -13,7 +13,8 @@
     "demo": "tsx scripts/demo.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "clock": "tsx scripts/clock.ts"
+    "clock": "tsx scripts/clock.ts",
+    "e2e": "node scripts/e2e-demo.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "0.125.0",
@@ -33,6 +34,7 @@
     "drizzle-kit": "0.31.10",
     "eslint": "^9",
     "eslint-config-next": "16.3.5",
+    "playwright": "1.56.1",
     "tsx": "^4.23.13",
     "typescript": "^5",
     "vitest": "5.0.0"

@@ -380,3 +380,16 @@ export const demands = pgTable(
   },
   (t) => [index("demand_chapter_status").on(t.chapterId, t.status)],
 );
+
+// ───────────── Beta privada (D-033): solicitudes de plaza desde la portada ─────────────
+export const betaRequests = pgTable("beta_requests", {
+  id: id(),
+  fullName: text("full_name").notNull(),
+  companyName: text("company_name").notNull(),
+  email: text("email").notNull(),
+  specialtyCode: text("specialty_code"),
+  city: text("city").notNull().default("Sevilla"),
+  message: text("message"),
+  status: text("status").notNull().default("NEW"), // NEW | CONTACTED | INVITED | DECLINED
+  createdAt: createdAt(),
+});
