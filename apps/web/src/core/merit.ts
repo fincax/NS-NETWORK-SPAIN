@@ -16,6 +16,7 @@ export function computePromise(layer0: ChapterLayer, score: NSMatchScore, turns:
   const status = (conf: number | undefined, insufficient?: boolean) => (insufficient || conf === undefined ? "RED" : conf >= 0.75 ? "GREEN" : conf >= 0.5 ? "AMBER" : "RED") as "GREEN" | "AMBER" | "RED";
 
   const comp: { key: PromiseComponentKey; status: "GREEN" | "AMBER" | "RED"; detail: string }[] = [];
+  comp.push({ key: "expects_contact", status: layer0.third_party_expects_contact ? "GREEN" : "AMBER", detail: layer0.third_party_expects_contact ? "El Interesado sabe que le llamarán." : "El Interesado no ha sido avisado todavía." });
   comp.push({ key: "real_need", status: layer0.confidence >= 0.75 ? "GREEN" : layer0.confidence >= 0.5 ? "AMBER" : "RED", detail: `Confianza del Indicio ${(layer0.confidence * 100).toFixed(0)} %.` });
   const answered = turns.filter((t) => !t.insufficient && (t.confidence ?? 0) >= 0.6).length;
   comp.push({ key: "information_complete", status: turns.length === 0 ? "RED" : answered === turns.length ? "GREEN" : answered > 0 ? "AMBER" : "RED", detail: `${answered} de ${turns.length} preguntas respondidas.` });
@@ -55,6 +56,7 @@ export function computeVerdictMerit(v: ReferralVerdict, promise: ReferralPromise
 }
 
 export const PROMISE_LABEL: Record<PromiseComponentKey, string> = {
+  expects_contact: "Interesado avisado",
   real_need: "Necesidad real",
   information_complete: "Información completa",
   decision_maker: "Decisor identificado",

@@ -9,7 +9,7 @@ import type { ChapterLayer, NeedDraft, QualificationLayer, QualificationTurn, Si
 const dnaOf = (slug: string) => SEED_COMPANIES.find((c) => c.slug === slug)!.dna;
 const cap = (slug: string, specialty: string): CapabilityView => ({ companyId: slug, companyName: slug, specialtyCode: specialty, isPrimarySeat: true, dna: dnaOf(slug) });
 
-const layer0A: ChapterLayer = { need_summary: "Empresa industrial de 51–200 empleados abrirá nueva sede en Dos Hermanas · 90 días · relación directa", industry: "Industrial", geography: { country: "España", region: "Andalucía", city: "Dos Hermanas" }, company_size_band: "51-200", timing: "90D", value_band: "50-100K", relationship_strength: "DIRECT", confidence: 0.9 };
+const layer0A: ChapterLayer = { need_summary: "Empresa industrial de 51–200 empleados abrirá nueva sede en Dos Hermanas · 90 días · relación directa", industry: "Industrial", geography: { country: "España", region: "Andalucía", city: "Dos Hermanas" }, company_size_band: "51-200", timing: "90D", value_band: "50-100K", relationship_strength: "DIRECT", third_party_expects_contact: false, confidence: 0.9 };
 const layer1A: QualificationLayer = { detailed_context: "Un cliente abre planta en Dos Hermanas en Q1.", triggers: ["NEW_SITE", "HEADCOUNT_GROWTH"], constraints: ["Presupuesto aprobado"], decision_role: "Director General" };
 const needObra: NeedDraft = { specialty_hints: ["OBRA_INDUSTRIAL"], description: "Reforma y adecuación de la nueva nave o planta.", plausibility: 0.85, evidence: [], unknowns: [] };
 const turnsA: QualificationTurn[] = [
@@ -134,5 +134,24 @@ describe("Promesa y Mérito (D-020, D-021)", () => {
     const fake = computeVerdictMerit({ ease: 1, business: 1, treatment: 1, result: "LOST", need_was_real: false }, p);
     expect(fake.originator.promiseRevoked).toBe(true);
     expect(fake.originator.verdict).toBe(0);
+  });
+});
+
+describe("D-029 · Interesado avisado y D-032 · Encargo", () => {
+  it("un Interesado avisado sube la relación y aparece en la Promesa", () => {
+    const base = computeNSMatchScore(needObra, layer0A, layer1A, turnsA, cap("hispalis", "OBRA_INDUSTRIAL"));
+    const warned = computeNSMatchScore(needObra, { ...layer0A, relationship_strength: "INDIRECT", third_party_expects_contact: true }, layer1A, turnsA, cap("hispalis", "OBRA_INDUSTRIAL"));
+    const cold = computeNSMatchScore(needObra, { ...layer0A, relationship_strength: "INDIRECT" }, layer1A, turnsA, cap("hispalis", "OBRA_INDUSTRIAL"));
+    expect(warned.total).toBeGreaterThan(cold.total);
+    expect(warned.components.find((c) => c.key === "relationship_strength")?.evidence).toMatch(/sabe que le llamarán/);
+    const p = computePromise({ ...layer0A, third_party_expects_contact: true }, base, turnsA);
+    expect(p.components.find((c) => c.key === "expects_contact")?.status).toBe("GREEN");
+    expect(computePromise(layer0A, base, turnsA).components.find((c) => c.key === "expects_contact")?.status).toBe("AMBER");
+  });
+  it("un Encargo abierto que coincide eleva la prioridad y lo dice en el Fundamento", () => {
+    const withDemand = computeNSMatchScore(needObra, layer0A, layer1A, turnsA, { ...cap("prl-andaluza", "PRL"), openDemand: "Busco aperturas de centros de trabajo" });
+    const without = computeNSMatchScore(needObra, layer0A, layer1A, turnsA, cap("prl-andaluza", "PRL"));
+    expect(withDemand.total).toBeGreaterThan(without.total);
+    expect(buildExplanation(withDemand, needObra, turnsA).why.some((w) => w.includes("Encargo"))).toBe(true);
   });
 });

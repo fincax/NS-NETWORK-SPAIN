@@ -13,6 +13,7 @@ import { runComplianceGate } from "@/core/compliance";
 import { computePromise } from "@/core/merit";
 import { assertTransition, TIMEOUTS } from "@/core/state-machine";
 import { NeedDraft, VALUE_BAND_RANGE, type QualificationTurn, type SignalEnvelope } from "@/core/types";
+import { matchingDemand, openDemands } from "@/services/demands";
 
 const MIN_PLAUSIBILITY = 0.4;
 const MIN_PRELIMINARY_FIT = 0.35;
@@ -101,7 +102,9 @@ export async function runMesa(db: Db, opportunitySignalId: string): Promise<Mesa
       const companyAgent = await db.query.agents.findFirst({ where: and(eq(schema.agents.companyId, cap.companyId), eq(schema.agents.kind, "COMPANY")) });
       const specialty = specialtyById.get(cap.specialtyId);
       if (!company || !dnaRow || !companyAgent || !specialty) continue;
-      const capView: CapabilityView = { companyId: company.id, companyName: company.name, specialtyCode: specialty.nscatCode, isPrimarySeat: cap.isPrimarySeat, dna: dnaRow.dna };
+      const demandsOfReceiver = await openDemands(db, chapterId, company.id);
+      const openDemand = matchingDemand(demandsOfReceiver, envelope.qualification_layer?.triggers ?? [], envelope.chapter_layer.industry);
+      const capView: CapabilityView = { companyId: company.id, companyName: company.name, specialtyCode: specialty.nscatCode, isPrimarySeat: cap.isPrimarySeat, dna: dnaRow.dna, openDemand };
 
       if (isInternal) {
         // Scenario D: descubrimiento interno sin emitir ningún mensaje. Solo se informa al cedente.

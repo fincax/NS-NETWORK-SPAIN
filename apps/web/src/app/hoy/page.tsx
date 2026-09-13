@@ -7,7 +7,9 @@ import { REVIEW_STATES } from "@/core/state-machine";
 import { daysAgo, eur, eurRange, firstName, greeting } from "@/lib/format";
 import { Encaje, Empty, StateBadge } from "@/components/ui";
 import { AgentAvatar } from "@/components/brand";
-import { prepareDemo } from "../actions";
+import { prepareDemo, runRastreoAction } from "../actions";
+import { runClockThrottled } from "@/services/clock";
+import { SOURCE_LABEL } from "@/agents/rastreo";
 
 export default async function HoyPage() {
   const ctx = await currentMember();
@@ -23,6 +25,7 @@ export default async function HoyPage() {
   }
   const db = await getDb();
   const { member, company, chapter } = ctx;
+  await runClockThrottled(db, chapter.id);
   const summary = await todaySummary(db, chapter.id, company.id, daysAgo(7));
   const bal = await balance(db, chapter.id, company.id);
   const companies = new Map((await db.query.companies.findMany()).map((c) => [c.id, c]));
@@ -36,6 +39,11 @@ export default async function HoyPage() {
   const matches = new Map((await db.query.matchCandidates.findMany({ where: inArray(schema.matchCandidates.id, pending.map((r) => r.matchId).concat("00000000-0000-0000-0000-000000000000")) })).map((m) => [m.id, m]));
   const inCourse = await db.query.referrals.findMany({ where: and(eq(schema.referrals.chapterId, chapter.id), inArray(schema.referrals.state, ["INTRODUCED", "MEETING", "COMMERCIAL_OPPORTUNITY", "WON"]), or(eq(schema.referrals.receiverCompanyId, company.id), eq(schema.referrals.originatorCompanyId, company.id))) });
 
+  const drafts = await db.query.opportunitySignals.findMany({ where: and(eq(schema.opportunitySignals.originatorCompanyId, company.id), eq(schema.opportunitySignals.status, "DRAFT")), orderBy: [desc(schema.opportunitySignals.createdAt)] });
+  const draftRecords = await db.query.publicRecords.findMany({ where: eq(schema.publicRecords.ingestedByCompanyId, company.id) });
+  const recordBySignal = new Map(draftRecords.filter((r) => r.opportunitySignalId).map((r) => [r.opportunitySignalId as string, r]));
+  const rastreoDrafts = drafts.filter((d) => recordBySignal.has(d.id));
+  const ownDrafts = drafts.filter((d) => !recordBySignal.has(d.id) && d.visibility !== "COMPANY_ONLY");
   const agentState = forMe.length ? "esperando" : summary.matches ? "encontrado" : "analizando";
 
   return (
@@ -80,6 +88,37 @@ export default async function HoyPage() {
                 </Link>
               );
             })}
+          </div>
+        )}
+      </section>
+
+      <section className="section">
+        <div className="row" style={{ marginBottom: 14 }}>
+          <h2 style={{ margin: 0 }}>Rastreo</h2>
+          <span className="spacer" />
+          <form action={runRastreoAction}><button className="btn small" type="submit">Rastrear fuentes públicas ahora</button></form>
+        </div>
+        {rastreoDrafts.length === 0 && ownDrafts.length === 0 ? (
+          <Empty title="Tu Agente no tiene Indicios en borrador.">Cuando encuentre en el BORME, en licitaciones o en licencias de obra algo que sirva a otro titular de la Sala, te lo dejará aquí para que decidas.</Empty>
+        ) : (
+          <div className="stack">
+            {rastreoDrafts.map((d) => {
+              const rec = recordBySignal.get(d.id)!;
+              const env = d.envelope;
+              return (
+                <Link key={d.id} href={`/indicio/${d.id}`} className="card" style={{ display: "grid", gap: 6 }}>
+                  <div className="row"><span className="badge">{SOURCE_LABEL[rec.source as keyof typeof SOURCE_LABEL] ?? rec.source}</span><span className="mono">{rec.publishedAt ? new Intl.DateTimeFormat("es-ES", { day: "2-digit", month: "short" }).format(rec.publishedAt) : ""}</span><span className="spacer" /><span className="mono">borrador · decide si publicar</span></div>
+                  <strong>{rec.title}</strong>
+                  <p className="lead" style={{ fontSize: 14 }}>{env.chapter_layer.need_summary}</p>
+                </Link>
+              );
+            })}
+            {ownDrafts.map((d) => (
+              <Link key={d.id} href={`/indicio/${d.id}`} className="card" style={{ display: "grid", gap: 6 }}>
+                <div className="row"><span className="badge amber">Tu Indicio · borrador</span></div>
+                <p className="lead" style={{ fontSize: 14 }}>{d.envelope.chapter_layer.need_summary}</p>
+              </Link>
+            ))}
           </div>
         )}
       </section>

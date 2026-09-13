@@ -15,14 +15,16 @@ export default async function IndicioPage({ params }: { params: Promise<{ id: st
   const needs = await db.query.needs.findMany({ where: eq(schema.needs.opportunitySignalId, os.id) });
   const env = os.envelope as SignalEnvelope;
   const internal = os.visibility === "COMPANY_ONLY";
+  const bs = await db.query.businessSignals.findFirst({ where: eq(schema.businessSignals.id, os.businessSignalId) });
+  const isPublic = bs?.source === "PUBLIC_RECORD";
   const l0 = env.chapter_layer;
   return (
     <div className="stack" style={{ gap: 24 }}>
       <div className="page-head">
         <div>
           <p className="eyebrow">Indicio · {os.status === "DRAFT" ? "previsualización" : os.status.toLowerCase()}</p>
-          <h1>{internal ? "Esto no saldrá de tu empresa." : "Esto es exactamente lo que verá la Sala."}</h1>
-          <p className="lead">{internal ? "Tu Agente buscará qué plazas de la Sala cubrirían la necesidad sin emitir ningún mensaje. Solo tú verás el resultado." : "Capa 0: sin identidad, sin personas. El contexto detallado (capa 1) solo llega a los Agentes que declaren interés; la identidad (capa 2) solo tras tu Apertura."}</p>
+          <h1>{internal ? "Esto no saldrá de tu empresa." : isPublic ? "Tu Agente lo encontró en una fuente pública." : "Esto es exactamente lo que verá la Sala."}</h1>
+          <p className="lead">{isPublic ? "Es un Indicio para otros titulares de la Sala: nadie de tu empresa lo ha aportado, lo ha detectado tu Agente. Si lo publicas, serás el cedente (relación débil, sin Interesado avisado) y ganarás Mérito si prospera." : internal ? "Tu Agente buscará qué plazas de la Sala cubrirían la necesidad sin emitir ningún mensaje. Solo tú verás el resultado." : "Capa 0: sin identidad, sin personas. El contexto detallado (capa 1) solo llega a los Agentes que declaren interés; la identidad (capa 2) solo tras tu Apertura."}</p>
         </div>
       </div>
 

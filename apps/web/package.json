@@ -12,7 +12,8 @@
     "db:reset": "rm -rf .data && tsx scripts/seed.ts",
     "demo": "tsx scripts/demo.ts",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "clock": "tsx scripts/clock.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "0.125.0",

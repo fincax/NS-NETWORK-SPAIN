@@ -49,6 +49,7 @@ export const SCENARIOS = {
     contactName: "Rafael Montes",
     contactRole: "Director General",
     legalBasisForContact: "LEGITIMATE_INTEREST" as const,
+    thirdPartyExpectsContact: true,
   },
   C: {
     originator: "securenet",

@@ -62,6 +62,7 @@ export default async function CesionPage({ params }: { params: Promise<{ id: str
           <StateBadge state={state} />
           {match.compliance ? <span className={`badge ${match.compliance.verdict === "PASS" ? "green" : match.compliance.verdict === "BLOCK" ? "red" : "amber"}`}>Salvoconducto · {match.compliance.verdict === "PASS" ? "sin excepciones" : match.compliance.verdict === "BLOCK" ? "bloqueado" : match.compliance.exceptions.join(", ")}</span> : null}
           {ref.embassy ? <span className="badge blue">Embajada</span> : null}
+          {env.chapter_layer.third_party_expects_contact ? <span className="badge green">Interesado avisado</span> : null}
           <span className="spacer" />
           {expires !== null && ["ORIGINATOR_PENDING", "RECEIVER_PENDING"].includes(state) ? <span className="mono">caduca en {expires} días</span> : null}
         </div>

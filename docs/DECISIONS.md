@@ -727,3 +727,71 @@ La cuota mensual, aunque varíe por Tramos, pertenece al segundo plano. Nunca es
 **Consequences.** Se elimina el criterio "registrable con el prefijo NS" del léxico (`docs/13`). Las decisiones anteriores que mencionaban comprobaciones de marca pendientes (D-015, D-025, D-027) quedan libres de esa condición. Si en el futuro conviene registrar algún término concreto (por ejemplo, el nombre de un producto o servicio de pago), se abrirá una decisión propia.
 
 **Revisit when.** NS salga de España o lance una línea de producto con nombre propio.
+
+---
+
+## D-029 · "Interesado avisado": el Indicio y la Promesa registran si el tercero sabe que le van a llamar
+
+**Status:** CONFIRMED (decisión del equipo fundador por delegación del fundador: "mira qué hace la competencia, mejóralo y toma tú las decisiones")
+**Date:** 2026-09-13
+
+**Context.** El análisis de competencia (`docs/16`) muestra que la mejor definición operativa de calidad de un referido en el sector es la de BNI: un referido es real cuando el miembro "le ha dicho al tercero que le llamarán" y el tercero espera la llamada. NS medía la relación del cedente con el Interesado pero no este hecho concreto.
+
+**Choice.** El Indicio incorpora `third_party_expects_contact` en la capa 0 (no es identidad). El Agente lo detecta en el texto ("le he dicho que le llamarán", "espera vuestra llamada"), el formulario lo pregunta con una casilla, la tarjeta de Cesión lo muestra como distintivo "Interesado avisado", la Promesa lo incluye como componente propio y el Encaje lo usa como evidencia (eleva la fuerza de relación a 0,85 como mínimo).
+
+**Why.** Es el dato que separa una pista de una Cesión de verdad. Mejora sobre BNI: no es una casilla, es un dato contrastado por el Agente que pesa en el Mérito y que el cesionario ve antes de aceptar.
+
+**Consequences.** Cambios en `core/types`, `core/scoring`, `core/merit`, proveedor determinista, formulario de Indicio, tarjeta. Los Indicios de Rastreo (D-031) nunca llevan Interesado avisado.
+
+**Revisit when.** Tras 50 Cesiones cerradas, para medir si el aviso predice la conversión.
+
+---
+
+## D-030 · El Reloj de la Sala ejecuta los plazos y el Agente empuja cuando el hilo pierde impulso
+
+**Status:** CONFIRMED (por delegación del fundador)
+**Date:** 2026-09-13
+
+**Context.** Boardy Pro demuestra que el seguimiento activo (empujar el hilo cuando pierde impulso, recordar, agendar) es lo que convierte introducciones en negocio. NS tenía los plazos diseñados en D-024 pero ningún mecanismo los ejecutaba.
+
+**Choice.** Un servicio determinista e idempotente, el **Reloj de la Sala** (`services/clock.ts`), que: recuerda a las 72 horas de revisión; caduca a los 7 días con `RESPONSE_LATE` para quien calló (la Cesión vuelve al cedente); marca la respuesta tardía a las 48 horas del Puente sin hito; y pregunta por el seguimiento cada 14 días. Cada acción deja un evento en la Mesa (privado para el afectado) y su Mérito. Se ejecuta al cargar Hoy (máximo una vez cada 10 minutos por proceso) y con `pnpm clock`; en el servidor será una tarea programada diaria.
+
+**Why.** Sin plazos ejecutados, el compromiso de 48 h y la caducidad de 7 días eran texto. Mejora sobre Boardy: el empujón lo recibe siempre el Timonel, nunca el Interesado; ningún Agente contacta con terceros.
+
+**Consequences.** Columnas `reminder_sent_at`, `late_flagged_at`, `last_nudge_at` en Cesiones (migración 0001). Nuevos eventos `REMINDER`, `EXPIRED`, `RESPONSE_LATE`, `CHECK_IN`. El léxico incorpora "Reloj de la Sala".
+
+**Revisit when.** Se mida el efecto de los recordatorios en el tiempo de respuesta real.
+
+---
+
+## D-031 · Rastreo público: el Agente convierte señales de fuentes públicas en Indicios en borrador para otros titulares
+
+**Status:** CONFIRMED (por delegación del fundador)
+**Date:** 2026-09-13
+
+**Context.** Clay, Common Room y similares viven de señales de compra (nueva sede, contrataciones, financiación, cambio de dirección) que en España están en fuentes públicas: BORME, licitaciones (PLACE), licencias de obra municipales, ofertas de empleo y prensa local. Ninguna de esas herramientas termina en una introducción cálida dentro de un club. El banco de ideas (`docs/11`, A1) ya lo preveía como "Rastreo".
+
+**Choice.** El Agente de cada empresa rastrea una fuente (`PublicFeed`) y crea Indicios en borrador con fuente `PUBLIC_RECORD`, relación "débil" y sin Interesado avisado, para otros titulares de la Sala. El Timonel los ve en Hoy ("Rastreo") y decide si los publica: si lo hace, es el cedente y gana Mérito si la Cesión prospera. Deduplicación por referencia externa (`public_records`). En v0.1 la fuente es un lote de ejemplo verosímil (`SampleFeed`); los adaptadores reales (BORME vía datos.gob.es, PLACE, portales municipales, empleo) implementan la misma interfaz y se añaden uno a uno.
+
+**Why.** Convierte a cada Agente en prospector para los demás, que es la promesa central de NS ("mientras tú trabajabas, tu red seguía trabajando"). Mejora sobre Clay: la señal acaba en una Cesión con doble visto bueno, no en un correo frío.
+
+**Consequences.** `agents/rastreo.ts`, tabla `public_records`, sección Rastreo en Hoy, botón "Rastrear fuentes públicas ahora" (en el servidor lo lanza el Reloj cada mañana). Un Indicio de Rastreo publicado que no genera ninguna Pista queda como necesidad sin cobertura, útil para la Antesala.
+
+**Revisit when.** Se conecte la primera fuente real; entonces se fijan frecuencia, filtros por zona y límites de volumen por Agente (para no inundar la Mesa).
+
+---
+
+## D-032 · Encargo: lo que cada titular busca ahora es un objeto visible en la Sala que los Agentes usan para priorizar
+
+**Status:** CONFIRMED (por delegación del fundador)
+**Date:** 2026-09-13
+
+**Context.** En BNI cada miembro dice cada semana "el referido que busco es..." y se pierde al terminar la reunión. El léxico ya tenía "Encargo" (`DemandPosting`) sin implementación.
+
+**Choice.** Tabla `demands`: texto, señal (trigger) opcional, industria opcional, vigencia (90 días por defecto), estado. El titular los publica y cierra desde su Dossier; la Sala los ve en Mi Sala. La Mesa consulta los Encargos abiertos del cesionario candidato: si uno coincide con el Indicio, la componente de prioridad estratégica del Encaje sube al máximo y el Fundamento lo dice ("Responde a tu Encargo abierto: ...").
+
+**Why.** El Encargo trabaja los siete días, no solo en el Pleno, y da a los Agentes una señal de demanda explícita que el ADN estático no tiene.
+
+**Consequences.** `services/demands.ts`, migración 0001, UI en Dossier y Mi Sala, evento `DEMAND_POSTED`. El Comunicado semanal (Protocolo II) incluirá los Encargos vigentes cuando se implemente.
+
+**Revisit when.** Haya datos sobre cuántas Cesiones responden a Encargos frente a las que nacen del ADN.

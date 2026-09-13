@@ -8,6 +8,9 @@ import { authorizeIntro, confirmValue, decide, markIntroduced, submitVerdict, up
 import { onboardCompany, SeatTakenError } from "@/services/onboarding";
 import { balance, mesaTimeline, todaySummary } from "@/services/today";
 import { SEED_COMPANIES } from "@/db/seed-data";
+import { runClock } from "@/services/clock";
+import { runRastreo, SampleFeed, SAMPLE_FEED } from "@/agents/rastreo";
+import { createDemand } from "@/services/demands";
 import type { SignalEnvelope } from "@/core/types";
 
 process.env.PGLITE_DATA_DIR = "memory";
@@ -143,5 +146,63 @@ describe("Scenario D · confidencialidad", () => {
     expect(other.some((e) => e.kind === "INTERNAL_MATCH_FOUND")).toBe(false);
     const today = await todaySummary(db, chapterId, c.companyId);
     expect(today.internal.length).toBeGreaterThanOrEqual(2);
+  });
+});
+
+describe("D-030 · Reloj de la Sala", () => {
+  it("recuerda a las 72 h y caduca a los 7 días con RESPONSE_LATE para quien calló", async () => {
+    const c = companies.guadalquivir;
+    const created = await createSignal(db, { companyId: c.companyId, memberId: c.memberId, rawContent: "Mi cliente Bodegas Alcor abre nueva sede en Utrera en Q1 con 30 empleados nuevos. Presupuesto aprobado. Decide el gerente." });
+    const res = await publishSignal(db, created.opportunitySignal.id, c.memberId);
+    expect(res.referralIds.length).toBeGreaterThan(0);
+    const id = res.referralIds[0];
+    const ref0 = (await db.query.referrals.findFirst({ where: eq(schema.referrals.id, id) }))!;
+    const t72 = new Date(ref0.reviewRequestedAt!.getTime() + 73 * 3_600_000);
+    const r1 = await runClock(db, t72, chapterId);
+    expect(r1.reminders).toBeGreaterThanOrEqual(1);
+    const r1b = await runClock(db, t72, chapterId);
+    expect(r1b.reminders).toBe(0); // idempotente
+    const t8d = new Date(ref0.reviewRequestedAt!.getTime() + 8 * 86_400_000);
+    const r2 = await runClock(db, t8d, chapterId);
+    expect(r2.expired).toBeGreaterThanOrEqual(1);
+    const ref1 = (await db.query.referrals.findFirst({ where: eq(schema.referrals.id, id) }))!;
+    expect(ref1.state).toBe("EXPIRED");
+    const late = await db.query.trustEvents.findFirst({ where: and(eq(schema.trustEvents.companyId, c.companyId), eq(schema.trustEvents.kind, "RESPONSE_LATE")) });
+    expect(late).toBeTruthy(); // el cedente no dio su visto bueno a tiempo
+  });
+});
+
+describe("D-031 · Rastreo público", () => {
+  it("deja Indicios en borrador para el Timonel, sin publicar nada, y no repite registros", async () => {
+    const c = companies.hispalis;
+    const before = await db.query.opportunitySignals.findMany({ where: eq(schema.opportunitySignals.originatorCompanyId, c.companyId) });
+    const r = await runRastreo(db, c.companyId, new SampleFeed(SAMPLE_FEED.slice(0, 3)));
+    expect(r.ingested.length).toBeGreaterThanOrEqual(2);
+    const after = await db.query.opportunitySignals.findMany({ where: eq(schema.opportunitySignals.originatorCompanyId, c.companyId) });
+    const drafts = after.filter((o) => !before.some((b) => b.id === o.id));
+    expect(drafts.every((d) => d.status === "DRAFT" || d.status === "WITHDRAWN")).toBe(true);
+    const first = drafts.find((d) => d.status === "DRAFT")!;
+    expect((first.envelope as SignalEnvelope).chapter_layer.relationship_strength).toBe("WEAK");
+    expect((first.envelope as SignalEnvelope).chapter_layer.need_summary).not.toMatch(/Cerámicas|Logística Bética|Farmalab/);
+    const again = await runRastreo(db, c.companyId, new SampleFeed(SAMPLE_FEED.slice(0, 3)));
+    expect(again.ingested.length).toBe(0);
+    expect(again.skipped).toBe(3);
+    // Publicar uno de ellos crea Cesiones para otros titulares con Híspalis como cedente
+    const res = await publishSignal(db, first.id, c.memberId);
+    expect(res.referralIds.length + res.discarded.length + res.uncovered.length).toBeGreaterThan(0);
+  });
+});
+
+describe("D-032 · Encargos", () => {
+  it("un Encargo abierto se refleja en el Fundamento de la Pista", async () => {
+    const talento = companies["talento-sur"];
+    await createDemand(db, { companyId: talento.companyId, text: "Busco empresas que contraten más de 20 personas en Sevilla", trigger: "HEADCOUNT_GROWTH" });
+    const c = companies.securenet;
+    const created = await createSignal(db, { companyId: c.companyId, memberId: c.memberId, rawContent: "Conozco una empresa logística de 80 empleados en Sevilla que va a contratar 30 personas más en tres meses. Decide el director de RRHH." });
+    const res = await publishSignal(db, created.opportunitySignal.id, c.memberId);
+    const ref = await db.query.referrals.findFirst({ where: and(eq(schema.referrals.receiverCompanyId, talento.companyId), eq(schema.referrals.opportunitySignalId, created.opportunitySignal.id)) });
+    expect(res.referralIds).toContain(ref?.id);
+    const match = await db.query.matchCandidates.findFirst({ where: eq(schema.matchCandidates.id, ref!.matchId) });
+    expect(match!.explanation.why.some((w) => w.includes("Encargo"))).toBe(true);
   });
 });

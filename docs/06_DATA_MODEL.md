@@ -22,6 +22,7 @@ PISTA                 interest_claims (S5) · qualifications (S6) · match_candi
 CESIÓN                referrals (estado, Promesa, alcance de revelación, valor) · referral_transitions · human_decisions
 PUENTE Y CIERRE       introductions · verdicts · recognitions · trust_events
 AUDITORÍA             audit_events · agent_interactions
+RASTREO Y ENCARGOS    public_records (D-031) · demands (D-032)
 ```
 
 | Léxico NS | Tabla | Notas |
@@ -50,6 +51,9 @@ AUDITORÍA             audit_events · agent_interactions
 | Mérito | `trust_events` | Cada hecho verificable con `weight`. La Hoja de Méritos es una vista, nunca un número opaco. |
 | Mesa Permanente | `audit_events` | `significant`, `company_ids[]` (vacío = toda la Sala; con ids = privado). |
 | Mensajes A2A | `agent_interactions` | Catálogo NS-ARP §5 con `layer_used` y `policy_applied`. |
+| Rastreo | `public_records` | Registro público ingerido (fuente, referencia externa única por Sala, Indicio generado). |
+| Encargo | `demands` | Lo que busca un titular ahora: texto, señal, industria, vigencia, estado. |
+| Reloj de la Sala | columnas en `referrals` | `reminder_sent_at`, `late_flagged_at`, `last_nudge_at` garantizan idempotencia (D-030). |
 
 ## 2. Ciclos de vida
 
@@ -62,7 +66,7 @@ MatchCandidate      PROPOSED | BELOW_THRESHOLD | ACCEPTED | REJECTED | EXPIRED
 Referral            ver máquina de estados en src/core/state-machine.ts (NS-ARP §9 + D-024)
 ```
 
-Plazos (D-024): recordatorio a las 72 h, caducidad a los 7 días de revisión, respuesta al Interesado en 48 h tras el Puente, check-in del Agente cada 14 días.
+Plazos (D-024) ejecutados por el Reloj de la Sala (D-030, `services/clock.ts`): recordatorio a las 72 h, caducidad a los 7 días de revisión, respuesta al Interesado en 48 h tras el Puente, check-in del Agente cada 14 días.
 
 ## 3. Visibilidad en consultas
 
@@ -87,4 +91,5 @@ Plazos (D-024): recordatorio a las 72 h, caducidad a los 7 días de revisión, r
 - `Communique`, `ChapterGazette`, `MemberDossier` (Protocolo II) y `MemberCompass` (Protocolo III): no persisten todavía; el Dossier se deriva del ADN.
 - `FeeTier` / `AgentCostLedger` (D-025): solo la columna `fee_tier`.
 - `Waitlist` (Antesala), `ReferralRoute` (Embajada en Red), `DataSource` (integraciones) y `Permission` por fuente.
+- Adaptadores reales de Rastreo (BORME, PLACE, licencias municipales, empleo): hoy solo `SampleFeed`.
 - Autenticación y RBAC: el slice usa una cookie de persona para la demo.

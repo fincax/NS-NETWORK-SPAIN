@@ -16,6 +16,7 @@ export interface CreateSignalInput {
   legalBasisForContact?: "CONSENT" | "LEGITIMATE_INTEREST" | "CONTRACT" | "NONE";
   contactName?: string;
   contactRole?: string;
+  thirdPartyExpectsContact?: boolean; // D-029
 }
 
 const PERSON_IN_TEXT = /\b(don|doña|sr\.|sra\.)\s+[A-ZÁÉÍÓÚ]/;
@@ -42,6 +43,7 @@ export async function createSignal(db: Db, input: CreateSignalInput) {
   if (leak) {
     extraction.qualification_layer.detailed_context = extraction.qualification_layer.detailed_context.replace(/\b(don|doña|sr\.|sra\.)\s+[A-ZÁÉÍÓÚ][^\s,.]*(\s+[A-ZÁÉÍÓÚ][^\s,.]*)?/g, "[persona]");
   }
+  if (input.thirdPartyExpectsContact) extraction.chapter_layer.third_party_expects_contact = true;
   const envelope: SignalEnvelope = {
     chapter_layer: extraction.chapter_layer,
     qualification_layer: extraction.qualification_layer,

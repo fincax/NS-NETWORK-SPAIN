@@ -26,6 +26,8 @@ Un agente NS no es un chat. Es un módulo con **entradas tipadas, salidas valida
 | **Matchmaker Agent** (uno por Sala) | S4 discovery sobre el índice estructurado de capabilities (≤ 8 por necesidad, titulares antes que secundarias); S5 puertas duras; S7 Match Score y Explanation; S9 solicitud de revisión. | `MatchCandidate`, `Explanation` | `agents/mesa.ts`, `core/scoring.ts` |
 | **Trust & Compliance Agent** (uno por Sala) | S2 redacción de datos personales en capas 0–1; S8 Salvoconducto con diez comprobaciones, excepciones y campos bloqueados; vigilancia de retribución (D-010) en cualquier texto libre. | `ComplianceVerdict`, `TrustEvent` | `core/compliance.ts`, `services/referrals.ts` |
 | **Chapter Intelligence Agent** | Registra necesidades sin titular (`NEED_UNCOVERED`, candidatas a Embajada). Gaceta y Balanza de Sala: pendientes. | `ChapterInsight` (como AuditEvent) | `agents/mesa.ts` |
+| **Rastreo** (parte del Company Agent) | Revisa fuentes públicas y deja Indicios en borrador para otros titulares; el Timonel decide (D-031). | `OpportunitySignal{DRAFT, source: PUBLIC_RECORD}` | `agents/rastreo.ts` |
+| **Reloj de la Sala** (sistema, sin modelo) | Ejecuta plazos y empujones de seguimiento (D-030). | `AuditEvent`, `TrustEvent`, transición `EXPIRED` | `services/clock.ts` |
 | **Executive Briefing Agent** | Hoy: síntesis por empresa a partir de AuditEvents visibles. Parte de Directiva: pendiente. | `Briefing` (vista) | `services/today.ts` |
 | **Global Routing Agent** | Fuera de v0.1. | — | — |
 
@@ -83,7 +85,7 @@ En v0.1 la Mesa se ejecuta de forma síncrona al publicar un Indicio (segundos c
 
 ## 7. Pendiente
 
-- Rastreo (fuentes públicas) y Sondeo (grafo de relaciones): fuera de v0.1.
+- Adaptadores reales de Rastreo (BORME, PLACE, licencias, empleo) y Sondeo (grafo de relaciones).
 - Cualificación real agente-a-agente con preguntas generadas por el Agente receptor (hoy: tres preguntas críticas fijas).
 - Recalibración de pesos a partir de S14 (`historical_conversion`, `member_reputation` son priors fijos).
 - Protocolos II y III: Comunicado, Gaceta, Brújula y Movimientos.

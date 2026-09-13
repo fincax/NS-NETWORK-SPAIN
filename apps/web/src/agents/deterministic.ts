@@ -147,7 +147,11 @@ export class DeterministicProvider implements LLMProvider {
     const { band, conf: sizeConf } = sizeBand(text);
     const city = CITIES.find((c) => new RegExp(c, "i").test(text)) ?? input.defaultCity;
     const geography = { country: "España", region: "Andalucía", city };
-    const relationship = /mi cliente|nuestro cliente|cliente m[ií]o|le aseguro|le llevamos/i.test(text)
+    const publicSource = /^fuente p[uú]blica/i.test(text.trim());
+    const expectsContact = /espera (la|vuestra|tu|su) llamada|le he dicho que le llamar|sabe que le llamar|est[aá] avisad|le he hablado de vosotros|me ha pedido que le presente/i.test(text);
+    const relationship = publicSource
+      ? "WEAK"
+      : /mi cliente|nuestro cliente|cliente m[ií]o|le aseguro|le llevamos/i.test(text)
       ? "DIRECT"
       : /conozco|contacto|amigo|proveedor/i.test(text)
         ? "INDIRECT"
@@ -194,7 +198,7 @@ export class DeterministicProvider implements LLMProvider {
               ? `necesita ${needs[0].description.toLowerCase().replace(/\.$/, "")}`
               : "presenta una necesidad por concretar";
     const timingLabel = { IMMEDIATE: "inmediato", "30D": "30 días", "90D": "90 días", "180D": "180 días", UNKNOWN: "plazo sin confirmar" }[t];
-    const relLabel = { DIRECT: "relación directa", INDIRECT: "relación indirecta", WEAK: "relación débil", UNKNOWN: "relación sin confirmar" }[relationship];
+    const relLabel = publicSource ? "fuente pública" : expectsContact ? "Interesado avisado" : { DIRECT: "relación directa", INDIRECT: "relación indirecta", WEAK: "relación débil", UNKNOWN: "relación sin confirmar" }[relationship];
 
     const tp = text.match(THIRD_PARTY_RE);
     const thirdPartyName = tp?.[1]?.trim();
@@ -209,6 +213,7 @@ export class DeterministicProvider implements LLMProvider {
         timing: t,
         value_band: vb,
         relationship_strength: relationship,
+        third_party_expects_contact: expectsContact,
         confidence: Number(confidence.toFixed(2)),
       },
       qualification_layer: {

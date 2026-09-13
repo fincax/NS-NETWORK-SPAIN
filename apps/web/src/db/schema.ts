@@ -232,6 +232,10 @@ export const referrals = pgTable(
     introducedAt: timestamp("introduced_at", { withTimezone: true }),
     responseDueAt: timestamp("response_due_at", { withTimezone: true }),
     closedAt: timestamp("closed_at", { withTimezone: true }),
+    // Reloj de la Sala (D-030)
+    reminderSentAt: timestamp("reminder_sent_at", { withTimezone: true }),
+    lateFlaggedAt: timestamp("late_flagged_at", { withTimezone: true }),
+    lastNudgeAt: timestamp("last_nudge_at", { withTimezone: true }),
     protocolVersion: text("protocol_version").notNull().default("0.2"),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
@@ -338,3 +342,41 @@ export const agentInteractions = pgTable("agent_interactions", {
   policyApplied: text("policy_applied"),
   createdAt: createdAt(),
 });
+
+// ───────────── Rastreo público (D-031) y Encargos (D-032) ─────────────
+export const publicRecords = pgTable(
+  "public_records",
+  {
+    id: id(),
+    chapterId: uuid("chapter_id").notNull().references(() => chapters.id),
+    externalRef: text("external_ref").notNull(), // fuente:identificador, p. ej. "BORME:2026-09-10:A-1234"
+    source: text("source").notNull(), // BORME | LICITACION | LICENCIA_OBRA | EMPLEO | PRENSA
+    title: text("title").notNull(),
+    summary: text("summary").notNull(),
+    companyName: text("company_name"),
+    city: text("city"),
+    url: text("url"),
+    publishedAt: timestamp("published_at", { withTimezone: true }),
+    ingestedByCompanyId: uuid("ingested_by_company_id").references(() => companies.id),
+    opportunitySignalId: uuid("opportunity_signal_id").references(() => opportunitySignals.id),
+    createdAt: createdAt(),
+  },
+  (t) => [uniqueIndex("public_record_ref").on(t.chapterId, t.externalRef)],
+);
+
+export const demands = pgTable(
+  "demands",
+  {
+    id: id(),
+    chapterId: uuid("chapter_id").notNull().references(() => chapters.id),
+    companyId: uuid("company_id").notNull().references(() => companies.id),
+    text: text("text").notNull(), // "Busco empresas industriales que abran planta en el área de Sevilla"
+    trigger: text("trigger"), // BusinessTrigger opcional
+    industry: text("industry"),
+    valueBand: text("value_band"),
+    status: text("status").notNull().default("OPEN"), // OPEN | FULFILLED | CLOSED
+    activeUntil: timestamp("active_until", { withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  (t) => [index("demand_chapter_status").on(t.chapterId, t.status)],
+);

@@ -47,6 +47,7 @@ export interface CapabilityView {
   isPrimarySeat: boolean;
   dna: BusinessDNA;
   reputation?: number; // 0..1, 0.6 por defecto en el MVP
+  openDemand?: string; // texto del Encargo abierto que coincide (D-032)
 }
 
 export interface GateContext {
@@ -226,12 +227,13 @@ function components(
   out.push({ key: "capacity_fit", weight: WEIGHTS.capacity_fit, value: capv, confidence: 0.9, evidence: dna.offering.capacity === "OPEN" ? "Tienes capacidad abierta ahora." : "Capacidad limitada ahora." });
 
   // strategic_priority
-  const sp = [0, 0.33, 0.66, 1][dna.commercial.strategic_priority];
-  out.push({ key: "strategic_priority", weight: WEIGHTS.strategic_priority, value: sp, confidence: 0.95, evidence: sp >= 0.66 ? "Has marcado esta especialidad como prioridad comercial." : "Prioridad comercial media o baja para este servicio." });
+  const sp = cap.openDemand ? 1 : [0, 0.33, 0.66, 1][dna.commercial.strategic_priority];
+  out.push({ key: "strategic_priority", weight: WEIGHTS.strategic_priority, value: sp, confidence: 0.95, evidence: cap.openDemand ? `Responde a tu Encargo abierto: "${cap.openDemand}".` : sp >= 0.66 ? "Has marcado esta especialidad como prioridad comercial." : "Prioridad comercial media o baja para este servicio." });
 
   // relationship_strength
-  const rs = { DIRECT: 1, INDIRECT: 0.6, WEAK: 0.3, UNKNOWN: 0.2 }[layer0.relationship_strength];
-  out.push({ key: "relationship_strength", weight: WEIGHTS.relationship_strength, value: rs, confidence: 0.9, evidence: layer0.relationship_strength === "DIRECT" ? "El cedente tiene relación directa con el Interesado." : `Relación del cedente con el Interesado: ${layer0.relationship_strength.toLowerCase()}.` });
+  const rsBase = { DIRECT: 1, INDIRECT: 0.6, WEAK: 0.3, UNKNOWN: 0.2 }[layer0.relationship_strength];
+  const rs = layer0.third_party_expects_contact ? Math.max(rsBase, 0.85) : rsBase;
+  out.push({ key: "relationship_strength", weight: WEIGHTS.relationship_strength, value: rs, confidence: 0.9, evidence: layer0.third_party_expects_contact ? "El Interesado ya sabe que le llamarán: el cedente ha preparado el terreno." : layer0.relationship_strength === "DIRECT" ? "El cedente tiene relación directa con el Interesado." : `Relación del cedente con el Interesado: ${labelRel(layer0.relationship_strength)}.` });
 
   // qualification_quality
   const critical = turns.filter((t) => ["BUDGET", "TIMING", "DECISION_MAKER"].includes(t.kind));
@@ -310,4 +312,8 @@ export function buildExplanation(score: NSMatchScore, need: NeedDraft, turns: Qu
 
 export function labelKind(kind: QualificationTurn["kind"]): string {
   return { BUDGET: "Presupuesto", TIMING: "Plazo", DECISION_MAKER: "Decisor", SCOPE: "Alcance", CONSTRAINT: "Condicionantes", FREE: "Pregunta" }[kind];
+}
+
+export function labelRel(r: ChapterLayer["relationship_strength"]): string {
+  return { DIRECT: "directa", INDIRECT: "indirecta", WEAK: "débil", UNKNOWN: "sin confirmar" }[r];
 }

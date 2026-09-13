@@ -147,6 +147,7 @@ export const ChapterLayer = z.object({
   timing: TimingBand,
   value_band: ValueBand.optional(),
   relationship_strength: RelationshipStrength,
+  third_party_expects_contact: z.boolean().default(false), // D-029 · el Interesado sabe que le llamarán
   confidence: z.number().min(0).max(1),
 });
 export type ChapterLayer = z.infer<typeof ChapterLayer>;
@@ -361,6 +362,7 @@ export type RevealScope = z.infer<typeof RevealScope>;
 
 // ───────────────────────── Promesa (D-021) ─────────────────────────
 export const PromiseComponentKey = z.enum([
+  "expects_contact",
   "real_need",
   "information_complete",
   "decision_maker",

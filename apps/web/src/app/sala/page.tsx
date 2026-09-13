@@ -4,6 +4,7 @@ import { getDb, schema } from "@/db/client";
 import { requireMember } from "@/lib/session";
 import { balance } from "@/services/today";
 import { eur } from "@/lib/format";
+import { openDemands } from "@/services/demands";
 
 export default async function SalaPage() {
   const { chapter, company } = await requireMember();
@@ -13,6 +14,7 @@ export default async function SalaPage() {
   const byId = new Map(companies.map((c) => [c.id, c]));
   const balances = await Promise.all(companies.map(async (c) => ({ c, b: await balance(db, chapter.id, c.id) })));
   const occupied = seats.filter((s) => s.status === "ACTIVE").length;
+  const demandsOpen = await openDemands(db, chapter.id);
   return (
     <div className="stack" style={{ gap: 28 }}>
       <div className="page-head">
@@ -37,6 +39,16 @@ export default async function SalaPage() {
             );
           })}
         </div>
+      </section>
+
+      <section>
+        <h2 style={{ marginBottom: 4 }}>Encargos abiertos</h2>
+        <p className="lead" style={{ fontSize: 14, marginBottom: 12 }}>Lo que cada titular busca ahora. Los Agentes priorizan las Pistas que responden a un Encargo.</p>
+        {demandsOpen.length === 0 ? <p className="mono">Ningún Encargo abierto.</p> : (
+          <ul className="plain">
+            {demandsOpen.map((d) => <li key={d.id} className="row"><Link href={`/empresa/${byId.get(d.companyId)?.slug}`}><strong>{byId.get(d.companyId)?.name}</strong></Link><span>{d.text}</span>{d.trigger ? <span className="badge">{d.trigger.toLowerCase().replaceAll("_", " ")}</span> : null}</li>)}
+          </ul>
+        )}
       </section>
 
       <section>

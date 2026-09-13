@@ -18,6 +18,7 @@ export async function createSignalAction(formData: FormData) {
     contactName,
     contactRole: String(formData.get("contactRole") ?? "").trim() || undefined,
     legalBasisForContact: contactName ? (String(formData.get("legalBasisForContact")) as LegalBasis) : undefined,
+    thirdPartyExpectsContact: formData.get("expectsContact") === "1",
   });
   redirect(`/indicio/${created.opportunitySignal.id}`);
 }
