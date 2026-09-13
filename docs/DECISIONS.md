@@ -896,3 +896,47 @@ La Ronda es idempotente: se puede lanzar varias veces al día sin efectos dobles
 **Consequences.** `services/ronda.ts`, `app/api/clock/route.ts`, `vercel.json`, variable `CRON_SECRET`, `pnpm clock` pasa a ejecutar la Ronda, exclusión de la ruta en la puerta de la demo, etiqueta "Ronda" en la Mesa, cinco pruebas nuevas. La entrada en el léxico.
 
 **Revisit when.** Se conecte la primera fuente real de Rastreo (la Ronda deberá limitar el volumen por Agente) o el Protocolo II exija una Ronda semanal además de la diaria.
+
+---
+
+## D-037 · Apunte: el Timonel mete un posible referido en la memoria de su Agente en treinta segundos, desde el móvil
+
+**Status:** CONFIRMED (petición del fundador: "una acción importante")
+**Date:** 2026-09-13
+
+**Context.** Los mejores referidos nacen en la calle: en una visita, en una feria, en una conversación casual. Si el Timonel tiene que esperar a sentarse ante un formulario, se pierden. El fundador pide un apartado, sobre todo en móvil pero no en exclusiva, para anotar de inmediato nombre de empresa o persona, persona de contacto, necesidad y observaciones, y que entre en la memoria del Agente en el acto.
+
+**Choice.** El **Apunte**:
+
+- Pantalla `/apunte` pensada para el móvil: dos campos obligatorios (quién y qué necesita), tres fichas para la relación (es mi cliente, lo conozco, me lo han contado), un interruptor "ya sabe que le llamarán" (D-029) y, plegados, persona de contacto y observaciones. Botón grande "Guardar en mi Agente".
+- Acceso permanente: botón flotante "Apuntar" en todas las pantallas de la app, atajo en Hoy, y acceso directo desde la pantalla de inicio del móvil (la app se puede "añadir a inicio" y el icono ofrece "Apuntar un referido").
+- El Apunte entra en el circuito normal de NS-ARP como Indicio en borrador con fuente `APUNTE`: el Agente lo lee, detecta necesidades y plazas, y lo deja en Hoy ("Tus Apuntes"). La confirmación muestra lo que el Agente ha entendido y ofrece publicar en la Sala con un toque, apuntar otro o ver la previsualización. **Nunca se publica solo.**
+- La relación elegida alimenta la fuerza de relación del Indicio; el nombre de la persona de contacto se guarda solo en la capa 2, sin base jurídica hasta que el Timonel la declare en la Apertura.
+
+**Why.** Es la puerta de entrada más natural del negocio real a la red: convierte el "me acabo de enterar de algo" en trabajo del Agente sin fricción. Reutiliza todo el protocolo (extracción, privacidad, Mesa) en lugar de crear un cajón aparte.
+
+**Consequences.** `services/apunte.ts`, ruta `/apunte`, botón flotante, `manifest.webmanifest` con atajos, sección "Tus Apuntes" en Hoy, fuente `APUNTE` en `business_signals`, pruebas. CLAUDE.md §22 incorpora el Apunte como prioridad móvil.
+
+**Revisit when.** Exista dictado por voz o captura desde una foto de tarjeta, o el Agente pueda hacer preguntas de seguimiento sobre el Apunte (entrevista corta).
+
+---
+
+## D-038 · Fuentes propias: cada Timonel añade direcciones a su Agente y la Ronda las lee cada mañana
+
+**Status:** CONFIRMED (petición del fundador)
+**Date:** 2026-09-13
+
+**Context.** El Rastreo (D-031) lee fuentes públicas de NS. El fundador quiere además que cada Timonel pueda ir incluyendo fuentes a su Agente para que rastree a diario: el medio local que él sigue, el boletín de su asociación, el portal de licitaciones de su sector.
+
+**Choice.**
+
+- Cada empresa tiene una lista de **fuentes propias** (hasta 12): nombre y dirección de un canal RSS o Atom. Se gestionan en el Dossier ("Fuentes de mi Agente"), con el estado de la última lectura y un botón "Leer mis fuentes ahora".
+- La Ronda (D-036) las lee cada mañana después de las fuentes públicas, con el mismo circuito del Rastreo: cada entrada con posible negocio se convierte en Indicio en borrador para el Timonel que añadió la fuente, con fuente `FUENTE_PROPIA` y deduplicada por referencia estable. Las entradas sin necesidad detectable se descartan en silencio.
+- Un fallo de lectura (dirección caída, formato no reconocido) se anota en la fuente y no detiene la Ronda. Solo se admiten direcciones públicas http/https.
+- El lector de RSS/Atom es propio y mínimo, sin dependencias; la misma interfaz (`PublicFeed`) servirá para los adaptadores de BORME, PLACE, licencias y empleo.
+
+**Why.** Convierte al Agente en un lector personalizado del mundo de cada Timonel, y hace que el Rastreo crezca con la red sin esperar a integraciones oficiales. Quien más fuentes buenas aporta, más Indicios genera para los demás y más Mérito acumula.
+
+**Consequences.** Tabla `agent_sources` (migración 0004), `agents/feeds.ts`, `services/sources.ts`, sección en el Dossier, la Ronda incluye las fuentes propias, pruebas con lectores simulados. En este entorno de desarrollo no hay salida a internet, así que la lectura real solo se comprueba en el servidor.
+
+**Revisit when.** Se conecten las fuentes oficiales (BORME, PLACE) o el volumen exija límites por fuente y filtros por zona o palabras clave.

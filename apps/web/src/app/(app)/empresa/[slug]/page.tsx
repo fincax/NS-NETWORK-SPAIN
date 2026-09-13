@@ -6,10 +6,13 @@ import { balance } from "@/services/today";
 import { eur } from "@/lib/format";
 import { AgentAvatar } from "@/components/brand";
 import { openDemands } from "@/services/demands";
-import { createDemandAction, closeDemandAction } from "./actions";
+import { createDemandAction, closeDemandAction, addSourceAction, removeSourceAction, runOwnSourcesAction } from "./actions";
+import { listSources, MAX_SOURCES_PER_AGENT } from "@/services/sources";
+import { dateTime } from "@/lib/format";
 
-export default async function EmpresaPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function EmpresaPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ fuente?: string }> }) {
   const { slug } = await params;
+  const { fuente: sourceError } = await searchParams;
   const { company: me, chapter } = await requireMember();
   const db = await getDb();
   const company = await db.query.companies.findFirst({ where: eq(schema.companies.slug, slug) });
@@ -21,6 +24,7 @@ export default async function EmpresaPage({ params }: { params: Promise<{ slug: 
   const distinctions = await db.query.recognitions.findMany({ where: eq(schema.recognitions.toCompanyId, company.id) });
   const own = company.id === me.id;
   const demandsOpen = await openDemands(db, chapter.id, company.id);
+  const sources = own ? await listSources(db, company.id) : [];
   const dna = dnaRow?.dna;
   if (!dna) notFound();
   return (
@@ -64,6 +68,36 @@ export default async function EmpresaPage({ params }: { params: Promise<{ slug: 
           </form>
         ) : null}
       </section>
+      {own ? (
+        <section className="card" id="fuentes">
+          <p className="eyebrow">Fuentes de mi Agente · lo que lee cada mañana</p>
+          <p className="lead" style={{ fontSize: 14 }}>Además de las fuentes públicas de NS, tu Agente lee las direcciones que tú le des: prensa local, boletines, portales de licitaciones, asociaciones de tu sector. Pega la dirección del canal RSS o Atom. Lo que encuentre te lo deja en Hoy como Indicio en borrador.</p>
+          {sourceError ? <div className="notice error" style={{ marginTop: 10 }}>{sourceError}</div> : null}
+          {sources.length === 0 ? <p className="mono" style={{ marginTop: 10 }}>Tu Agente todavía no tiene fuentes propias.</p> : (
+            <ul className="plain" style={{ marginTop: 10 }}>
+              {sources.map((f) => (
+                <li key={f.id} className="row">
+                  <span><strong>{f.label}</strong> <span className="mono">{new URL(f.url).hostname}</span></span>
+                  <span className={`badge ${f.lastStatus?.startsWith("error") ? "red" : f.lastStatus ? "green" : ""}`}>{f.lastStatus ? f.lastStatus.split(" · ")[0] : "sin leer aún"}</span>
+                  <span className="mono">{f.lastStatus ? `${f.lastStatus.split(" · ").slice(1).join(" · ")}${f.lastFetchedAt ? ` · ${dateTime(f.lastFetchedAt)}` : ""}` : ""}</span>
+                  <span className="spacer" />
+                  <form action={removeSourceAction}><input type="hidden" name="id" value={f.id} /><input type="hidden" name="slug" value={company.slug} /><button className="btn small ghost" type="submit">Quitar</button></form>
+                </li>
+              ))}
+            </ul>
+          )}
+          <form action={addSourceAction} className="form-grid" style={{ marginTop: 14 }}>
+            <input type="hidden" name="slug" value={company.slug} />
+            <div className="field"><label htmlFor="fl">Nombre de la fuente</label><input id="fl" name="label" required maxLength={80} placeholder="Diario de Sevilla · Economía" /></div>
+            <div className="field"><label htmlFor="fu">Dirección (RSS o Atom)</label><input id="fu" name="url" required inputMode="url" placeholder="https://…/rss" /></div>
+            <div className="actions" style={{ gridColumn: "1 / -1" }}>
+              <button className="btn" type="submit" disabled={sources.length >= MAX_SOURCES_PER_AGENT}>Añadir fuente</button>
+              <span className="mono">{sources.length} de {MAX_SOURCES_PER_AGENT}</span>
+            </div>
+          </form>
+          {sources.length ? <form action={runOwnSourcesAction} style={{ marginTop: 10 }}><input type="hidden" name="slug" value={company.slug} /><button className="btn small ghost" type="submit">Leer mis fuentes ahora</button></form> : null}
+        </section>
+      ) : null}
       {own ? (
         <section className="card quiet">
           <p className="eyebrow">Solo tú ves esto</p>

@@ -19,6 +19,8 @@ Hay dos "servidores" distintos y conviene no confundirlos:
 - Portada pública en `/` con la narrativa en modo beta, la disponibilidad real de plazas y la candidatura "Solicitar plaza en la beta" (se guarda en la base de datos).
 - Puerta de la demo en `/acceso`: usuario y contraseña compartidos, definidos por variables de entorno. Todo lo que no es portada exige esa sesión.
 - Aviso permanente "Beta privada · datos ficticios" dentro de la app, con salida.
+- **Apunte** (D-037): botón flotante "Apuntar" en toda la app. En el móvil, con la demo abierta en el navegador, "Añadir a pantalla de inicio" crea un icono NS cuyo menú ofrece "Apuntar un referido".
+- **Fuentes propias** (D-038): en el Dossier de la propia empresa, "Fuentes de mi Agente". La Ronda las lee cada mañana; en local se prueban con "Leer mis fuentes ahora" (requiere salida a internet).
 - **Antesala** (D-035): la Directiva ve y despacha las candidaturas que llegan desde la portada, con el veredicto de plaza calculado. En la demo, elige a Inés Domínguez (Bufete Alameda · Directiva) en el selector de Timonel.
 
 ## 1. Demo privada: ahora

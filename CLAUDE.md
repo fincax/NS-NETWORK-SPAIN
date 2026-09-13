@@ -780,6 +780,8 @@ Introducción
 
 El móvil debe convertir decisiones de 10 minutos en decisiones de 30 segundos. Configuraciones avanzadas y Business DNA pueden priorizar escritorio.
 
+Segunda prioridad móvil, fijada por el fundador (D-037): el **Apunte**. El Timonel, en la calle, en una visita o en una conversación casual, anota en treinta segundos un posible referido (quién, qué necesita, contacto, observaciones) y entra en el acto en la memoria de su Agente. Un toque desde cualquier pantalla y desde la pantalla de inicio del móvil. El Agente lo lee y lo deja en Hoy; el Timonel decide si se publica.
+
 ## 23. Web pública
 
 Construir una experiencia capaz de explicar una categoría nueva.

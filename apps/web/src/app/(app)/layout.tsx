@@ -3,6 +3,7 @@ import { Monogram } from "@/components/brand";
 import { currentMember, listMembers } from "@/lib/session";
 import { PersonaSwitch } from "./persona-switch";
 import { NavLinks } from "./nav-links";
+import { ApunteFab } from "./apunte-fab";
 import { logoutAction } from "../acceso/actions";
 import { getDb } from "@/db/client";
 import { candidacyCounts } from "@/services/antesala";
@@ -42,6 +43,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         </div>
       </header>
       <main>{children}</main>
+      {ctx ? <ApunteFab /> : null}
     </div>
   );
 }

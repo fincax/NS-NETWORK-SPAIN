@@ -12,7 +12,7 @@ export interface CreateSignalInput {
   memberId?: string;
   rawContent: string;
   visibility?: Visibility; // CHAPTER por defecto; COMPANY_ONLY para Scenario D
-  source?: "MEMBER_INPUT" | "AGENT_CHECKIN" | "WEBSITE" | "INTEGRATION" | "PUBLIC_RECORD";
+  source?: "MEMBER_INPUT" | "APUNTE" | "AGENT_CHECKIN" | "WEBSITE" | "INTEGRATION" | "PUBLIC_RECORD";
   legalBasisForContact?: "CONSENT" | "LEGITIMATE_INTEREST" | "CONTRACT" | "NONE";
   contactName?: string;
   contactRole?: string;
