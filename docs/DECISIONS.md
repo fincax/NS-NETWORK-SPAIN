@@ -873,3 +873,26 @@ Pasos fijados, en orden:
 **Consequences.** `services/antesala.ts`, ruta `/antesala` con acciones, columnas nuevas en `beta_requests` (migración 0003), prefijado del alta desde una candidatura aprobada, seis candidaturas de demostración (una por veredicto), pruebas y recorrido de navegador ampliado. En producción, la Antesala será la primera pantalla de la Directiva que exija autenticación real por rol.
 
 **Revisit when.** Exista la entrevista del ADN por el Agente (el paso "Entrevistada" pasará a apoyarse en ella) o haya varias Salas en la zona (la salida "otra Sala" tendrá destino real).
+
+---
+
+## D-036 · Ronda: los Agentes hacen su pasada cada mañana sin que nadie abra la aplicación
+
+**Status:** CONFIRMED (delegado por el fundador: "sigue con el 4")
+**Date:** 2026-09-13
+
+**Context.** El Reloj de la Sala (D-030) y el Rastreo (D-031) se ejecutaban solo cuando alguien abría Hoy o pulsaba un botón. Eso contradice la promesa central de NS: la red trabaja mientras el Timonel no está. En el servidor hace falta que ocurra sola cada mañana.
+
+**Choice.** Una **Ronda** diaria, para todas las Salas, en este orden:
+
+1. Reloj de la Sala: recordatorios, caducidades, respuestas tardías y check-ins.
+2. Rastreo con el Agente de cada empresa activa. Los registros nuevos se reparten: empieza el Agente que menos ha rastreado hasta ahora, para que los Indicios en borrador no caigan siempre en el mismo Timonel.
+3. Un evento "Ronda" por Sala en la Mesa Permanente, visible para todos, con el resumen de lo hecho. Si no hubo nada que hacer, no se escribe nada.
+
+La Ronda es idempotente: se puede lanzar varias veces al día sin efectos dobles. La lanza el alojamiento cada mañana mediante la ruta `GET /api/clock`, definida en `vercel.json` (06:00 UTC, es decir, a las 8 de la mañana en verano y a las 7 en invierno). La ruta está protegida por `CRON_SECRET`, que el alojamiento envía como cabecera; sin secreto configurado, en producción la ruta no se ejecuta. En local, `pnpm clock` hace lo mismo. El Reloj al abrir Hoy se mantiene como red de seguridad de la demo.
+
+**Why.** Es la pieza mínima que hace verdad "mientras tú trabajabas, tu red seguía trabajando". Separar la Ronda del Reloj permite añadirle más tareas de mañana (Comunicado semanal, Brújula, Gaceta) sin tocar el alojamiento. El reparto equitativo del Rastreo evita que el Mérito de los Indicios públicos se concentre en una empresa por accidente de orden.
+
+**Consequences.** `services/ronda.ts`, `app/api/clock/route.ts`, `vercel.json`, variable `CRON_SECRET`, `pnpm clock` pasa a ejecutar la Ronda, exclusión de la ruta en la puerta de la demo, etiqueta "Ronda" en la Mesa, cinco pruebas nuevas. La entrada en el léxico.
+
+**Revisit when.** Se conecte la primera fuente real de Rastreo (la Ronda deberá limitar el volumen por Agente) o el Protocolo II exija una Ronda semanal además de la diaria.

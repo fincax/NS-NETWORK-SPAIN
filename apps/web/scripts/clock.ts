@@ -1,8 +1,10 @@
-/** pnpm clock · ejecuta el Reloj de la Sala (D-030): recordatorios, caducidades, respuestas tardías y check-ins. */
+/** pnpm clock · ejecuta la Ronda (D-036): Reloj de la Sala + Rastreo para todas las Salas. */
 import { getDb, closeDb } from "@/db/client";
-import { runClock } from "@/services/clock";
+import { runRonda } from "@/services/ronda";
 
 const db = await getDb();
-const r = await runClock(db);
-console.log(`Reloj: ${r.reminders} recordatorio(s) · ${r.expired} caducada(s) · ${r.late} respuesta(s) tardía(s) · ${r.nudges} check-in(s)`);
+const r = await runRonda(db);
+for (const c of r.chapters) {
+  console.log(`${c.chapterName} · Reloj: ${c.clock.reminders} recordatorio(s) · ${c.clock.expired} caducada(s) · ${c.clock.late} respuesta(s) tardía(s) · ${c.clock.nudges} check-in(s) · Rastreo: ${c.rastreo.agents} Agentes, ${c.rastreo.drafts} Indicio(s) en borrador`);
+}
 await closeDb();

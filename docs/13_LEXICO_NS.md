@@ -73,6 +73,7 @@ Criterios de cada nombre: castellano; una palabra siempre que sea posible; insti
 | **Mesa Permanente** | La reunión 24/7 de los agentes de una Sala. Lo que en la app se ve como cronología de eventos significativos. | `AgentRoom` |
 | **Despacho** | Sesión breve y periódica del miembro con su Agente: tres cosas ya preparadas, decisiones de 30 segundos. | `AgentCheckIn` |
 | **Encargo** | Lo que una empresa busca ahora (texto, señal, industria, vigencia). Visible en la Sala; los Agentes priorizan las Pistas que responden a un Encargo abierto y lo dicen en el Fundamento (D-032). | `Demand` |
+| **Ronda** | La pasada de cada mañana de los Agentes, para todas las Salas: Reloj de la Sala y Rastreo, con un resumen en la Mesa Permanente. Ocurre sola, sin que nadie abra la aplicación (D-036). | `DailyRun` |
 | **Rastreo** | Prospección del Agente en fuentes públicas (BORME, licitaciones, licencias de obra, empleo, prensa local) para generar Indicios en borrador para otros titulares. El Timonel decide si los publica (D-031). | `PublicProspecting` |
 | **Interesado avisado** | Hecho que distingue una Cesión de verdad: el Interesado sabe que le van a llamar. Va en la capa 0, lo detecta el Agente, lo confirma el cedente y pesa en la Promesa y en el Encaje (D-029). | `third_party_expects_contact` |
 | **Reloj de la Sala** | Mecanismo que ejecuta los plazos: recuerda a las 72 h, caduca a los 7 días, marca la respuesta tardía a las 48 h del Puente y pregunta cada 14 días. El empujón lo recibe el Timonel, nunca el Interesado (D-030). | `ChapterClock` |
