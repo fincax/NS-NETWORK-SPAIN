@@ -38,7 +38,11 @@ export const RULE_SCOPE_LABEL: Record<RuleScope, string> = {
   NS: "Obligación de NS con la Sala",
 };
 
-/** Criterio propuesto de titular Destacado (PROPUESTA, pendiente del fundador). */
+/**
+ * Criterio propuesto de titular Destacado (PROPUESTA, pendiente del fundador).
+ * 85 es el titular que cumple plazos y Ritmo al 100 %, con Ecos medios de 4/5 y lo cedido con Aval 80 (docs/18 §2):
+ * no se alcanza con Ecos perfectos y media disciplina (80) ni con disciplina perfecta y Ecos discretos (80).
+ */
 export const DESTACADO = {
   minAval: 85,
   weeksInPace: 8,

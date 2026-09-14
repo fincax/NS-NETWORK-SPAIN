@@ -38,6 +38,24 @@ Estados: **BORRADOR** (anotada, pendiente del fundador) → **PROTOCOLIZADA** (f
 
 Se calcula solo, cada noche, y se ve en el Dossier. Nunca es un ranking: es una condición que cualquiera puede alcanzar. El fundador puede fijar otro criterio o varios grados.
 
+### Por qué 85 (cálculo con la fórmula real del Aval, 2026-09-14)
+
+Aval del titular = 40 % Voz de los Interesados + 25 % Calidad de lo que cede + 20 % Respuesta + 15 % Contribución. Perfiles ejecutados sobre `computeTitularAval`:
+
+| Perfil | Aval |
+| --- | --- |
+| Recién llegado, todo neutro | 60 |
+| Cumple plazos y Ritmo; Ecos 3/5; lo cedido con Aval 70 | 73 |
+| Cumple plazos y Ritmo; Ecos 3,5/5; lo cedido 80 | 80 |
+| **Cumple plazos y Ritmo; Ecos 4/5; lo cedido 80** | **85** |
+| Cumple plazos y Ritmo; Ecos 4/5; lo cedido 90 | 88 |
+| Cumple todo; Ecos 5/5; lo cedido 90 | 98 |
+| Ecos 5/5 y lo cedido 90, pero la mitad de los plazos y del Ritmo | 80 |
+| Ecos 5/5 y lo cedido 90, con el 80 % de plazos y de Ritmo | 91 |
+| Ecos 2,5/5 (mal atendido) aunque cumple todo; lo cedido 90 | 73 |
+
+Conclusión: **85** es exactamente el titular que hace todo lo que depende de él (plazos y Ritmo al 100 %), cuyos Interesados le dan de media 4 sobre 5 y cuyas Cesiones cedidas salen con Aval 80. Por debajo de 85 se llega con Ecos discretos aunque se cumpla todo (80), o con Ecos perfectos aunque se cumpla solo la mitad (80): ninguno de los dos debe ser destacado. Por eso el umbral no es 80. Un 90 exigiría Ecos de 4,5 sobre 5, que dependen de la generosidad del cliente más que del titular: demasiado alto para una condición alcanzable. Además, 85 coincide con la banda "Aval alto" ya definida. El Aval debe ser **firme** (al menos tres Ecos y tres Cesiones con Veredicto): el valor neutro de un recién llegado es 60 y nunca cuenta.
+
 ## 3. Normas · para todos los titulares
 
 | Id | Norma | Estado | Fuente | Cómo se aplica | Si se incumple |
