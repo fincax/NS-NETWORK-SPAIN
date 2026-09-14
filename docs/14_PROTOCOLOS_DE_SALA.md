@@ -300,7 +300,7 @@ Promesa y Veredicto son voces de miembros. Falta la del cliente referido. **Toda
 | **Eco** | La voz del Interesado sobre el cesionario: Atención, Resultado, Recomendación (1–5 cada uno), una línea opcional, fase (durante / al cierre), consentimiento de publicación y nombre con el que quiere aparecer. | Cuenta siempre; texto y nombre `PUBLIC` solo con consentimiento; si no, `MATCHED_PARTY` + `DIRECTORS`. | `Endorsement` |
 | **Petición de Eco** | Mensaje con el enlace que redacta el Agente del cesionario y envía la persona. | `COMPANY_ONLY` (cesionario) | `Endorsement.request_message` |
 | **Aval de la Cesión** | Número 0–100 que nace de Promesa (25 %), Veredicto (35 %) y Eco (40 %). Estados: provisional, firme, sin Eco, nulo. | `PUBLIC` | `Referral.aval`, `Referral.aval_status` |
-| **Aval del titular** | Número 0–100 con cuatro bloques explicados: Voz de los Interesados (40 %), Calidad de lo que cede (25 %), Respuesta (20 %), Contribución (15 %). | `PUBLIC` | `TitularAval` (vista) |
+| **Aval del titular** | Número 0–100 con cuatro bloques explicados: Voz de los Interesados (40 %), Calidad de lo que cede (25 %), Respuesta (20 %), Contribución (15 %). Se muestra también en la web pública (`/aval/[slug]`): nombre de la empresa, Aval y, de cada Eco, el nombre elegido por el Interesado y su valoración. Sin datos de contacto. | `PUBLIC` | `TitularAval` (vista), `PublicAvalPage` |
 | **Ventana del Interesado** | 30 días tras el cierre para dejar o revisar el Eco. | — | `ECO_WINDOW_DAYS` |
 
 ### 3. Especificación agentic
@@ -381,12 +381,11 @@ Reglas:
 - **Hoy**: Peticiones pendientes; el Agente pasa a "esperando".
 - **Dossier**: Aval del titular con los cuatro bloques, elegibilidad de Embajadora y los Ecos publicados con permiso.
 - **Balanza**: columna Aval, enlazada al Dossier.
+- **Web pública** `/aval/[slug]`: nombre, especialidad y Sala del titular, Aval con sus bloques y Ecos con consentimiento (nombre elegido, valoración, línea). Nunca correo, teléfono, web ni nombre del Timonel. El Dossier enlaza a ella.
 - **Crónica**: "Metalúrgica del Sur avala públicamente a Híspalis (100 sobre 100) tras la presentación de Guadalquivir".
 
-### 8. Pendientes del fundador
+### 8. Decidido por el fundador (2026-09-14) y pendientes
 
-1. Pesos del Aval de la Cesión (propuesta 25 · 35 · 40) y del titular (40 · 25 · 20 · 15).
-2. Umbrales de Embajadora (Aval 70, 3 Ecos, voz 70) y la ventana del Interesado (30 días).
-3. Si el Aval del titular se muestra también fuera de la red (sello de miembro en la web pública) o solo dentro.
-4. Si la Petición de Eco podrá enviarla NS en nombre del cesionario cuando se amplíe la autonomía externa (fase posterior al MVP).
-5. Nombres: Dar la Palabra (protocolo), Eco (voz del Interesado), Aval (número público), Petición de Eco. Alternativas en `docs/13_LEXICO_NS.md`.
+Confirmado: nombres (Dar la Palabra, Eco, Aval, Petición de Eco), pesos (25 · 35 · 40 y 40 · 25 · 20 · 15), umbrales de Embajadora (Aval 70, 3 Ecos, voz 70), ventana de 30 días, y que **el Aval se muestra en la web pública** solo con nombre y apellido o nombre de empresa y su valoración, sin datos de contacto. Los pesos y umbrales se recalibran con 50 Ecos reales.
+
+Pendiente: si la Petición de Eco podrá enviarla NS en nombre del cesionario cuando se amplíe la autonomía externa (fase posterior al MVP).

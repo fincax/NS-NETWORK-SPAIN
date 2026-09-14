@@ -8,8 +8,8 @@ src/core        dominio puro, sin framework: types (zod), scoring (puertas + NS 
 src/agents      provider (contrato LLM), deterministic, anthropic, mesa (orquestador NS-ARP S4–S9), rastreo (fuentes públicas)
 src/services    onboarding (alta y plaza), signals (S0–S3), referrals (puertas humanas), today (Hoy, Mesa, Balanza), clock (Reloj de la Sala), ronda (pasada de cada mañana: Reloj + Rastreo), demands (Encargos), antesala (candidaturas y veredicto de plaza, Directiva), apunte (captura móvil de un posible referido), sources (fuentes propias del Agente), entrevista (el Agente construye el ADN conversando), fundacion (Promotora y Sala nueva desde la Antesala), eco (Protocolo IV: invitación con el Puente, Petición de Eco, página pública del Interesado, Aval de la Cesión y del titular, Reloj)
 src/db          schema (Drizzle), client (PGlite | Postgres), nscat (NS-CAT), seed-data (NS Cumbre), seed
-src/app         / (portada beta pública) · acceso (puerta de la demo) · eco/[token] (página pública del Interesado, D-042) · (app)/: hoy · mesa · cesiones/[id] · indicio · sala · empresa/[slug]
-src/proxy.ts    exige la sesión de la demo en todo lo que no sea portada, acceso o la página del Eco (D-033, D-042)
+src/app         / (portada beta pública) · acceso (puerta de la demo) · eco/[token] (página pública del Interesado, D-042) · aval/[slug] (Aval público del titular, sin datos de contacto) · (app)/: hoy · mesa · cesiones/[id] · indicio · sala · empresa/[slug]
+src/proxy.ts    exige la sesión de la demo en todo lo que no sea portada, acceso, la página del Eco o la del Aval público (D-033, D-042)
 tests           core.test.ts (funciones puras) · slice.test.ts (recorrido completo sobre PGlite en memoria) · eco.test.ts (Protocolo IV de principio a fin)
 scripts         seed.ts · demo.ts
 drizzle         migraciones SQL generadas (pnpm db:generate)

@@ -84,6 +84,7 @@ Referral.aval       PROVISIONAL → FIRME (Veredicto + Eco al cierre) | SIN_ECO 
 | Cesionario | Capa 1 al aceptarse su claim; capa 2 solo desde `INTRO_AUTHORIZED` y según `reveal_scope`; nunca la capa 3. | Tarjeta de Cesión, `layer2Open`. |
 | Interesado (sin usuario) | Solo capa 0 y nombres de las dos empresas, desde `/eco/[token]`. Nunca el Veredicto ni las capas 1–3. | `ecoPageContext()` en `services/eco.ts`; la ruta queda fuera del proxy de la demo. |
 | Toda la red | El Aval de cada titular y los Ecos con consentimiento de publicación. | `avalOfCompany()`; Balanza y Dossier. |
+| Cualquiera (web pública) | Nombre de la empresa, especialidad, Sala, Aval con sus bloques y Ecos con consentimiento (nombre elegido, valoración, línea). Nunca correo, teléfono, web, Timonel ni identificadores. | `publicAvalPage()`; `/aval/[slug]` fuera del proxy de la demo. |
 | Directiva | Cesiones de la Sala con excepciones; capa 2 solo si la excepción es de datos personales. | `members.is_director`. |
 | Agente de otra empresa | Nada por debajo de CHAPTER fuera de una Cesión en curso. | Los agentes reciben objetos ya filtrados por el orquestador. |
 

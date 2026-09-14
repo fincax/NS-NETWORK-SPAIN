@@ -45,7 +45,7 @@ export default async function EcoPage({ params, searchParams }: { params: Promis
         {error ? <div className="notice error">{decodeURIComponent(error)}</div> : null}
         {ok === "1" && received ? (
           <div className="notice" style={{ borderColor: "var(--green)" }}>
-            <strong>Gracias. Tu Eco ha llegado.</strong> {ctx.receiverName} y {ctx.originatorName} lo verán tal cual. {inv.publicConsent ? "Has autorizado publicarlo con tu nombre en la Sala." : "No se publica con tu nombre: solo cuenta en el Aval."}
+            <strong>Gracias. Tu Eco ha llegado.</strong> {ctx.receiverName} y {ctx.originatorName} lo verán tal cual. {inv.publicConsent ? "Has autorizado publicarlo con tu nombre en la Sala y en la página pública del Aval, sin datos de contacto." : "No se publica con tu nombre: solo cuenta en el Aval."}
           </div>
         ) : null}
 
@@ -82,9 +82,9 @@ export default async function EcoPage({ params, searchParams }: { params: Promis
               <legend className="mono" style={{ padding: "0 6px" }}>Publicación</legend>
               <label className="row" style={{ alignItems: "flex-start", gap: 10 }}>
                 <input type="checkbox" name="public_consent" defaultChecked={inv.publicConsent} style={{ marginTop: 4, accentColor: "var(--amber)" }} />
-                <span>Autorizo a publicar mi Eco con mi nombre en la Sala de {ctx.receiverName}. Si no lo marco, cuenta en el Aval pero no se muestra con mi nombre. Puedo retirarlo cuando quiera desde este enlace.</span>
+                <span>Autorizo a publicar mi Eco con el nombre que indico abajo (mi nombre y apellido o el de mi empresa) en la Sala y en la página pública del Aval de {ctx.receiverName}. Solo ese nombre y mi valoración: nunca mis datos de contacto. Si no lo marco, cuenta en el Aval pero no se muestra con mi nombre. Puedo retirarlo cuando quiera desde este enlace.</span>
               </label>
-              <div className="field"><label htmlFor="dn">Cómo quiero aparecer (empresa o nombre, opcional)</label><input id="dn" name="display_name" maxLength={80} defaultValue={inv.displayName ?? ""} placeholder="Metalúrgica del Sur" /></div>
+              <div className="field"><label htmlFor="dn">Cómo quiero aparecer (nombre y apellido, o nombre de empresa)</label><input id="dn" name="display_name" maxLength={80} defaultValue={inv.displayName ?? ""} placeholder="Metalúrgica del Sur" /></div>
             </fieldset>
             <button className="btn amber" type="submit">{received ? "Revisar mi Eco" : "Enviar mi Eco"}</button>
             <p className="mono">Nadie de NS te llamará por esto. Tus respuestas las ven las dos empresas y la red a la que pertenecen; nunca se venden ni se usan fuera de la red.</p>

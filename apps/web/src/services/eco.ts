@@ -68,7 +68,7 @@ export async function draftEcoRequest(db: Db, referralId: string, memberId: stri
     "",
     link,
     "",
-    "Tu respuesta llega a la red NS Network, a la que pertenecemos, y sirve para que las presentaciones entre empresas sigan siendo de confianza. Solo se publica con tu nombre si tú lo autorizas.",
+    "Tu respuesta llega a la red NS Network, a la que pertenecemos, y sirve para que las presentaciones entre empresas sigan siendo de confianza. Solo se publica con tu nombre, y nunca con tus datos de contacto, si tú lo autorizas.",
     "",
     `Gracias,`,
     `${person?.fullName ?? ""} · ${receiver!.name}`,
@@ -282,4 +282,45 @@ export async function runEcoClock(db: Db, now = new Date(), chapterId?: string):
     }
   }
   return res;
+}
+
+/**
+ * Página pública del Aval (D-042, matiz del fundador): lo que ve cualquiera fuera de la red.
+ * Solo el nombre de la empresa, su especialidad y Sala, el Aval con sus bloques, y de cada Eco publicado con consentimiento
+ * el nombre que el Interesado eligió, su valoración y su línea. Nunca datos de contacto: ni correo, ni teléfono, ni web,
+ * ni el nombre del Timonel, ni identificadores internos.
+ */
+export interface PublicAvalPage {
+  companyName: string;
+  specialtyName: string | null;
+  chapterName: string;
+  zoneName: string;
+  total: number;
+  provisional: boolean;
+  ecosCount: number;
+  embassyEligible: boolean;
+  blocks: { key: string; label: string; value: number; weight: number; evidence: string; hasData: boolean }[];
+  ecos: { displayName: string; score: number; comment: string | null; submittedAt: Date | null }[];
+}
+
+export async function publicAvalPage(db: Db, slug: string): Promise<PublicAvalPage | null> {
+  const company = await db.query.companies.findFirst({ where: eq(schema.companies.slug, slug) });
+  if (!company || company.status !== "ACTIVE") return null;
+  const chapter = await db.query.chapters.findFirst({ where: eq(schema.chapters.id, company.chapterId) });
+  const zone = chapter ? await db.query.zones.findFirst({ where: eq(schema.zones.id, chapter.zoneId) }) : undefined;
+  const seat = await db.query.categorySeats.findFirst({ where: eq(schema.categorySeats.companyId, company.id) });
+  const specialty = seat ? await db.query.specialties.findFirst({ where: eq(schema.specialties.id, seat.specialtyId) }) : undefined;
+  const aval = await avalOfCompany(db, company.chapterId, company.id);
+  return {
+    companyName: company.name,
+    specialtyName: specialty?.name ?? null,
+    chapterName: chapter?.name ?? "",
+    zoneName: zone?.name ?? "",
+    total: aval.total,
+    provisional: aval.provisional,
+    ecosCount: aval.ecosCount,
+    embassyEligible: aval.embassyEligible,
+    blocks: aval.blocks.map((b) => ({ key: b.key, label: b.label, value: b.value, weight: b.weight, evidence: b.evidence, hasData: b.hasData })),
+    ecos: aval.publicEcos.map((e) => ({ displayName: e.displayName ?? "Interesado", score: e.score, comment: e.comment, submittedAt: e.submittedAt })),
+  };
 }

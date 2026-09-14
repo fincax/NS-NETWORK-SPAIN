@@ -5,7 +5,7 @@ import { closeDb, getDb, schema, type Db } from "@/db/client";
 import { seedChapter, SCENARIOS } from "@/db/seed";
 import { createSignal, publishSignal } from "@/services/signals";
 import { authorizeIntro, decide, markIntroduced, submitVerdict, updateStage } from "@/services/referrals";
-import { avalOfCompany, draftEcoRequest, ecoOfReferral, ecoPageContext, markEcoRequested, pendingEcoRequests, submitEco, withdrawEcoPublicity } from "@/services/eco";
+import { avalOfCompany, draftEcoRequest, ecoOfReferral, ecoPageContext, markEcoRequested, pendingEcoRequests, publicAvalPage, submitEco, withdrawEcoPublicity } from "@/services/eco";
 import { runClock } from "@/services/clock";
 import { pendingDecisions, mesaTimeline } from "@/services/today";
 
@@ -114,6 +114,14 @@ describe("Eco: la voz del Interesado", () => {
     expect(aval.publicEcos).toHaveLength(1);
     expect(aval.publicEcos[0].displayName).toBe("Metalúrgica del Sur");
     expect(aval.provisional).toBe(true); // un solo hecho firme
+    // Página pública del Aval (matiz del fundador): nombre y valoración, sin datos de contacto de nadie
+    const pub = (await publicAvalPage(db, "hispalis"))!;
+    expect(pub.companyName).toBe("Reformas Industriales Híspalis");
+    expect(pub.total).toBe(aval.total);
+    expect(pub.ecos).toEqual([expect.objectContaining({ displayName: "Metalúrgica del Sur", score: 100 })]);
+    const flat = JSON.stringify(pub);
+    expect(flat).not.toMatch(/@|https?:\/\/|Carlos Ruiz|Rafael|referralId|token|\bid\b/);
+    expect(await publicAvalPage(db, "no-existe")).toBeNull();
     const cedente = await avalOfCompany(db, chapterId, companies.guadalquivir.companyId);
     expect(cedente.blocks.find((b) => b.key === "given_quality")?.hasData).toBe(true);
     await withdrawEcoPublicity(db, token);

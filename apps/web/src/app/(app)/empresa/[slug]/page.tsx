@@ -54,6 +54,7 @@ export default async function EmpresaPage({ params, searchParams }: { params: Pr
         <div className="row" style={{ alignItems: "baseline", marginBottom: 10 }}>
           <p className="eyebrow" style={{ margin: 0 }}>Aval · público en la red</p>
           <span className="spacer" />
+          <Link href={`/aval/${company.slug}`} className="mono" target="_blank" rel="noopener">Página pública del Aval ↗</Link>
           {aval.embassyEligible ? <span className="badge green">Elegible como Embajadora</span> : <span className="badge" title="Para acoger Embajadas hacen falta Aval, Ecos y voz de los Interesados">Embajadora: Aval ≥ {EMBASSY_ELIGIBILITY.minAval} · {EMBASSY_ELIGIBILITY.minEcos} Ecos · voz ≥ {Math.round(EMBASSY_ELIGIBILITY.minVoice * 100)}</span>}
         </div>
         <div className="row" style={{ alignItems: "baseline", gap: 18, marginBottom: 12 }}>
