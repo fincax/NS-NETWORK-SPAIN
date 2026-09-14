@@ -1375,9 +1375,13 @@ Y posteriormente:
 15. Cada mejora debe fortalecer el Network Effect.
 16. La Sala no es territorial: se define por sus empresas, no por su mapa.
 
+## Reglamento: Normas y Ventajas (D-043)
+
+Las obligaciones de los titulares y las ventajas de los destacados viven en un único registro vivo, el **Reglamento** (`docs/18_REGLAMENTO.md`, `apps/web/src/core/rulebook.ts`, visible en la Sala en `/sala/reglamento`). El fundador añade Normas (para todos) y Ventajas (para los destacados) en el tiempo; cada una se protocoliza de inmediato o cuando él lo diga, con estado, mecanismo, consecuencia y verificación. Una Norma sin verificación no está vigente. Las reglas inmutables de abajo son Normas del Reglamento con la marca inmutable.
+
 ## Reglas inmutables (D-010)
 
-Estas tres reglas están por encima de cualquier feature, decisión de diseño o modelo económico. No se revisan; se aplican.
+Estas reglas están por encima de cualquier feature, decisión de diseño o modelo económico. No se revisan; se aplican.
 
 1. **Nunca se cobra por un referido.** Ningún miembro puede pedir, ofrecer, aceptar o condicionar un referido a dinero, comisión, descuento, contraprestación o favor. NS tampoco cobra por referido (D-005). Hacerlo es **motivo de expulsión** de la Sala y de la red. El espíritu de NS es un network colaborativo: se da porque se pertenece.
 2. **Toda empresa debe aportar un número mínimo de referidos en los plazos que se estipulen.** Pertenecer a NS es contribuir. El mínimo y el plazo se fijan por Sala y se aplican con una escalera de consecuencias que termina en la pérdida de la plaza. El agente de cada empresa trabaja para que su miembro lo cumpla sin esfuerzo.

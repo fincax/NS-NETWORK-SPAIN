@@ -1050,3 +1050,32 @@ Cómo se aplica en el producto:
 **Consequences.** `Eco`, `Aval` y `Petición de Eco` en el léxico; Protocolo IV en `docs/14`; NS-ARP v0.3 con S13b (Eco) y §7.2 actualizado en `docs/02`; tarjeta con cara C en `docs/15`; tabla `endorsements` y columnas `aval`, `aval_status` en Cesiones (migración 0007); `core/aval.ts` (funciones puras), `services/eco.ts`, Reloj ampliado, página pública `/eco/[token]` fuera de la puerta de la demo, sección de Eco y Aval en la tarjeta, Aval en Dossier y Balanza, Peticiones pendientes en Hoy y en el icono; pruebas `eco.test.ts` y ampliación de `core.test.ts`.
 
 **Revisit when.** Se disponga de 50 Ecos en la Sala piloto, para calibrar pesos (25 · 35 · 40 y 40 · 25 · 20 · 15), umbrales de Embajadora y la ventana de 30 días. La publicación del Aval en la web pública y su alcance (nombre y valoración, sin contacto) quedan fijados por el fundador.
+
+---
+
+## D-043 · Reglamento: canal permanente de Normas de obligado cumplimiento para todos los titulares y Ventajas para los destacados, con protocolización inmediata o diferida a criterio del fundador
+
+**Status:** CONFIRMED (canal abierto por el fundador el 2026-09-14); criterio de "destacado" PROPOSED
+**Date:** 2026-09-14
+
+**Context.** El fundador va a crear normas internas de obligado cumplimiento y ventajas para titulares: normas para todos y ventajas para los destacados. Pide un canal para ir añadiéndolas en el tiempo y que se protocolicen de inmediato o cuando él lo diga. Hasta ahora las obligaciones vivían repartidas entre las reglas inmutables, los protocolos y decisiones sueltas; no había un registro único ni un lugar en la app donde el titular las viera con su estado.
+
+**Options.**
+
+1. Un documento de normas que se actualiza a mano, sin reflejo en el producto.
+2. Un registro único (documento + registro tipado en el código) con estados, visible en la Sala y comprobado por pruebas, que se alimenta en conversación.
+
+**Choice.** Opción 2, el **Reglamento** (`docs/18_REGLAMENTO.md` y `apps/web/src/core/rulebook.ts`).
+
+- **Entradas.** Normas (N-0xx, obligan a todos los titulares o a NS con la Sala) y Ventajas (V-0xx, para los titulares destacados). Cada una con enunciado, ámbito, estado, fecha, fuente, mecanismo, consecuencia o beneficio, y eventos de verificación.
+- **Estados.** BORRADOR (anotada, pendiente del fundador) → PROTOCOLIZADA (fijada por el fundador; especificada y visible en la Sala) → VIGENTE (NS la verifica y la aplica sola); SUSPENDIDA y DEROGADA con motivo. "De inmediato" = protocolizada hoy y vigente en cuanto el mecanismo esté en el código; "cuando se diga" = borrador.
+- **Visible en la Sala.** `/sala/reglamento` muestra todas las entradas con su estado, cómo se aplican y qué pasa si se incumplen. Nada se aplica por sorpresa.
+- **Integridad.** Una prueba comprueba que los identificadores son únicos, que toda entrada vigente tiene mecanismo y verificación, que toda Norma protocolizada tiene consecuencia, y que las verificaciones nombran eventos que existen en el protocolo.
+- **Siembra.** Las reglas inmutables (D-010, D-018, D-019, D-042) y las obligaciones ya en vigor (plazos de D-024 y D-030, Veredicto, plaza única y Timonel, autonomía externa, ADN validado) entran como Normas N-001 a N-012; la Embajada, la prioridad en la Mesa, la prima de Embajada, la Distinción, los Niveles y la gratificación de la Promotora entran como Ventajas V-001 a V-006.
+- **Destacado (propuesta).** Aval firme ≥ 85, En Ritmo o Por encima en las últimas 8 semanas, Comunicado al día y sin incumplimientos en el Ejercicio. Calculado cada noche, visible en el Dossier, nunca un ranking. Pendiente de que el fundador lo confirme o fije otro criterio.
+
+**Why.** Convierte las normas en producto: el titular las ve, el Reloj las empuja, el Aval y el Mérito las miden y la Directiva las aplica con evidencia. Da al fundador un canal de una línea para legislar y una garantía de que nada se pierde en conversaciones.
+
+**Consequences.** `docs/18_REGLAMENTO.md`, `core/rulebook.ts`, página `/sala/reglamento` con enlace desde Mi Sala, prueba `rulebook.test.ts`, términos Reglamento · Norma · Ventaja · Destacado en el léxico, referencia en `CLAUDE.md` y README.
+
+**Revisit when.** El fundador fije el criterio de Destacado, los parámetros del Compromiso (N-002) y las consecuencias pendientes (N-009, N-012), o cuando el Reglamento supere las veinte entradas y convenga agruparlas por capítulos.

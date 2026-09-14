@@ -129,6 +129,10 @@ Alternativas consideradas para Tramo: "Escalón" y "Nivel de cuota" (descartado 
 | **NS-AEP** | NS Agentic Endorsement Protocol: cómo nace la invitación al Eco, cómo se redacta y envía la Petición, cómo responde el Interesado, cómo se calcula y publica el Aval y qué hace el Reloj si nadie da la palabra. |
 | **NS-CAT** | Clasificación NS de Actividades: base CNAE + Especialidad NS, ampliable y versionada. |
 | **Especialidad** | Nivel de NS-CAT que otorga plaza. |
+| **Reglamento** | Registro vivo de Normas y Ventajas de los titulares, con estado (borrador, protocolizada, vigente), mecanismo, consecuencia y verificación. Lo alimenta el fundador; la Sala lo ve en la app (D-043). | `docs/18`, `core/rulebook.ts`, `/sala/reglamento` |
+| **Norma** | Regla de obligado cumplimiento para todos los titulares (o para NS con la Sala). N-0xx. Vigente solo cuando NS la verifica y la aplica. | `Rule{kind: NORMA}` |
+| **Ventaja** | Lo que gana el titular destacado. V-0xx. Amplía el acceso; nunca restringe el básico ni es dinero por referidos. | `Rule{kind: VENTAJA}` |
+| **Destacado** | Titular que cumple el criterio fijado por el fundador (propuesta: Aval firme ≥ 85, En Ritmo ocho semanas, Comunicado al día, sin incumplimientos). Condición, nunca ranking. | `DESTACADO` |
 | **Reglas inmutables** | Nunca se cobra por una Cesión (expulsión); Compromiso obligatorio; calidad sobre cantidad (D-010); Comunicado semanal (D-018); Balanza pública (D-019); toda Cesión da la palabra al Interesado (D-042). |
 
 ---

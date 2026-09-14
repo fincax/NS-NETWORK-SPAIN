@@ -25,7 +25,7 @@ export default async function SalaPage() {
           <h1>{chapter.name}</h1>
           <p className="lead">{occupied} plazas ocupadas · {seats.length - occupied} vacantes · Ritmo {chapter.weeklyPace} Cesión válida por semana y titular.</p>
         </div>
-        <Link href="/sala/alta" className="btn">Solicitar plaza para una empresa</Link>
+        <div className="row"><Link href="/sala/reglamento" className="btn ghost">Reglamento</Link><Link href="/sala/alta" className="btn">Solicitar plaza para una empresa</Link></div>
       </div>
 
       <section>
