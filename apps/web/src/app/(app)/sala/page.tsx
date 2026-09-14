@@ -5,6 +5,7 @@ import { requireMember } from "@/lib/session";
 import { balance } from "@/services/today";
 import { eur } from "@/lib/format";
 import { openDemands } from "@/services/demands";
+import { compromisoStatus } from "@/services/compromiso";
 
 export default async function SalaPage() {
   const { chapter, company } = await requireMember();
@@ -12,7 +13,7 @@ export default async function SalaPage() {
   const seats = await db.select({ id: schema.categorySeats.id, status: schema.categorySeats.status, specialtyName: schema.specialties.name, code: schema.specialties.nscatCode, companyId: schema.categorySeats.companyId }).from(schema.categorySeats).innerJoin(schema.specialties, eq(schema.specialties.id, schema.categorySeats.specialtyId)).where(eq(schema.categorySeats.chapterId, chapter.id)).orderBy(asc(schema.specialties.name));
   const companies = await db.query.companies.findMany({ where: eq(schema.companies.chapterId, chapter.id), orderBy: [asc(schema.companies.name)] });
   const byId = new Map(companies.map((c) => [c.id, c]));
-  const balances = await Promise.all(companies.map(async (c) => ({ c, b: await balance(db, chapter.id, c.id) })));
+  const balances = await Promise.all(companies.filter((c) => c.status !== "RELEASED").map(async (c) => ({ c, b: await balance(db, chapter.id, c.id), r: await compromisoStatus(db, chapter.id, c.id) })));
   const occupied = seats.filter((s) => s.status === "ACTIVE").length;
   const demandsOpen = await openDemands(db, chapter.id);
   return (
@@ -21,7 +22,7 @@ export default async function SalaPage() {
         <div>
           <p className="eyebrow">NS Sevilla · Sala</p>
           <h1>{chapter.name}</h1>
-          <p className="lead">{occupied} plazas ocupadas · {seats.length - occupied} vacantes · Ritmo {chapter.weeklyPace} Cesión válida por semana y titular.</p>
+          <p className="lead">{occupied} plazas ocupadas · {seats.length - occupied} vacantes · Ritmo {Math.max(1, chapter.weeklyPace)} Cesión válida por semana y titular, sin excusas; a la cuarta semana sin ceder, la plaza vuelve a la Antesala (D-042).</p>
         </div>
         <Link href="/sala/alta" className="btn">Solicitar plaza para una empresa</Link>
       </div>
@@ -56,14 +57,15 @@ export default async function SalaPage() {
         <p className="lead" style={{ fontSize: 14, marginBottom: 12 }}>Lo que cada titular da y recibe. Ordenada por plaza, nunca un ranking. Solo valor contrastado.</p>
         <div className="table-wrap">
           <table>
-            <thead><tr><th>Titular</th><th className="num">Cesiones dadas</th><th className="num">Recibidas</th><th className="num">Valor generado</th><th className="num">Valor recibido</th><th className="num">Mérito</th></tr></thead>
+            <thead><tr><th>Titular</th><th className="num">Cesiones dadas</th><th className="num">Recibidas</th><th className="num">Valor generado</th><th className="num">Valor recibido</th><th className="num">Mérito</th><th>Ritmo</th></tr></thead>
             <tbody>
-              {balances.map(({ c, b }) => (
+              {balances.map(({ c, b, r }) => (
                 <tr key={c.id} style={c.id === company.id ? { background: "var(--graphite)" } : undefined}>
                   <td><Link href={`/empresa/${c.slug}`}>{c.name}</Link></td>
                   <td className="num">{b.given}</td><td className="num">{b.received}</td>
                   <td className="num money">{eur(b.valueGiven)}</td><td className="num money">{eur(b.valueReceived)}</td>
                   <td className="num">{b.merit}</td>
+                  <td><span className={`badge ${r.lastAction === "RELEASE_NOTICE" || r.missedStreak >= 2 ? "red" : r.thisWeek.validCount >= r.minimum ? "green" : ""}`}>{r.label}</span></td>
                 </tr>
               ))}
             </tbody>

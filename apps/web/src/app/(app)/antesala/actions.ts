@@ -5,6 +5,7 @@ import { getDb } from "@/db/client";
 import { requireMember } from "@/lib/session";
 import { updateCandidacy, CandidacyTransitionError, type CandidacyStatus } from "@/services/antesala";
 import { activateFounding, FoundingError, joinFounding, startFounding } from "@/services/fundacion";
+import { CompromisoError, executeRelease } from "@/services/compromiso";
 
 const STATUSES: CandidacyStatus[] = ["NEW", "CONTACTED", "INTERVIEW", "APPROVED", "WAITLISTED", "FOUNDING", "DECLINED", "ACTIVATED"];
 
@@ -53,4 +54,21 @@ export async function foundingAction(formData: FormData) {
   revalidatePath("/antesala");
   revalidatePath("/hoy");
   redirect(`/antesala?vista=${view}#fundacion`);
+}
+
+/** Baja de titularidad por Compromiso (D-042): la Directiva la ejecuta; la plaza vuelve a la Antesala. */
+export async function releaseAction(formData: FormData) {
+  const { member, chapter } = await requireMember();
+  const db = await getDb();
+  const view = String(formData.get("view") ?? "pendientes");
+  try {
+    await executeRelease(db, { chapterId: chapter.id, companyId: String(formData.get("companyId") ?? ""), memberId: member.id });
+  } catch (e) {
+    const msg = e instanceof CompromisoError ? e.message : "No se pudo ejecutar la baja.";
+    redirect(`/antesala?vista=${view}&error=${encodeURIComponent(msg)}#bajas`);
+  }
+  revalidatePath("/antesala");
+  revalidatePath("/sala");
+  revalidatePath("/hoy");
+  redirect(`/antesala?vista=${view}`);
 }

@@ -293,7 +293,7 @@ Reglas derivadas:
 
 **Consequences.** `CLAUDE.md` y `00_NORTH_STAR.md` incorporan una sección "Reglas inmutables". NS-ARP v0.2 añade la comprobación 10 de Compliance, los nuevos `TrustEvent` y el objeto `ContributionQuota`. La solicitud de membresía y el onboarding incluyen aceptación expresa. El banco de ideas (`11_IDEAS_DISRUPTIVAS.md`) reformula el pilar 2 como "con suelo, sin techo".
 
-**Revisit when.** Nunca en cuanto a las tres reglas. Los parámetros de la cuota (número, periodo, consecuencias) se revisan tras el primer periodo completo de NS Sevilla.
+**Revisit when.** Nunca en cuanto a las tres reglas. Los parámetros de la cuota (número, periodo, consecuencias) quedaron fijados por el fundador en **D-042** (2026-09-14): mínimo de 1 Cesión válida por semana y escalera de cuatro semanas hasta la baja.
 
 **Aclaración del fundador (2026-09-11).** Los referidos NS son ajenos a la circulación de negocio ordinaria entre empresas miembro. Que dos miembros se contraten entre sí no es un referido ni está sujeto a estas reglas; lo prohibido es condicionar un referido a cualquier contraprestación.
 
@@ -1014,3 +1014,38 @@ Cómo se aplica en el producto:
 **Consequences.** Tabla `chapter_foundings` y columna `founding_id` en candidaturas (migración 0006), estado "En fundación", `services/fundacion.ts`, sección "Salas en fundación" y botones en la Antesala, alta en una Sala recién fundada, aviso en la portada, Sala en fundación de demostración (Correduría Giralda como Promotora, 3 de 12), pruebas.
 
 **Revisit when.** Se conozca el mínimo real tras las primeras fundaciones, se fije la gratificación definitiva, o se construya el kit de promoción de la Promotora.
+
+---
+
+## D-042 · Compromiso: mínimo de 1 Cesión válida por semana, sin excusas; cuatro semanas sin ceder suponen la baja de la titularidad (aviso diplomático en la 2.ª, aviso formal en la 3.ª, notificación de baja en la 4.ª)
+
+**Status:** CONFIRMED (regla fijada por el fundador)
+**Date:** 2026-09-14
+
+**Context.** D-010 dejó la regla inmutable de aportación mínima con los parámetros pendientes: número, periodo y escalera de consecuencias. Hasta hoy la especificación hablaba de un "Ejercicio" por estipular (mes o trimestre), de un Ritmo de NS "propuesto" de 1 por semana y de una escalera larga con plan de contribución y plaza en revisión. El fundador fija los parámetros y los endurece.
+
+**Choice.** Regla del fundador, literal en lo esencial:
+
+- **Mínimo: 1 Cesión válida a la semana.** Válida es la que el cesionario acepta (transición a `APPROVED`, momento en que ya cuenta para el Compromiso según D-024) y que NS puede auditar. El mínimo es el suelo de NS; una Sala puede fijar un Ritmo mayor, nunca menor.
+- **Con el mínimo se cumple, pero nunca se destaca.** NS promueve que cada titular ceda **varias** Cesiones **a varias especialidades**. El Mérito semanal lo refleja: base por cumplir y un plus por cada especialidad distinta a la que se cede. La Brújula lo dice con esas palabras cuando el titular cumple con una sola.
+- **No se debe fallar, sin excusas.** Cada semana completa sin una sola Cesión válida consta en la Balanza y en la Brújula y resta en la Hoja de Méritos. No hay periodos de gracia, planes de contribución ni plazas en revisión.
+- **Escalera de cuatro semanas seguidas sin una sola Cesión válida:**
+
+```text
+Semana 1   Constancia: la Balanza y la Brújula lo muestran; el Agente propone Movimientos.
+Semana 2   Aviso diplomático del Agente al Timonel.
+Semana 3   Aviso formal de la Directiva: aportar lo antes posible. Lo ven la empresa y la Directiva.
+Semana 4   Notificación de baja de la titularidad. La empresa queda suspendida y su plaza vuelve a la Antesala.
+```
+
+- **Una Cesión válida pone la cuenta a cero.** La escalera cuenta semanas seguidas; cualquier semana cumplida la reinicia.
+- **Ejecución de la baja.** La notificación es automática y sin excepciones. La ejecución material (plaza vacante, empresa fuera de la Sala, Agente inactivo) la hace la Directiva con un toque desde la Antesala, porque es una operación irreversible y reputacionalmente sensible (constitución §7: las acciones irreversibles llevan una puerta humana). La Directiva no decide si procede la baja: la ejecuta. Mientras tanto, la empresa está suspendida y no participa en la Mesa.
+- **Semana y primera semana.** La semana va de lunes a domingo (UTC). La semana de alta no cuenta: la primera semana completa en la Sala es la primera evaluada. Se evalúa cada mañana en la Ronda, una sola vez por titular y semana.
+- **Coherencia con el resto.** El Ritmo (D-019) deja de ser "propuesta" y pasa a ser 1 por defecto, con la Sala pudiendo subirlo. El "Ejercicio" sigue existiendo para la Promesa, la cuota por Tramos (D-025) y la Embajada, pero el Compromiso ya no se mide por Ejercicio sino por semana. El Comunicado (D-018) mantiene su propia escalera, más suave, y solo "el incumplimiento reiterado" llega a la de D-042.
+
+**Why.** Un club en el que se puede no ceder durante un mes sin consecuencias no es un club de contribución. La escalera corta y pública convierte la regla inmutable 2 en algo que se cumple sin esfuerzo la inmensa mayoría de las semanas, porque el Agente trabaja para ello, y que libera la plaza rápido cuando una empresa no aporta. El plus por especialidades distintas empuja hacia el comportamiento que hace red: ceder a muchos, no solo al vecino de plaza.
+
+**Consequences.** Nuevo `apps/web/src/core/compromiso.ts` (reglas puras: escalera, semana, Mérito semanal), tabla `contribution_weeks` (migración 0007), `services/compromiso.ts` (evaluación semanal idempotente, avisos, notificación de baja, ejecución por la Directiva, estado para Brújula y Balanza), paso 5 del Reloj de la Sala dentro de la Ronda, tarjeta de Compromiso en Hoy, columna Ritmo en la Balanza, sección "Bajas notificadas por Compromiso" en la Antesala, pruebas (`tests/compromiso.test.ts`). Documentación: regla inmutable 2 en `CLAUDE.md` y `00_NORTH_STAR.md`, léxico (Compromiso, Ejercicio, Aviso diplomático, Aviso formal, Baja), `14_PROTOCOLOS_DE_SALA.md` §5 y §4, NS-ARP pendiente 6 cerrado, `06_DATA_MODEL.md`, `11_IDEAS_DISRUPTIVAS.md` B8, `17_DESPLIEGUE.md`.
+
+**Revisit when.** Nunca en cuanto a la regla. El plus de Mérito por especialidades distintas y el peso de cada peldaño se calibran tras cuatro semanas de la Sala piloto.
+

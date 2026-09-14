@@ -52,7 +52,7 @@ Estas son las cinco cosas que faltan hoy y que hacen imprudente abrir la puerta 
 | 4 | **Textos legales y GDPR** | Aviso de privacidad, condiciones de la plaza (con las reglas inmutables y la cuota por Tramos), base jurídica de los datos de terceros, retención y borrado. Es `docs/08_SECURITY_PRIVACY_GDPR.md`, que aún no existe. | 1 semana con un abogado |
 | 5 | **La entrevista del ADN por el Agente** | Hecha en su primera versión (D-040): el alta desemboca en la entrevista, el ADN se construye conversando y se valida al final. Falta afinarla con Timoneles reales y con la clave del modelo en el servidor. | Hecha · afinar 2 días |
 
-A esto se suman las decisiones de producto que siguen esperándote y que la web pública y el onboarding necesitan: importes de la cuota y Tramos (D-025), parámetros del Compromiso (D-010), lista de especialidades fundadoras de NS Cumbre, tipografía (D-023).
+A esto se suman las decisiones de producto que siguen esperándote y que la web pública y el onboarding necesitan: importes de la cuota y Tramos (D-025), lista de especialidades fundadoras de NS Cumbre, tipografía (D-023). Los parámetros del Compromiso quedaron fijados en D-042.
 
 **Estimación honesta:** unas 4 a 6 semanas de trabajo del equipo fundador desde que se decida, más el tiempo del abogado. Antes de eso, la "producción" sería una demo con datos reales, que es lo peor de los dos mundos.
 

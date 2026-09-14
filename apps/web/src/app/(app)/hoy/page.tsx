@@ -3,6 +3,7 @@ import { and, desc, eq, inArray, or } from "drizzle-orm";
 import { getDb, schema } from "@/db/client";
 import { currentMember, requireDemo } from "@/lib/session";
 import { todaySummary, balance } from "@/services/today";
+import { compromisoStatus } from "@/services/compromiso";
 import { REVIEW_STATES } from "@/core/state-machine";
 import { daysAgo, eur, eurRange, firstName, greeting } from "@/lib/format";
 import { Encaje, Empty, StateBadge } from "@/components/ui";
@@ -32,6 +33,8 @@ export default async function HoyPage() {
   await runClockThrottled(db, chapter.id);
   const summary = await todaySummary(db, chapter.id, company.id, daysAgo(7));
   const bal = await balance(db, chapter.id, company.id);
+  const compromiso = await compromisoStatus(db, chapter.id, company.id);
+  const compromisoTone = compromiso.lastAction === "RELEASE_NOTICE" || compromiso.missedStreak >= 2 ? "red" : compromiso.thisWeek.validCount >= compromiso.minimum ? "green" : "amber";
   const companies = new Map((await db.query.companies.findMany()).map((c) => [c.id, c]));
 
   const pending = await db.query.referrals.findMany({
@@ -76,6 +79,11 @@ export default async function HoyPage() {
       </div>
 
       <InstallHint />
+
+      <section className={`card ${compromisoTone} row`} style={{ justifyContent: "space-between", gap: 14 }} aria-label="Compromiso de la semana">
+        <span><strong>Compromiso · {compromiso.label}.</strong> Esta semana {compromiso.thisWeek.validCount} de {compromiso.minimum} Cesión válida{compromiso.thisWeek.distinctSpecialties > 1 ? ` a ${compromiso.thisWeek.distinctSpecialties} especialidades` : ""}. {compromiso.nextStep}</span>
+        <span className="mono">Brújula · solo tú lo ves</span>
+      </section>
 
       {dnaRow && !dnaRow.validatedAt ? (
         <Link href="/entrevista" className="card amber row" style={{ justifyContent: "space-between", textDecoration: "none" }}>

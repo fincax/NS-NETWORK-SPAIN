@@ -254,6 +254,23 @@ export const referralTransitions = pgTable("referral_transitions", {
   occurredAt: createdAt(),
 });
 
+/** Compromiso semanal (D-042): una fila por titular y semana evaluada. La escalera vive aquí, no en la Cesión. */
+export const contributionWeeks = pgTable(
+  "contribution_weeks",
+  {
+    id: id(),
+    chapterId: uuid("chapter_id").notNull().references(() => chapters.id),
+    companyId: uuid("company_id").notNull().references(() => companies.id),
+    weekStart: timestamp("week_start", { withTimezone: true }).notNull(), // lunes 00:00 UTC
+    validCount: integer("valid_count").notNull().default(0),
+    distinctSpecialties: integer("distinct_specialties").notNull().default(0),
+    missedStreak: integer("missed_streak").notNull().default(0), // semanas seguidas sin Cesión válida, incluida esta
+    action: text("action").notNull().default("NONE"), // NONE | MISSED | DIPLOMATIC_NOTICE | FORMAL_NOTICE | RELEASE_NOTICE
+    createdAt: createdAt(),
+  },
+  (t) => [uniqueIndex("contribution_week_unique").on(t.companyId, t.weekStart), index("contribution_chapter_week").on(t.chapterId, t.weekStart)],
+);
+
 export const humanDecisions = pgTable("human_decisions", {
   id: id(),
   referralId: uuid("referral_id").notNull().references(() => referrals.id),

@@ -3,6 +3,7 @@
  *  - Revisión: recordatorio a las 72 h; caducidad a los 7 días (vuelve al cedente; el silencio cuenta).
  *  - Puente: respuesta al Interesado en 48 h; si no hay hito, RESPONSE_LATE para el cesionario.
  *  - Seguimiento: el Agente pregunta cada 14 días.
+ *  - Compromiso (D-042): cada semana completa, cuenta de Cesiones válidas por titular y escalera de avisos hasta la baja.
  * Idempotente: cada acción se marca en la Cesión y no se repite. El empujón lo recibe el Timonel, nunca el Interesado.
  */
 import { and, eq, inArray, lt, isNull, or } from "drizzle-orm";
@@ -10,19 +11,21 @@ import type { Db } from "@/db/client";
 import { schema } from "@/db/client";
 import { audit } from "@/lib/audit";
 import { TIMEOUTS } from "@/core/state-machine";
+import { evaluateCompromiso, type CompromisoResult } from "@/services/compromiso";
 
 export interface ClockResult {
   reminders: number;
   expired: number;
   late: number;
   nudges: number;
+  compromiso: CompromisoResult;
 }
 
 const H = 3_600_000;
 const D = 86_400_000;
 
 export async function runClock(db: Db, now = new Date(), chapterId?: string): Promise<ClockResult> {
-  const res: ClockResult = { reminders: 0, expired: 0, late: 0, nudges: 0 };
+  const res: ClockResult = { reminders: 0, expired: 0, late: 0, nudges: 0, compromiso: { evaluated: 0, met: 0, notices: 0, releases: 0 } };
   const scope = chapterId ? eq(schema.referrals.chapterId, chapterId) : undefined;
 
   // 1 · Recordatorio a las 72 h en revisión
@@ -69,6 +72,17 @@ export async function runClock(db: Db, now = new Date(), chapterId?: string): Pr
     await db.update(schema.referrals).set({ lastNudgeAt: now }).where(eq(schema.referrals.id, r.id));
     await audit(db, { chapterId: r.chapterId, kind: "CHECK_IN", actor: { type: "AGENT", id: "clock" }, subject: { type: "Referral", id: r.id }, policyApplied: "timeouts.checkin_14d", result: "Tu Agente pregunta: ¿cómo va esta Cesión? Actualiza el hito o cierra con el Veredicto. Al cedente también le gustará saberlo.", significant: true, companyIds: [r.receiverCompanyId] });
     res.nudges++;
+  }
+
+  // 5 · Compromiso semanal (D-042): última semana completa, una vez por titular
+  if (chapterId) {
+    res.compromiso = await evaluateCompromiso(db, now, chapterId);
+  } else {
+    const chapters = await db.query.chapters.findMany({ columns: { id: true } });
+    for (const c of chapters) {
+      const r = await evaluateCompromiso(db, now, c.id);
+      res.compromiso = { evaluated: res.compromiso.evaluated + r.evaluated, met: res.compromiso.met + r.met, notices: res.compromiso.notices + r.notices, releases: res.compromiso.releases + r.releases };
+    }
   }
   return res;
 }

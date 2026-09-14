@@ -4,7 +4,8 @@ import { requireDirector } from "@/lib/session";
 import { NSCAT, SPECIALTY_NAME } from "@/db/nscat";
 import { dateTime } from "@/lib/format";
 import { Empty } from "@/components/ui";
-import { candidacyAction, foundingAction } from "./actions";
+import { candidacyAction, foundingAction, releaseAction } from "./actions";
+import { pendingReleases } from "@/services/compromiso";
 import { listFoundings } from "@/services/fundacion";
 import { CANDIDACY_LABEL, CANDIDACY_TRANSITIONS, candidacyCounts, listCandidacies, triageCandidacy, type Candidacy, type CandidacyStatus, type CandidacyTriage, type CandidacyView } from "@/services/antesala";
 
@@ -122,7 +123,7 @@ export default async function AntesalaPage({ searchParams }: { searchParams: Pro
     );
   }
   const db = await getDb();
-  const [counts, rows, foundings] = await Promise.all([candidacyCounts(db), listCandidacies(db, view), listFoundings(db, ctx.chapter.zoneId)]);
+  const [counts, rows, foundings, releases] = await Promise.all([candidacyCounts(db), listCandidacies(db, view), listFoundings(db, ctx.chapter.zoneId), pendingReleases(db, ctx.chapter.id)]);
   const triaged = await Promise.all(rows.map(async (c) => ({ c, t: await triageCandidacy(db, ctx.chapter.id, c) })));
   const countFor: Record<CandidacyView, number> = { pendientes: counts.pendientes, espera: counts.espera, aprobadas: counts.aprobadas, declinadas: counts.declinadas, todas: counts.todas };
 
@@ -140,6 +141,19 @@ export default async function AntesalaPage({ searchParams }: { searchParams: Pro
           <div><strong>{counts.aprobadas}</strong><span className="mono">aprobadas</span></div>
         </div>
       </div>
+
+      {releases.length ? (
+        <section id="bajas" className="stack" style={{ gap: 10 }}>
+          <h2 style={{ margin: 0 }}>Bajas notificadas por Compromiso</h2>
+          <p className="lead" style={{ fontSize: 14 }}>Cuatro semanas seguidas sin una sola Cesión válida suponen la baja de la titularidad (D-010, D-042). El sistema ya ha notificado a la empresa; la Directiva ejecuta la baja y la plaza vuelve a la Antesala.</p>
+          {releases.map((r) => (
+            <article key={r.seatId} className="card red row" style={{ justifyContent: "space-between", gap: 12 }}>
+              <span><strong>{r.company.name}</strong> · plaza de {r.specialtyName}</span>
+              <form action={releaseAction}><input type="hidden" name="companyId" value={r.company.id} /><input type="hidden" name="view" value={view} /><button type="submit" className="btn small">Ejecutar la baja</button></form>
+            </article>
+          ))}
+        </section>
+      ) : null}
 
       {foundings.length ? (
         <section id="fundacion" className="stack" style={{ gap: 10 }}>

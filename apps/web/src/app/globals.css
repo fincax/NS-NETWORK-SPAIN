@@ -59,6 +59,7 @@ main { padding: 32px 24px 80px; max-width: 1120px; width: 100%; margin: 0 auto; 
 .card { background: var(--graphite); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
 .card.amber { border-color: rgba(232, 163, 61, 0.55); }
 .card.green { border-color: rgba(47, 191, 113, 0.5); }
+.card.red { border-color: rgba(210, 85, 74, 0.6); }
 .card.quiet { background: transparent; border-style: dashed; color: var(--muted); }
 .card h2 { margin-bottom: 6px; }
 .section { margin-top: 36px; }

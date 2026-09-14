@@ -61,13 +61,14 @@ export async function runRonda(db: Db, now = new Date(), feed: PublicFeed = new 
       ownSources.errors += o.errors;
     }
 
-    const worked = clock.reminders + clock.expired + clock.late + clock.nudges + rastreo.drafts + ownSources.drafts > 0;
+    const worked = clock.reminders + clock.expired + clock.late + clock.nudges + clock.compromiso.evaluated + rastreo.drafts + ownSources.drafts > 0;
     if (worked) {
       const parts = [
         clock.reminders ? `${clock.reminders} recordatorio(s)` : null,
         clock.expired ? `${clock.expired} Cesión(es) caducada(s)` : null,
         clock.late ? `${clock.late} respuesta(s) tardía(s)` : null,
         clock.nudges ? `${clock.nudges} check-in(s)` : null,
+        clock.compromiso.evaluated ? `Compromiso de la semana evaluado a ${clock.compromiso.evaluated} titular(es): ${clock.compromiso.met} cumplen${clock.compromiso.notices ? `, ${clock.compromiso.notices} aviso(s)` : ""}${clock.compromiso.releases ? `, ${clock.compromiso.releases} baja(s) notificada(s)` : ""}` : null,
         rastreo.drafts ? `${rastreo.drafts} Indicio(s) en borrador desde fuentes públicas` : null,
         ownSources.drafts ? `${ownSources.drafts} Indicio(s) en borrador desde fuentes propias de los Agentes` : null,
       ].filter(Boolean);

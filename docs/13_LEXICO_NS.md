@@ -59,8 +59,9 @@ Criterios de cada nombre: castellano; una palabra siempre que sea posible; insti
 | **Mérito** | Unidad de reputación verificable. Nace en tres momentos: Mérito de Promesa (al aceptarse la Cesión), Mérito de Veredicto (al valorarla el cesionario) y Mérito de Cierre (al contrastarse el valor). Nunca de cantidad. | `TrustEvent.weight` |
 | **Hoja de Méritos** | Panel público (dentro de la red) de comportamientos verificables de una empresa: cesiones, calidad media, valor contrastado, tiempo de respuesta, fiabilidad como cesionario. Nunca un número opaco. | `ReputationProfile` |
 | **Distinción** | Reconocimiento que el cesionario otorga al cedente por una Cesión concreta, nombrando el eje que destacó (Facilidad, Negocio o Trato) y una línea de motivo. Escasa: máximo una por titular y mes. Se publica en la Crónica y alimenta el Mérito. De entre las Distinciones del mes sale la **Cesión del mes** de la Sala. | `Recognition{axis, reason}` |
-| **Compromiso** | Mínimo de Cesiones válidas por Ejercicio que toda empresa debe aportar (D-010). | `ContributionQuota` |
-| **Ejercicio** | Periodo de cómputo del Compromiso (por estipular: mes o trimestre). | `QuotaPeriod` |
+| **Compromiso** | Mínimo de Cesiones válidas que toda empresa debe ceder: al menos una por semana, sin excusas (D-010, D-042). Con una se cumple; para destacar, varias y a varias especialidades. | `ContributionWeek` |
+| **Escalera** | Consecuencias de las semanas seguidas sin una sola Cesión válida: 1.ª constancia, 2.ª **Aviso diplomático** del Agente, 3.ª **Aviso formal** de la Directiva, 4.ª **Baja** de la titularidad, que la Directiva ejecuta y devuelve la plaza a la Antesala (D-042). Una Cesión válida pone la cuenta a cero. | `ContributionWeek{ missed_streak, action }` |
+| **Ejercicio** | Periodo de cómputo de la Promesa, la cuota por Tramos y la Embajada (por estipular: mes o trimestre). El Compromiso se mide por semana. | `Period` |
 | **Niveles** | Miembro · Contribuidor · Referente · Consejero · Fundador. Se ganan con Mérito; amplían acceso, nunca lo restringen. ("Embajador" queda reservado a la Embajada.) | `MembershipTier` |
 | **Arbitraje** | Resolución de disputas entre cedente y cesionario por la Directiva. | `Dispute` |
 | **Cuota** | El precio de la suscripción a NS: lo que paga una empresa a NS por su plaza y su Agente. Coste inicial (por decidir si existe) y cuota mensual por Tramos. Son los ingresos de NS. Es un plano distinto de la regla entre miembros: nunca es un porcentaje del negocio ni un cargo por Cesión (D-005, D-025). | `MembershipPlan` |
@@ -123,7 +124,7 @@ Alternativas consideradas para Tramo: "Escalón" y "Nivel de cuota" (descartado 
 | **NS-ATP** | NS Agentic Transparency Protocol: cómo se calculan, contrastan y publican la Balanza y el Ritmo, y cómo el Agente genera la Brújula y sus Movimientos. |
 | **NS-CAT** | Clasificación NS de Actividades: base CNAE + Especialidad NS, ampliable y versionada. |
 | **Especialidad** | Nivel de NS-CAT que otorga plaza. |
-| **Reglas inmutables** | Nunca se cobra por una Cesión (expulsión); Compromiso obligatorio; calidad sobre cantidad (D-010). |
+| **Reglas inmutables** | Nunca se cobra por una Cesión (expulsión); Compromiso obligatorio de una Cesión válida por semana con Escalera de cuatro semanas (D-010, D-042); calidad sobre cantidad; Comunicado semanal (D-018); Balanza pública (D-019). |
 
 ---
 
