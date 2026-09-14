@@ -14,6 +14,7 @@ import { computePromise } from "@/core/merit";
 import { assertTransition, TIMEOUTS } from "@/core/state-machine";
 import { NeedDraft, VALUE_BAND_RANGE, type QualificationTurn, type SignalEnvelope } from "@/core/types";
 import { matchingDemand, openDemands } from "@/services/demands";
+import { avalOfCompany } from "@/services/eco";
 
 const MIN_PLAUSIBILITY = 0.4;
 const MIN_PRELIMINARY_FIT = 0.35;
@@ -93,18 +94,25 @@ export async function runMesa(db: Db, opportunitySignalId: string): Promise<Mesa
       await audit(db, { chapterId, kind: "AGENT_DISCOVERY", actor: { type: "AGENT", id: matchmaker.id }, subject: { type: "Need", id: needRow.id }, inputsUsed: [{ type: "Need", id: needRow.id, layer: 0 }], result: `${caps.length} Agente(s) consultado(s) para "${need.description}".`, significant: caps.length > 1 });
     }
 
-    // Prioridad de plaza (D-001): titulares antes que capabilities secundarias
-    const ordered = [...caps].sort((a, b) => Number(b.isPrimarySeat) - Number(a.isPrimarySeat));
+    // Prioridad de plaza (D-001): titulares antes que capabilities secundarias. A igual plaza, primero quien tiene más Aval (D-042).
+    const avalByCompany = new Map<string, Awaited<ReturnType<typeof avalOfCompany>>>();
+    for (const cap of caps) if (!avalByCompany.has(cap.companyId)) avalByCompany.set(cap.companyId, await avalOfCompany(db, chapterId, cap.companyId));
+    const ordered = [...caps].sort((a, b) => Number(b.isPrimarySeat) - Number(a.isPrimarySeat) || (avalByCompany.get(b.companyId)?.total ?? 0) - (avalByCompany.get(a.companyId)?.total ?? 0));
 
     for (const cap of ordered) {
       const company = await db.query.companies.findFirst({ where: eq(schema.companies.id, cap.companyId) });
+      const aval = avalByCompany.get(cap.companyId);
       const dnaRow = await db.query.businessDna.findFirst({ where: eq(schema.businessDna.companyId, cap.companyId) });
       const companyAgent = await db.query.agents.findFirst({ where: and(eq(schema.agents.companyId, cap.companyId), eq(schema.agents.kind, "COMPANY")) });
       const specialty = specialtyById.get(cap.specialtyId);
       if (!company || !dnaRow || !companyAgent || !specialty) continue;
       const demandsOfReceiver = await openDemands(db, chapterId, company.id);
       const openDemand = matchingDemand(demandsOfReceiver, envelope.qualification_layer?.triggers ?? [], envelope.chapter_layer.industry);
-      const capView: CapabilityView = { companyId: company.id, companyName: company.name, specialtyCode: specialty.nscatCode, isPrimarySeat: cap.isPrimarySeat, dna: dnaRow.dna, openDemand };
+      const capView: CapabilityView = {
+        companyId: company.id, companyName: company.name, specialtyCode: specialty.nscatCode, isPrimarySeat: cap.isPrimarySeat, dna: dnaRow.dna, openDemand,
+        reputation: aval ? aval.total / 100 : undefined,
+        reputationNote: aval ? (aval.provisional ? `Aval provisional ${aval.total} sobre 100 (sin histórico suficiente).` : `Aval ${aval.total} sobre 100: ${aval.blocks.find((b) => b.key === "voice")?.evidence}`) : undefined,
+      };
 
       if (isInternal) {
         // Scenario D: descubrimiento interno sin emitir ningún mensaje. Solo se informa al cedente.

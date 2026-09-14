@@ -1,6 +1,6 @@
 /** pnpm db:seed · crea NS Cumbre y ejecuta los escenarios A, C y D dejando las Cesiones pendientes de visto bueno. */
 import { getDb, closeDb } from "@/db/client";
-import { seedChapter, SCENARIOS } from "@/db/seed";
+import { seedChapter, seedClosedCesionWithEco, SCENARIOS } from "@/db/seed";
 import { createSignal, publishSignal } from "@/services/signals";
 import { decide } from "@/services/referrals";
 import { runRastreo } from "@/agents/rastreo";
@@ -27,6 +27,9 @@ if (pendingToHispalis) {
   await decide(db, { referralId: pendingToHispalis.id, memberId: guadalquivir.memberId, decision: "APPROVE" });
   console.log("Visto bueno del cedente dado a la Cesión Guadalquivir → Híspalis: esperando a Carlos.");
 }
+// Protocolo IV (D-042): una Cesión cerrada con Veredicto, valor contrastado y Eco público del Interesado.
+const closed = await seedClosedCesionWithEco(db, companies);
+if (closed) console.log("Cesión Guadalquivir → PRL Andaluza cerrada con Eco público: el Dossier de PRL Andaluza muestra su Aval.");
 // Encargo de Talento Sur y Rastreo del Agente de Híspalis (D-031, D-032)
 await createDemand(db, { companyId: companies["talento-sur"].companyId, memberId: companies["talento-sur"].memberId, text: "Busco empresas industriales que contraten más de 20 personas en el área de Sevilla en los próximos 6 meses", trigger: "HEADCOUNT_GROWTH" });
 const rastreo = await runRastreo(db, hispalis.companyId);

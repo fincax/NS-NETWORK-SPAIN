@@ -50,6 +50,13 @@
       "when": 1789344638131,
       "tag": "0006_fundacion",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1789383489011,
+      "tag": "0007_eco_aval",
+      "breakpoints": true
     }
   ]
 }

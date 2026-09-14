@@ -5,6 +5,8 @@ import { requireMember } from "@/lib/session";
 import { balance } from "@/services/today";
 import { eur } from "@/lib/format";
 import { openDemands } from "@/services/demands";
+import { avalOfCompany } from "@/services/eco";
+import { AvalBadge } from "@/components/aval";
 
 export default async function SalaPage() {
   const { chapter, company } = await requireMember();
@@ -12,7 +14,7 @@ export default async function SalaPage() {
   const seats = await db.select({ id: schema.categorySeats.id, status: schema.categorySeats.status, specialtyName: schema.specialties.name, code: schema.specialties.nscatCode, companyId: schema.categorySeats.companyId }).from(schema.categorySeats).innerJoin(schema.specialties, eq(schema.specialties.id, schema.categorySeats.specialtyId)).where(eq(schema.categorySeats.chapterId, chapter.id)).orderBy(asc(schema.specialties.name));
   const companies = await db.query.companies.findMany({ where: eq(schema.companies.chapterId, chapter.id), orderBy: [asc(schema.companies.name)] });
   const byId = new Map(companies.map((c) => [c.id, c]));
-  const balances = await Promise.all(companies.map(async (c) => ({ c, b: await balance(db, chapter.id, c.id) })));
+  const balances = await Promise.all(companies.map(async (c) => ({ c, b: await balance(db, chapter.id, c.id), a: await avalOfCompany(db, chapter.id, c.id) })));
   const occupied = seats.filter((s) => s.status === "ACTIVE").length;
   const demandsOpen = await openDemands(db, chapter.id);
   return (
@@ -53,17 +55,18 @@ export default async function SalaPage() {
 
       <section>
         <h2 style={{ marginBottom: 4 }}>Balanza</h2>
-        <p className="lead" style={{ fontSize: 14, marginBottom: 12 }}>Lo que cada titular da y recibe. Ordenada por plaza, nunca un ranking. Solo valor contrastado.</p>
+        <p className="lead" style={{ fontSize: 14, marginBottom: 12 }}>Lo que cada titular da y recibe. Ordenada por plaza, nunca un ranking. Solo valor contrastado. El Aval es el número público que respalda a cada titular (D-042): se explica en su Dossier.</p>
         <div className="table-wrap">
           <table>
-            <thead><tr><th>Titular</th><th className="num">Cesiones dadas</th><th className="num">Recibidas</th><th className="num">Valor generado</th><th className="num">Valor recibido</th><th className="num">Mérito</th></tr></thead>
+            <thead><tr><th>Titular</th><th className="num">Cesiones dadas</th><th className="num">Recibidas</th><th className="num">Valor generado</th><th className="num">Valor recibido</th><th className="num">Mérito</th><th>Aval</th></tr></thead>
             <tbody>
-              {balances.map(({ c, b }) => (
+              {balances.map(({ c, b, a }) => (
                 <tr key={c.id} style={c.id === company.id ? { background: "var(--graphite)" } : undefined}>
                   <td><Link href={`/empresa/${c.slug}`}>{c.name}</Link></td>
                   <td className="num">{b.given}</td><td className="num">{b.received}</td>
                   <td className="num money">{eur(b.valueGiven)}</td><td className="num money">{eur(b.valueReceived)}</td>
                   <td className="num">{b.merit}</td>
+                  <td><Link href={`/empresa/${c.slug}#aval`}><AvalBadge total={a.total} status={a.provisional ? "PROVISIONAL" : undefined} /></Link></td>
                 </tr>
               ))}
             </tbody>

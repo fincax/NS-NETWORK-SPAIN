@@ -1,8 +1,8 @@
 # 02 · NS-ARP · NS Agentic Referral Protocol
 
-**Versión del protocolo:** 0.1 (borrador fundacional)
-**Estado:** especificación de diseño. Todavía no existe implementación.
-**Depende de:** `CLAUDE.md`, `docs/DECISIONS.md` (D-001 a D-008).
+**Versión del protocolo:** 0.3 (v0.1 borrador fundacional; v0.2 Promesa, Veredicto, Embajada, Encargos; v0.3 Eco y Aval, D-042)
+**Estado:** especificación de diseño con implementación en `apps/web` (`src/core`, `src/services`, `src/agents`).
+**Depende de:** `CLAUDE.md`, `docs/DECISIONS.md` (D-001 a D-042).
 **Es referencia obligatoria para:** `06_DATA_MODEL`, `07_AGENT_ARCHITECTURE`, `08_SECURITY_PRIVACY_GDPR`, y toda feature agentic.
 
 ---
@@ -217,11 +217,35 @@ interface Outcome {
   learning_notes?: string;              // por qué funcionó o no
 }
 
+interface Endorsement {                 // Eco (D-042): la voz del Interesado sobre el cesionario
+  id: EndorsementId;
+  referral_id: ReferralId;
+  token: string;                        // llave del Interesado; única por Cesión; nace con el Puente
+  status: "PENDING" | "SENT" | "RECEIVED";
+  phase?: "DURANTE" | "FINAL";          // el FINAL sustituye al DURANTE en el Aval
+  attention?: 1 | 2 | 3 | 4 | 5;        // ¿le atendieron pronto y bien?
+  result?: 1 | 2 | 3 | 4 | 5;           // ¿resolvieron lo que necesitaba?
+  recommend?: 1 | 2 | 3 | 4 | 5;        // ¿lo recomendaría?
+  comment?: string;                     // una línea, máx. 280
+  public_consent: boolean;              // texto y nombre PUBLIC solo si true; el Interesado puede retirarlo
+  display_name?: string;
+  history: EcoRecord[];                 // Ecos anteriores (durante → final, revisiones)
+  contrast_status: "PENDING" | "OK" | "FLAGGED";
+}
+
+interface ReferralAval {                // Aval de la Cesión (D-042): Promesa 25 % + Veredicto 35 % + Eco 40 %
+  total: number;                        // 0..100
+  status: "PROVISIONAL" | "FIRME" | "SIN_ECO" | "NULO";
+  parts: { key: "promise" | "verdict" | "eco"; value: number | null; weight: number; evidence: string }[];
+}
+
 interface TrustEvent {                  // alimenta la reputación verificable
   id: TrustEventId;
   company_id: CompanyId;
   kind: "REFERRAL_ACCEPTED" | "REFERRAL_DECLINED_WITH_REASON" | "RESPONSE_ON_TIME"
       | "RESPONSE_LATE" | "INTRO_COMPLETED" | "OUTCOME_REPORTED" | "VALUE_VERIFIED"
+      | "PROMISE_EARNED" | "PROMISE_REVOKED" | "VERDICT_MERIT" | "CLOSE_MERIT" | "RECEIVER_MERIT" | "RECOGNITION_GIVEN"
+      | "ECO_REQUEST_SENT" | "ECO_REQUEST_MISSED" | "ECO_RECEIVED" | "ECO_MERIT" | "AVAL_MERIT"   // D-042 · Protocolo IV
       | "COMPLAINT" | "DISPUTE_OPENED" | "DISPUTE_RESOLVED" | "POLICY_VIOLATION"
       | "REFERRAL_FEE_VIOLATION"        // D-010 · motivo de expulsión
       | "CONTRIBUTION_QUOTA_MET" | "CONTRIBUTION_QUOTA_MISSED";  // D-010 · mínimo de aportación
@@ -299,7 +323,9 @@ Cada agente actúa con la identidad de su `agent_id` y los permisos de la empres
 
 **S13 · Outcome.** `VALUE_CONFIRMED` requiere confirmación de ambas partes. El valor verificado es el único que alimenta la métrica North Star `Verified closed value`.
 
-**S14 · Learning + Reputation.** Se emiten `TrustEvent` para ambas partes y se registra la tupla `(signal features, capability features, score components, outcome)` para calibración futura de pesos. La reputación nunca se reduce a un número opaco: se muestra como panel de comportamientos verificables.
+**S13b · Eco.** Con el Puente (S11) nace la invitación al Eco, con token único. El Agente del cesionario redacta la Petición de Eco; la envía siempre una persona. El Interesado responde desde una página pública sin usuario, durante la Cesión y al cierre, sobre tres ejes (Atención, Resultado, Recomendación), con una línea opcional y su consentimiento de publicación. Solo ve la capa 0 y los nombres de las dos empresas; nunca el Veredicto. El Eco es obligatorio de pedir en toda Cesión cerrada (Protocolo IV): el Reloj empuja a los 3 días, marca el incumplimiento a los 14 y cierra la ventana del Interesado a los 30. Especificación en `docs/14` (NS-AEP).
+
+**S14 · Learning + Reputation.** Se emiten `TrustEvent` para ambas partes y se registra la tupla `(signal features, capability features, score components, outcome)` para calibración futura de pesos. De Promesa, Veredicto y Eco nace el **Aval de la Cesión** (0–100) y, agregado, el **Aval del titular**, público en la red y explicado en cuatro bloques (Voz de los Interesados, Calidad de lo que cede, Respuesta, Contribución). El Aval alimenta `member_reputation` en S7, ordena a los candidatos a igual plaza en S4 y da elegibilidad de Embajadora (§13). La reputación nunca se reduce a un número opaco: se muestra como panel de comportamientos verificables.
 
 ---
 
@@ -325,6 +351,8 @@ Todos los mensajes son objetos `AgentInteraction` persistidos con `from_agent_id
 | `INTRO_PACKAGE` | Company (originador) → Company (receptor) | 2 | mensaje de intro, contexto, siguiente paso |
 | `OPPORTUNITY_UPDATE` | Company → Company | 2 | `stage`, `notes` |
 | `OUTCOME_REPORT` | Company → Company, Chapter (agregado) | 2 | `result`, `value`, `learning_notes` |
+| `ECO_REQUEST` | Company (cesionario) → Human (Interesado, enviado por la persona) | 0 | Petición de Eco con enlace; pasa el filtro de contraprestación |
+| `ECO_RECEIVED` | Interesado → Sistema → Company × 2 | 0 | `attention`, `result`, `recommend`, `comment?`, `phase`, `public_consent` |
 | `ROUTING_PROPOSAL` (futuro) | Matchmaker → Global Routing | 0 | `need_id`, `reason_no_local_coverage` |
 
 Reglas:
@@ -437,8 +465,8 @@ Cualquiera de estas condiciones produce `NO_INTEREST` o `DISQUALIFY` sin scoring
 | `strategic_priority` | 0.07 | `strategic_priority` de la capability | 0/0.33/0.66/1.0 |
 | `relationship_strength` | 0.10 | `envelope.relationship_strength` del originador con el tercero | DIRECT 1.0 · INDIRECT 0.6 · WEAK 0.3 · UNKNOWN 0.2 |
 | `qualification_quality` | 0.08 | resultado de S6 | proporción de preguntas críticas (`BUDGET`, `TIMING`, `DECISION_MAKER`) respondidas con `confidence ≥ 0.6` |
-| `member_reputation` | 0.04 | `TrustEvent` del receptor | normalizado; en el MVP arranca en 0.6 para todos (sin histórico) |
-| `historical_conversion` | 0.04 | pares `(specialty, trigger)` con outcome | prior bayesiano; en el MVP contribuye 0.5 fijo hasta disponer de datos |
+| `member_reputation` | 0.06 | Aval del titular (D-042) / 100 | cuatro bloques explicados: Voz de los Interesados, Calidad de lo que cede, Respuesta, Contribución; sin histórico vale 0.6 y lo dice |
+| `historical_conversion` | 0.02 | pares `(specialty, trigger)` con outcome | prior bayesiano; en el MVP contribuye 0.5 fijo hasta disponer de datos |
 
 Suma de pesos: 1.00.
 
@@ -558,6 +586,9 @@ DETECTED
   → WON | LOST | NO_DECISION (receptor informa; originador confirma)
   → VALUE_CONFIRMED          (ambas partes confirman valor verificado)
 
+Ortogonal al estado, desde INTRODUCED: Endorsement PENDING → SENT → RECEIVED (Eco del Interesado, D-042).
+El Aval de la Cesión (PROVISIONAL → FIRME | SIN_ECO | NULO) se recalcula con cada Veredicto y cada Eco.
+
 Estados terminales laterales desde cualquier estado previo a INTRODUCED:
   DISQUALIFIED · BLOCKED · REJECTED_BY_MEMBER · WITHDRAWN_BY_ORIGINATOR · EXPIRED
 ```
@@ -598,6 +629,8 @@ Si dos claims sobre la misma necesidad provienen de una plaza principal y de una
 | Alcance de revelación | Originador | empresa sola / empresa + contacto | capa 2 propia |
 | Envío de introducción | Originador (persona) | enviar / editar / cancelar | `IntroPackage` |
 | Confirmación de resultado | Ambos | valor verificado | outcome propuesto por la otra parte |
+| Petición de Eco | Cesionario (persona) | enviar / editar la Petición | Petición redactada por su Agente con el enlace del Interesado |
+| Eco | Interesado (sin usuario) | qué dice y si se publica con su nombre | capa 0 y nombres de las dos empresas; nunca el Veredicto |
 
 Toda decisión humana produce `HumanDecision{ user_id, decision, notes, seen_layers[], timestamp }`. El sistema registra qué capas vio la persona en el momento de decidir.
 
@@ -685,6 +718,18 @@ S10 Referral INTRO_AUTHORIZED. Híspalis ve por primera vez "Metalúrgica del Su
 S11 Agente prepara IntroPackage. El miembro de Guadalquivir lo envía desde su correo y marca INTRODUCED.
 ```
 
+Continuación (D-042):
+
+```text
+S13 Carlos (Híspalis) cierra: WON, 38.000 €. Veredicto Facilidad 5 · Negocio 4 · Trato 5. Aval de la Cesión 88, provisional.
+S13b Su Agente ha redactado la Petición de Eco (saluda a Rafael porque la Apertura reveló el contacto). Carlos la envía desde su correo.
+     Rafael abre /eco/<token> en el móvil: Atención 5 · Resultado 5 · Recomendación 5 · "La obra terminó en plazo y sin parar la producción."
+     Autoriza publicarlo como "Metalúrgica del Sur".
+S14 Aval de la Cesión 92, firme. Mérito de Eco 80 para Híspalis; Mérito de Aval 30 para Guadalquivir.
+     Crónica: "Metalúrgica del Sur avala públicamente a Reformas Industriales Híspalis (100 sobre 100) tras la presentación de Correduría Guadalquivir."
+     El Aval de Híspalis sube; con tres Ecos así será elegible como Embajadora en NS Ágora.
+```
+
 ### Scenario C · Falso positivo semántico
 
 ```text
@@ -729,7 +774,7 @@ Se documenta en `01_PRODUCT_REQUIREMENTS.md` (flujo de Application). NS-ARP solo
 4. Política de expiración de `OpportunitySignal` por tipo de trigger (una expansión internacional dura más que una sustitución de proveedor).
 5. Calibración inicial de pesos con datos demo antes del piloto real.
 6. Objeto `ContributionQuota` (D-010): mínimo de referidos válidos por periodo y Sala, cómputo solo de referidos cualificados por el receptor, escalera de consecuencias y papel del agente en el cumplimiento. Parámetros por estipular por el fundador.
-7. Objeto `ReferralPromise` (D-021): valor a priori fijado en `APPROVED` a partir de `value_band`, `qualification_quality`, `relationship_strength` y `timing`, confirmado o ajustado por el receptor; emite `TrustEvent{PROMISE_EARNED}` para el originador. Objeto `ReferralQualification` (D-009, D-020): Veredicto del receptor en tres ejes (Facilidad, Negocio, Trato) con evidencia del Agente; objeto `Recognition{axis, reason}` para la Distinción, máximo una por titular y mes; reputación bilateral.
+7. Objeto `ReferralPromise` (D-021): valor a priori fijado en `APPROVED` a partir de `value_band`, `qualification_quality`, `relationship_strength` y `timing`, confirmado o ajustado por el receptor; emite `TrustEvent{PROMISE_EARNED}` para el originador. Objeto `ReferralQualification` (D-009, D-020): Veredicto del receptor en tres ejes (Facilidad, Negocio, Trato) con evidencia del Agente; objeto `Recognition{axis, reason}` para la Distinción, máximo una por titular y mes; reputación bilateral. **Implementado en v0.2.** Objeto `Endorsement` y `ReferralAval` (D-042): **implementados en v0.3**; queda por calibrar pesos y umbrales con 50 Ecos reales.
 8. Objetos `Zone` y `Sala` (D-013): saturación de zona, apertura de nuevas Salas y enrutamiento Sala → Zona → Red en S4/§13. Clasificación `NS-CAT` como origen de `Specialty`.
 
 ---

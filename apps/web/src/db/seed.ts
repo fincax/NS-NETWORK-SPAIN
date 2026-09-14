@@ -5,6 +5,8 @@ import { schema } from "@/db/client";
 import { NSCAT } from "./nscat";
 import { SEED_CANDIDACIES, SEED_COMPANIES } from "./seed-data";
 import { onboardCompany } from "@/services/onboarding";
+import { authorizeIntro, confirmValue, decide, markIntroduced, submitVerdict, updateStage } from "@/services/referrals";
+import { draftEcoRequest, markEcoRequested, submitEco } from "@/services/eco";
 
 export async function seedChapter(db: Db) {
   let zone = await db.query.zones.findFirst({ where: eq(schema.zones.slug, "ns-sevilla") });
@@ -72,3 +74,29 @@ export const SCENARIOS = {
     visibility: "COMPANY_ONLY" as const,
   },
 };
+
+/**
+ * Demo del Protocolo IV (D-042): cierra de principio a fin la Cesión Guadalquivir → PRL Andaluza del escenario A
+ * (vistos buenos, Apertura, Puente, reunión, cierre ganado, Veredicto, valor contrastado, Petición de Eco y Eco público del Interesado),
+ * para que el Dossier, la Balanza y la Crónica muestren un Aval firme. Idempotente: si no queda ninguna pendiente, no hace nada.
+ */
+export async function seedClosedCesionWithEco(db: Db, companies: Record<string, { companyId: string; memberId: string }>) {
+  const cedente = companies["guadalquivir"];
+  const cesionario = companies["prl-andaluza"];
+  if (!cedente || !cesionario) return null;
+  const ref = await db.query.referrals.findFirst({ where: (t, { and, eq }) => and(eq(t.originatorCompanyId, cedente.companyId), eq(t.receiverCompanyId, cesionario.companyId), eq(t.state, "ORIGINATOR_PENDING")) });
+  if (!ref) return null;
+  await decide(db, { referralId: ref.id, memberId: cedente.memberId, decision: "APPROVE" });
+  await decide(db, { referralId: ref.id, memberId: cesionario.memberId, decision: "APPROVE" });
+  const pkg = await authorizeIntro(db, ref.id, cedente.memberId, "COMPANY_ONLY");
+  await markIntroduced(db, ref.id, cedente.memberId, pkg.message);
+  await updateStage(db, ref.id, cesionario.memberId, "MEETING");
+  await submitVerdict(db, { referralId: ref.id, memberId: cesionario.memberId, verdict: { ease: 5, business: 4, treatment: 5, result: "WON", value_verified: 9_500, need_was_real: true } });
+  await confirmValue(db, ref.id, cedente.memberId);
+  // En la demo todo ocurre en segundos: se retrasa el Puente tres días para que el Contraste no marque el Eco como demasiado rápido.
+  await db.update(schema.referrals).set({ introducedAt: new Date(Date.now() - 3 * 86_400_000) }).where(eq(schema.referrals.id, ref.id));
+  const draft = await draftEcoRequest(db, ref.id, cesionario.memberId);
+  await markEcoRequested(db, ref.id, cesionario.memberId, draft.message);
+  await submitEco(db, draft.token, { attention: 5, result: 5, recommend: 5, comment: "Técnico en la planta a las 48 h y el plan de prevención listo antes de la apertura.", public_consent: true, display_name: "Metalúrgica del Sur" });
+  return ref.id;
+}

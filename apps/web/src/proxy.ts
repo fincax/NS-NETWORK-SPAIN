@@ -1,6 +1,7 @@
 /**
  * Puerta de la demo privada (D-033). Todo lo que no sea la portada pública, el acceso o los recursos estáticos
- * exige la cookie de sesión de la demo. La ruta programada /api/clock se protege con CRON_SECRET, no con la cookie. Las Server Functions de cada página vuelven a comprobarla (requireDemo).
+ * exige la cookie de sesión de la demo. La ruta programada /api/clock se protege con CRON_SECRET, no con la cookie.
+ * La página del Eco (/eco/[token], D-042) es pública por diseño: el Interesado nunca es usuario de NS; su llave es el token. Las Server Functions de cada página vuelven a comprobarla (requireDemo).
  */
 import { NextResponse, type NextRequest } from "next/server";
 import { DEMO_COOKIE, isValidSession } from "@/lib/auth";
@@ -14,5 +15,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!acceso|api/clock|api/pending|manifest.webmanifest|_next/static|_next/image|icon.svg|icon-192.png|icon-512.png|apple-touch-icon.png|favicon.ico|$).*)"],
+  matcher: ["/((?!acceso|eco/|api/clock|api/pending|manifest.webmanifest|_next/static|_next/image|icon.svg|icon-192.png|icon-512.png|apple-touch-icon.png|favicon.ico|$).*)"],
 };

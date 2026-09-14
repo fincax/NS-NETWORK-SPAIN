@@ -502,7 +502,7 @@ Semantic Fit
 + Timing
 + Capacity
 + Relationship Strength
-+ Member Reputation
++ Member Reputation (el Aval del titular, D-042)
 + Historical Conversion
 + Referral Path Quality
 
@@ -576,9 +576,9 @@ Medir preferentemente: valor generado; calidad; aceptación; conversiones; tiemp
 
 La reputación debe basarse en comportamiento verificable. No crear un "número mágico" opaco que pueda destruir injustamente la reputación de una empresa.
 
-### Promesa, Veredicto y Distinción: la Cesión vale en dos momentos (D-020, D-021)
+### Promesa, Veredicto, Eco y Aval: la Cesión vale en tres momentos (D-020, D-021, D-042)
 
-La valoración de una Cesión no recae solo en el cesionario. Vale **a priori**, por lo que el Indicio promete, y **a posteriori**, por lo que ocurrió una vez prestado el servicio.
+La valoración de una Cesión no recae solo en el cesionario. Vale **a priori**, por lo que el Indicio promete; **a posteriori**, por lo que ocurrió una vez prestado el servicio; y **por la voz de quien lo recibió**, el Interesado. De los tres momentos nace un número público, el **Aval**, que respalda a cedente y cesionario.
 
 **Promesa (a priori).** Cuando la Cesión se acepta, el sistema fija su Promesa a partir de datos estructurados, no de una opinión: valor estimado, necesidad real, información completa, decisor identificado, plazo, fuerza de la relación del cedente con el Interesado. La calculan los Agentes con el Fundamento; el cesionario la confirma o la ajusta con un toque al aceptar. La Promesa da al cedente **Mérito de Promesa** en el momento de la aceptación, sin esperar al cierre. Así un buen referido cuenta aunque después el cesionario no lo convierta.
 
@@ -594,9 +594,21 @@ El Veredicto completa la Promesa: confirma o matiza Facilidad y Trato, y aporta 
 
 Además del Veredicto, el cesionario puede otorgar una **Distinción** al cedente por esa Cesión. Es un acto deliberado y escaso: como máximo una por titular y mes. Debe nombrar el eje que destacó (Facilidad, Negocio o Trato) y una línea de motivo, que se publica en la Crónica. Las Distinciones alimentan el Mérito y la Hoja de Méritos del cedente, que muestra por qué le valoran ("12 Distinciones: 5 por Trato, 4 por Facilidad, 3 por Negocio"). El Contraste verifica que cada Distinción corresponde a una Cesión con Veredicto válido y vigila los pares que se distinguen mutuamente. Nadie se distingue a sí mismo ni distingue por cantidad: solo quien recibe, y solo por calidad.
 
+**Eco (la voz del Interesado).** El tercer momento es el del cliente referido, el Interesado. Durante la Cesión y, sobre todo, al cierre, el Interesado opina sobre el servicio o producto del cesionario en tres ejes y tres toques, desde una página pública sin usuario:
+
+```text
+ATENCIÓN        ¿Le atendieron pronto y bien?
+RESULTADO       ¿Resolvieron lo que necesitaba?
+RECOMENDACIÓN   ¿Recomendaría al cesionario?
+```
+
+Puede añadir una línea y decidir si su Eco se publica con su nombre. El Eco es obligatorio de pedir (Protocolo IV): con el Puente nace la invitación, el Agente del cesionario redacta la **Petición de Eco** y la envía la persona; ningún Agente contacta con el Interesado. El Interesado **nunca ve el Veredicto**, que es interno a NS. Sin consentimiento, el Eco cuenta en el Aval pero no se muestra con su nombre; el Interesado puede retirar la publicación cuando quiera.
+
+**Aval (el número público).** De Promesa, Veredicto y Eco nace el Aval de la Cesión (0–100, pesos propuestos 25 · 35 · 40): provisional hasta que hay Veredicto y Eco al cierre; nulo si el Indicio era falso. Agregado, cada titular tiene su **Aval** público en la red, siempre con cuatro bloques explicados: Voz de los Interesados (lo que dicen los clientes a los que atendió), Calidad de lo que cede (el Aval de sus Cesiones cedidas), Respuesta (plazos cumplidos con Timoneles e Interesados) y Contribución (Cesiones válidas frente al Ritmo, Embajadas). El Aval respalda a las dos partes: **da elegibilidad de Embajadora** (Aval mínimo, Ecos mínimos y voz de los Interesados mínima) y **prioridad en la Mesa** cuando varios titulares podrían recibir una Cesión. El algoritmo prefiere a quien más se implica, más comparte, mejor responde a los Interesados y mejores Ecos públicos tiene. Nunca es un ranking: es un número con su explicación al lado, y sin histórico arranca en un valor neutro que lo dice.
+
 ### Embajada · Propuesta Fuera de la Sala (D-015)
 
-Cuando un miembro dispone de un buen referido y **en su Sala no hay titular de esa especialidad** (plaza vacante o especialidad sin representar), NS le ofrece un acto extraordinario: la **Embajada**. El miembro propone él mismo a un titular de **otra Sala de la zona**. Su Agente le presenta candidatos ordenados por Hoja de Méritos, tiempo de respuesta y encaje; el miembro puede elegir uno que ya conozca. La cesión sigue el ciclo completo de NS-ARP.
+Cuando un miembro dispone de un buen referido y **en su Sala no hay titular de esa especialidad** (plaza vacante o especialidad sin representar), NS le ofrece un acto extraordinario: la **Embajada**. El miembro propone él mismo a un titular de **otra Sala de la zona**. Su Agente le presenta candidatos elegibles (Aval mínimo, Ecos mínimos y voz de los Interesados mínima, D-042) ordenados por Aval, tiempo de respuesta y encaje; el miembro puede elegir uno que ya conozca. La cesión sigue el ciclo completo de NS-ARP.
 
 La empresa que acoge la cesión se convierte en **Embajadora** de esa especialidad en la Sala del cedente mientras la plaza siga vacante: representa esa especialidad ante la Sala sin ser miembro de ella, sin plaza y sin voto.
 
@@ -611,17 +623,20 @@ Reglas del core:
 
 La Embajada recompensa la generosidad exactamente donde más cuesta, evita que un buen referido se pierda y convierte cada hueco en una señal de captación.
 
-### Los tres protocolos obligatorios de Sala (D-018, D-019)
+### Los cuatro protocolos obligatorios de Sala (D-018, D-019, D-042)
 
 ```text
 Protocolo I   · GENERAR NEGOCIO   Ceder referidos de calidad.                 Unidad: la Cesión.     Especificación: NS-ARP.
 Protocolo II  · DAR A CONOCER     Comunicar tu trabajo a la Sala.             Unidad: el Comunicado. Especificación: NS-ADP.
 Protocolo III · CUENTAS CLARAS    Hacer visible el valor dado y recibido.     Unidad: la Balanza.    Especificación: NS-ATP.
+Protocolo IV  · DAR LA PALABRA    Que el Interesado opine y su voz cuente.    Unidad: el Eco.        Especificación: NS-AEP.
 ```
 
 **Protocolo II · Dar a Conocer.** Nadie puede ceder bien lo que no conoce bien. Cada semana, el Agente de cada empresa informa a los Agentes de las demás empresas de la Sala de su especialidad y plaza, de las funciones, servicios y productos que trabaja, y de las actualizaciones, novedades y cualquier dato importante ocurrido esa semana (**Comunicado**). El Chapter Intelligence Agent los compila en la **Gaceta** semanal de la Sala, con una vista "relevante para ti" por Timonel. Todo Timonel debe conocer, o poder consultar en segundos, el **Dossier**, el histórico y las novedades de cada miembro de su Sala. El Timonel aprueba su Comunicado en el Despacho con un toque; el cumplimiento es verificable y sigue la misma escalera que el Compromiso. Especificación completa en `docs/14_PROTOCOLOS_DE_SALA.md`.
 
 **Protocolo III · Cuentas Claras.** Lo que se da y lo que se recibe se ve. En cada Sala es visible, para todos sus miembros, la **Balanza** de cada titular: Cesiones hechas y recibidas, valor contrastado generado para otros y recibido, del mes y acumulado, y en qué punto del **Ritmo** (objetivo semanal fijado por la Sala o, en su defecto, por NS) se encuentra. Nunca es un ranking: se ordena por plaza, solo muestra lo válido y contrastado, y la reciprocidad se explica, no se juzga. En privado, cada titular tiene su **Brújula**: el Agente estudia constantemente cómo mejorar sus resultados y le muestra si consigue sus objetivos, por qué, qué gana con ello, qué puede ofrecer a otros, qué puede proponer y qué referidos posibles tiene para ceder, en forma de tres **Movimientos** semanales accionables con un toque. La Brújula nunca sale de la empresa. Especificación completa en `docs/14_PROTOCOLOS_DE_SALA.md`.
+
+**Protocolo IV · Dar la Palabra.** Toda Cesión da la palabra al Interesado. El cesionario pide su **Eco** (Atención, Resultado, Recomendación) con la Petición que redacta su Agente; el Interesado responde desde una página pública sin usuario, durante y al cierre; su voz pesa más que ninguna otra parte en el **Aval** de la Cesión y alimenta el Aval público del titular. El Reloj de la Sala empuja al cesionario a los 3 días del cierre, marca el incumplimiento a los 14 y cierra la ventana del Interesado a los 30. El Veredicto nunca llega al Interesado; su Eco solo se publica con su consentimiento. Especificación completa en `docs/14_PROTOCOLOS_DE_SALA.md`.
 
 ## 15. Privacidad como ventaja competitiva
 
@@ -1369,6 +1384,7 @@ Estas tres reglas están por encima de cualquier feature, decisión de diseño o
 3. **La calidad importa más que la cantidad.** Un referido cuenta cuando el receptor lo cualifica como válido y NS puede auditarlo. Un referido flojo no cumple el mínimo ni suma reputación; puede restar.
 4. **Toda empresa da a conocer su trabajo a la Sala cada semana** (D-018). El Agente redacta el Comunicado; el Timonel lo aprueba. Sin conocimiento mutuo no hay referidos de calidad.
 5. **Lo que se da y lo que se recibe se ve** (D-019). La Balanza de cada titular es pública en su Sala, exacta y contrastada. Lo que hay que hacer para mejorar solo lo ve quien tiene que hacerlo.
+6. **Toda Cesión da la palabra al Interesado** (D-042). El cesionario pide el Eco del cliente referido; lo que el Interesado dice cuenta más que nada en el Aval, el número público que respalda a cedente y cesionario, da elegibilidad de Embajadora y prioridad para recibir. El Veredicto nunca llega al Interesado; su Eco solo se publica con su consentimiento. Pedir o pagar una valoración es contraprestación: regla 1.
 
 # NORTH STAR
 

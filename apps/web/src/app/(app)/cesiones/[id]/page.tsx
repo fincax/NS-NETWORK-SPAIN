@@ -5,9 +5,12 @@ import { requireMember } from "@/lib/session";
 import { eur, eurRange, dateTime, daysUntil } from "@/lib/format";
 import { Encaje, StateBadge } from "@/components/ui";
 import { PROMISE_LABEL } from "@/core/merit";
+import { AvalBadge, ReferralAvalParts } from "@/components/aval";
+import { computeReferralAval, ECO_LABEL, ecoScore } from "@/core/aval";
+import { draftEcoRequest, ecoOfReferral } from "@/services/eco";
 import { STATE_LABEL, TIMEOUTS } from "@/core/state-machine";
-import type { ReferralState, SignalEnvelope } from "@/core/types";
-import { aperturaAction, confirmValueAction, decideAction, puenteAction, stageAction, verdictAction } from "./actions";
+import type { EcoPhase, ReferralState, SignalEnvelope } from "@/core/types";
+import { aperturaAction, confirmValueAction, decideAction, ecoRequestAction, puenteAction, stageAction, verdictAction } from "./actions";
 
 export default async function CesionPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -33,6 +36,9 @@ export default async function CesionPage({ params }: { params: Promise<{ id: str
   const originatorTrust = await db.query.trustEvents.findMany({ where: eq(schema.trustEvents.companyId, ref.originatorCompanyId) });
   const originatorDistinctions = await db.query.recognitions.findMany({ where: eq(schema.recognitions.toCompanyId, ref.originatorCompanyId) });
   if (!match || !os || !need || !originator || !receiver) notFound();
+  const eco = await ecoOfReferral(db, ref.id);
+  const ecoReceived = eco?.status === "RECEIVED" && eco.attention && eco.result && eco.recommend ? { attention: eco.attention, result: eco.result, recommend: eco.recommend, phase: (eco.phase ?? "FINAL") as EcoPhase } : null;
+  const aval = computeReferralAval({ promise: ref.promise, verdict: verdict?.verdict, eco: ecoReceived, ecoWindowClosed: Boolean(eco?.windowClosedAt) });
 
   const env = os.envelope as SignalEnvelope;
   const state = ref.state as ReferralState;
@@ -54,6 +60,9 @@ export default async function CesionPage({ params }: { params: Promise<{ id: str
     : "LECTURA";
 
   const expires = daysUntil(ref.expiresAt);
+  const afterBridge = ["INTRODUCED", "MEETING", "COMMERCIAL_OPPORTUNITY", "WON", "LOST", "NO_DECISION", "VALUE_CONFIRMED"].includes(state);
+  const closed = ["WON", "LOST", "NO_DECISION", "VALUE_CONFIRMED"].includes(state);
+  const ecoDraft = iAmReceiver && afterBridge && (!eco || eco.status === "PENDING") ? await draftEcoRequest(db, ref.id, member.id) : null;
 
   return (
     <div className="referral">
@@ -63,6 +72,7 @@ export default async function CesionPage({ params }: { params: Promise<{ id: str
           {match.compliance ? <span className={`badge ${match.compliance.verdict === "PASS" ? "green" : match.compliance.verdict === "BLOCK" ? "red" : "amber"}`}>Salvoconducto · {match.compliance.verdict === "PASS" ? "sin excepciones" : match.compliance.verdict === "BLOCK" ? "bloqueado" : match.compliance.exceptions.join(", ")}</span> : null}
           {ref.embassy ? <span className="badge blue">Embajada</span> : null}
           {env.chapter_layer.third_party_expects_contact ? <span className="badge green">Interesado avisado</span> : null}
+          {verdict || ecoReceived ? <AvalBadge total={aval.total} status={aval.status} /> : null}
           <span className="spacer" />
           {expires !== null && ["ORIGINATOR_PENDING", "RECEIVER_PENDING"].includes(state) ? <span className="mono">caduca en {expires} días</span> : null}
         </div>
@@ -229,7 +239,7 @@ export default async function CesionPage({ params }: { params: Promise<{ id: str
       {face === "VEREDICTO" ? (
         <section className="card amber">
           <h2>Veredicto</h2>
-          <p className="lead" style={{ fontSize: 14, marginBottom: 12 }}>Tres ejes, tres toques. Tu Agente ya ha rellenado la evidencia. Al confirmar, {originator.name} recibe Mérito de Veredicto y de Cierre.</p>
+          <p className="lead" style={{ fontSize: 14, marginBottom: 12 }}>Tres ejes, tres toques. Tu Agente ya ha rellenado la evidencia. Al confirmar, {originator.name} recibe Mérito de Veredicto y de Cierre. El Veredicto es interno a NS: el Interesado nunca lo verá; a él le pedirás su Eco después.</p>
           <form action={verdictAction} className="stack">
             <input type="hidden" name="referralId" value={ref.id} />
             <input type="hidden" name="result" value={state} />
@@ -254,6 +264,39 @@ export default async function CesionPage({ params }: { params: Promise<{ id: str
             <div className="field"><label htmlFor="vnotes">Notas para el Contraste (opcional)</label><textarea id="vnotes" name="notes" /></div>
             <div className="actions"><button className="btn amber" type="submit">Confirmar el Veredicto</button></div>
           </form>
+        </section>
+      ) : null}
+
+      {/* ───────── Protocolo IV · Dar la Palabra (D-042): el cesionario pide el Eco; el Interesado responde ───────── */}
+      {ecoDraft ? (
+        <section className={`card ${closed ? "amber" : ""}`}>
+          <h2>Da la palabra al Interesado</h2>
+          <p className="lead" style={{ fontSize: 14, marginBottom: 12 }}>{closed ? "La Cesión está cerrada: el Protocolo IV obliga a pedir el Eco del Interesado. " : "Puedes pedirle su Eco ya, a mitad de camino, y otra vez al cierre. "}Tu Agente ha redactado la Petición con el enlace. La envías tú, desde tu correo o en persona: ningún Agente escribe al Interesado. El Interesado nunca verá tu Veredicto.</p>
+          <form action={ecoRequestAction} className="stack">
+            <input type="hidden" name="referralId" value={ref.id} />
+            <div className="field"><label>Asunto</label><input readOnly value={ecoDraft.subject} /></div>
+            <div className="field"><label htmlFor="ecomsg">Petición de Eco (edítala si quieres; el enlace debe seguir dentro)</label><textarea id="ecomsg" name="message" defaultValue={ecoDraft.message} style={{ minHeight: 200 }} /></div>
+            <p className="mono">Enlace del Interesado: {ecoDraft.link}</p>
+            <div className="actions"><button className={`btn ${closed ? "amber" : ""}`} type="submit">Marcar la Petición de Eco como enviada</button></div>
+          </form>
+        </section>
+      ) : null}
+      {eco && eco.status === "SENT" ? (
+        <div className="notice">Petición de Eco enviada el {eco.sentAt ? dateTime(eco.sentAt) : ""}. Esperando la palabra del Interesado.{iAmReceiver ? " Si pasan dos semanas, tu Agente te lo recordará para que se lo recuerdes tú." : ""}</div>
+      ) : null}
+      {eco && ecoReceived ? (
+        <section className="card green">
+          <h2>Eco del Interesado {eco.phase === "FINAL" ? "· al cierre" : "· durante la Cesión"}</h2>
+          <p>{ECO_LABEL.attention} {ecoReceived.attention}/5 · {ECO_LABEL.result} {ecoReceived.result}/5 · {ECO_LABEL.recommend} {ecoReceived.recommend}/5 · <strong>{Math.round(ecoScore(ecoReceived) * 100)} sobre 100</strong></p>
+          {eco.comment ? <p className="eco-quote" style={{ marginTop: 8 }}>“{eco.comment}”{eco.publicConsent ? <span className="mono">{eco.displayName ?? "Interesado"} · autorizado a publicarse en la Sala</span> : <span className="mono">solo para las dos partes y NS · no publicado</span>}</p> : <p className="mono" style={{ marginTop: 6 }}>{eco.publicConsent ? `Autorizado a publicarse en la Sala como ${eco.displayName ?? "Interesado"}.` : "Sin consentimiento de publicación: cuenta en el Aval, no se muestra con su nombre."}</p>}
+          {eco.contrastStatus === "FLAGGED" ? <p className="mono" style={{ color: "var(--amber)", marginTop: 6 }}>Contraste: marcado para revisión de la Directiva.</p> : null}
+        </section>
+      ) : null}
+      {verdict || ecoReceived ? (
+        <section className="card">
+          <p className="eyebrow">Aval de la Cesión · {aval.total} sobre 100 · {aval.status.toLowerCase().replace("_", " ")}</p>
+          <ReferralAvalParts aval={aval} />
+          <p className="mono" style={{ marginTop: 10 }}>La Promesa y el Veredicto son internos a NS. El Eco solo se publica con el consentimiento del Interesado. El Aval es público y respalda a las dos partes: da elegibilidad de Embajadora y prioridad en la Mesa.</p>
         </section>
       ) : null}
 
@@ -323,8 +366,8 @@ function waitingText(state: ReferralState, iAmOriginator: boolean, iAmReceiver: 
     case "INTRO_AUTHORIZED": return `Puente listo. ${originatorName} lo enviará en persona.`;
     case "INTRODUCED": return "Puente tendido. El cesionario responderá al Interesado en 48 h.";
     case "MEETING": case "COMMERCIAL_OPPORTUNITY": return "En curso. El cesionario actualiza los hitos.";
-    case "WON": case "LOST": case "NO_DECISION": return "Cerrada. Pendiente del Veredicto del cesionario.";
-    case "VALUE_CONFIRMED": return "Valor contrastado por ambas partes.";
+    case "WON": case "LOST": case "NO_DECISION": return "Cerrada. Pendiente del Veredicto del cesionario y de la palabra del Interesado.";
+    case "VALUE_CONFIRMED": return "Valor contrastado por ambas partes. Falta, si no ha llegado, el Eco del Interesado.";
     case "REJECTED_BY_MEMBER": return "Declinada con motivo. No afecta a la reputación de quien declina; el cedente conserva su Mérito de Promesa.";
     case "EXPIRED": return "Caducada por silencio. Vuelve al cedente, que puede proponerla a otra Sala.";
     case "BLOCKED": return "Bloqueada por Compliance.";

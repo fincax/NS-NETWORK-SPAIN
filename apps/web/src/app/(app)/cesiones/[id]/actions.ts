@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { getDb } from "@/db/client";
 import { requireMember } from "@/lib/session";
 import { authorizeIntro, confirmValue, decide, markIntroduced, submitVerdict, updateStage } from "@/services/referrals";
+import { markEcoRequested } from "@/services/eco";
 import type { HumanDecisionKind, RevealScope, VerdictAxis } from "@/core/types";
 
 function done(id: string) {
@@ -70,6 +71,15 @@ export async function verdictAction(formData: FormData) {
     },
     recognition: axis && reason ? { axis: axis as VerdictAxis, reason } : undefined,
   });
+  done(id);
+}
+
+/** Protocolo IV (D-042): la persona envía la Petición de Eco y lo marca aquí. */
+export async function ecoRequestAction(formData: FormData) {
+  const { member } = await requireMember();
+  const db = await getDb();
+  const id = String(formData.get("referralId"));
+  await markEcoRequested(db, id, member.id, String(formData.get("message") ?? ""));
   done(id);
 }
 

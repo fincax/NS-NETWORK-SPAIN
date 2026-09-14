@@ -13,6 +13,7 @@ import { SOURCE_LABEL } from "@/agents/rastreo";
 import { candidacyCounts } from "@/services/antesala";
 import { InstallHint } from "../install-hint";
 import { activeInterview } from "@/services/entrevista";
+import { pendingEcoRequests } from "@/services/eco";
 
 export default async function HoyPage() {
   await requireDemo();
@@ -50,7 +51,8 @@ export default async function HoyPage() {
   const draftSources = new Map((await db.query.businessSignals.findMany({ where: inArray(schema.businessSignals.id, drafts.map((d) => d.businessSignalId).concat("00000000-0000-0000-0000-000000000000")), columns: { id: true, source: true, rawContent: true } })).map((b) => [b.id, b]));
   const apuntes = drafts.filter((d) => !recordBySignal.has(d.id) && draftSources.get(d.businessSignalId)?.source === "APUNTE");
   const ownDrafts = drafts.filter((d) => !recordBySignal.has(d.id) && !apuntes.includes(d) && d.visibility !== "COMPANY_ONLY");
-  const agentState = forMe.length ? "esperando" : summary.matches ? "encontrado" : "analizando";
+  const ecosToRequest = await pendingEcoRequests(db, chapter.id, company.id);
+  const agentState = forMe.length || ecosToRequest.length ? "esperando" : summary.matches ? "encontrado" : "analizando";
   const candidacies = member.isDirector ? await candidacyCounts(db) : null;
   const dnaRow = await db.query.businessDna.findFirst({ where: eq(schema.businessDna.companyId, company.id), columns: { validatedAt: true } });
   const interview = dnaRow?.validatedAt ? null : await activeInterview(db, company.id);
@@ -70,7 +72,7 @@ export default async function HoyPage() {
         <div className="card kpi"><span className="value">{summary.agentConversations}</span><span className="label">conversaciones entre Agentes (7 días)</span></div>
         <div className="card kpi"><span className="value">{summary.signals}</span><span className="label">Indicios relacionados con tu Sala</span></div>
         <div className="card kpi"><span className="value">{summary.matches}</span><span className="label">Pistas investigadas</span></div>
-        <div className="card kpi"><span className={`value ${forMe.length ? "amber" : ""}`}>{forMe.length}</span><span className="label">decisiones que esperan tu toque</span></div>
+        <div className="card kpi"><span className={`value ${forMe.length + ecosToRequest.length ? "amber" : ""}`}>{forMe.length + ecosToRequest.length}</span><span className="label">decisiones que esperan tu toque</span></div>
         <div className="card kpi"><span className="value amber money" style={{ fontSize: 26 }}>{eurRange(summary.potential.min, summary.potential.max)}</span><span className="label">valor potencial en Cesiones abiertas</span></div>
         <div className="card kpi"><span className="value green money" style={{ fontSize: 26 }}>{eur(bal.valueReceived)}</span><span className="label">valor contrastado recibido · Mérito {bal.merit}</span></div>
       </div>
@@ -116,6 +118,22 @@ export default async function HoyPage() {
           </div>
         )}
       </section>
+
+      {ecosToRequest.length ? (
+        <section className="section">
+          <h2>Da la palabra al Interesado</h2>
+          <div className="stack">
+            {ecosToRequest.map((r) => (
+              <Link key={r.id} href={`/cesiones/${r.id}`} className="card amber" style={{ display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
+                <StateBadge state={r.state} />
+                <span>Cesión de {companies.get(r.originatorCompanyId)?.name} cerrada: el Interesado todavía no tiene la palabra. Tu Agente ha redactado la Petición de Eco.</span>
+                <span className="spacer" />
+                <span className="mono">Enviar en un toque →</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <section className="section">
         <div className="row" style={{ marginBottom: 14 }}>

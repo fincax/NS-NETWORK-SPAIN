@@ -9,6 +9,9 @@ import { AgentAvatar } from "@/components/brand";
 import { openDemands } from "@/services/demands";
 import { createDemandAction, closeDemandAction, addSourceAction, removeSourceAction, runOwnSourcesAction } from "./actions";
 import { listSources, MAX_SOURCES_PER_AGENT } from "@/services/sources";
+import { avalOfCompany } from "@/services/eco";
+import { AvalNumber, TitularAvalBlocks } from "@/components/aval";
+import { EMBASSY_ELIGIBILITY } from "@/core/aval";
 import { dateTime } from "@/lib/format";
 
 export default async function EmpresaPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ fuente?: string; adn?: string }> }) {
@@ -23,6 +26,7 @@ export default async function EmpresaPage({ params, searchParams }: { params: Pr
   const seat = await db.select({ name: schema.specialties.name }).from(schema.categorySeats).innerJoin(schema.specialties, eq(schema.specialties.id, schema.categorySeats.specialtyId)).where(eq(schema.categorySeats.companyId, company.id));
   const bal = await balance(db, chapter.id, company.id);
   const distinctions = await db.query.recognitions.findMany({ where: eq(schema.recognitions.toCompanyId, company.id) });
+  const aval = await avalOfCompany(db, chapter.id, company.id);
   const own = company.id === me.id;
   const demandsOpen = await openDemands(db, chapter.id, company.id);
   const sources = own ? await listSources(db, company.id) : [];
@@ -46,6 +50,26 @@ export default async function EmpresaPage({ params, searchParams }: { params: Pr
         <div className="card kpi"><span className="value green money" style={{ fontSize: 26 }}>{eur(bal.valueGiven)}</span><span className="label">valor contrastado generado para otros</span></div>
         <div className="card kpi"><span className="value">{bal.merit}</span><span className="label">Mérito · {distinctions.length} Distinciones</span></div>
       </div>
+      <section className="card" id="aval">
+        <div className="row" style={{ alignItems: "baseline", marginBottom: 10 }}>
+          <p className="eyebrow" style={{ margin: 0 }}>Aval · público en la red</p>
+          <span className="spacer" />
+          {aval.embassyEligible ? <span className="badge green">Elegible como Embajadora</span> : <span className="badge" title="Para acoger Embajadas hacen falta Aval, Ecos y voz de los Interesados">Embajadora: Aval ≥ {EMBASSY_ELIGIBILITY.minAval} · {EMBASSY_ELIGIBILITY.minEcos} Ecos · voz ≥ {Math.round(EMBASSY_ELIGIBILITY.minVoice * 100)}</span>}
+        </div>
+        <div className="row" style={{ alignItems: "baseline", gap: 18, marginBottom: 12 }}>
+          <AvalNumber total={aval.total} provisional={aval.provisional} />
+          <span className="lead" style={{ fontSize: 14 }}>Lo que dicen los Interesados a los que atendió, la calidad de lo que cede, cómo responde y cuánto se implica. Da prioridad en la Mesa y elegibilidad de Embajadora. Nunca un ranking.</span>
+        </div>
+        <TitularAvalBlocks aval={aval} />
+        {aval.publicEcos.length ? (
+          <div className="stack" style={{ marginTop: 14 }}>
+            <p className="eyebrow">Ecos publicados con permiso del Interesado</p>
+            {aval.publicEcos.map((e) => (
+              <p key={e.id} className="eco-quote">{e.comment ? `“${e.comment}”` : "Sin comentario."}<span className="mono">{e.displayName ?? "Interesado"} · {e.score} sobre 100{e.submittedAt ? ` · ${dateTime(e.submittedAt)}` : ""}</span></p>
+            ))}
+          </div>
+        ) : <p className="mono" style={{ marginTop: 10 }}>Ningún Interesado ha autorizado todavía publicar su Eco con su nombre.</p>}
+      </section>
       <div className="grid grid-2">
         <section className="card"><p className="eyebrow">Qué hace</p><ul className="plain">{dna.offering.services.map((s) => <li key={s}>{s}</li>)}</ul></section>
         <section className="card"><p className="eyebrow">A quién sirve</p><p>{dna.ideal_customer.industries.join(", ") || "—"}</p><p className="mono" style={{ marginTop: 6 }}>{dna.ideal_customer.company_size.join(" · ") || "cualquier tamaño"} · {dna.ideal_customer.geography.join(", ")}</p><p style={{ marginTop: 8 }}>Señales: {dna.ideal_customer.triggers.map((t) => t.toLowerCase().replaceAll("_", " ")).join(", ") || "—"}</p></section>

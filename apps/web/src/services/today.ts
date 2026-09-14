@@ -3,6 +3,7 @@ import { and, desc, eq, gte, inArray, or, sql } from "drizzle-orm";
 import type { Db } from "@/db/client";
 import { schema } from "@/db/client";
 import { REVIEW_STATES } from "@/core/state-machine";
+import { pendingEcoRequests } from "@/services/eco";
 
 export async function mesaTimeline(db: Db, chapterId: string, companyId: string, limit = 40) {
   const rows = await db.query.auditEvents.findMany({ where: and(eq(schema.auditEvents.chapterId, chapterId), eq(schema.auditEvents.significant, true)), orderBy: [desc(schema.auditEvents.occurredAt)], limit: limit * 2 });
@@ -36,7 +37,7 @@ export async function balance(db: Db, chapterId: string, companyId: string) {
   return { given: given.filter(valid).length, received: received.filter(valid).length, valueGiven: confirmed(given), valueReceived: confirmed(received), merit: Number(merit[0]?.total ?? 0) };
 }
 
-/** Lo que espera el toque del Timonel (D-039): Cesiones por decidir, Apuntes por publicar y, si es Directiva, candidaturas nuevas. */
+/** Lo que espera el toque del Timonel (D-039): Cesiones por decidir, Apuntes por publicar, Peticiones de Eco por enviar (D-042) y, si es Directiva, candidaturas nuevas. */
 export async function pendingDecisions(db: Db, chapterId: string, companyId: string, member: { isDirector: boolean }) {
   const open = await db.query.referrals.findMany({
     where: and(eq(schema.referrals.chapterId, chapterId), inArray(schema.referrals.state, [...REVIEW_STATES, "APPROVED", "INTRO_AUTHORIZED"]), or(eq(schema.referrals.receiverCompanyId, companyId), eq(schema.referrals.originatorCompanyId, companyId))),
@@ -50,5 +51,6 @@ export async function pendingDecisions(db: Db, chapterId: string, companyId: str
     const rows = await db.query.betaRequests.findMany({ where: eq(schema.betaRequests.status, "NEW"), columns: { id: true } });
     candidacies = rows.length;
   }
-  return { referrals, apuntes, candidacies, total: referrals + apuntes + candidacies };
+  const ecos = (await pendingEcoRequests(db, chapterId, companyId)).length;
+  return { referrals, apuntes, ecos, candidacies, total: referrals + apuntes + ecos + candidacies };
 }

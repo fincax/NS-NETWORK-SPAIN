@@ -28,8 +28,8 @@ export const WEIGHTS = {
   strategic_priority: 0.07,
   relationship_strength: 0.1,
   qualification_quality: 0.08,
-  member_reputation: 0.04,
-  historical_conversion: 0.04,
+  member_reputation: 0.06, // Aval del titular (D-042): quien mejor atiende a los Interesados recibe antes
+  historical_conversion: 0.02,
 } as const;
 
 export const PENALTY_WEIGHTS = {
@@ -46,7 +46,8 @@ export interface CapabilityView {
   specialtyCode: string;
   isPrimarySeat: boolean;
   dna: BusinessDNA;
-  reputation?: number; // 0..1, 0.6 por defecto en el MVP
+  reputation?: number; // 0..1 · Aval del titular / 100 (D-042); 0.6 si no hay histórico
+  reputationNote?: string; // evidencia en lenguaje de negocio ("Aval 78: los Interesados valoran su atención")
   openDemand?: string; // texto del Encargo abierto que coincide (D-032)
 }
 
@@ -242,7 +243,7 @@ function components(
   out.push({ key: "qualification_quality", weight: WEIGHTS.qualification_quality, value: qq, confidence: critical.length === 0 ? 0.3 : 0.85, evidence: critical.length === 0 ? "Sin cualificación agente-a-agente todavía." : `${answered} de ${critical.length} preguntas críticas respondidas con confianza.` });
 
   // member_reputation / historical_conversion (MVP: valores por defecto)
-  out.push({ key: "member_reputation", weight: WEIGHTS.member_reputation, value: cap.reputation ?? 0.6, confidence: 0.5, evidence: "Reputación inicial (sin histórico suficiente)." });
+  out.push({ key: "member_reputation", weight: WEIGHTS.member_reputation, value: cap.reputation ?? 0.6, confidence: cap.reputation !== undefined ? 0.8 : 0.5, evidence: cap.reputationNote ?? (cap.reputation !== undefined ? `Aval del titular ${Math.round(cap.reputation * 100)} sobre 100.` : "Aval inicial (sin histórico suficiente).") });
   out.push({ key: "historical_conversion", weight: WEIGHTS.historical_conversion, value: 0.5, confidence: 0.3, evidence: "Sin histórico de conversión para este par especialidad/trigger." });
 
   return out;

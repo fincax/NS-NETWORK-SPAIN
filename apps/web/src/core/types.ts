@@ -5,7 +5,7 @@
  */
 import { z } from "zod";
 
-export const PROTOCOL_VERSION = "0.2";
+export const PROTOCOL_VERSION = "0.3";
 
 // ───────────────────────── Visibilidad y permisos ─────────────────────────
 export const Visibility = z.enum([
@@ -418,6 +418,11 @@ export const TrustEventKind = z.enum([
   "CLOSE_MERIT",
   "RECEIVER_MERIT",
   "RECOGNITION_GIVEN",
+  "ECO_REQUEST_SENT",
+  "ECO_REQUEST_MISSED",
+  "ECO_RECEIVED",
+  "ECO_MERIT",
+  "AVAL_MERIT",
   "COMPLAINT",
   "DISPUTE_OPENED",
   "DISPUTE_RESOLVED",
@@ -427,6 +432,32 @@ export const TrustEventKind = z.enum([
   "CONTRIBUTION_QUOTA_MISSED",
 ]);
 export type TrustEventKind = z.infer<typeof TrustEventKind>;
+
+// ───────────────────────── Eco y Aval (D-042) ─────────────────────────
+/** Eco: la voz del Interesado sobre el cesionario. Tres ejes, tres toques. Nunca ve el Veredicto. */
+export const EcoAxis = z.enum(["ATENCION", "RESULTADO", "RECOMENDACION"]);
+export type EcoAxis = z.infer<typeof EcoAxis>;
+
+/** DURANTE: mientras la Cesión sigue en curso. FINAL: una vez cerrada. El FINAL sustituye al DURANTE en el Aval. */
+export const EcoPhase = z.enum(["DURANTE", "FINAL"]);
+export type EcoPhase = z.infer<typeof EcoPhase>;
+
+export const EcoInput = z.object({
+  attention: z.number().int().min(1).max(5), // ¿le atendieron pronto y bien?
+  result: z.number().int().min(1).max(5), // ¿resolvió lo que necesitaba?
+  recommend: z.number().int().min(1).max(5), // ¿lo recomendaría?
+  comment: z.string().max(280).optional(),
+  public_consent: z.boolean().default(false), // el Interesado autoriza publicar su Eco con su nombre
+  display_name: z.string().max(80).optional(), // cómo quiere aparecer si es público
+});
+export type EcoInput = z.infer<typeof EcoInput>;
+
+export const EcoRecord = EcoInput.extend({ phase: EcoPhase, submitted_at: z.string() });
+export type EcoRecord = z.infer<typeof EcoRecord>;
+
+/** Estado del Aval de una Cesión: provisional hasta tener Veredicto y Eco; sin Eco si el Interesado no respondió en plazo; nulo si el Indicio era falso. */
+export const AvalStatus = z.enum(["PROVISIONAL", "FIRME", "SIN_ECO", "NULO"]);
+export type AvalStatus = z.infer<typeof AvalStatus>;
 
 // ───────────────────────── Puente ─────────────────────────
 export const IntroPackage = z.object({

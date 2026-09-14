@@ -1014,3 +1014,38 @@ Cómo se aplica en el producto:
 **Consequences.** Tabla `chapter_foundings` y columna `founding_id` en candidaturas (migración 0006), estado "En fundación", `services/fundacion.ts`, sección "Salas en fundación" y botones en la Antesala, alta en una Sala recién fundada, aviso en la portada, Sala en fundación de demostración (Correduría Giralda como Promotora, 3 de 12), pruebas.
 
 **Revisit when.** Se conozca el mínimo real tras las primeras fundaciones, se fije la gratificación definitiva, o se construya el kit de promoción de la Promotora.
+
+---
+
+## D-042 · La Cesión vale en tres momentos: el Interesado deja su Eco, y de Promesa, Veredicto y Eco nace el Aval, el número público que respalda a cedente y cesionario (Protocolo IV · Dar la Palabra)
+
+**Status:** CONFIRMED (concepto fijado por el fundador el 2026-09-14); nombres, pesos y umbrales PROPOSED
+**Date:** 2026-09-14
+
+**Context.** Hasta ahora la Cesión valía en dos momentos, ambos internos a NS: la Promesa (a priori, calculada por los Agentes y confirmada por el cesionario) y el Veredicto (a posteriori, del cesionario). El fundador quiere incorporar al protocolo, y a la valoración global del negocio generado, la opinión de la empresa o persona referida al cesionario: el Interesado, una vez concluido el servicio o incluso durante el proceso, opina sobre el servicio o producto del cesionario. Con la valoración previa del cedente (Promesa), la valoración interna (Veredicto, que nunca es pública a los clientes referidos) y la puntuación del Interesado (pública si él lo autoriza) se crea una puntuación global del negocio que genera **un número público**. Ese número sirve a cedente y cesionario para ser Embajadores y para tener prioridad al recibir referidos. El algoritmo dará preferencia a los titulares que más se impliquen, más compartan, mejor respondan a los clientes referidos y mejores reseñas públicas tengan. Debe integrarse en la columna de NS y ser protocolo obligatorio.
+
+**Options.**
+
+1. Encuesta de satisfacción opcional al cierre, fuera del protocolo, como dato informativo.
+2. Reseña pública al estilo de los directorios (estrellas y texto abiertos a cualquiera), con el riesgo de convertir NS en un marketplace de reputación.
+3. Un tercer momento de valoración integrado en NS-ARP, con un objeto propio (Eco), reglas de consentimiento y privacidad, un número público explicable (Aval) que alimenta el Encaje, la Embajada y la prioridad de la Mesa, y un protocolo obligatorio con Reloj y consecuencias (Protocolo IV).
+
+**Choice.** Opción 3.
+
+- **Eco.** La voz del Interesado sobre el cesionario. Tres ejes, tres toques: **Atención** (¿le atendieron pronto y bien?), **Resultado** (¿resolvieron lo que necesitaba?), **Recomendación** (¿lo recomendaría?). Una línea opcional. Dos fases: **durante** la Cesión (desde el Puente) y **al cierre**; el Eco de cierre sustituye al de durante en el Aval, y el Interesado puede revisarlo desde el mismo enlace hasta 30 días después del cierre.
+- **Cómo se pide.** Con el Puente nace la invitación (token único por Cesión). El Agente del cesionario redacta la **Petición de Eco**; la envía la persona (correo, NS o en persona), como el Puente. Ningún Agente contacta con el Interesado (autonomía externa restringida en el MVP). La Petición pasa por el filtro de contraprestación: pedir o pagar una valoración es la regla inmutable 1.
+- **Página pública.** El Interesado nunca es usuario de NS. Responde en `/eco/[token]`, sin sesión, y solo ve la capa 0 (resumen de la necesidad) y los nombres de las dos empresas. **Nunca ve el Veredicto** ni las capas 1–3.
+- **Consentimiento y privacidad.** El Eco siempre cuenta en el Aval. Su texto y su nombre solo se publican en la Sala (Crónica, Dossier) si el Interesado marca el consentimiento; puede retirarlo cuando quiera desde el mismo enlace y el Eco sigue contando sin mostrarse. Base jurídica: consentimiento del propio Interesado. Retención configurable.
+- **Aval de la Cesión (0–100).** Media ponderada de Promesa (25 %), Veredicto (35 %) y Eco (40 %): la voz del Interesado pesa más que ninguna otra parte. Provisional hasta que hay Veredicto y Eco de cierre (o Eco de durante con la ventana cerrada); "sin Eco" si la ventana de 30 días se cerró sin voz; nulo si el Veredicto demostró que el Indicio era falso.
+- **Aval del titular (0–100, público en la red).** Cuatro bloques con evidencia, nunca un número opaco: **Voz de los Interesados** (40 %: media de los Ecos recibidos como cesionario), **Calidad de lo que cede** (25 %: Aval medio de las Cesiones cedidas con Veredicto), **Respuesta** (20 %: plazos cumplidos frente a incumplidos, incluida la Petición de Eco) y **Contribución** (15 %: Cesiones válidas cedidas frente al Ritmo en las últimas 12 semanas, con las Embajadas a valor y medio). Sin histórico, cada bloque vale lo neutro (60) y lo dice; con menos de tres hechos firmes se muestra como provisional.
+- **Para qué sirve el Aval.** (1) Es el componente `member_reputation` del Encaje, cuyo peso sube de 0,04 a 0,06 (y `historical_conversion` baja de 0,04 a 0,02, sin datos todavía). (2) A igual plaza, la Mesa consulta primero al titular con más Aval. (3) **Elegibilidad de Embajadora**: Aval ≥ 70, al menos 3 Ecos como cesionario y voz de los Interesados ≥ 70; los candidatos a Embajada se ordenan por Aval. (4) Se ve en la Balanza y se explica en el Dossier.
+- **Mérito.** Un Eco da Mérito de Eco al cesionario (base 80 × Eco) y Mérito de Aval al cedente (base 30 × Eco), porque su referido acabó bien atendido. Las revisiones suman solo la diferencia. Embajada: ×1,5.
+- **Protocolo IV · Dar la Palabra (NS-AEP).** Obligatorio. Reloj de la Sala: 3 días tras el cierre sin Petición, empujón al cesionario; 14 días, `ECO_REQUEST_MISSED` (−15) y aviso; 14 días tras la Petición sin Eco, el Agente pide al Timonel que se lo recuerde al Interesado; 30 días tras el cierre, ventana cerrada. Las Peticiones pendientes cuentan en el número del icono y aparecen en Hoy.
+- **Contraste.** Se marca para la Directiva un Eco recibido en la primera hora tras el Puente o con indicio de contraprestación en el comentario. Pendiente: pares cedente–cesionario con Ecos sistemáticamente perfectos y sin texto.
+- **Regla inmutable 6.** "Toda Cesión da la palabra al Interesado" entra en `CLAUDE.md` y `00_NORTH_STAR.md`.
+
+**Why.** Cierra el bucle con la única voz que faltaba: la del cliente. Convierte la calidad del servicio en un hecho verificable fuera del círculo de miembros, sin abrir NS a reseñas anónimas. Un número público explicable alinea a todos con lo que importa (atender bien, ceder bien, responder a tiempo, contribuir) y da al algoritmo un criterio legítimo para priorizar. Mantiene las puertas humanas: la persona pide, el Interesado decide qué se publica.
+
+**Consequences.** `Eco`, `Aval` y `Petición de Eco` en el léxico; Protocolo IV en `docs/14`; NS-ARP v0.3 con S13b (Eco) y §7.2 actualizado en `docs/02`; tarjeta con cara C en `docs/15`; tabla `endorsements` y columnas `aval`, `aval_status` en Cesiones (migración 0007); `core/aval.ts` (funciones puras), `services/eco.ts`, Reloj ampliado, página pública `/eco/[token]` fuera de la puerta de la demo, sección de Eco y Aval en la tarjeta, Aval en Dossier y Balanza, Peticiones pendientes en Hoy y en el icono; pruebas `eco.test.ts` y ampliación de `core.test.ts`.
+
+**Revisit when.** Se disponga de 50 Ecos en la Sala piloto, para calibrar pesos (25 · 35 · 40 y 40 · 25 · 20 · 15), umbrales de Embajadora, la ventana de 30 días y si el Aval del titular debe mostrarse también en la web pública (sello de miembro).

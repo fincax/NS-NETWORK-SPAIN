@@ -6,6 +6,7 @@ import { audit } from "@/lib/audit";
 import { getProvider } from "@/agents/provider";
 import { assertTransition, TIMEOUTS, type Actor } from "@/core/state-machine";
 import { computeVerdictMerit } from "@/core/merit";
+import { ensureEcoInvitation, recomputeReferralAval } from "@/services/eco";
 import { detectsReferralFee } from "@/core/compliance";
 import { ReferralVerdict, type HumanDecisionKind, type ReferralPromise, type ReferralState, type RevealScope, type SignalEnvelope, type VerdictAxis } from "@/core/types";
 
@@ -143,6 +144,7 @@ export async function markIntroduced(db: Db, referralId: string, memberId: strin
   await db.update(schema.introductions).set({ finalMessage, channel, sentAt: new Date(), sentByMemberId: memberId }).where(eq(schema.introductions.referralId, referralId));
   const ref = await transition(db, referralId, "INTRODUCED", "ORIGINATOR", memberId);
   await db.insert(schema.trustEvents).values({ chapterId: ref.chapterId, companyId: ref.originatorCompanyId, kind: "INTRO_COMPLETED", weight: 10, evidenceRef: `referral:${referralId}` });
+  await ensureEcoInvitation(db, referralId); // Protocolo IV (D-042): con el Puente nace la invitación al Eco del Interesado
   await audit(db, { chapterId: ref.chapterId, kind: "INTRODUCED", actor: { type: "USER", id: memberId }, subject: { type: "Referral", id: referralId }, result: "El cedente tendió el Puente. El cesionario se compromete a responder al Interesado en 48 h.", significant: true, companyIds: [ref.originatorCompanyId, ref.receiverCompanyId] });
 }
 
@@ -200,9 +202,10 @@ export async function submitVerdict(db: Db, input: VerdictInput) {
     const receiver = await db.query.companies.findFirst({ where: eq(schema.companies.id, ref.receiverCompanyId) });
     await audit(db, { chapterId: ref.chapterId, kind: "RECOGNITION", actor: { type: "USER", id: input.memberId }, subject: { type: "Recognition", id: recognition.id }, result: `${receiver!.name} distingue a ${originator!.name} por ${input.recognition.axis.toLowerCase()}: "${input.recognition.reason}".`, significant: true });
   }
+  const aval = await recomputeReferralAval(db, ref.id); // Aval de la Cesión (D-042): provisional hasta que el Interesado deje su Eco
   const resultLabel = { WON: "ganada", LOST: "perdida", NO_DECISION: "sin decisión" }[v.result];
-  await audit(db, { chapterId: ref.chapterId, kind: "VERDICT", actor: { type: "USER", id: input.memberId }, subject: { type: "Verdict", id: row.id }, policyApplied: merit.originator.promiseRevoked ? "promise.revoked" : "merit.three_moments", result: `Veredicto emitido (Facilidad ${v.ease}/5 · Negocio ${v.business}/5 · Trato ${v.treatment}/5): Cesión ${resultLabel}${v.value_verified ? `, ${v.value_verified.toLocaleString("es-ES")} € pendientes de contraste` : ""}.`, significant: true, companyIds: [ref.originatorCompanyId, ref.receiverCompanyId] });
-  return { verdict: row, merit, recognition };
+  await audit(db, { chapterId: ref.chapterId, kind: "VERDICT", actor: { type: "USER", id: input.memberId }, subject: { type: "Verdict", id: row.id }, policyApplied: merit.originator.promiseRevoked ? "promise.revoked" : "merit.three_moments", result: `Veredicto emitido (Facilidad ${v.ease}/5 · Negocio ${v.business}/5 · Trato ${v.treatment}/5): Cesión ${resultLabel}${v.value_verified ? `, ${v.value_verified.toLocaleString("es-ES")} € pendientes de contraste` : ""}. Aval ${aval.total} (${aval.status.toLowerCase()}): falta la voz del Interesado.`, significant: true, companyIds: [ref.originatorCompanyId, ref.receiverCompanyId] });
+  return { verdict: row, merit, recognition, aval };
 }
 
 /** El cedente confirma el valor: VALUE_CONFIRMED → Libro de Valor y Balanza. */

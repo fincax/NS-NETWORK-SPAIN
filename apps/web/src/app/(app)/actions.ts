@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { MEMBER_COOKIE } from "@/lib/session";
 import { getDb } from "@/db/client";
-import { seedChapter, SCENARIOS } from "@/db/seed";
+import { seedChapter, seedClosedCesionWithEco, SCENARIOS } from "@/db/seed";
 import { createSignal, publishSignal } from "@/services/signals";
 import { decide } from "@/services/referrals";
 import { and, eq } from "drizzle-orm";
@@ -32,6 +32,7 @@ export async function prepareDemo() {
     }
     const pending = await db.query.referrals.findFirst({ where: and(eq(schema.referrals.receiverCompanyId, companies["hispalis"].companyId), eq(schema.referrals.originatorCompanyId, companies["guadalquivir"].companyId), eq(schema.referrals.state, "ORIGINATOR_PENDING")) });
     if (pending) await decide(db, { referralId: pending.id, memberId: companies["guadalquivir"].memberId, decision: "APPROVE" });
+    await seedClosedCesionWithEco(db, companies); // Protocolo IV (D-042): un Aval firme visible en la demo
     await runRastreo(db, companies["hispalis"].companyId);
   }
   revalidatePath("/", "layout");

@@ -94,6 +94,9 @@ describe("Scenario A · oportunidad excelente", () => {
     const ref = (await db.query.referrals.findFirst({ where: eq(schema.referrals.id, referralId) }))!;
     expect(ref.state).toBe("INTRODUCED");
     expect(ref.responseDueAt).toBeInstanceOf(Date);
+    // Protocolo IV (D-042): con el Puente nace la invitación al Eco del Interesado
+    const inv = await db.query.endorsements.findFirst({ where: eq(schema.endorsements.referralId, referralId) });
+    expect(inv?.status).toBe("PENDING");
   });
 
   it("seguimiento, Veredicto en tres ejes con Distinción y valor contrastado por ambas partes", async () => {
@@ -102,6 +105,7 @@ describe("Scenario A · oportunidad excelente", () => {
     const out = await submitVerdict(db, { referralId, memberId: carlos().memberId, verdict: { ease: 5, business: 4, treatment: 5, result: "WON", value_verified: 38_000, need_was_real: true }, recognition: { axis: "TRATO", reason: "Trato impecable con el Director General." } });
     expect(out.merit.originator.close).toBeGreaterThan(0);
     expect(out.recognition?.axis).toBe("TRATO");
+    expect(out.aval.status).toBe("PROVISIONAL"); // el Aval de la Cesión espera la voz del Interesado (D-042)
     await expect(submitVerdict(db, { referralId, memberId: carlos().memberId, verdict: { ease: 3, business: 3, treatment: 3, result: "WON", need_was_real: true }, recognition: { axis: "TRATO", reason: "otra" } })).rejects.toThrow();
     await confirmValue(db, referralId, lucia().memberId);
     const ref = (await db.query.referrals.findFirst({ where: eq(schema.referrals.id, referralId) }))!;

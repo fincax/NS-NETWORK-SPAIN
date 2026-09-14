@@ -1,22 +1,23 @@
-# 14 · Los tres protocolos obligatorios de Sala
+# 14 · Los cuatro protocolos obligatorios de Sala
 
-**Estado:** D-018 y D-019 (CONFIRMED en su obligación por el fundador; nombres y parámetros PROPOSED).
+**Estado:** D-018, D-019 y D-042 (CONFIRMED en su obligación por el fundador; nombres y parámetros PROPOSED).
 
-Pertenecer a una Sala NS implica tres deberes que los Agentes ejecutan y las personas validan:
+Pertenecer a una Sala NS implica cuatro deberes que los Agentes ejecutan y las personas validan:
 
 ```text
 Protocolo I  · GENERAR NEGOCIO      Ceder referidos de calidad.          Unidad: la Cesión.      Especificación: NS-ARP (docs/02).
 Protocolo II · DAR A CONOCER        Comunicar tu trabajo a la Sala.      Unidad: el Comunicado.  Especificación: NS-ADP (este documento).
 Protocolo III · CUENTAS CLARAS      Hacer visible el valor dado y recibido. Unidad: la Balanza.  Especificación: NS-ATP (este documento).
+Protocolo IV · DAR LA PALABRA       Que el Interesado opine y su voz cuente. Unidad: el Eco.     Especificación: NS-AEP (este documento).
 ```
 
-Los tres tienen cadencia semanal, cumplimiento verificable y consecuencias (D-010). Los tres los realiza el Agente; el Timonel decide en segundos.
+Los cuatro tienen cumplimiento verificable y consecuencias (D-010). Los cuatro los prepara el Agente; el Timonel decide en segundos. El cuarto añade una voz que no es de ningún miembro: la del cliente referido.
 
 ---
 
 ## Protocolo I · Generar Negocio (resumen)
 
-Cada semana el Agente de cada empresa propone el máximo de Cesiones válidas posibles a partir de Indicios propios (Despacho), Rastreo y Sondeo. El titular cualifica con Veredicto (Facilidad, Negocio, Trato) y puede otorgar una Distinción; NS hace Contraste; el cedente suma Mérito y cumple su Compromiso. Sin titular en la Sala: Embajada. Todo el detalle vive en `docs/02_NS_AGENTIC_REFERRAL_PROTOCOL.md`, `docs/12_SALAS.md` y `docs/13_LEXICO_NS.md`.
+Cada semana el Agente de cada empresa propone el máximo de Cesiones válidas posibles a partir de Indicios propios (Despacho), Rastreo y Sondeo. El titular cualifica con Veredicto (Facilidad, Negocio, Trato) y puede otorgar una Distinción; NS hace Contraste; el cedente suma Mérito y cumple su Compromiso. Sin titular en la Sala: Embajada. Toda Cesión termina dando la palabra al Interesado (Protocolo IV). Todo el detalle vive en `docs/02_NS_AGENTIC_REFERRAL_PROTOCOL.md`, `docs/12_SALAS.md` y `docs/13_LEXICO_NS.md`.
 
 ---
 
@@ -280,3 +281,112 @@ Reglas:
 1. Ritmo de NS por defecto (propuesta: 1 Cesión válida por semana y titular).
 2. Si la Balanza muestra el valor contrastado en euros por titular o solo el número de Cesiones (la propuesta muestra ambos, solo agregados).
 3. Nombres: Cuentas Claras (protocolo), Balanza (público), Brújula (privado), Ritmo (objetivo semanal), Movimiento (acción propuesta). Alternativas en `docs/13_LEXICO_NS.md`.
+
+
+---
+
+## Protocolo IV · Dar la Palabra · NS-AEP (NS Agentic Endorsement Protocol)
+
+### 1. Principio
+
+> La Cesión no termina cuando el cesionario dice cómo fue. Termina cuando lo dice el Interesado.
+
+Promesa y Veredicto son voces de miembros. Falta la del cliente referido. **Toda Cesión da la palabra al Interesado**: el cesionario le pide su **Eco** durante el trabajo y al cierre; lo que el Interesado dice pesa más que ninguna otra parte en el **Aval**, el número público que respalda a las dos empresas. El Veredicto nunca llega al Interesado. Su Eco solo se publica con su consentimiento.
+
+### 2. Objetos
+
+| Término NS | Qué es | Visibilidad | Identificador técnico |
+| --- | --- | --- | --- |
+| **Eco** | La voz del Interesado sobre el cesionario: Atención, Resultado, Recomendación (1–5 cada uno), una línea opcional, fase (durante / al cierre), consentimiento de publicación y nombre con el que quiere aparecer. | Cuenta siempre; texto y nombre `PUBLIC` solo con consentimiento; si no, `MATCHED_PARTY` + `DIRECTORS`. | `Endorsement` |
+| **Petición de Eco** | Mensaje con el enlace que redacta el Agente del cesionario y envía la persona. | `COMPANY_ONLY` (cesionario) | `Endorsement.request_message` |
+| **Aval de la Cesión** | Número 0–100 que nace de Promesa (25 %), Veredicto (35 %) y Eco (40 %). Estados: provisional, firme, sin Eco, nulo. | `PUBLIC` | `Referral.aval`, `Referral.aval_status` |
+| **Aval del titular** | Número 0–100 con cuatro bloques explicados: Voz de los Interesados (40 %), Calidad de lo que cede (25 %), Respuesta (20 %), Contribución (15 %). | `PUBLIC` | `TitularAval` (vista) |
+| **Ventana del Interesado** | 30 días tras el cierre para dejar o revisar el Eco. | — | `ECO_WINDOW_DAYS` |
+
+### 3. Especificación agentic
+
+| Campo | Especificación |
+| --- | --- |
+| **Trigger** | El Puente (nace la invitación con token único). Cada hito de la Cesión y, sobre todo, el cierre (Petición al cierre). Reloj de la Sala a los 3, 14 y 30 días del cierre. |
+| **Inputs** | Estado de la Cesión, alcance de la Apertura (para saludar por el nombre solo si se reveló el contacto), nombres de las dos empresas, resumen de la necesidad (capa 0). |
+| **Agente** | Company Agent del cesionario redacta la Petición; Trust & Compliance filtra contraprestación y marca el Contraste; Chapter Intelligence publica en la Crónica los Ecos con consentimiento; Executive Briefing lleva a Hoy las Peticiones pendientes. |
+| **Tools** | Generador de token; plantilla de Petición; filtro de contraprestación (`detectsReferralFee`); cálculo puro del Aval (`core/aval.ts`); Reloj. |
+| **Permisos** | Ningún Agente contacta con el Interesado: la Petición la envía la persona (como el Puente). La página del Eco solo expone la capa 0 y los nombres. El consentimiento de publicación es del Interesado y se puede retirar. |
+| **Objetivo de razonamiento** | Ninguno que invente nada: la Petición es una plantilla sobria; el Aval es una fórmula explicada. Lo que decide es el Interesado. |
+| **Salida estructurada** | `Endorsement{ attention, result, recommend, comment?, phase, public_consent, display_name?, history[] }` · `ReferralAval{ total, status, parts[3] }` · `TitularAval{ total, provisional, blocks[4], ecosCount, embassyEligible }`. |
+| **Confianza** | El Eco es un hecho, no una estimación. El Aval del titular declara qué bloques tienen datos y cuáles valen lo neutro; con menos de tres hechos firmes se muestra como provisional. |
+| **Puerta humana** | El cesionario envía la Petición (un toque desde la tarjeta o desde Hoy). El Interesado decide qué dice y si se publica. |
+| **Efecto** | Aval de la Cesión recalculado; Mérito de Eco al cesionario y Mérito de Aval al cedente; Aval del titular en Balanza y Dossier; componente `member_reputation` del Encaje; orden de candidatos en la Mesa y en la Embajada; Crónica si hay consentimiento. |
+| **Evento de auditoría** | `ECO_REQUESTED`, `ECO_RECEIVED` (privado para las dos partes), `ECO_PUBLISHED` (Sala, solo con consentimiento), `ECO_PUBLICITY_WITHDRAWN`, `ECO_NUDGE`, `ECO_REQUEST_MISSED`, `ECO_FOLLOW_UP`. |
+| **Fallo** | Enlace caducado o ventana cerrada: la página lo dice y agradece. Eco en la primera hora tras el Puente o con indicio de contraprestación: `contrast_status = FLAGGED` para la Directiva; cuenta hasta que la Directiva decida. |
+
+### 4. La página del Eco
+
+```text
+NS Network · La palabra del Interesado
+
+¿Cómo lo ha hecho Reformas Industriales Híspalis?
+Correduría Guadalquivir os presentó porque necesitabais reforma y adecuación de la nueva nave.
+
+¿Te atendieron pronto y bien?          1 2 3 4 [5]
+¿Resolvieron lo que necesitabas?       1 2 3 4 [5]
+¿Recomendarías a Híspalis?             1 2 3 4 [5]
+Una línea, si quieres                  "La obra terminó en plazo y sin parar la producción."
+
+[ ] Autorizo a publicar mi Eco con mi nombre en la Sala. Puedo retirarlo cuando quiera.
+Cómo quiero aparecer: Metalúrgica del Sur
+
+[Enviar mi Eco]
+Nadie de NS te llamará por esto. Tus respuestas las ven las dos empresas y la red; nunca se venden.
+```
+
+Sin usuario, sin contraseña, móvil primero. Nunca aparece el Veredicto, la Promesa ni nada de las capas 1–3.
+
+### 5. El Aval
+
+```text
+AVAL DE LA CESIÓN · 92 · firme
+Promesa    25 %   84   Promesa 84 sobre 100 al aceptarse.
+Veredicto  35 %   92   Facilidad 5, Negocio 4, Trato 5. Interno a NS.
+Eco        40 %  100   Atención 5, Resultado 5, Recomendación 5.
+
+AVAL DEL TITULAR · Híspalis · 88 · Aval alto · elegible como Embajadora
+Voz de los Interesados   40 %   96   4 Ecos recibidos como cesionario, media 96.
+Calidad de lo que cede   25 %   85   3 Cesiones cedidas con Veredicto, Aval medio 85.
+Respuesta                20 %   90   9 de 10 plazos cumplidos.
+Contribución             15 %   75   9 Cesiones válidas frente a un Ritmo de 1 por semana en 12 semanas.
+```
+
+Reglas:
+
+1. **La voz del Interesado pesa más que ninguna otra parte** (40 %). Sin Eco, el Aval de la Cesión es provisional; si la ventana se cierra sin voz, queda "sin Eco" con las otras dos partes.
+2. **Nunca un número opaco.** Cada parte y cada bloque llevan su evidencia. Sin histórico, el bloque vale lo neutro (60) y lo dice.
+3. **Nunca un ranking.** La Balanza lo muestra por plaza; el Dossier lo explica. Ordena solo lo que tiene que ordenar: candidatos en la Mesa y en la Embajada.
+4. **Elegibilidad de Embajadora:** Aval ≥ 70, al menos 3 Ecos como cesionario y voz de los Interesados ≥ 70. Un titular con buen Aval pero mal atendido por sus Interesados no acoge Embajadas.
+5. **Un Indicio falso anula el Aval de la Cesión** (D-021).
+6. **Mérito:** Mérito de Eco al cesionario (80 × Eco) y Mérito de Aval al cedente (30 × Eco); revisiones, solo la diferencia; Embajada ×1,5.
+
+### 6. Cumplimiento
+
+- Pedir el Eco es obligatorio en toda Cesión cerrada. Reloj: 3 días sin Petición, empujón al cesionario; 14 días, `ECO_REQUEST_MISSED` (−15 de Mérito) y aviso; 14 días tras la Petición sin Eco, el Agente pide al Timonel que se lo recuerde al Interesado; 30 días, ventana cerrada.
+- Las Peticiones pendientes cuentan en el número del icono (D-039) y aparecen en Hoy como "Da la palabra al Interesado".
+- Pedir o pagar una valoración (descuento, regalo, condición) es contraprestación: regla inmutable 1, expulsión. La Petición pasa por el mismo filtro que el Puente.
+- Contraste: Ecos en la primera hora tras el Puente, comentarios con indicio de contraprestación, y (pendiente) pares cedente–cesionario con Ecos sistemáticamente perfectos y sin texto.
+- Métricas: proporción de Cesiones cerradas con Eco; tiempo cierre → Eco; Eco medio de la Sala; proporción de Ecos con consentimiento de publicación; correlación Veredicto–Eco (si divergen mucho, algo falla en el Veredicto o en el servicio).
+
+### 7. Interfaz
+
+- **Tarjeta de Cesión** (cesionario, tras el Puente): "Da la palabra al Interesado" con la Petición redactada y el enlace; ámbar al cerrar. Ambas partes: el Eco recibido y el Aval de la Cesión con sus tres partes.
+- **Página pública** `/eco/[token]`: cara C de la tarjeta (docs/15).
+- **Hoy**: Peticiones pendientes; el Agente pasa a "esperando".
+- **Dossier**: Aval del titular con los cuatro bloques, elegibilidad de Embajadora y los Ecos publicados con permiso.
+- **Balanza**: columna Aval, enlazada al Dossier.
+- **Crónica**: "Metalúrgica del Sur avala públicamente a Híspalis (100 sobre 100) tras la presentación de Guadalquivir".
+
+### 8. Pendientes del fundador
+
+1. Pesos del Aval de la Cesión (propuesta 25 · 35 · 40) y del titular (40 · 25 · 20 · 15).
+2. Umbrales de Embajadora (Aval 70, 3 Ecos, voz 70) y la ventana del Interesado (30 días).
+3. Si el Aval del titular se muestra también fuera de la red (sello de miembro en la web pública) o solo dentro.
+4. Si la Petición de Eco podrá enviarla NS en nombre del cesionario cuando se amplíe la autonomía externa (fase posterior al MVP).
+5. Nombres: Dar la Palabra (protocolo), Eco (voz del Interesado), Aval (número público), Petición de Eco. Alternativas en `docs/13_LEXICO_NS.md`.

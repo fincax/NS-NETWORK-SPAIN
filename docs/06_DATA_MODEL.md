@@ -1,7 +1,7 @@
 # 06 · Modelo de datos
 
 **Estado:** v0.1 · implementado en `apps/web/src/db/schema.ts` (Drizzle ORM, PostgreSQL). Cada cambio de esquema genera una migración en `apps/web/drizzle/`.
-**Deriva de:** NS-ARP v0.2 (`docs/02`), Salas (`docs/12`), Protocolos (`docs/14`), tarjeta de Cesión (`docs/15`), D-001, D-010, D-013, D-020, D-021, D-024, D-025.
+**Deriva de:** NS-ARP v0.3 (`docs/02`), Salas (`docs/12`), Protocolos (`docs/14`), tarjeta de Cesión (`docs/15`), D-001, D-010, D-013, D-020, D-021, D-024, D-025, D-042.
 
 ## 0. Principios
 
@@ -20,7 +20,7 @@ EMPRESA               companies · members · business_dna · capabilities · ag
 INDICIO               business_signals (S0) · opportunity_signals (S1–S3, envelope) · needs
 PISTA                 interest_claims (S5) · qualifications (S6) · match_candidates (S7–S8: score, explanation, compliance)
 CESIÓN                referrals (estado, Promesa, alcance de revelación, valor) · referral_transitions · human_decisions
-PUENTE Y CIERRE       introductions · verdicts · recognitions · trust_events
+PUENTE Y CIERRE       introductions · verdicts · recognitions · endorsements (Eco, D-042) · trust_events
 AUDITORÍA             audit_events · agent_interactions
 RASTREO Y ENCARGOS    public_records (D-031) · demands (D-032)
 ```
@@ -42,12 +42,14 @@ RASTREO Y ENCARGOS    public_records (D-031) · demands (D-032)
 | Interés | `interest_claims` | `preliminary_fit`, `status`, `decline_code` (puerta dura). |
 | Cualificación | `qualifications` | `turns[]` tipados, `outcome`. |
 | Pista | `match_candidates` | `score` (NSMatchScore), `explanation`, `compliance` (Salvoconducto). |
-| Cesión | `referrals` | `state` (máquina §9), `route` CHAPTER/ZONE/NETWORK, `embassy`, `promise` (D-021), `reveal_scope`, `value_potential_*`, `value_verified`, plazos (`expires_at`, `response_due_at`). |
+| Cesión | `referrals` | `state` (máquina §9), `route` CHAPTER/ZONE/NETWORK, `embassy`, `promise` (D-021), `reveal_scope`, `value_potential_*`, `value_verified`, `aval` y `aval_status` (D-042), plazos (`expires_at`, `response_due_at`). |
 | Transición | `referral_transitions` | Toda transición con actor y motivo. |
 | Visto bueno | `human_decisions` | Rol, decisión, `reveal_scope`, `seen_layers[]` (qué vio la persona al decidir). |
 | Puente | `introductions` | Borrador del Agente, mensaje final, canal, quién lo envió. |
 | Veredicto | `verdicts` | Tres ejes + resultado + valor; Mérito emitido; `contrast_status`. |
 | Distinción | `recognitions` | Eje y motivo; máx. una por titular y mes (regla en servicio). |
+| Eco | `endorsements` | Una por Cesión, nace con el Puente. `token` único (la llave del Interesado), `status` PENDING/SENT/RECEIVED, `phase` DURANTE/FINAL, tres ejes, `comment`, `public_consent`, `display_name`, `history[]` (Ecos anteriores), Petición (`request_message`, `sent_at`, `sent_by_member_id`), marcas del Reloj (`nudge_sent_at`, `missed_flagged_at`, `follow_up_sent_at`, `window_closed_at`), `contrast_status`. |
+| Aval del titular | vista (`services/eco.ts`) | No se persiste: se calcula al leerlo a partir de Ecos recibidos, Aval de las Cesiones cedidas, `trust_events` de respuesta y Cesiones válidas frente al Ritmo. Cuatro bloques con evidencia. |
 | Mérito | `trust_events` | Cada hecho verificable con `weight`. La Hoja de Méritos es una vista, nunca un número opaco. |
 | Mesa Permanente | `audit_events` | `significant`, `company_ids[]` (vacío = toda la Sala; con ids = privado). |
 | Mensajes A2A | `agent_interactions` | Catálogo NS-ARP §5 con `layer_used` y `policy_applied`. |
@@ -66,7 +68,12 @@ MatchCandidate      PROPOSED | BELOW_THRESHOLD | ACCEPTED | REJECTED | EXPIRED
 Referral            ver máquina de estados en src/core/state-machine.ts (NS-ARP §9 + D-024)
 ```
 
-Plazos (D-024) ejecutados por el Reloj de la Sala (D-030, `services/clock.ts`): recordatorio a las 72 h, caducidad a los 7 días de revisión, respuesta al Interesado en 48 h tras el Puente, check-in del Agente cada 14 días.
+Plazos (D-024) ejecutados por el Reloj de la Sala (D-030, `services/clock.ts`): recordatorio a las 72 h, caducidad a los 7 días de revisión, respuesta al Interesado en 48 h tras el Puente, check-in del Agente cada 14 días. Protocolo IV (D-042): empujón al cesionario 3 días tras el cierre sin Petición de Eco, incumplimiento a los 14, recordatorio al Timonel 14 días tras la Petición sin Eco, ventana del Interesado cerrada a los 30 días.
+
+```text
+Endorsement (Eco)   PENDING (nace con el Puente) → SENT (la persona envió la Petición) → RECEIVED (el Interesado respondió; puede revisar hasta 30 días tras el cierre)
+Referral.aval       PROVISIONAL → FIRME (Veredicto + Eco al cierre) | SIN_ECO (ventana cerrada sin voz) | NULO (Indicio falso)
+```
 
 ## 3. Visibilidad en consultas
 
@@ -75,6 +82,8 @@ Plazos (D-024) ejecutados por el Reloj de la Sala (D-030, `services/clock.ts`): 
 | Cualquier titular de la Sala | Capa 0 de Indicios publicados; eventos `significant` sin `company_ids`; Balanza (agregados contrastados). | `mesaTimeline`, `balance`. |
 | Cedente | Capas 0–3 propias; Cesiones donde es originador. | `roleOf()` en `services/referrals.ts`. |
 | Cesionario | Capa 1 al aceptarse su claim; capa 2 solo desde `INTRO_AUTHORIZED` y según `reveal_scope`; nunca la capa 3. | Tarjeta de Cesión, `layer2Open`. |
+| Interesado (sin usuario) | Solo capa 0 y nombres de las dos empresas, desde `/eco/[token]`. Nunca el Veredicto ni las capas 1–3. | `ecoPageContext()` en `services/eco.ts`; la ruta queda fuera del proxy de la demo. |
+| Toda la red | El Aval de cada titular y los Ecos con consentimiento de publicación. | `avalOfCompany()`; Balanza y Dossier. |
 | Directiva | Cesiones de la Sala con excepciones; capa 2 solo si la excepción es de datos personales. | `members.is_director`. |
 | Agente de otra empresa | Nada por debajo de CHAPTER fuera de una Cesión en curso. | Los agentes reciben objetos ya filtrados por el orquestador. |
 

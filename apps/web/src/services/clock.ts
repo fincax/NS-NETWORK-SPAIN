@@ -3,6 +3,8 @@
  *  - Revisión: recordatorio a las 72 h; caducidad a los 7 días (vuelve al cedente; el silencio cuenta).
  *  - Puente: respuesta al Interesado en 48 h; si no hay hito, RESPONSE_LATE para el cesionario.
  *  - Seguimiento: el Agente pregunta cada 14 días.
+ *  - Eco (Protocolo IV, D-042): empujón a los 3 días del cierre sin Petición, incumplimiento a los 14, recordatorio al Timonel
+ *    a los 14 días de la Petición sin respuesta, ventana del Interesado cerrada a los 30 días.
  * Idempotente: cada acción se marca en la Cesión y no se repite. El empujón lo recibe el Timonel, nunca el Interesado.
  */
 import { and, eq, inArray, lt, isNull, or } from "drizzle-orm";
@@ -10,19 +12,21 @@ import type { Db } from "@/db/client";
 import { schema } from "@/db/client";
 import { audit } from "@/lib/audit";
 import { TIMEOUTS } from "@/core/state-machine";
+import { runEcoClock, type EcoClockResult } from "@/services/eco";
 
 export interface ClockResult {
   reminders: number;
   expired: number;
   late: number;
   nudges: number;
+  eco: EcoClockResult; // Protocolo IV (D-042)
 }
 
 const H = 3_600_000;
 const D = 86_400_000;
 
 export async function runClock(db: Db, now = new Date(), chapterId?: string): Promise<ClockResult> {
-  const res: ClockResult = { reminders: 0, expired: 0, late: 0, nudges: 0 };
+  const res: ClockResult = { reminders: 0, expired: 0, late: 0, nudges: 0, eco: { nudges: 0, missed: 0, followUps: 0, windowsClosed: 0 } };
   const scope = chapterId ? eq(schema.referrals.chapterId, chapterId) : undefined;
 
   // 1 · Recordatorio a las 72 h en revisión
@@ -70,6 +74,9 @@ export async function runClock(db: Db, now = new Date(), chapterId?: string): Pr
     await audit(db, { chapterId: r.chapterId, kind: "CHECK_IN", actor: { type: "AGENT", id: "clock" }, subject: { type: "Referral", id: r.id }, policyApplied: "timeouts.checkin_14d", result: "Tu Agente pregunta: ¿cómo va esta Cesión? Actualiza el hito o cierra con el Veredicto. Al cedente también le gustará saberlo.", significant: true, companyIds: [r.receiverCompanyId] });
     res.nudges++;
   }
+
+  // 5 · Protocolo IV: la palabra del Interesado (D-042)
+  res.eco = await runEcoClock(db, now, chapterId);
   return res;
 }
 

@@ -51,7 +51,7 @@ Business DNA acumulado
 + NS-ARP (protocolo)
 + Referral Graph
 + histórico de qué señales convierten
-+ reputación verificable
++ reputación verificable (Aval: la voz de los Interesados, no solo la de los miembros)
 + densidad de empresas de calidad
 + exclusividad de plazas
 ```
@@ -82,6 +82,7 @@ Business DNA acumulado
 3. **Calidad por encima de cantidad.** Solo cuenta el referido que el receptor cualifica como válido y NS puede auditar.
 4. **Toda empresa da a conocer su trabajo a la Sala cada semana** (D-018): el Agente redacta el Comunicado, el Timonel lo aprueba, la Gaceta y el Dossier lo hacen accesible a todos.
 5. **Lo que se da y lo que se recibe se ve** (D-019): la Balanza de cada titular es pública en su Sala; la Brújula, privada.
+6. **Toda Cesión da la palabra al Interesado** (D-042): el cesionario pide el Eco del cliente referido; su voz pesa más que nada en el Aval, el número público que respalda a las dos partes, da elegibilidad de Embajadora y prioridad para recibir. El Veredicto nunca llega al Interesado.
 
 ## Pregunta de control antes de cualquier feature
 

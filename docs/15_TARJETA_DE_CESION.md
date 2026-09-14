@@ -2,7 +2,7 @@
 
 **Estado:** D-024 (CONFIRMED). Diseño publicado en el lienzo "Cesión NS". Fuente de verdad del comportamiento: NS-ARP (`docs/02`), D-020 y D-021.
 
-La tarjeta de Cesión es la mejor pieza de UX del producto: el objeto donde la IA descubre y las personas deciden. Tiene dos caras y una tercera vista a posteriori.
+La tarjeta de Cesión es la mejor pieza de UX del producto: el objeto donde la IA descubre y las personas deciden. Tiene dos caras, una tercera vista a posteriori y una cara pública para el Interesado (D-042).
 
 ## Regla de oro
 
@@ -40,11 +40,26 @@ Nueva · En revisión (esperando al otro) · Requiere Directiva (excepción expl
 
 ## Veredicto y Distinción (a posteriori)
 
-Al Cierre, el cesionario valora en tres ejes y tres toques (Facilidad, Negocio, Trato) con la evidencia ya rellenada por el Agente. Puede otorgar una Distinción (una por mes) nombrando el eje y una línea que va a la Crónica. Al confirmar: Mérito de Veredicto y de Cierre para el cedente; Mérito de cesionario para quien cierra el bucle; valor contrastado al Libro de Valor y a la Balanza; Contraste de NS.
+Al Cierre, el cesionario valora en tres ejes y tres toques (Facilidad, Negocio, Trato) con la evidencia ya rellenada por el Agente. El Veredicto es interno a NS: el Interesado nunca lo ve. Puede otorgar una Distinción (una por mes) nombrando el eje y una línea que va a la Crónica. Al confirmar: Mérito de Veredicto y de Cierre para el cedente; Mérito de cesionario para quien cierra el bucle; valor contrastado al Libro de Valor y a la Balanza; Contraste de NS.
+
+## Cara C · el Interesado deja su Eco (D-042)
+
+| | |
+| --- | --- |
+| **Objetivo del usuario** | Decir en un minuto cómo le atendió el cesionario, sin registrarse en nada. |
+| **Trabajo por hacer** | Devolver confianza a quien le presentó y a la red que lo hizo posible. |
+| **Acción primaria** | Enviar el Eco: tres ejes (Atención, Resultado, Recomendación) en tres toques. |
+| **Secundarias** | Añadir una línea; autorizar la publicación con su nombre; revisar el Eco desde el mismo enlace hasta 30 días después del cierre; retirar la publicación. |
+| **Jerarquía** | Quién le presentó y por qué (capa 0) → tres preguntas → una línea → consentimiento → enviar. |
+| **Qué no aparece** | El Veredicto del cesionario, la Promesa, las capas 1–3, nada de NS por dentro. Solo los nombres de las dos empresas y el resumen de la necesidad. |
+| **Dónde vive** | `/eco/[token]`, fuera de la puerta de la demo: el Interesado nunca es usuario de NS. El token, único por Cesión, es la llave. |
+| **Cómo llega** | Con la Petición de Eco que redacta el Agente del cesionario y envía la persona, durante la Cesión y al cierre. |
+
+**Para el cesionario, en la tarjeta:** tras el Puente aparece "Da la palabra al Interesado" con la Petición redactada y el enlace; al cerrar la Cesión pasa a ámbar (obligatorio). Cuando el Eco llega, la tarjeta lo muestra a las dos partes con su consentimiento de publicación, y debajo el **Aval de la Cesión** con sus tres partes (Promesa, Veredicto, Eco) y su estado (provisional, firme, sin Eco, nulo).
 
 ## Móvil
 
-La cara A en una pantalla: Promesa, tres razones, Salvoconducto y la decisión con el pulgar. La cara B prioriza escritorio, pero es operable en móvil con el mismo orden.
+La cara A en una pantalla: Promesa, tres razones, Salvoconducto y la decisión con el pulgar. La cara B prioriza escritorio, pero es operable en móvil con el mismo orden. La cara C es móvil por naturaleza: el Interesado abre el enlace desde el correo en el teléfono y responde con el pulgar.
 
 ## Estados de interfaz obligatorios
 

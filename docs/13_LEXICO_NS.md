@@ -59,6 +59,10 @@ Criterios de cada nombre: castellano; una palabra siempre que sea posible; insti
 | **Mérito** | Unidad de reputación verificable. Nace en tres momentos: Mérito de Promesa (al aceptarse la Cesión), Mérito de Veredicto (al valorarla el cesionario) y Mérito de Cierre (al contrastarse el valor). Nunca de cantidad. | `TrustEvent.weight` |
 | **Hoja de Méritos** | Panel público (dentro de la red) de comportamientos verificables de una empresa: cesiones, calidad media, valor contrastado, tiempo de respuesta, fiabilidad como cesionario. Nunca un número opaco. | `ReputationProfile` |
 | **Distinción** | Reconocimiento que el cesionario otorga al cedente por una Cesión concreta, nombrando el eje que destacó (Facilidad, Negocio o Trato) y una línea de motivo. Escasa: máximo una por titular y mes. Se publica en la Crónica y alimenta el Mérito. De entre las Distinciones del mes sale la **Cesión del mes** de la Sala. | `Recognition{axis, reason}` |
+| **Eco** | La voz del Interesado sobre el cesionario: tres ejes, tres toques (**Atención**, **Resultado**, **Recomendación**) y una línea opcional, desde una página pública sin usuario, durante la Cesión y al cierre. Siempre cuenta en el Aval; su texto y su nombre solo se publican con el consentimiento del Interesado, que puede retirarlo. El Interesado nunca ve el Veredicto (D-042). | `Endorsement{attention, result, recommend, phase}` |
+| **Petición de Eco** | Mensaje con el enlace del Eco que el Agente del cesionario redacta y la persona envía al Interesado, como el Puente. Ningún Agente contacta con el Interesado. Pasa por el filtro de contraprestación. | `Endorsement.request_message` |
+| **Aval** | El número público (0–100) que respalda una Cesión y, agregado, a cada titular. En la Cesión nace de Promesa, Veredicto y Eco (25 · 35 · 40). En el titular tiene cuatro bloques explicados: Voz de los Interesados, Calidad de lo que cede, Respuesta y Contribución. Da elegibilidad de Embajadora y prioridad en la Mesa. Nunca un ranking; sin histórico vale lo neutro y lo dice (D-042). | `Referral.aval`, `TitularAval` |
+| **Ventana del Interesado** | Los 30 días tras el cierre en los que el Interesado puede dejar o revisar su Eco. Después, el Aval de la Cesión queda "sin Eco". | `ECO_WINDOW_DAYS` |
 | **Compromiso** | Mínimo de Cesiones válidas por Ejercicio que toda empresa debe aportar (D-010). | `ContributionQuota` |
 | **Ejercicio** | Periodo de cómputo del Compromiso (por estipular: mes o trimestre). | `QuotaPeriod` |
 | **Niveles** | Miembro · Contribuidor · Referente · Consejero · Fundador. Se ganan con Mérito; amplían acceso, nunca lo restringen. ("Embajador" queda reservado a la Embajada.) | `MembershipTier` |
@@ -118,12 +122,14 @@ Alternativas consideradas para Tramo: "Escalón" y "Nivel de cuota" (descartado 
 | **Protocolo I · Generar Negocio** | Deber de ceder referidos de calidad. Unidad: la Cesión. Especificación técnica: NS-ARP. |
 | **Protocolo II · Dar a Conocer** | Deber de comunicar el trabajo propio a la Sala cada semana. Unidad: el Comunicado. Especificación técnica: NS-ADP. |
 | **Protocolo III · Cuentas Claras** | Deber de NS de hacer visible en la Sala el valor dado y recibido por cada titular. Unidad: la Balanza. Especificación técnica: NS-ATP. |
+| **Protocolo IV · Dar la Palabra** | Deber del cesionario de pedir al Interesado su Eco en toda Cesión, y de NS de hacer que esa voz cuente en el Aval. Unidad: el Eco. Especificación técnica: NS-AEP. |
 | **NS-ARP** | NS Agentic Referral Protocol: cómo los agentes descubren, comparten, cualifican, puntúan, autorizan y trazan Cesiones. |
 | **NS-ADP** | NS Agentic Disclosure Protocol: cómo los agentes redactan, filtran, envían, acusan y compilan Comunicados, Gaceta y Dossier. |
 | **NS-ATP** | NS Agentic Transparency Protocol: cómo se calculan, contrastan y publican la Balanza y el Ritmo, y cómo el Agente genera la Brújula y sus Movimientos. |
+| **NS-AEP** | NS Agentic Endorsement Protocol: cómo nace la invitación al Eco, cómo se redacta y envía la Petición, cómo responde el Interesado, cómo se calcula y publica el Aval y qué hace el Reloj si nadie da la palabra. |
 | **NS-CAT** | Clasificación NS de Actividades: base CNAE + Especialidad NS, ampliable y versionada. |
 | **Especialidad** | Nivel de NS-CAT que otorga plaza. |
-| **Reglas inmutables** | Nunca se cobra por una Cesión (expulsión); Compromiso obligatorio; calidad sobre cantidad (D-010). |
+| **Reglas inmutables** | Nunca se cobra por una Cesión (expulsión); Compromiso obligatorio; calidad sobre cantidad (D-010); Comunicado semanal (D-018); Balanza pública (D-019); toda Cesión da la palabra al Interesado (D-042). |
 
 ---
 
@@ -139,6 +145,8 @@ Alternativas consideradas para Tramo: "Escalón" y "Nivel de cuota" (descartado 
 5. Vistos buenos: el cedente autoriza la Apertura; el titular acepta.
 6. El cedente tiende el Puente al Interesado. Desde aquí es una Cesión en curso.
 7. El titular emite Veredicto por hitos; NS hace Contraste; el cedente suma Mérito y cumple Compromiso.
+8. El titular da la palabra al Interesado: le envía la Petición de Eco que redactó su Agente. El Interesado deja su Eco.
+   De Promesa, Veredicto y Eco nace el Aval de la Cesión, que respalda a los dos y alimenta el Aval público de cada uno.
 ```
 
 El Agente del cedente no "vende" el referido: lo estructura, lo protege y lo propone. El Agente del titular no "compra": cualifica y prepara. Las personas deciden en los pasos 5 y 6.
@@ -152,6 +160,8 @@ Compliance emite Salvoconducto. Carlos da el visto bueno en su Despacho; Lucía 
 Apertura: se revela la identidad. Carlos tiende el Puente; el tercero ve la Carta de Presentación.
 La Cesión avanza a Oportunidad y a Cierre ganado. Ambos confirman: 38.000 € de valor contrastado en el Libro de Valor.
 Lucía emite su Veredicto; NS hace Contraste. Híspalis suma Mérito y cumple su Compromiso del Ejercicio.
+Carlos da la palabra al Interesado: Metalúrgica del Sur deja su Eco (Atención 5, Resultado 5, Recomendación 5) y autoriza publicarlo.
+La Cesión cierra con Aval 92; el Aval público de Híspalis y el de Guadalquivir suben, y Carlos queda elegible como Embajador.
 La Crónica de NS Cumbre lo publica; la Cesión recibe la Distinción de la semana.
 La plaza de Mobiliario estaba vacante en NS Cumbre: Carlos hizo una Embajada a un titular de NS Ágora, que pasó a ser Embajadora de Mobiliario en NS Cumbre; Carlos obtuvo prima de Mérito.
 El Parte del Consejo de Zona anota que Mobiliario debería cubrirse desde la Antesala.
@@ -164,6 +174,10 @@ El fundador quería una palabra cercana, no un cargo administrativo. Se descarta
 ## 6ter. Por qué "Embajada"
 
 El fundador descartó "Extramuros" por agresivo. "Embajada" describe el acto con exactitud diplomática: la Sala del cedente envía una cesión a otra Sala, y la empresa que la acoge queda acreditada como **Embajadora** de esa especialidad en la Sala que no la tiene. Es sobria, cálida, castellana y sin pista territorial. Para evitar colisión, el antiguo nivel de membresía "Embajador" pasa a llamarse "Consejero".
+
+## 6quater. Por qué "Eco" y "Aval" (D-042)
+
+**Eco**: lo que vuelve del Interesado después del Puente. Una palabra, castellana, literal (el sonido que regresa), sin pista territorial, y que hace familia con Puente y Brújula. Alternativas consideradas: "Testimonio" (demasiado jurídico y largo), "Reseña" (lenguaje de directorios y marketplaces, que NS no usa) y "Parecer" (impreciso). **Aval**: lo que respalda a una empresa ante otra. "Tiene el aval de sus clientes" es castellano corriente; describe con exactitud el número público que nace de la voz de los Interesados y del comportamiento verificable del titular. Alternativas consideradas: "Ley" (colisión con lo jurídico en una red con despachos), "Quilate" (demasiado juguetón para un número institucional) y "Nota" (escolar). Palabras que NS no usa para esto: "puntuación", "rating", "estrellas", "ranking".
 
 ## 7. Palabras que NS no usa
 

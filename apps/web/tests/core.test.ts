@@ -3,6 +3,7 @@ import { buildExplanation, computeNSMatchScore, hardGates, WEIGHTS, PENALTY_WEIG
 import { runComplianceGate, detectsReferralFee } from "@/core/compliance";
 import { assertTransition, canTransition, TransitionError } from "@/core/state-machine";
 import { computePromise, computeVerdictMerit } from "@/core/merit";
+import { avalBand, computeEcoMerit, computeReferralAval, computeTitularAval, EMBASSY_ELIGIBILITY } from "@/core/aval";
 import { SEED_COMPANIES } from "@/db/seed-data";
 import type { ChapterLayer, NeedDraft, QualificationLayer, QualificationTurn, SignalEnvelope } from "@/core/types";
 
@@ -153,5 +154,52 @@ describe("D-029 · Interesado avisado y D-032 · Encargo", () => {
     const without = computeNSMatchScore(needObra, layer0A, layer1A, turnsA, cap("prl-andaluza", "PRL"));
     expect(withDemand.total).toBeGreaterThan(without.total);
     expect(buildExplanation(withDemand, needObra, turnsA).why.some((w) => w.includes("Encargo"))).toBe(true);
+  });
+});
+
+describe("D-042 · Eco y Aval", () => {
+  const score = computeNSMatchScore(needObra, layer0A, layer1A, turnsA, cap("hispalis", "OBRA_INDUSTRIAL"));
+  const promise = computePromise(layer0A, score, turnsA);
+  const verdict = { ease: 5, business: 4, treatment: 5, result: "WON" as const, value_verified: 80_000, need_was_real: true };
+  it("el Aval de una Cesión es provisional sin Eco, firme con Veredicto y Eco, nulo si el Indicio era falso", () => {
+    const soloPromesa = computeReferralAval({ promise });
+    expect(soloPromesa.status).toBe("PROVISIONAL");
+    expect(soloPromesa.parts.find((p) => p.key === "eco")?.value).toBeNull();
+    const conVeredicto = computeReferralAval({ promise, verdict });
+    expect(conVeredicto.status).toBe("PROVISIONAL");
+    const firme = computeReferralAval({ promise, verdict, eco: { attention: 5, result: 5, recommend: 5 } });
+    expect(firme.status).toBe("FIRME");
+    expect(firme.total).toBeGreaterThan(conVeredicto.total);
+    const malEco = computeReferralAval({ promise, verdict, eco: { attention: 1, result: 1, recommend: 1 } });
+    expect(malEco.total).toBeLessThan(conVeredicto.total); // la voz del Interesado pesa más que ninguna otra parte
+    const sinEco = computeReferralAval({ promise, verdict, ecoWindowClosed: true });
+    expect(sinEco.status).toBe("SIN_ECO");
+    expect(computeReferralAval({ promise, verdict, eco: { attention: 4, result: 4, recommend: 4, phase: "DURANTE" } }).status).toBe("PROVISIONAL"); // el Eco durante no cierra el Aval
+    expect(computeReferralAval({ promise, verdict, eco: { attention: 4, result: 4, recommend: 4, phase: "DURANTE" }, ecoWindowClosed: true }).status).toBe("FIRME"); // salvo si la ventana se cerró
+    expect(computeReferralAval({ promise, verdict: { ...verdict, need_was_real: false }, eco: { attention: 5, result: 5, recommend: 5 } })).toMatchObject({ total: 0, status: "NULO" });
+    expect(avalBand(90).key).toBe("ALTO");
+    expect(avalBand(40).key).toBe("BAJO");
+  });
+  it("el Aval del titular tiene cuatro bloques, arranca neutro y premia la voz de los Interesados y la respuesta", () => {
+    const nuevo = computeTitularAval({ ecosReceived: [], givenAvals: [], responses: { onTime: 0, late: 0, ecoSent: 0, ecoMissed: 0 }, contribution: { validGiven: 0, weeks: 0, pace: 1, embassies: 0 } });
+    expect(nuevo.total).toBe(60);
+    expect(nuevo.provisional).toBe(true);
+    expect(nuevo.blocks.every((b) => !b.hasData)).toBe(true);
+    expect(nuevo.embassyEligible).toBe(false);
+    const bueno = computeTitularAval({ ecosReceived: [1, 0.92, 1], givenAvals: [88, 91], responses: { onTime: 6, late: 0, ecoSent: 3, ecoMissed: 0 }, contribution: { validGiven: 10, weeks: 8, pace: 1, embassies: 1 } });
+    expect(bueno.total).toBeGreaterThanOrEqual(EMBASSY_ELIGIBILITY.minAval);
+    expect(bueno.embassyEligible).toBe(true);
+    expect(bueno.provisional).toBe(false);
+    const lento = computeTitularAval({ ...{ ecosReceived: [1, 0.92, 1], givenAvals: [88, 91], contribution: { validGiven: 10, weeks: 8, pace: 1, embassies: 1 } }, responses: { onTime: 1, late: 5, ecoSent: 0, ecoMissed: 3 } });
+    expect(lento.total).toBeLessThan(bueno.total);
+    const callado = computeTitularAval({ ecosReceived: [0.3, 0.25, 0.4], givenAvals: [88, 91], responses: { onTime: 6, late: 0, ecoSent: 3, ecoMissed: 0 }, contribution: { validGiven: 10, weeks: 8, pace: 1, embassies: 1 } });
+    expect(callado.embassyEligible).toBe(false);
+  });
+  it("el Eco da Mérito al cesionario y una parte al cedente; la Embajada lo multiplica", () => {
+    const m = computeEcoMerit({ attention: 5, result: 5, recommend: 5 });
+    expect(m.receiver).toBe(80);
+    expect(m.originator).toBe(30);
+    expect(computeEcoMerit({ attention: 5, result: 5, recommend: 5 }, { embassy: true }).receiver).toBe(120);
+    expect(computeEcoMerit({ attention: 1, result: 1, recommend: 1 })).toEqual({ receiver: 0, originator: 0 });
   });
 });

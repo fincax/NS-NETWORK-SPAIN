@@ -13,6 +13,7 @@ Primera implantación: **NS Sevilla · NS Cumbre** (primera Sala de la zona), un
 ```text
 alta de empresa (plaza única) → ADN de Empresa → Indicio → Mesa Permanente (Pista, Encaje explicado,
 Salvoconducto) → tarjeta de Cesión (cara A / cara B) → visto bueno → Apertura → Puente → Veredicto → valor contrastado
+→ Eco del Interesado (página pública) → Aval de la Cesión y Aval público del titular (D-042)
 + Rastreo público (Indicios desde fuentes públicas) · Encargos · Reloj de la Sala (plazos ejecutados) · Interesado avisado
 ```
 
@@ -22,7 +23,7 @@ Salvoconducto) → tarjeta de Cesión (cara A / cara B) → visto bueno → Aper
 pnpm install
 pnpm db:seed      # crea NS Sevilla · NS Cumbre, 10 titulares con ADN y los escenarios A, C y D
 pnpm dev          # http://localhost:3000 · portada beta; /acceso con demo / nscumbre · Hoy, Mesa, Cesiones, Mi Sala
-pnpm test         # 30 tests: score, puertas, Salvoconducto, máquina de estados, Promesa, Reloj, Rastreo, Encargos y el slice completo
+pnpm test         # 79 tests: score, puertas, Salvoconducto, máquina de estados, Promesa, Eco y Aval, Reloj, Rastreo, Encargos y el slice completo
 ```
 
 Sin configuración usa PGlite (Postgres embebido en `apps/web/.data`) y el proveedor de razonamiento determinista. Con `DATABASE_URL` usa PostgreSQL; con `ANTHROPIC_API_KEY` los Agentes razonan con Claude (`claude-opus-5` por defecto) mediante salidas estructuradas. En la interfaz, el selector "Actúas como" cambia de persona (no hay autenticación en el slice).
@@ -37,9 +38,9 @@ Sin configuración usa PGlite (Postgres embebido en `apps/web/.data`) y el prove
 | [`docs/05_DESIGN_BRIEF.md`](./docs/05_DESIGN_BRIEF.md) | Brief para Claude Design: identidad, logo, dirección visual, pantallas prioritarias, datos demo y entregables. |
 | [`docs/11_IDEAS_DISRUPTIVAS.md`](./docs/11_IDEAS_DISRUPTIVAS.md) | Banco de ideas disruptivas sobre el núcleo: prospección agentic, calidad verificada, reconocimiento escalable, efecto red. |
 | [`docs/12_SALAS.md`](./docs/12_SALAS.md) | La Sala como eje: zonas y saturación, apertura de nuevas Salas, clasificación NS-CAT (base CNAE ampliable), plazas y casuística de sectores, enrutamiento Sala → Zona → Red, ciclo de vida de la Sala. |
-| [`docs/13_LEXICO_NS.md`](./docs/13_LEXICO_NS.md) | Léxico oficial de NS: nombres propios para la estructura (Sala, Plaza, Titular, Timonel, Antesala, Pleno, Confluencia), el flujo (Indicio, Pista, Cesión, Embajada, Puente, Valor contrastado), la reputación (Veredicto, Contraste, Mérito, Compromiso) y el día a día (Mesa Permanente, Despacho, Encargo, Rastreo, Sondeo, Parte, Crónica). |
-| [`docs/14_PROTOCOLOS_DE_SALA.md`](./docs/14_PROTOCOLOS_DE_SALA.md) | Los tres protocolos obligatorios: Generar Negocio (Cesión, NS-ARP), Dar a Conocer (Comunicado, Gaceta, Dossier, NS-ADP) y Cuentas Claras (Balanza, Ritmo, Brújula, Movimiento, NS-ATP), con especificación agentic completa. |
-| [`docs/15_TARJETA_DE_CESION.md`](./docs/15_TARJETA_DE_CESION.md) | La tarjeta de Cesión a dos caras: objetivo, acciones, jerarquía, Promesa, capa 2, plazos, estados, Veredicto y Distinción. |
+| [`docs/13_LEXICO_NS.md`](./docs/13_LEXICO_NS.md) | Léxico oficial de NS: nombres propios para la estructura (Sala, Plaza, Titular, Timonel, Antesala, Pleno, Confluencia), el flujo (Indicio, Pista, Cesión, Embajada, Puente, Valor contrastado), la reputación (Promesa, Veredicto, Eco, Aval, Contraste, Mérito, Compromiso) y el día a día (Mesa Permanente, Despacho, Encargo, Rastreo, Sondeo, Parte, Crónica). |
+| [`docs/14_PROTOCOLOS_DE_SALA.md`](./docs/14_PROTOCOLOS_DE_SALA.md) | Los cuatro protocolos obligatorios: Generar Negocio (Cesión, NS-ARP), Dar a Conocer (Comunicado, Gaceta, Dossier, NS-ADP), Cuentas Claras (Balanza, Ritmo, Brújula, Movimiento, NS-ATP) y Dar la Palabra (Eco del Interesado, Aval, NS-AEP), con especificación agentic completa. |
+| [`docs/15_TARJETA_DE_CESION.md`](./docs/15_TARJETA_DE_CESION.md) | La tarjeta de Cesión: cara A (cesionario), cara B (cedente), Veredicto y Distinción, y cara C (el Interesado deja su Eco desde una página pública). |
 | [`docs/16_COMPETENCIA.md`](./docs/16_COMPETENCIA.md) | Competencia (BNI, LeTip, Linkeat, Boardy, Lunchclub, Intros, Clay, Common Room, Commsor, Alignable 360): qué hacen, qué NS supera y qué adoptamos mejorado (D-029 a D-032). |
 | [`docs/17_DESPLIEGUE.md`](./docs/17_DESPLIEGUE.md) | Cuándo y cómo pasar al servidor: entorno privado de demostración ahora, producción con empresas reales tras la puerta de Fase 1. |
 | [`docs/06_DATA_MODEL.md`](./docs/06_DATA_MODEL.md) | Modelo de datos implementado: tablas, ciclos de vida, visibilidad en consultas, persistencia (Drizzle · PostgreSQL · PGlite). |

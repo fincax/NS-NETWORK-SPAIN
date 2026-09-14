@@ -7,6 +7,7 @@ import type {
   AuditEventInput,
   BusinessDNA,
   ComplianceVerdict,
+  EcoRecord,
   Explanation,
   IntroPackage,
   NSMatchScore,
@@ -37,7 +38,7 @@ export const chapters = pgTable("chapters", {
   slug: text("slug").notNull().unique(),
   nameStatus: text("name_status").notNull().default("AUTHORIZED"),
   status: text("status").notNull().default("ACTIVE"),
-  protocolVersion: text("protocol_version").notNull().default("0.2"),
+  protocolVersion: text("protocol_version").notNull().default("0.3"),
   valueThresholdEur: integer("value_threshold_eur").notNull().default(250_000),
   weeklyPace: integer("weekly_pace").notNull().default(1),
   createdAt: createdAt(),
@@ -149,7 +150,7 @@ export const opportunitySignals = pgTable(
     envelope: jsonb("envelope").$type<SignalEnvelope>().notNull(),
     visibility: text("visibility").notNull().default("CHAPTER"),
     status: text("status").notNull().default("DRAFT"), // DRAFT | PUBLISHED | WITHDRAWN | EXPIRED
-    protocolVersion: text("protocol_version").notNull().default("0.2"),
+    protocolVersion: text("protocol_version").notNull().default("0.3"),
     publishedAt: timestamp("published_at", { withTimezone: true }),
     expiresAt: timestamp("expires_at", { withTimezone: true }),
     createdAt: createdAt(),
@@ -227,6 +228,9 @@ export const referrals = pgTable(
     valuePotentialMin: integer("value_potential_min"),
     valuePotentialMax: integer("value_potential_max"),
     valueVerified: integer("value_verified"),
+    // Aval de la Cesión (D-042): Promesa + Veredicto + Eco. Se recalcula al emitirse el Veredicto y al llegar el Eco.
+    aval: integer("aval"),
+    avalStatus: text("aval_status"), // PROVISIONAL | FIRME | SIN_ECO | NULO
     reviewRequestedAt: timestamp("review_requested_at", { withTimezone: true }),
     expiresAt: timestamp("expires_at", { withTimezone: true }),
     introducedAt: timestamp("introduced_at", { withTimezone: true }),
@@ -236,7 +240,7 @@ export const referrals = pgTable(
     reminderSentAt: timestamp("reminder_sent_at", { withTimezone: true }),
     lateFlaggedAt: timestamp("late_flagged_at", { withTimezone: true }),
     lastNudgeAt: timestamp("last_nudge_at", { withTimezone: true }),
-    protocolVersion: text("protocol_version").notNull().default("0.2"),
+    protocolVersion: text("protocol_version").notNull().default("0.3"),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
@@ -287,6 +291,43 @@ export const verdicts = pgTable("verdicts", {
   contrastStatus: text("contrast_status").notNull().default("PENDING"), // PENDING | OK | FLAGGED
   createdAt: createdAt(),
 });
+
+/**
+ * Eco (D-042): la voz del Interesado sobre el cesionario. Nace con el Puente (token único), la persona envía la Petición de Eco,
+ * el Interesado responde desde una página pública sin usuario. Nunca ve el Veredicto. Su texto y su nombre solo se publican con su consentimiento.
+ */
+export const endorsements = pgTable(
+  "endorsements",
+  {
+    id: id(),
+    chapterId: uuid("chapter_id").notNull().references(() => chapters.id),
+    referralId: uuid("referral_id").notNull().references(() => referrals.id).unique(),
+    token: text("token").notNull().unique(),
+    status: text("status").notNull().default("PENDING"), // PENDING (Petición sin enviar) | SENT | RECEIVED
+    phase: text("phase"), // DURANTE | FINAL · fase del último Eco recibido
+    attention: integer("attention"),
+    result: integer("result"),
+    recommend: integer("recommend"),
+    comment: text("comment"),
+    publicConsent: boolean("public_consent").notNull().default(false),
+    displayName: text("display_name"),
+    history: jsonb("history").$type<EcoRecord[]>().notNull().default([]), // Ecos anteriores (DURANTE → FINAL, revisiones)
+    requestMessage: text("request_message"), // Petición de Eco redactada por el Agente y enviada por la persona
+    sentAt: timestamp("sent_at", { withTimezone: true }),
+    sentByMemberId: uuid("sent_by_member_id"),
+    submittedAt: timestamp("submitted_at", { withTimezone: true }),
+    publicityWithdrawnAt: timestamp("publicity_withdrawn_at", { withTimezone: true }),
+    // Reloj de la Sala (D-030): idempotencia de los empujones
+    nudgeSentAt: timestamp("nudge_sent_at", { withTimezone: true }), // "pide el Eco" al cesionario, 3 días tras el cierre
+    missedFlaggedAt: timestamp("missed_flagged_at", { withTimezone: true }), // ECO_REQUEST_MISSED, 14 días tras el cierre sin Petición
+    followUpSentAt: timestamp("follow_up_sent_at", { withTimezone: true }), // "recuerda al Interesado", 14 días tras la Petición sin Eco
+    windowClosedAt: timestamp("window_closed_at", { withTimezone: true }), // ventana del Interesado cerrada sin Eco
+    contrastStatus: text("contrast_status").notNull().default("PENDING"), // PENDING | OK | FLAGGED
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [index("endorsement_chapter_status").on(t.chapterId, t.status)],
+);
 
 export const recognitions = pgTable("recognitions", {
   id: id(),
