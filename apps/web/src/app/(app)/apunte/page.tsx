@@ -6,6 +6,7 @@ import { SPECIALTY_NAME } from "@/db/nscat";
 import { RELATION_LABEL, type ApunteRelation } from "@/services/apunte";
 import { apunteAction } from "./actions";
 import { publishSignalAction } from "../indicio/nuevo/actions";
+import { DictationButton } from "@/components/dictation";
 
 /**
  * Apunte (D-037). Pensado para el móvil, en la calle: cuatro campos, un toque. Lo demás lo hace el Agente.
@@ -61,7 +62,7 @@ export default async function ApuntePage({ searchParams }: { searchParams: Promi
         <input id="who" name="who" required autoFocus autoComplete="off" autoCapitalize="words" placeholder="Metalúrgica del Sur" />
       </div>
       <div className="field">
-        <label htmlFor="need">Qué necesita</label>
+        <div className="row" style={{ justifyContent: "space-between" }}><label htmlFor="need">Qué necesita</label><DictationButton target="need" /></div>
         <textarea id="need" name="need" required minLength={5} style={{ minHeight: 96 }} placeholder="Abre planta nueva en Dos Hermanas y busca obra, seguros y 20 técnicos" />
       </div>
       <div className="chips" role="radiogroup" aria-label="Relación con el Interesado">
@@ -76,7 +77,7 @@ export default async function ApuntePage({ searchParams }: { searchParams: Promi
             <div className="field"><label htmlFor="cn">Nombre</label><input id="cn" name="contactName" autoComplete="off" autoCapitalize="words" /></div>
             <div className="field"><label htmlFor="cr">Cargo</label><input id="cr" name="contactRole" autoComplete="off" /></div>
           </div>
-          <div className="field"><label htmlFor="notes">Observaciones</label><textarea id="notes" name="notes" style={{ minHeight: 80 }} placeholder="Presupuesto aprobado, decide en octubre, me lo comentó en la feria" /></div>
+          <div className="field"><div className="row" style={{ justifyContent: "space-between" }}><label htmlFor="notes">Observaciones</label><DictationButton target="notes" /></div><textarea id="notes" name="notes" style={{ minHeight: 80 }} placeholder="Presupuesto aprobado, decide en octubre, me lo comentó en la feria" /></div>
           <p className="hint">Los nombres de personas solo los ve tu empresa hasta que tú autorices la Apertura. Nunca escribas una contraprestación: un referido no se cobra.</p>
         </div>
       </details>

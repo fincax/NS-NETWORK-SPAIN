@@ -15,6 +15,7 @@ import type {
   ReferralVerdict,
   SignalEnvelope,
 } from "@/core/types";
+import type { ValueTrialReport } from "@/core/prueba";
 
 const id = () => uuid("id").primaryKey().defaultRandom();
 const createdAt = () => timestamp("created_at", { withTimezone: true }).notNull().defaultNow();
@@ -254,6 +255,21 @@ export const referralTransitions = pgTable("referral_transitions", {
   actorId: text("actor_id").notNull(),
   reason: text("reason"),
   occurredAt: createdAt(),
+});
+
+/** Prueba de Valor (D-050): siete días de Agente para un candidato, antes de la plaza. */
+export const valueTrials = pgTable("value_trials", {
+  id: id(),
+  chapterId: uuid("chapter_id").notNull().references(() => chapters.id),
+  candidacyId: uuid("candidacy_id").notNull().references(() => betaRequests.id).unique(),
+  companyId: uuid("company_id").notNull().references(() => companies.id), // empresa en estado TRIAL, sin plaza
+  specialtyCode: text("specialty_code").notNull(),
+  token: text("token").notNull().unique(), // enlace público del informe
+  startedAt: createdAt(),
+  endsAt: timestamp("ends_at", { withTimezone: true }).notNull(),
+  reportGeneratedAt: timestamp("report_generated_at", { withTimezone: true }),
+  report: jsonb("report").$type<ValueTrialReport>(),
+  startedBy: uuid("started_by"),
 });
 
 /** Aceptación expresa de las Normas NS al alta como titular (D-043). Queda la versión firmada y quién firmó. */

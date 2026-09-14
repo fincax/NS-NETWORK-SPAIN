@@ -25,6 +25,18 @@ Lo que se ha dejado deliberadamente "para más adelante". Claude lo recuerda cua
 - Importes de la cuota, si existe cuota de incorporación, número de Tramos, umbrales y periodo de revisión.
 - Mínimo real de fundadoras y gratificación definitiva de la Promotora.
 
+## Fuentes públicas y Prueba de Valor (D-050, D-051)
+
+- **BORME por empresa**: los actos están en PDF por provincia; hace falta extracción de texto antes de leerlos.
+- **Licencias de obra** municipales y **empleo**: sin fuente abierta estable; buscar convenios o portales de datos abiertos.
+- **Validar en el servidor** los adaptadores de PLACE y prensa (volumen y calidad de Indicios por fuente).
+- **Envío automático del informe** de la Prueba de Valor por correo al candidato y su duración definitiva (hoy 7 días).
+- **Web del candidato en la Prueba**: la candidatura pública aún no pide la web; con ella el ADN provisional sería mejor.
+
+## Mesa en directo (siguiente paso del plan)
+
+- Cola de trabajos para que la Mesa (extracción, cualificación entre Agentes) corra en segundo plano con el modelo real; hoy se ejecuta al publicar, con reglas fijas si no hay clave.
+
 ## Producto
 
 - Tipografía definitiva (D-023).

@@ -318,6 +318,8 @@ Otro CTA poderoso: **Comprobar disponibilidad de mi sector**.
 
 La exclusividad de categoría es simultáneamente una regla operativa y un elemento comercial.
 
+**Prueba de Valor (D-050).** Antes de la plaza, siete días de Agente: el candidato ve lo que su Agente habría cedido a la Sala y, en agregado y sin identidad, lo que la Sala ya encontró para su especialidad. Las dos caras miran a los demás. Es el argumento de venta de NS.
+
 ## 9. El agente empresarial
 
 Cada empresa debe disponer de su **NS Business Agent**.
@@ -1369,6 +1371,7 @@ Y posteriormente:
 14. El producto debe generar negocio medible.
 15. Cada mejora debe fortalecer el Network Effect.
 16. La Sala no es territorial: se define por sus empresas, no por su mapa.
+17. **Nadie busca para sí** (D-049). Los titulares y sus Agentes buscan negocio para los demás titulares de su Sala. El negocio para la propia empresa no entra en NS: solo entra lo que se cede a uno o varios cesionarios. Lo que recibes lo han buscado los demás para ti.
 
 ## Reglas inmutables (D-010)
 
@@ -1379,6 +1382,7 @@ Estas reglas están por encima de cualquier feature, decisión de diseño o mode
 3. **La calidad del negocio cedido vale más que la cantidad. Siempre** (D-045). Un referido cuenta cuando el receptor lo cualifica como válido y NS puede auditarlo. Un referido flojo no cumple el mínimo ni suma reputación; puede restar. El Mérito no crece con el número de Cesiones, sino con lo que cada una vale.
 4. **Toda empresa da a conocer su trabajo a la Sala cada semana** (D-018). El Agente redacta el Comunicado; el Timonel lo aprueba. Sin conocimiento mutuo no hay referidos de calidad.
 5. **Lo que se da y lo que se recibe se ve** (D-019). La Balanza de cada titular es pública en su Sala, exacta y contrastada. Lo que hay que hacer para mejorar solo lo ve quien tiene que hacerlo.
+6. **Tu Agente y tú buscáis para los demás** (D-049). Ningún Agente NS trabaja para su propia empresa. Una licitación a la que podrías presentarte, un cliente para ti: eso no es NS. NS es lo que cedes.
 
 # NORTH STAR
 

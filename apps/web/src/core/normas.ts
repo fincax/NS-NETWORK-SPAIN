@@ -3,7 +3,7 @@
  * Son las reglas inmutables de la constitución más la condición de la cuota. Cambiar el texto obliga a subir la versión:
  * la aceptación queda registrada con la versión firmada, y el sistema no da de alta a nadie que no las haya aceptado todas.
  */
-export const NORMAS_VERSION = "2026-09-14.2";
+export const NORMAS_VERSION = "2026-09-14.3";
 
 export interface NormaNS {
   code: string;
@@ -18,6 +18,12 @@ export const NORMAS_NS: readonly NormaNS[] = [
     title: "Nunca se cobra por un referido.",
     text: "Ningún miembro puede pedir, ofrecer, aceptar ni condicionar una Cesión a dinero, comisión, descuento, contraprestación o favor. NS tampoco cobra por Cesión. Hacerlo es motivo de expulsión de la Sala y de la red.",
     decision: "D-010",
+  },
+  {
+    code: "PARA_LOS_DEMAS",
+    title: "Tu Agente y tú buscáis negocio para los demás titulares de la Sala.",
+    text: "El negocio para tu propia empresa no entra en NS: solo entra lo que cedes a uno o varios cesionarios. Lo que recibes lo han buscado los demás para ti. Ningún Agente NS trabaja para su propia empresa.",
+    decision: "D-049",
   },
   {
     code: "COMPROMISO_SEMANAL",

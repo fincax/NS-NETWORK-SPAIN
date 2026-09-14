@@ -4,7 +4,9 @@ import { requireDirector } from "@/lib/session";
 import { NSCAT, SPECIALTY_NAME } from "@/db/nscat";
 import { dateTime } from "@/lib/format";
 import { Empty } from "@/components/ui";
-import { candidacyAction, foundingAction, releaseAction, directorActionAction } from "./actions";
+import { candidacyAction, foundingAction, releaseAction, directorActionAction, trialAction } from "./actions";
+import { listTrials } from "@/services/prueba";
+import { VALUE_TRIAL_DAYS } from "@/core/prueba";
 import { listDirectorActions } from "@/services/direccion";
 import { dateTime as when } from "@/lib/format";
 import { pendingReleases } from "@/services/compromiso";
@@ -33,6 +35,7 @@ const ACTION_LABEL: Record<CandidacyStatus, string> = {
 const STATUS_TONE: Record<CandidacyStatus, string> = { NEW: "amber", CONTACTED: "amber", INTERVIEW: "amber", APPROVED: "green", ACTIVATED: "green", WAITLISTED: "blue", FOUNDING: "blue", DECLINED: "red" };
 
 type FoundingView = Awaited<ReturnType<typeof listFoundings>>[number];
+type TrialView = Awaited<ReturnType<typeof listTrials>> extends Map<string, infer V> ? V : never;
 
 function SeatBadge({ t }: { t: CandidacyTriage }) {
   if (t.seat === "VACANT" && !t.overlaps.length && !t.duplicateOf) return <span className="badge green">Plaza vacante · {t.specialtyName}</span>;
@@ -41,7 +44,7 @@ function SeatBadge({ t }: { t: CandidacyTriage }) {
   return <span className="badge">Sin clasificar</span>;
 }
 
-function CandidacyCard({ c, t, view, foundings }: { c: Candidacy; t: CandidacyTriage; view: CandidacyView; foundings: FoundingView[] }) {
+function CandidacyCard({ c, t, view, foundings, trial }: { c: Candidacy; t: CandidacyTriage; view: CandidacyView; foundings: FoundingView[]; trial?: TrialView }) {
   const status = c.status as CandidacyStatus;
   const next = CANDIDACY_TRANSITIONS[status];
   const openFoundings = foundings.filter((f) => f.founding.status !== "ACTIVATED" && !(c.specialtyCode && f.specialties.includes(c.specialtyCode)));
@@ -85,6 +88,19 @@ function CandidacyCard({ c, t, view, foundings }: { c: Candidacy; t: CandidacyTr
           ))}
         </div>
       ) : null}
+      {!["DECLINED", "ACTIVATED"].includes(status) ? (
+        <div className="cand-actions" style={{ borderTop: "1px dashed var(--line)", paddingTop: 10 }}>
+          {trial ? (
+            <>
+              <span className="mono" style={{ alignSelf: "center" }}>Prueba de Valor · día {trial.day} de {VALUE_TRIAL_DAYS} · {trial.drafts} Indicio(s) para la Sala{trial.reportGeneratedAt ? " · informe generado" : ""}</span>
+              <form action={trialAction}><input type="hidden" name="id" value={c.id} /><input type="hidden" name="view" value={view} /><input type="hidden" name="op" value="report" /><input type="hidden" name="trialId" value={trial.id} /><button type="submit" className="btn small">{trial.reportGeneratedAt ? "Regenerar informe" : "Generar informe"}</button></form>
+              {trial.reportGeneratedAt ? <a className="btn small ghost" href={`/prueba/${trial.token}`} target="_blank" rel="noreferrer">Ver informe para enviar</a> : null}
+            </>
+          ) : c.specialtyCode ? (
+            <form action={trialAction}><input type="hidden" name="id" value={c.id} /><input type="hidden" name="view" value={view} /><input type="hidden" name="op" value="start" /><button type="submit" className="btn small">Iniciar Prueba de Valor ({VALUE_TRIAL_DAYS} días de Agente)</button></form>
+          ) : <span className="mono">Clasifica la especialidad para iniciar la Prueba de Valor.</span>}
+        </div>
+      ) : null}
       {status === "FOUNDING" && c.foundingId ? <p className="mono">Fundadora de la Sala promovida por {foundings.find((f) => f.founding.id === c.foundingId)?.promoter?.companyName ?? "…"}.</p> : null}
       {status !== "ACTIVATED" ? (
         <details className="cand-more">
@@ -125,7 +141,7 @@ export default async function AntesalaPage({ searchParams }: { searchParams: Pro
     );
   }
   const db = await getDb();
-  const [counts, rows, foundings, releases, directorActions] = await Promise.all([candidacyCounts(db), listCandidacies(db, view), listFoundings(db, ctx.chapter.zoneId), pendingReleases(db, ctx.chapter.id), listDirectorActions(db, ctx.chapter.id)]);
+  const [counts, rows, foundings, releases, directorActions, trials] = await Promise.all([candidacyCounts(db), listCandidacies(db, view), listFoundings(db, ctx.chapter.zoneId), pendingReleases(db, ctx.chapter.id), listDirectorActions(db, ctx.chapter.id), listTrials(db, ctx.chapter.id)]);
   const triaged = await Promise.all(rows.map(async (c) => ({ c, t: await triageCandidacy(db, ctx.chapter.id, c) })));
   const countFor: Record<CandidacyView, number> = { pendientes: counts.pendientes, espera: counts.espera, aprobadas: counts.aprobadas, declinadas: counts.declinadas, todas: counts.todas };
 
@@ -211,7 +227,7 @@ export default async function AntesalaPage({ searchParams }: { searchParams: Pro
         </Empty>
       ) : (
         <div className="stack" style={{ gap: 14 }}>
-          {triaged.map(({ c, t }) => <CandidacyCard key={c.id} c={c} t={t} view={view} foundings={foundings} />)}
+          {triaged.map(({ c, t }) => <CandidacyCard key={c.id} c={c} t={t} view={view} foundings={foundings} trial={trials.get(c.id)} />)}
         </div>
       )}
 

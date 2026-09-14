@@ -83,6 +83,8 @@ Business DNA acumulado
 4. **Toda empresa da a conocer su trabajo a la Sala cada semana** (D-018): el Agente redacta el Comunicado, el Timonel lo aprueba, la Gaceta y el Dossier lo hacen accesible a todos.
 5. **Lo que se da y lo que se recibe se ve** (D-019): la Balanza de cada titular es pública en su Sala; la Brújula, privada.
 
+**Nadie busca para sí** (D-049): cada titular y su Agente buscan negocio para los demás titulares de su Sala; el negocio propio no entra en NS. Es lo que separa a NS de un buscador de leads.
+
 La **Valoración** (D-046) es el porcentaje mensual, explicable, que mide calidad y fiabilidad de cada titular: con un 80 % durante un mes se puede ser Embajadora y candidata a Director/a de Sala. Nunca mide cantidad.
 
 Toda empresa acepta estas normas, y la condición de la cuota por Tramos (D-025), de forma expresa y una a una al ocupar su plaza. Sin aceptación no hay alta (D-043).

@@ -1193,3 +1193,87 @@ Servicio a la red        10 %   solo suma: acciones de dirección del mes (3 = 1
 
 **Revisit when.** Se defina la elección y el mandato del Director/a de Sala.
 
+---
+
+## D-049 · Nadie busca para sí: los titulares (Agentes y Timoneles) buscan negocio para los demás titulares de su Sala; el negocio propio no entra en NS
+
+**Status:** CONFIRMED (principio fijado por el fundador)
+**Date:** 2026-09-14
+
+**Context.** Al proponer la Prueba de Valor se describió el informe como "señales que encajan con tu cliente ideal". El fundador corrige y fija el principio: dentro de NS, cada titular y su Agente buscan referidos para sus compañeros de Sala. Cualquier negocio para uno mismo no entra en NS; solo entra el negocio que se puede ceder a uno o varios cesionarios. Lo que un titular recibe lo han buscado los demás para él.
+
+**Choice.**
+
+- Principio del núcleo, con rango de Norma NS que firma todo titular ("Para los demás", versión `2026-09-14.3`).
+- En el sistema ya se cumplía y ahora está escrito: el Matchmaker nunca propone a la empresa originadora como cesionaria; el Rastreo produce Indicios en borrador "para otros titulares"; una necesidad que solo cubre la especialidad del propio originador no es plaza vacante ni Cesión. Las fuentes públicas solo aportan hechos de terceros que anticipan necesidades (por ejemplo, adjudicaciones: quien gana el contrato es quien va a necesitar cosas), nunca "oportunidades para ti" (una licitación abierta a la que un miembro podría presentarse es negocio propio y no entra).
+- La Prueba de Valor (D-050) tiene dos caras y las dos miran a los demás: lo que el Agente del candidato habría cedido, y lo que los Agentes de la Sala ya encontraron para su especialidad.
+- Los Encargos ("lo que busco ahora") no contradicen el principio: son la forma de que los demás sepan qué ceder.
+
+**Why.** Es lo que distingue a NS de un buscador de leads: la red trabaja para cada miembro porque cada miembro trabaja para la red. Sin esta regla, el Agente degeneraría en prospección propia y la reciprocidad desaparecería.
+
+**Consequences.** Norma nueva en `core/normas.ts`; constitución (principio 17 y regla 6); North Star; léxico; adaptadores de fuentes con el filtro explícito; informe de la Prueba de Valor. Prueba en `tests/prueba.test.ts`.
+
+**Revisit when.** Nunca.
+
+---
+
+## D-050 · Prueba de Valor: siete días de Agente para el candidato, antes de la plaza, con un informe de dos caras
+
+**Status:** CONFIRMED (el fundador aprueba la propuesta "implementa todo, paso a paso")
+**Date:** 2026-09-14
+
+**Context.** El "wow" comercial de NS no es una pantalla: es que una empresa vea negocio real antes de haber hecho nada. Hasta hoy la demo funcionaba con datos ficticios y el candidato solo veía una portada.
+
+**Choice.**
+
+- Un Director/a inicia desde la Antesala la **Prueba de Valor** de una candidatura con especialidad clasificada. Se crea una empresa en estado `TRIAL`: sin plaza, sin voto, sin acceso, con un ADN provisional (mensaje de la candidatura y, cuando exista, su web) y un Agente en estado de prueba.
+- Durante **siete días** su Agente rastrea en la Ronda como cualquier otro, para los demás (D-049). Rastrea con su propia clave de deduplicación: sus borradores no quitan a los titulares ningún hecho público. Nunca recibe Cesiones: la Mesa solo consulta titulares activos.
+- Al terminar (o antes, a petición del Director/a), se genera el **informe**, público por enlace con token: **cara 1**, lo que su Agente habría cedido (hechos, necesidades, especialidades y titulares que las habrían recibido); **cara 2**, lo que la Sala ya encontró para su especialidad en el último mes, en agregado y sin identidad (recuento, Agentes que lo encontraron, cuántas se quedaron sin titular, sectores, valor estimado, plazos). El candidato no es miembro: nunca ve capa 0 ni nombres de terceros.
+- El informe termina con la solicitud de plaza y las Normas.
+
+**Why.** Enseña las dos cosas que venden NS: que su Agente trabajaría para la Sala desde el primer día, y que la Sala ya trabaja para su especialidad. Ningún club, directorio ni red profesional puede enseñar eso.
+
+**Consequences.** Tabla `value_trials` (migración 0011), `services/prueba.ts`, `core/prueba.ts`, estado `TRIAL` en empresas y Agentes, Ronda con empresas en prueba, ruta pública `/prueba/[token]` fuera de la puerta de la demo, botones en la Antesala, pruebas.
+
+**Revisit when.** Se conozca la conversión candidatura → plaza con y sin Prueba de Valor; o se decida enviar el informe por correo automáticamente.
+
+---
+
+## D-051 · Fuentes públicas reales para el Rastreo: adjudicaciones de PLACE y prensa económica local; BORME y licencias, pendientes
+
+**Status:** CONFIRMED en la decisión; adaptadores PROPOSED hasta validarlos en el servidor
+**Date:** 2026-09-14
+
+**Context.** El Rastreo (D-031) funcionaba con un lote de muestra. La Prueba de Valor y la Ronda solo impresionan con hechos reales de la zona.
+
+**Choice.**
+
+- **PLACE** (Plataforma de Contratación del Sector Público, Atom de licitaciones): solo entradas con **resultado de adjudicación** cuya provincia, ciudad u órgano contengan la zona. La adjudicataria es la que va a necesitar personal, seguros, subcontratas o financiación (D-049). Nunca licitaciones abiertas.
+- **Prensa económica local** por RSS (Diario de Sevilla, ABC Sevilla, El Correo): titulares y entradillas; el modelo extrae después el Indicio. Una cabecera caída nunca rompe la Ronda.
+- Lectores sin dependencias (expresiones regulares tolerantes sobre XML). Se activan con `NS_PUBLIC_FEEDS=real`; sin esa variable, el lote de muestra. Las pruebas usan fixtures con el formato real.
+- **Pendientes:** BORME (los actos por empresa están en PDF por provincia; hace falta extracción de texto), licencias de obra municipales (sin fuente abierta estable) y empleo (sin RSS público fiable). Todos en `PENDIENTES_DEL_FUNDADOR.md`.
+- Los adaptadores no han podido probarse contra los servidores reales desde el entorno de desarrollo (sin salida de red a esos dominios). Primera validación: en el servidor desplegado.
+
+**Why.** Adjudicaciones y prensa son las dos fuentes con formato estable, abiertas y ricas en hechos de terceros. Empezar por ellas da Indicios reales en días.
+
+**Consequences.** `agents/feeds-public.ts`, `defaultPublicFeed()` en la Ronda, pruebas con fixtures, variable de entorno documentada en `docs/17`.
+
+**Revisit when.** Se valide en el servidor el volumen y la calidad de Indicios por fuente; entonces se añade BORME.
+
+---
+
+## D-052 · Apunte por voz: el Timonel dicta y el Agente estructura
+
+**Status:** CONFIRMED (el fundador aprueba la propuesta)
+**Date:** 2026-09-14
+
+**Context.** El Apunte (D-037) es la segunda prioridad móvil. En la calle se habla, no se escribe.
+
+**Choice.** En el Apunte, los campos "Qué necesita" y "Observaciones" llevan un botón de dictado que usa el reconocimiento de voz del propio móvil (castellano). Si el dispositivo no lo ofrece, el botón no aparece. El texto cae en el campo y el circuito sigue igual: el Agente lo estructura y el Timonel decide si se publica. Ningún audio sale del dispositivo hacia NS.
+
+**Why.** Convierte treinta segundos de conversación en un Indicio sin fricción, sin infraestructura de audio ni datos personales de voz en los servidores de NS.
+
+**Consequences.** `components/dictation.tsx`, Apunte con dictado. Pendiente (móvil real): afinar la puntuación y probar en iOS y Android.
+
+**Revisit when.** El dictado del navegador no sea suficiente (ruido, precisión) y merezca transcripción en servidor.
+

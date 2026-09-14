@@ -7,6 +7,7 @@ import { updateCandidacy, CandidacyTransitionError, type CandidacyStatus } from 
 import { activateFounding, FoundingError, joinFounding, startFounding } from "@/services/fundacion";
 import { CompromisoError, confirmRelease, proposeRelease } from "@/services/compromiso";
 import { DireccionError, logDirectorAction } from "@/services/direccion";
+import { generateValueTrialReport, PruebaError, startValueTrial } from "@/services/prueba";
 
 const STATUSES: CandidacyStatus[] = ["NEW", "CONTACTED", "INTERVIEW", "APPROVED", "WAITLISTED", "FOUNDING", "DECLINED", "ACTIVATED"];
 
@@ -89,4 +90,21 @@ export async function directorActionAction(formData: FormData) {
   }
   revalidatePath("/antesala");
   redirect(`/antesala?vista=${view}#direccion`);
+}
+
+/** Prueba de Valor (D-050): iniciar los siete días o generar el informe. */
+export async function trialAction(formData: FormData) {
+  const { member, chapter } = await requireMember();
+  const db = await getDb();
+  const view = String(formData.get("view") ?? "pendientes");
+  const candidacyId = String(formData.get("id") ?? "");
+  try {
+    if (String(formData.get("op")) === "report") await generateValueTrialReport(db, String(formData.get("trialId") ?? ""));
+    else await startValueTrial(db, { chapterId: chapter.id, candidacyId, memberId: member.id });
+  } catch (e) {
+    const msg = e instanceof PruebaError ? e.message : "No se pudo gestionar la Prueba de Valor.";
+    redirect(`/antesala?vista=${view}&error=${encodeURIComponent(msg)}#c-${candidacyId}`);
+  }
+  revalidatePath("/antesala");
+  redirect(`/antesala?vista=${view}#c-${candidacyId}`);
 }

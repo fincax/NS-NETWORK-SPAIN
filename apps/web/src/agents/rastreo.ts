@@ -60,7 +60,11 @@ export async function runRastreo(db: Db, companyId: string, feed: PublicFeed = n
   if (!company || !agent) throw new Error("Empresa sin Agente");
   const records = await feed.fetch({ zone: company.city, since });
   const result: RastreoResult = { ingested: [], skipped: 0 };
-  for (const rec of records) {
+  // Una empresa en Prueba de Valor (D-050) rastrea con su propia clave: sus borradores no bloquean a los titulares,
+  // porque nadie los publicará; lo que ella "habría cedido" lo cede de verdad el titular que lo ingiere.
+  const refOf = (ref: string) => (company.status === "TRIAL" ? `trial:${company.id}:${ref}` : ref);
+  for (const rec0 of records) {
+    const rec = { ...rec0, external_ref: refOf(rec0.external_ref) };
     const existing = await db.query.publicRecords.findFirst({ where: and(eq(schema.publicRecords.chapterId, company.chapterId), eq(schema.publicRecords.externalRef, rec.external_ref)) });
     if (existing) {
       result.skipped++;

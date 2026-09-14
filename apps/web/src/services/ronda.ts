@@ -11,12 +11,13 @@
  * Idempotente: el Reloj marca cada acción y el Rastreo deduplica por referencia externa. Se puede lanzar
  * varias veces al día sin efectos dobles; solo la primera pasada de la mañana produce trabajo.
  */
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import type { Db } from "@/db/client";
 import { schema } from "@/db/client";
 import { audit } from "@/lib/audit";
 import { runClock, type ClockResult } from "@/services/clock";
-import { runRastreo, SampleFeed, type PublicFeed } from "@/agents/rastreo";
+import { runRastreo, type PublicFeed } from "@/agents/rastreo";
+import { defaultPublicFeed } from "@/agents/feeds-public";
 import { runOwnSources } from "@/services/sources";
 import { fetchText as defaultFetch, type FetchText } from "@/agents/feeds";
 
@@ -33,14 +34,15 @@ export interface RondaResult {
   chapters: RondaChapterResult[];
 }
 
-export async function runRonda(db: Db, now = new Date(), feed: PublicFeed = new SampleFeed(), reader: FetchText = defaultFetch): Promise<RondaResult> {
+export async function runRonda(db: Db, now = new Date(), feed: PublicFeed = defaultPublicFeed(), reader: FetchText = defaultFetch): Promise<RondaResult> {
   const chapters = await db.query.chapters.findMany();
   const out: RondaResult = { ranAt: now.toISOString(), chapters: [] };
 
   for (const chapter of chapters) {
     const clock = await runClock(db, now, chapter.id);
 
-    const companies = await db.query.companies.findMany({ where: and(eq(schema.companies.chapterId, chapter.id), eq(schema.companies.status, "ACTIVE")) });
+    // Titulares activos y empresas en Prueba de Valor (D-050): todos rastrean para los demás (D-049). Nadie rastrea para sí.
+    const companies = await db.query.companies.findMany({ where: and(eq(schema.companies.chapterId, chapter.id), inArray(schema.companies.status, ["ACTIVE", "TRIAL"])) });
     const records = await db.query.publicRecords.findMany({ where: eq(schema.publicRecords.chapterId, chapter.id), columns: { ingestedByCompanyId: true } });
     const ingestedBy = new Map<string, number>();
     for (const r of records) if (r.ingestedByCompanyId) ingestedBy.set(r.ingestedByCompanyId, (ingestedBy.get(r.ingestedByCompanyId) ?? 0) + 1);

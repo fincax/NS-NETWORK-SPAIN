@@ -13,7 +13,7 @@ export default async function SalaPage() {
   const seats = await db.select({ id: schema.categorySeats.id, status: schema.categorySeats.status, specialtyName: schema.specialties.name, code: schema.specialties.nscatCode, companyId: schema.categorySeats.companyId }).from(schema.categorySeats).innerJoin(schema.specialties, eq(schema.specialties.id, schema.categorySeats.specialtyId)).where(eq(schema.categorySeats.chapterId, chapter.id)).orderBy(asc(schema.specialties.name));
   const companies = await db.query.companies.findMany({ where: eq(schema.companies.chapterId, chapter.id), orderBy: [asc(schema.companies.name)] });
   const byId = new Map(companies.map((c) => [c.id, c]));
-  const balances = await Promise.all(companies.filter((c) => c.status !== "RELEASED").map(async (c) => ({ c, b: await balance(db, chapter.id, c.id), r: await compromisoStatus(db, chapter.id, c.id) })));
+  const balances = await Promise.all(companies.filter((c) => c.status === "ACTIVE" || c.status === "SUSPENDED").map(async (c) => ({ c, b: await balance(db, chapter.id, c.id), r: await compromisoStatus(db, chapter.id, c.id) })));
   const occupied = seats.filter((s) => s.status === "ACTIVE").length;
   const demandsOpen = await openDemands(db, chapter.id);
   return (
