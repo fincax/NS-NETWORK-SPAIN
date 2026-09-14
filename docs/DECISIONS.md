@@ -1117,3 +1117,79 @@ Semana 4   Notificación de baja de la titularidad. La empresa queda suspendida 
 
 **Revisit when.** Nunca en cuanto al principio. La lista de documentos, cada vez que se cree o retire uno.
 
+---
+
+## D-046 · Valoración mensual del titular: para ser Embajadora hace falta al menos un 80 % durante un mes; con ese mismo umbral se es candidata a Director/a de Sala
+
+**Status:** CONFIRMED (regla fijada por el fundador); componentes y pesos PROPOSED
+**Date:** 2026-09-14
+
+**Context.** La Embajada (D-015) y la dirección de la Sala necesitan un criterio verificable de quién merece representar una especialidad fuera de su Sala o dirigirla. El fundador fija el umbral: 80 % de valoración durante un mes. Faltaba definir qué es la Valoración de forma que no sea un número mágico (constitución §14) y que respete que la calidad vale más que la cantidad (D-045).
+
+**Choice.**
+
+- **Valoración** es un porcentaje mensual por titular y Sala, explicable componente a componente. Mide calidad y fiabilidad, nunca cantidad:
+
+```text
+Calidad de lo cedido     40 %   media de los Veredictos recibidos en el mes sobre Cesiones cedidas (Facilidad, Negocio, Trato sobre 15); necesidad falsa = 0
+Compromiso semanal       25 %   semanas del mes con el Compromiso cumplido / semanas evaluadas
+Plazo de respuesta       15 %   como cesionario: respuestas al Interesado en 48 h / Puentes recibidos
+Comunicado semanal       10 %   Comunicados aprobados / semanas (sin datos hasta el Protocolo II)
+Servicio a la red        10 %   solo suma: acciones de dirección del mes (3 = 100 %), ver D-048
+```
+
+- Los componentes sin datos en el mes no cuentan ni a favor ni en contra: su peso se reparte entre los que sí tienen datos. Sin datos en ningún componente no hay Valoración y no se cumple ningún umbral.
+- **El mes que decide es el último completo.** La del mes en curso se muestra como orientación.
+- **Embajada:** solo puede proponerse como Embajadora (D-015) una titular con Valoración ≥ 80 % en el último mes completo. El sistema lo verifica y lo muestra en el Dossier ("Apta para Embajada").
+- **Candidatura a Director/a de Sala:** el mismo umbral. Cómo se elige y por cuánto tiempo queda en `PENDIENTES_DEL_FUNDADOR.md`. La figura pasa a llamarse **Director/a de Sala** (hasta hoy "Directiva", provisional).
+- Pesos y umbral de acciones se calibran tras el primer mes de la Sala piloto.
+
+**Why.** Un umbral público y explicable convierte la Embajada y la dirección en algo que se gana con comportamiento verificable, no con antigüedad ni volumen. Al medir Veredictos, Compromiso y plazos, premia exactamente lo que hace buena a una Cesión.
+
+**Consequences.** `core/valoracion.ts` (cálculo puro), `services/valoracion.ts` (lectura del mes, `eligibleForEmbajada`), tarjeta de Valoración en el Dossier con desglose y las dos aptitudes, pruebas. Léxico: Valoración, Director/a de Sala.
+
+**Revisit when.** Tras el primer mes completo de NS Cumbre, con Valoraciones reales; y cuando exista el Protocolo II (componente Comunicado con datos).
+
+---
+
+## D-047 · Una empresa con varios CNAE puede ocupar varias plazas en la misma Sala, cada una con su titularidad; NS premia con Mérito de Red que lleve cada especialidad a una Sala distinta
+
+**Status:** CONFIRMED (regla fijada por el fundador)
+**Date:** 2026-09-14
+
+**Context.** `docs/12` §4 solo permitía una segunda plaza en la misma Sala de forma excepcional. El fundador decide lo contrario: se permite, pero se premia hacerlo en Salas distintas, porque cada plaza llevada a otra Sala ayuda a crear Salas.
+
+**Choice.**
+
+- **Titularidades múltiples en la misma Sala.** Una empresa con varias especialidades (varios CNAE) puede ocupar varias plazas en la misma Sala. Cada plaza es una titularidad: exclusividad propia, Compromiso propio. El Compromiso mínimo semanal de la empresa en esa Sala se multiplica por su número de plazas. Ceder algo pero menos que el mínimo consta como "Por debajo del mínimo" y resta Mérito, pero no sube la Escalera: la Escalera solo cuenta semanas sin una sola Cesión válida (D-042).
+- **Mérito de Red.** Cuando la misma empresa (mismo CIF) ocupa plaza en otra Sala de la zona, recibe Mérito de Red al darse de alta, con constancia en la Mesa. El CIF se registra en el alta. Propuesta: +50 por Sala adicional.
+- **Salas en fundación.** Una empresa con la segunda especialidad puede ser fundadora o Promotora de una Sala nueva (D-041) con esa especialidad; es la vía preferida y la que NS promociona en el Dossier junto al botón de "otra plaza".
+- Se sustituye la casuística "empresa multiservicio" de `docs/12` §4.
+
+**Why.** No hay razón para impedir que una empresa aporte todo lo que sabe hacer; sí la hay para empujarla a repartirlo por la zona, porque cada plaza en otra Sala densifica la red y adelanta la siguiente fundación.
+
+**Consequences.** `addSeat` en `services/onboarding.ts`, capability secundaria, `companies.legal_id` (migración 0010), bono `NETWORK_SEAT_BONUS`, mínimo por titularidad y acción `BELOW` en el Compromiso, formulario "Ocupar también esta plaza" en el Dossier, pruebas. `docs/12` §4 actualizado.
+
+**Revisit when.** Se conozca cuántas empresas piden segunda plaza en la Sala piloto y cuántas eligen otra Sala.
+
+---
+
+## D-048 · Los Directores/as de Sala promueven acciones entre Salas y resuelven dudas entre Timoneles, y eso suma Valoración
+
+**Status:** CONFIRMED (regla fijada por el fundador)
+**Date:** 2026-09-14
+
+**Context.** Dirigir una Sala es trabajo para la red. Debe verse y contar.
+
+**Choice.**
+
+- Un Director/a registra en la Antesala sus **acciones de dirección**: "Acción entre Salas" (encuentros, cruces de plazas vacantes, Embajadas facilitadas) y "Duda resuelta entre Timoneles". Cada acción exige una frase (qué se hizo y con quién) y queda en la Mesa, visible para la Sala.
+- Cada acción suma **puntos de Valoración** a la empresa del Director/a en el componente "Servicio a la red" (D-046): tres acciones en el mes valen el 100 % del componente. Solo suma; nunca resta. Mérito propuesto: +15 por acción entre Salas, +10 por duda resuelta.
+- El Contraste puede revisar acciones vacías o repetidas. Las acciones entre Salas nutren los encuentros entre Salas (`docs/12` §6bis).
+
+**Why.** Sin esto, dirigir solo cuesta. Con esto, dirigir bien abre la puerta a la Embajada y a seguir dirigiendo, y la red gana quien la cuida.
+
+**Consequences.** `services/direccion.ts`, `TrustEvent` `DIRECTOR_INTERCHAPTER_ACTION` y `DIRECTOR_QUERY_RESOLVED`, sección "Acciones de dirección" en la Antesala, componente en la Valoración, pruebas.
+
+**Revisit when.** Se defina la elección y el mandato del Director/a de Sala.
+

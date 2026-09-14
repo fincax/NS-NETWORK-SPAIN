@@ -155,7 +155,7 @@ Con datos reales, la taxonomía se corrige sola: si los referidos de dos especia
 
 Reglas (integran D-001 y D-004):
 
-1. Una empresa, una plaza principal por Sala. Capabilities secundarias sin exclusividad.
+1. Una empresa, una plaza principal por Sala y, si tiene varias especialidades (varios CNAE), tantas titularidades como plazas vacantes ocupe (D-047). Cada titularidad tiene su exclusividad y su Compromiso. NS premia con Mérito de Red llevar cada especialidad a una Sala distinta.
 2. Especialidad ocupada en la Sala solicitada → el solicitante admitido elige: otra Sala de la zona con la plaza libre, lista de espera de esa Sala, o lista de fundadores de la próxima Sala.
 3. Solapamiento `ADJACENT` → revisión de la Directiva de Sala antes de admitir. `CONFLICT` → no en esa Sala.
 4. La plaza se conserva cumpliendo la cuota de contribución (D-010) y las reglas inmutables. Se pierde por incumplimiento reiterado o expulsión.
@@ -165,7 +165,7 @@ Reglas (integran D-001 y D-004):
 
 | Caso | Regla |
 | --- | --- |
-| Empresa multiservicio (legal + fiscal + laboral) | Una plaza principal. Puede solicitar una segunda plaza en la misma Sala solo si esa especialidad lleva ≥ 2 periodos vacante sin lista de espera, y asume cuota completa por cada plaza. Pierde la segunda en cuanto aparece un solicitante admitido para ella. |
+| Empresa multiservicio (legal + fiscal + laboral) | Puede ocupar una plaza por especialidad en la misma Sala, cada una con su titularidad y su Compromiso semanal (D-047). NS le propone llevar la siguiente especialidad a otra Sala de la zona, o fundarla (D-041), y lo premia con Mérito de Red. |
 | Generalista frente a especialista | El generalista ocupa una especialidad concreta, nunca la clase CNAE. Un especialista posterior tiene prioridad en las especialidades que el generalista no ocupa. |
 | Franquicia o red de oficinas | La plaza la ocupa la unidad local, no la marca. Dos oficinas de la misma marca no pueden estar en la misma Sala; sí en dos Salas de la zona. |
 | Empresa nacional o 100 % remota | Puede ocupar plaza en una Sala de la zona donde tenga equipo o clientes verificables. No puede ocupar la misma especialidad en dos Salas de la misma zona. |

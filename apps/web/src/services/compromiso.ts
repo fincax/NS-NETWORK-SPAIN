@@ -58,7 +58,7 @@ export async function evaluateCompromiso(db: Db, now: Date, chapterId: string): 
   const res: CompromisoResult = { evaluated: 0, met: 0, notices: 0, releases: 0 };
   const chapter = await db.query.chapters.findFirst({ where: eq(schema.chapters.id, chapterId) });
   if (!chapter) return res;
-  const minimum = Math.max(COMPROMISO.weeklyMinimum, chapter.weeklyPace);
+  const pace = Math.max(COMPROMISO.weeklyMinimum, chapter.weeklyPace);
   const start = lastCompletedWeekStart(now);
   const end = addWeeks(start, 1);
   if (start < weekStart(chapter.createdAt)) return res; // la Sala aún no ha vivido una semana completa
@@ -81,10 +81,12 @@ export async function evaluateCompromiso(db: Db, now: Date, chapterId: string): 
 
   for (const company of pending) {
     const seat = holders.find((s) => s.companyId === company.id)!;
+    const minimum = pace * holders.filter((s) => s.companyId === company.id).length; // una Cesión por semana y titularidad (D-047)
     const c = counts.get(company.id) ?? { validCount: 0, distinctSpecialties: 0 };
     const met = c.validCount >= minimum;
-    const streak = met ? 0 : (prevStreak.get(company.id) ?? 0) + 1;
-    const action: CompromisoAction = met ? "NONE" : ladderAction(streak);
+    // La Escalera cuenta semanas sin una sola Cesión válida; ceder algo por debajo del mínimo consta, pero no sube la Escalera.
+    const streak = c.validCount > 0 ? 0 : (prevStreak.get(company.id) ?? 0) + 1;
+    const action: CompromisoAction = met ? "NONE" : c.validCount > 0 ? "BELOW" : ladderAction(streak);
     await db.insert(schema.contributionWeeks).values({ chapterId, companyId: company.id, weekStart: start, validCount: c.validCount, distinctSpecialties: c.distinctSpecialties, missedStreak: streak, action });
     res.evaluated++;
     const weekLabel = `semana del ${start.toISOString().slice(0, 10)}`;
@@ -100,7 +102,9 @@ export async function evaluateCompromiso(db: Db, now: Date, chapterId: string): 
 
     await db.insert(schema.trustEvents).values({ chapterId, companyId: company.id, kind: "CONTRIBUTION_QUOTA_MISSED", weight: MISSED_WEIGHT[action], evidenceRef: evidence });
     const seatName = specialtyName.get(seat.specialtyId) ?? "su especialidad";
-    if (action === "MISSED") {
+    if (action === "BELOW") {
+      await audit(db, { chapterId, kind: "COMPROMISO_BELOW", actor: { type: "AGENT", id: "clock" }, subject: { type: "Company", id: company.id }, policyApplied: "compromiso.weekly", result: `Por debajo del mínimo en la ${weekLabel}: ${c.validCount} de ${minimum} Cesiones válidas (una por semana y titularidad). Tu Agente te propone Movimientos en la Brújula.`, significant: true, companyIds: [company.id] });
+    } else if (action === "MISSED") {
       await audit(db, { chapterId, kind: "COMPROMISO_MISSED", actor: { type: "AGENT", id: "clock" }, subject: { type: "Company", id: company.id }, policyApplied: "compromiso.weekly", result: `Semana sin una sola Cesión válida (${weekLabel}). El Compromiso pide al menos ${minimum} por semana, sin excusas. Tu Agente te propone Movimientos en la Brújula para ceder esta semana.`, significant: true, companyIds: [company.id] });
     } else if (action === "DIPLOMATIC_NOTICE") {
       res.notices++;
@@ -170,14 +174,15 @@ export interface CompromisoStatus {
 /** Estado del Compromiso de un titular para la Brújula (privado) y la Balanza (público). */
 export async function compromisoStatus(db: Db, chapterId: string, companyId: string, now = new Date()): Promise<CompromisoStatus> {
   const chapter = await db.query.chapters.findFirst({ where: eq(schema.chapters.id, chapterId) });
-  const minimum = Math.max(COMPROMISO.weeklyMinimum, chapter?.weeklyPace ?? 1);
+  const seats = await db.query.categorySeats.findMany({ where: and(eq(schema.categorySeats.chapterId, chapterId), eq(schema.categorySeats.companyId, companyId), eq(schema.categorySeats.status, "ACTIVE")), columns: { id: true } });
+  const minimum = Math.max(COMPROMISO.weeklyMinimum, chapter?.weeklyPace ?? 1) * Math.max(1, seats.length);
   const start = weekStart(now);
   const live = (await validGivenBetween(db, chapterId, start, addWeeks(start, 1))).get(companyId) ?? { validCount: 0, distinctSpecialties: 0 };
   const last = await db.query.contributionWeeks.findFirst({ where: and(eq(schema.contributionWeeks.companyId, companyId), lt(schema.contributionWeeks.weekStart, start)), orderBy: [desc(schema.contributionWeeks.weekStart)] });
   const streak = last?.missedStreak ?? 0;
   const lastAction = (last?.action ?? "NONE") as CompromisoAction;
   const metNow = live.validCount >= minimum;
-  const label = lastAction === "RELEASE_NOTICE" ? ACTION_LABEL.RELEASE_NOTICE : metNow ? (live.distinctSpecialties > 1 ? "Por encima" : "En Ritmo") : streak === 0 ? "Pendiente esta semana" : `${ACTION_LABEL[lastAction]} · ${streak} ${streak === 1 ? "semana" : "semanas"} sin ceder`;
+  const label = lastAction === "RELEASE_NOTICE" ? ACTION_LABEL.RELEASE_NOTICE : metNow ? (live.distinctSpecialties > 1 ? "Por encima" : "En Ritmo") : live.validCount > 0 ? `Por debajo del mínimo · ${live.validCount} de ${minimum}` : streak === 0 ? "Pendiente esta semana" : `${ACTION_LABEL[lastAction]} · ${streak} ${streak === 1 ? "semana" : "semanas"} sin ceder`;
   const nextStep =
     lastAction === "RELEASE_NOTICE" ? "La Directiva propone la baja y NS la confirma." :
     metNow ? (live.distinctSpecialties > 1 ? "Semana cumplida con varias especialidades: así se destaca." : "Semana cumplida. Para destacar, cede otra a una especialidad distinta.") :

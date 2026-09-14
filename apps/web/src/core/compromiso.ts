@@ -20,7 +20,8 @@ export const COMPROMISO = {
   releaseWeek: 4,
 } as const;
 
-export type CompromisoAction = "NONE" | "MISSED" | "DIPLOMATIC_NOTICE" | "FORMAL_NOTICE" | "RELEASE_NOTICE";
+export type CompromisoAction = "NONE" | "BELOW" | "MISSED" | "DIPLOMATIC_NOTICE" | "FORMAL_NOTICE" | "RELEASE_NOTICE";
+// BELOW: cedió algo pero menos que el mínimo (varias titularidades en la Sala, D-047). No sube la Escalera: hubo Cesión válida.
 
 /** Qué toca en una semana sin Cesión válida, según las semanas seguidas (incluida esta) sin ceder. */
 export function ladderAction(missedStreak: number): CompromisoAction {
@@ -32,7 +33,7 @@ export function ladderAction(missedStreak: number): CompromisoAction {
 }
 
 /** Peso en la Hoja de Méritos de cada peldaño. La baja no resta más: la plaza ya se pierde. */
-export const MISSED_WEIGHT: Record<CompromisoAction, number> = { NONE: 0, MISSED: -5, DIPLOMATIC_NOTICE: -10, FORMAL_NOTICE: -20, RELEASE_NOTICE: -20 };
+export const MISSED_WEIGHT: Record<CompromisoAction, number> = { NONE: 0, BELOW: -5, MISSED: -5, DIPLOMATIC_NOTICE: -10, FORMAL_NOTICE: -20, RELEASE_NOTICE: -20 };
 
 /** Mérito por cumplir la semana: base por cumplir y un plus por cada especialidad distinta más allá de la primera. */
 export function weeklyMerit(validCount: number, distinctSpecialties: number): number {
@@ -61,6 +62,7 @@ export function addWeeks(start: Date, n: number): Date {
 
 export const ACTION_LABEL: Record<CompromisoAction, string> = {
   NONE: "En Ritmo",
+  BELOW: "Por debajo del mínimo",
   MISSED: "Semana sin ceder",
   DIPLOMATIC_NOTICE: "Aviso diplomático",
   FORMAL_NOTICE: "Aviso formal",

@@ -4,7 +4,9 @@ import { requireDirector } from "@/lib/session";
 import { NSCAT, SPECIALTY_NAME } from "@/db/nscat";
 import { dateTime } from "@/lib/format";
 import { Empty } from "@/components/ui";
-import { candidacyAction, foundingAction, releaseAction } from "./actions";
+import { candidacyAction, foundingAction, releaseAction, directorActionAction } from "./actions";
+import { listDirectorActions } from "@/services/direccion";
+import { dateTime as when } from "@/lib/format";
 import { pendingReleases } from "@/services/compromiso";
 import { listFoundings } from "@/services/fundacion";
 import { CANDIDACY_LABEL, CANDIDACY_TRANSITIONS, candidacyCounts, listCandidacies, triageCandidacy, type Candidacy, type CandidacyStatus, type CandidacyTriage, type CandidacyView } from "@/services/antesala";
@@ -123,7 +125,7 @@ export default async function AntesalaPage({ searchParams }: { searchParams: Pro
     );
   }
   const db = await getDb();
-  const [counts, rows, foundings, releases] = await Promise.all([candidacyCounts(db), listCandidacies(db, view), listFoundings(db, ctx.chapter.zoneId), pendingReleases(db, ctx.chapter.id)]);
+  const [counts, rows, foundings, releases, directorActions] = await Promise.all([candidacyCounts(db), listCandidacies(db, view), listFoundings(db, ctx.chapter.zoneId), pendingReleases(db, ctx.chapter.id), listDirectorActions(db, ctx.chapter.id)]);
   const triaged = await Promise.all(rows.map(async (c) => ({ c, t: await triageCandidacy(db, ctx.chapter.id, c) })));
   const countFor: Record<CandidacyView, number> = { pendientes: counts.pendientes, espera: counts.espera, aprobadas: counts.aprobadas, declinadas: counts.declinadas, todas: counts.todas };
 
@@ -141,6 +143,17 @@ export default async function AntesalaPage({ searchParams }: { searchParams: Pro
           <div><strong>{counts.aprobadas}</strong><span className="mono">aprobadas</span></div>
         </div>
       </div>
+
+      <section id="direccion" className="card" style={{ display: "grid", gap: 10 }}>
+        <div><p className="eyebrow">Acciones de dirección</p><strong>Promover acciones entre Salas y resolver dudas entre Timoneles suma Valoración (D-048).</strong></div>
+        <form action={directorActionAction} className="row" style={{ alignItems: "end" }}>
+          <input type="hidden" name="view" value={view} />
+          <div className="field"><label htmlFor="da-kind">Tipo</label><select id="da-kind" name="kind" defaultValue="INTERCHAPTER"><option value="INTERCHAPTER">Acción entre Salas</option><option value="QUERY">Duda resuelta entre Timoneles</option></select></div>
+          <div className="field" style={{ flex: 1, minWidth: 260 }}><label htmlFor="da-text">Qué se hizo y con quién</label><input id="da-text" name="text" required minLength={12} placeholder="Encuentro con NS Ágora para cruzar plazas vacantes de obra e instalaciones" /></div>
+          <button type="submit" className="btn small">Registrar</button>
+        </form>
+        {directorActions.length ? <ul className="plain">{directorActions.map((a) => <li key={a.id} className="row"><span className="mono">{when(a.occurredAt)}</span><span>{a.result}</span></li>)}</ul> : <p className="mono">Ninguna acción registrada todavía.</p>}
+      </section>
 
       {releases.length ? (
         <section id="bajas" className="stack" style={{ gap: 10 }}>

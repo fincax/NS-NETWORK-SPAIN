@@ -237,6 +237,10 @@ Reglas:
 5. El bloque "Cuota" (D-025) muestra el Tramo actual, el valor contrastado recibido en el Ejercicio, la relación cuota/valor y el umbral del siguiente Tramo. Es la única pantalla donde aparece la cuota; la Balanza pública nunca la muestra. Cualquier cambio de Tramo se anuncia aquí al menos un Ejercicio antes.
 6. La Brújula sigue la Escalera de D-042. Tras una semana sin ceder, el Agente propone cinco Movimientos en lugar de tres y ofrece agendar un Despacho de 10 minutos. Tras dos, entrega el aviso diplomático y dice en una línea qué pasa la tercera y la cuarta semana. Tras tres, muestra el aviso formal de la Directiva. Tras cuatro, la notificación de baja.
 
+### 4bis. La Valoración (pública en la Sala)
+
+Porcentaje mensual de cada titular, explicable componente a componente (D-046): calidad de lo cedido 40 %, Compromiso 25 %, plazo de respuesta 15 %, Comunicado 10 %, servicio a la red 10 %. Los componentes sin datos reparten su peso. El mes que decide es el último completo. Con ≥ 80 %: apta para Embajada y candidata a Director/a de Sala. Se ve en el Dossier con su desglose. Nunca mide cantidad.
+
 ### 5. El Ritmo
 
 - El Ritmo de NS es **1 Cesión válida por semana y titular**, y es también el Compromiso mínimo (D-042). La Sala (Directiva, ratificado en Pleno) puede fijar un Ritmo mayor al inicio de cada Ejercicio; nunca menor.

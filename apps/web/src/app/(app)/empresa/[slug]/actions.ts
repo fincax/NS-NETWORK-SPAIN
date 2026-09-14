@@ -4,6 +4,7 @@ import { getDb } from "@/db/client";
 import { requireMember } from "@/lib/session";
 import { closeDemand, createDemand } from "@/services/demands";
 import { addSource, removeSource, runOwnSources, SourceError } from "@/services/sources";
+import { addSeat } from "@/services/onboarding";
 import { redirect } from "next/navigation";
 import type { BusinessTrigger } from "@/core/types";
 
@@ -55,4 +56,19 @@ export async function runOwnSourcesAction(formData: FormData) {
   await runOwnSources(db, company.id);
   revalidatePath(`/empresa/${String(formData.get("slug"))}`);
   revalidatePath("/hoy");
+}
+
+/** D-047: otra especialidad de la misma empresa en la misma Sala. */
+export async function addSeatAction(formData: FormData) {
+  const { member, company, chapter } = await requireMember();
+  const db = await getDb();
+  const slug = String(formData.get("slug") ?? company.slug);
+  try {
+    await addSeat(db, { chapterId: chapter.id, companyId: company.id, specialtyCode: String(formData.get("specialtyCode") ?? ""), memberId: member.id });
+  } catch (e) {
+    redirect(`/empresa/${slug}?error=${encodeURIComponent(e instanceof Error ? e.message : "No se pudo ocupar la plaza.")}`);
+  }
+  revalidatePath(`/empresa/${slug}`);
+  revalidatePath("/sala");
+  redirect(`/empresa/${slug}`);
 }

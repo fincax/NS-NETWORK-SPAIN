@@ -71,6 +71,13 @@
       "when": 1789425655247,
       "tag": "0009_expediente_baja",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1789427746182,
+      "tag": "0010_valoracion",
+      "breakpoints": true
     }
   ]
 }

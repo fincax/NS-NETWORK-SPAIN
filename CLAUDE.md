@@ -145,6 +145,8 @@ NS Sevilla
 
 Puede haber varias Salas en una misma ciudad.
 
+**Varios CNAE, varias titularidades (D-047).** Una empresa con varias especialidades puede ocupar varias plazas en la misma Sala, cada una con su titularidad y su Compromiso. NS premia con Mérito de Red que lleve cada especialidad a una Sala distinta, porque así se crean Salas.
+
 **Plaza ocupada, Sala nueva (D-041).** Cuando una empresa pretende entrar y su plaza ya está ocupada por otra del mismo sector, NS la ayuda a promover, promocionar e iniciar una nueva Sala. Si consigue el número mínimo de fundadoras que se exija (a determinar en la práctica), recibe como compensación una gratificación que NS anuncia, por ejemplo unos meses de cuota gratis. Nunca es dinero por referidos.
 
 **La Sala no es territorial (D-014).** Una Sala se define por sus empresas, no por un mapa. No tiene barrio, distrito ni radio. Su nombre no debe dar ninguna pista territorial: el nombre de la ciudad o municipio está reservado a NS para agrupar las Salas de la zona ("NS Sevilla"), y ninguna Sala puede llevar el nombre de una ciudad, municipio, provincia, comunidad autónoma, país, barrio o distrito. Cada Sala elige un nombre propio, con el prefijo NS, autorizado por NS y único en toda la red: "NS Cumbre", "NS Ágora". Las Salas de una zona se encuentran entre sí (encuentros entre Salas) porque generan negocio, no porque compartan territorio.
@@ -428,6 +430,8 @@ Durante las últimas 24 horas:
 
 La directiva no debe verse obligada a leer conversaciones completas. Debe recibir inteligencia ejecutiva.
 
+**Director/a de Sala (D-046, D-048).** Quien dirige una Sala se llama Director/a de Sala. Es candidata quien alcanza un 80 % de Valoración durante un mes. Promueve acciones entre Salas y resuelve dudas entre Timoneles, y todo ello suma Valoración: dirigir bien se ve y cuenta.
+
 ### Global Routing Agent
 
 Futuro. Cuando ningún miembro local pueda cubrir una oportunidad, analizar si puede transferirse a: otro grupo de la ciudad; otra ciudad; otra región; otro país. Así surge el efecto red global.
@@ -603,6 +607,7 @@ La empresa que acoge la cesión se convierte en **Embajadora** de esa especialid
 Reglas del core:
 
 - Solo procede cuando la plaza está vacante en la Sala del cedente. El sistema lo verifica. Con la plaza ocupada, la prioridad es siempre de la propia Sala.
+- **Solo puede ser Embajadora una titular con al menos un 80 % de Valoración durante un mes completo** (D-046). La Valoración es un porcentaje mensual explicable que mide calidad y fiabilidad, nunca cantidad: Veredictos recibidos, Compromiso, plazo de respuesta, Comunicado y servicio a la red. Con ese mismo umbral, la titular es candidata a **Director/a de Sala**.
 - Si resuelve (veredicto válido de la Embajadora, y más aún si llega a valor contrastado), el cedente recibe una **prima de Mérito muy superior** a la de una cesión ordinaria. La Embajadora recibe Mérito como en cualquier cesión y la mención "Embajadora de [especialidad] en [Sala]" en su Hoja de Méritos. Parámetros propuestos en D-015.
 - La condición de Embajadora es temporal: termina cuando la plaza se cubre o al cierre del Ejercicio siguiente si no hay nuevas Embajadas. Una empresa puede ser Embajadora en un máximo de dos Salas a la vez, para que la figura no se convierta en una membresía múltiple encubierta. La Embajadora no adquiere derecho ni prioridad sobre la plaza.
 - Cada Embajada deja constancia de una plaza que la Sala debería cubrir desde la Antesala. Tres Embajadas de una misma especialidad en un Ejercicio abren candidatura preferente para esa plaza.

@@ -74,6 +74,7 @@ export const companies = pgTable("companies", {
   name: text("name").notNull(),
   slug: text("slug").notNull().unique(),
   legalName: text("legal_name"),
+  legalId: text("legal_id"), // CIF/NIF: identifica a la misma empresa en varias Salas (D-047)
   website: text("website"),
   city: text("city").notNull().default("Sevilla"),
   status: text("status").notNull().default("ACTIVE"), // APPLICANT | ACTIVE | SUSPENDED | RELEASED

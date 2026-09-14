@@ -13,10 +13,11 @@ Lo que se ha dejado deliberadamente "para más adelante". Claude lo recuerda cua
 
 ## Estructura y gobierno
 
-- **Nombre y composición de la dirección de la Sala** (quién propone la baja, quién despacha la Antesala). D-044 la llama "Directiva" provisionalmente.
+- ~~Nombre de la dirección de la Sala~~ → **Director/a de Sala** (D-046). Pendientes: composición (una persona o varias), cómo se elige entre las candidatas con ≥ 80 % de Valoración, duración del mandato.
+- **Calibración de la Valoración** (D-046): pesos de los cinco componentes, umbral de tres acciones de dirección, Mérito por acción (D-048), Mérito de Red por Sala adicional (D-047). Tras el primer mes de la Sala piloto.
+- **Cesiones abiertas en el momento de la baja** (D-044).
 - **Panel de NS.** Hoy NS confirma las bajas desde la Antesala de la Sala con el rol `is_network`. Falta un panel propio de la red.
 - **Re-aceptación de las Normas NS** por los titulares existentes cuando cambie la versión (D-043).
-- **Qué pasa con las Cesiones abiertas de una empresa que recibe la notificación de baja** (D-044): hoy siguen su curso; decidir si se devuelven al cedente.
 - Delimitar la Zona NS Sevilla; lista de especialidades fundadoras de NS Cumbre y primera versión NS-CAT; umbrales de apertura y saturación; formato de los encuentros entre Salas (`docs/12` §9).
 
 ## Modelo económico (D-025, D-041)
