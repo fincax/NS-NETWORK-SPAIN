@@ -1,7 +1,8 @@
 "use server";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { getDb } from "@/db/client";
+import { getDb, schema } from "@/db/client";
+import { eq } from "drizzle-orm";
 import { requireMember } from "@/lib/session";
 import { onboardCompany, SeatTakenError } from "@/services/onboarding";
 import { activateCandidacy } from "@/services/antesala";
@@ -11,9 +12,12 @@ import { MEMBER_COOKIE } from "@/lib/session";
 const slugify = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
 export async function onboardAction(formData: FormData) {
-  const { chapter } = await requireMember();
+  const { chapter: own } = await requireMember();
   const db = await getDb();
   const name = String(formData.get("name"));
+  const chapterSlug = String(formData.get("chapterSlug") ?? "");
+  const target = chapterSlug ? await db.query.chapters.findFirst({ where: eq(schema.chapters.slug, chapterSlug) }) : undefined;
+  const chapter = target && target.zoneId === own.zoneId ? target : own;
   let company;
   let member;
   const description = String(formData.get("description") ?? "").trim();

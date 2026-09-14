@@ -82,6 +82,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
       <section id="disponibilidad" className="public-section">
         <h2>Disponibilidad en NS Cumbre</h2>
         <p className="lead">Una plaza por especialidad. Las ocupadas no admiten otra empresa del mismo sector; las vacantes esperan en la Antesala.</p>
+        <div className="notice" style={{ marginTop: 16 }}><strong>¿Tu especialidad está ocupada?</strong> Presenta la candidatura igualmente. NS te ayuda a promover y fundar la siguiente Sala de tu zona: si reúnes el mínimo de empresas fundadoras, la Promotora recibe una gratificación que NS anuncia, como meses de cuota gratis.</div>
         <div className="seats" style={{ marginTop: 16 }}>
           {seats.map((s) => (
             <div key={s.code} className={`seat ${s.taken ? "" : "vacant"}`}>

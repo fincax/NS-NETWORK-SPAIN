@@ -4,10 +4,12 @@ import { requireMember } from "@/lib/session";
 import { onboardAction } from "./actions";
 import { SPECIALTY_NAME } from "@/db/nscat";
 
-export default async function AltaPage({ searchParams }: { searchParams: Promise<{ error?: string; candidatura?: string }> }) {
-  const { chapter } = await requireMember();
-  const { error, candidatura } = await searchParams;
+export default async function AltaPage({ searchParams }: { searchParams: Promise<{ error?: string; candidatura?: string; sala?: string }> }) {
+  const { chapter: own } = await requireMember();
+  const { error, candidatura, sala } = await searchParams;
   const db = await getDb();
+  const target = sala ? await db.query.chapters.findFirst({ where: eq(schema.chapters.slug, sala) }) : undefined;
+  const chapter = target && target.zoneId === own.zoneId ? target : own;
   const cand = candidatura ? await db.query.betaRequests.findFirst({ where: eq(schema.betaRequests.id, candidatura) }) : undefined;
   const fromCandidacy = cand && cand.status === "APPROVED" ? cand : undefined;
   const seats = await db.select({ status: schema.categorySeats.status, name: schema.specialties.name, code: schema.specialties.nscatCode, holderId: schema.categorySeats.companyId }).from(schema.categorySeats).innerJoin(schema.specialties, eq(schema.specialties.id, schema.categorySeats.specialtyId)).where(eq(schema.categorySeats.chapterId, chapter.id)).orderBy(asc(schema.specialties.name));
@@ -15,7 +17,7 @@ export default async function AltaPage({ searchParams }: { searchParams: Promise
     <div className="stack" style={{ gap: 24 }}>
       <div className="page-head">
         <div>
-          <p className="eyebrow">{chapter.name} · Candidatura</p>
+          <p className="eyebrow">{chapter.name} · Candidatura{chapter.id !== own.id ? " · Sala recién fundada" : ""}</p>
           <h1>Solicitar plaza.</h1>
           <p className="lead">Una empresa por especialidad. Comprueba la plaza, da de alta a la empresa y a su Timonel, y deja el resto al Agente: la entrevista del ADN empieza en cuanto se activa la plaza.</p>
         </div>
@@ -24,6 +26,7 @@ export default async function AltaPage({ searchParams }: { searchParams: Promise
       {fromCandidacy ? <div className="notice amber">Alta desde la candidatura aprobada de <strong>{fromCandidacy.companyName}</strong>{fromCandidacy.specialtyCode ? ` · ${SPECIALTY_NAME[fromCandidacy.specialtyCode]}` : ""}. Al activar la plaza, la candidatura pasa a titular activo.</div> : null}
       <form action={onboardAction} className="stack" style={{ maxWidth: 820 }}>
         {fromCandidacy ? <input type="hidden" name="candidacyId" value={fromCandidacy.id} /> : null}
+        {chapter.id !== own.id ? <input type="hidden" name="chapterSlug" value={chapter.slug} /> : null}
         <fieldset>
           <legend>Plaza</legend>
           <div className="field">

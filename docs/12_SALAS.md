@@ -73,6 +73,8 @@ La Directiva de Zona abre la Sala N+1 cuando se cumplen las tres condiciones:
 2. **Profundidad de mercado.** El censo de empresas objetivo de la zona (DIRCE por CNAE y tamaño, filtrado por los ICP de las especialidades fundadoras) soporta una Sala más sin que el flujo esperado de referidos válidos por miembro caiga por debajo del umbral configurado (propuesta: ≥ 3× la cuota mínima de D-010).
 3. **Salud de las Salas existentes.** Las Salas activas están en o por encima del objetivo de 25–35 plazas y su tasa de cumplimiento de cuota es sana. No se abre una Sala nueva para descargar una Sala que no funciona.
 
+**Quién empuja (D-041).** La empresa cuya plaza está ocupada no se queda en lista: NS le ofrece ser **Promotora** de la siguiente Sala. Reúne fundadoras en la Antesala (una por especialidad), la Directiva funda la Sala al alcanzar el mínimo, y la Promotora recibe una **gratificación** anunciada por NS (propuesta: meses de cuota gratis). Reglas completas en D-041.
+
 ### 2.3 Cuándo la zona está saturada
 
 Señales que detienen la apertura y que el Chapter Intelligence Agent vigila:

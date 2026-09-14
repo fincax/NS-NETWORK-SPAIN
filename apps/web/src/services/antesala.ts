@@ -11,7 +11,7 @@ import { schema } from "@/db/client";
 import { audit } from "@/lib/audit";
 import { NSCAT, SPECIALTY_NAME } from "@/db/nscat";
 
-export type CandidacyStatus = "NEW" | "CONTACTED" | "INTERVIEW" | "APPROVED" | "WAITLISTED" | "DECLINED" | "ACTIVATED";
+export type CandidacyStatus = "NEW" | "CONTACTED" | "INTERVIEW" | "APPROVED" | "WAITLISTED" | "FOUNDING" | "DECLINED" | "ACTIVATED";
 
 export const CANDIDACY_LABEL: Record<CandidacyStatus, string> = {
   NEW: "Nueva",
@@ -19,6 +19,7 @@ export const CANDIDACY_LABEL: Record<CandidacyStatus, string> = {
   INTERVIEW: "Entrevistada",
   APPROVED: "Plaza aprobada",
   WAITLISTED: "En la Antesala",
+  FOUNDING: "En fundación",
   DECLINED: "Declinada",
   ACTIVATED: "Titular activo",
 };
@@ -30,6 +31,7 @@ export const CANDIDACY_TRANSITIONS: Record<CandidacyStatus, CandidacyStatus[]> =
   INTERVIEW: ["APPROVED", "WAITLISTED", "DECLINED"],
   WAITLISTED: ["APPROVED", "INTERVIEW", "DECLINED"],
   APPROVED: ["WAITLISTED", "DECLINED"],
+  FOUNDING: ["DECLINED"], // se sale de la fundación declinando; el resto lo gestiona services/fundacion.ts
   DECLINED: ["NEW"],
   ACTIVATED: [],
 };
@@ -40,7 +42,7 @@ export type CandidacyView = "pendientes" | "espera" | "aprobadas" | "declinadas"
 
 export const VIEW_STATUSES: Record<CandidacyView, CandidacyStatus[] | null> = {
   pendientes: PENDING_STATUSES,
-  espera: ["WAITLISTED"],
+  espera: ["WAITLISTED", "FOUNDING"],
   aprobadas: ["APPROVED", "ACTIVATED"],
   declinadas: ["DECLINED"],
   todas: null,
@@ -106,7 +108,7 @@ export async function triageCandidacy(db: Db, chapterId: string, c: Candidacy, z
   const overlaps = seats.filter((s) => overlapCodes.has(s.code) && s.status === "ACTIVE" && s.holderName).map((s) => ({ specialtyName: s.specialtyName, holderName: s.holderName as string }));
 
   if (seat.status === "ACTIVE" && seat.holderName) {
-    return { seat: "TAKEN", specialtyName: seat.specialtyName, holderName: seat.holderName, overlaps, duplicateOf, outsideZone, canApprove: false, recommendation: `Plaza ocupada por ${seat.holderName}. Opciones: Antesala hasta que quede libre, otra Sala de la zona, o revisar si la especialidad real es otra.` };
+    return { seat: "TAKEN", specialtyName: seat.specialtyName, holderName: seat.holderName, overlaps, duplicateOf, outsideZone, canApprove: false, recommendation: `Plaza ocupada por ${seat.holderName}. NS le ayuda a fundar la siguiente Sala: Promotora de nueva Sala o sumarse a una en fundación (D-041). También: Antesala hasta que quede libre, otra Sala de la zona, o revisar si la especialidad real es otra.` };
   }
   const parts: string[] = [];
   if (duplicateOf?.kind === "MEMBER") parts.push(`${duplicateOf.name} ya es titular de la Sala: comprueba que no es la misma empresa.`);
@@ -128,7 +130,7 @@ export async function listCandidacies(db: Db, view: CandidacyView = "pendientes"
 export async function candidacyCounts(db: Db) {
   const all = await db.query.betaRequests.findMany({ columns: { status: true } });
   const count = (s: CandidacyStatus[]) => all.filter((r) => s.includes(r.status as CandidacyStatus)).length;
-  return { nuevas: count(["NEW"]), pendientes: count(PENDING_STATUSES), espera: count(["WAITLISTED"]), aprobadas: count(["APPROVED", "ACTIVATED"]), declinadas: count(["DECLINED"]), todas: all.length };
+  return { nuevas: count(["NEW"]), pendientes: count(PENDING_STATUSES), espera: count(["WAITLISTED", "FOUNDING"]), aprobadas: count(["APPROVED", "ACTIVATED"]), declinadas: count(["DECLINED"]), todas: all.length };
 }
 
 export class CandidacyTransitionError extends Error {}

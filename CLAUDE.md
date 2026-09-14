@@ -145,6 +145,8 @@ NS Sevilla
 
 Puede haber varias Salas en una misma ciudad.
 
+**Plaza ocupada, Sala nueva (D-041).** Cuando una empresa pretende entrar y su plaza ya está ocupada por otra del mismo sector, NS la ayuda a promover, promocionar e iniciar una nueva Sala. Si consigue el número mínimo de fundadoras que se exija (a determinar en la práctica), recibe como compensación una gratificación que NS anuncia, por ejemplo unos meses de cuota gratis. Nunca es dinero por referidos.
+
 **La Sala no es territorial (D-014).** Una Sala se define por sus empresas, no por un mapa. No tiene barrio, distrito ni radio. Su nombre no debe dar ninguna pista territorial: el nombre de la ciudad o municipio está reservado a NS para agrupar las Salas de la zona ("NS Sevilla"), y ninguna Sala puede llevar el nombre de una ciudad, municipio, provincia, comunidad autónoma, país, barrio o distrito. Cada Sala elige un nombre propio, con el prefijo NS, autorizado por NS y único en toda la red: "NS Cumbre", "NS Ágora". Las Salas de una zona se encuentran entre sí (encuentros entre Salas) porque generan negocio, no porque compartan territorio.
 
 Posteriormente existirán:

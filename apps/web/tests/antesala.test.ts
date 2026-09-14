@@ -76,7 +76,7 @@ describe("Despacho de la Directiva", () => {
     await expect(updateCandidacy(db, { chapterId, candidacyId: c.id, memberId: timonelId, status: "CONTACTED" })).rejects.toBeInstanceOf(CandidacyTransitionError);
   });
   it("no se aprueba una plaza ocupada ni se salta el orden de estados", async () => {
-    const c = await byCompany("Correduría Giralda");
+    const [c] = await db.insert(schema.betaRequests).values({ fullName: "Sara Tena", companyName: "Seguros Bética", email: "sara@segurosbetica.es", specialtyCode: "SEGUROS_EMPRESA" }).returning();
     await expect(updateCandidacy(db, { chapterId, candidacyId: c.id, memberId: directorId, status: "APPROVED" })).rejects.toThrow(/No se puede pasar/);
     await updateCandidacy(db, { chapterId, candidacyId: c.id, memberId: directorId, status: "INTERVIEW" });
     await expect(updateCandidacy(db, { chapterId, candidacyId: c.id, memberId: directorId, status: "APPROVED" })).rejects.toThrow(/ocupada/);
@@ -102,10 +102,10 @@ describe("Despacho de la Directiva", () => {
   });
   it("las vistas y los recuentos cuadran", async () => {
     const counts = await candidacyCounts(db);
-    expect(counts.todas).toBe(7);
-    expect(counts.espera).toBe(2);
+    expect(counts.todas).toBe(10);
+    expect(counts.espera).toBe(5); // 2 en la Antesala + 3 en fundación
     expect(counts.aprobadas).toBe(1);
     expect((await listCandidacies(db, "pendientes")).every((c) => ["NEW", "CONTACTED", "INTERVIEW"].includes(c.status))).toBe(true);
-    expect((await listCandidacies(db, "todas")).length).toBe(7);
+    expect((await listCandidacies(db, "todas")).length).toBe(10);
   });
 });

@@ -43,6 +43,13 @@
       "when": 1789342762680,
       "tag": "0005_entrevista",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1789344638131,
+      "tag": "0006_fundacion",
+      "breakpoints": true
     }
   ]
 }

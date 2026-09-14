@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { getDb } from "@/db/client";
 import { requireDirector } from "@/lib/session";
-import { NSCAT } from "@/db/nscat";
+import { NSCAT, SPECIALTY_NAME } from "@/db/nscat";
 import { dateTime } from "@/lib/format";
 import { Empty } from "@/components/ui";
-import { candidacyAction } from "./actions";
+import { candidacyAction, foundingAction } from "./actions";
+import { listFoundings } from "@/services/fundacion";
 import { CANDIDACY_LABEL, CANDIDACY_TRANSITIONS, candidacyCounts, listCandidacies, triageCandidacy, type Candidacy, type CandidacyStatus, type CandidacyTriage, type CandidacyView } from "@/services/antesala";
 
 const VIEWS: { key: CandidacyView; label: string }[] = [
@@ -21,11 +22,14 @@ const ACTION_LABEL: Record<CandidacyStatus, string> = {
   INTERVIEW: "Entrevista hecha",
   APPROVED: "Aprobar plaza",
   WAITLISTED: "A la Antesala",
+  FOUNDING: "En fundación",
   DECLINED: "Declinar",
   ACTIVATED: "Titular activo",
 };
 
-const STATUS_TONE: Record<CandidacyStatus, string> = { NEW: "amber", CONTACTED: "amber", INTERVIEW: "amber", APPROVED: "green", ACTIVATED: "green", WAITLISTED: "blue", DECLINED: "red" };
+const STATUS_TONE: Record<CandidacyStatus, string> = { NEW: "amber", CONTACTED: "amber", INTERVIEW: "amber", APPROVED: "green", ACTIVATED: "green", WAITLISTED: "blue", FOUNDING: "blue", DECLINED: "red" };
+
+type FoundingView = Awaited<ReturnType<typeof listFoundings>>[number];
 
 function SeatBadge({ t }: { t: CandidacyTriage }) {
   if (t.seat === "VACANT" && !t.overlaps.length && !t.duplicateOf) return <span className="badge green">Plaza vacante · {t.specialtyName}</span>;
@@ -34,9 +38,12 @@ function SeatBadge({ t }: { t: CandidacyTriage }) {
   return <span className="badge">Sin clasificar</span>;
 }
 
-function CandidacyCard({ c, t, view }: { c: Candidacy; t: CandidacyTriage; view: CandidacyView }) {
+function CandidacyCard({ c, t, view, foundings }: { c: Candidacy; t: CandidacyTriage; view: CandidacyView; foundings: FoundingView[] }) {
   const status = c.status as CandidacyStatus;
   const next = CANDIDACY_TRANSITIONS[status];
+  const openFoundings = foundings.filter((f) => f.founding.status !== "ACTIVATED" && !(c.specialtyCode && f.specialties.includes(c.specialtyCode)));
+  const canFound = !c.foundingId && !["DECLINED", "ACTIVATED", "APPROVED"].includes(status);
+  const foundedChapter = c.foundingId ? foundings.find((f) => f.founding.id === c.foundingId)?.chapter : undefined;
   return (
     <article id={`c-${c.id}`} className={`card cand ${status === "NEW" ? "amber" : ""}`}>
       <div className="cand-head">
@@ -55,7 +62,7 @@ function CandidacyCard({ c, t, view }: { c: Candidacy; t: CandidacyTriage; view:
       </div>
       {status !== "ACTIVATED" ? (
         <div className="cand-actions">
-          {status === "APPROVED" ? <Link href={`/sala/alta?candidatura=${c.id}`} className="btn primary small">Dar de alta en la Sala</Link> : null}
+          {status === "APPROVED" ? <Link href={`/sala/alta?candidatura=${c.id}${foundedChapter ? `&sala=${foundedChapter.slug}` : ""}`} className="btn primary small">Dar de alta en {foundedChapter ? foundedChapter.name : "la Sala"}</Link> : null}
           {next.map((s) => (
             <form key={s} action={candidacyAction}>
               <input type="hidden" name="id" value={c.id} /><input type="hidden" name="view" value={view} /><input type="hidden" name="status" value={s} />
@@ -64,6 +71,18 @@ function CandidacyCard({ c, t, view }: { c: Candidacy; t: CandidacyTriage; view:
           ))}
         </div>
       ) : c.companyId ? <p className="mono">Ya es titular de la Sala.</p> : null}
+      {canFound && (t.seat === "TAKEN" || openFoundings.length) ? (
+        <div className="cand-actions" style={{ borderTop: "1px dashed var(--line)", paddingTop: 10 }}>
+          <span className="mono" style={{ alignSelf: "center" }}>{t.seat === "TAKEN" ? "Plaza ocupada: NS le ayuda a fundar la siguiente Sala ·" : "Sala en fundación ·"}</span>
+          {t.seat === "TAKEN" ? (
+            <form action={foundingAction}><input type="hidden" name="id" value={c.id} /><input type="hidden" name="view" value={view} /><input type="hidden" name="op" value="start" /><button type="submit" className="btn small">Promotora de nueva Sala</button></form>
+          ) : null}
+          {openFoundings.map((f) => (
+            <form key={f.founding.id} action={foundingAction}><input type="hidden" name="id" value={c.id} /><input type="hidden" name="view" value={view} /><input type="hidden" name="op" value="join" /><input type="hidden" name="foundingId" value={f.founding.id} /><button type="submit" className="btn small ghost">Sumar a la Sala de {f.promoter?.companyName ?? "la Promotora"} ({f.count}/{f.founding.minMembers})</button></form>
+          ))}
+        </div>
+      ) : null}
+      {status === "FOUNDING" && c.foundingId ? <p className="mono">Fundadora de la Sala promovida por {foundings.find((f) => f.founding.id === c.foundingId)?.promoter?.companyName ?? "…"}.</p> : null}
       {status !== "ACTIVATED" ? (
         <details className="cand-more">
           <summary>Nota y clasificación{c.notes ? " · hay nota" : ""}</summary>
@@ -103,7 +122,7 @@ export default async function AntesalaPage({ searchParams }: { searchParams: Pro
     );
   }
   const db = await getDb();
-  const [counts, rows] = await Promise.all([candidacyCounts(db), listCandidacies(db, view)]);
+  const [counts, rows, foundings] = await Promise.all([candidacyCounts(db), listCandidacies(db, view), listFoundings(db, ctx.chapter.zoneId)]);
   const triaged = await Promise.all(rows.map(async (c) => ({ c, t: await triageCandidacy(db, ctx.chapter.id, c) })));
   const countFor: Record<CandidacyView, number> = { pendientes: counts.pendientes, espera: counts.espera, aprobadas: counts.aprobadas, declinadas: counts.declinadas, todas: counts.todas };
 
@@ -122,6 +141,31 @@ export default async function AntesalaPage({ searchParams }: { searchParams: Pro
         </div>
       </div>
 
+      {foundings.length ? (
+        <section id="fundacion" className="stack" style={{ gap: 10 }}>
+          <h2 style={{ margin: 0 }}>Salas en fundación</h2>
+          <p className="lead" style={{ fontSize: 14 }}>Cuando una plaza está ocupada, NS ayuda a esa empresa a promover la siguiente Sala de la zona. Al reunir el mínimo, la Directiva la funda y la Promotora recibe la gratificación anunciada (D-041).</p>
+          {foundings.map((f) => (
+            <article key={f.founding.id} className={`card ${f.ready && f.founding.status !== "ACTIVATED" ? "green" : ""}`} style={{ display: "grid", gap: 10 }}>
+              <div className="row" style={{ justifyContent: "space-between" }}>
+                <div><p className="eyebrow">{f.founding.status === "ACTIVATED" ? "Sala fundada" : f.ready ? "Mínimo alcanzado" : "En fundación"}</p><strong>{f.chapter ? f.chapter.name : `Promotora: ${f.promoter?.companyName ?? "…"}`}</strong>{f.chapter ? <span className="mono"> · promovida por {f.promoter?.companyName} · nombre pendiente de autorización de NS</span> : null}</div>
+                <div className="row" style={{ gap: 12 }}><div className="progress" aria-hidden="true"><span style={{ width: `${Math.min(100, Math.round((f.count / f.founding.minMembers) * 100))}%` }} /></div><span className="mono">{f.count} de {f.founding.minMembers} fundadoras</span></div>
+              </div>
+              <p className="mono">{f.specialties.map((code) => SPECIALTY_NAME[code] ?? code).join(" · ") || "sin especialidades aún"}{f.missing ? ` · faltan ${f.missing}` : ""}</p>
+              <p className="mono">Gratificación anunciada: {f.founding.rewardText}{f.founding.rewardGrantedAt ? " · concedida" : ""}.</p>
+              {f.ready && f.founding.status !== "ACTIVATED" ? (
+                <form action={foundingAction} className="row">
+                  <input type="hidden" name="op" value="activate" /><input type="hidden" name="foundingId" value={f.founding.id} /><input type="hidden" name="view" value={view} />
+                  <div className="field" style={{ minWidth: 260 }}><label htmlFor={`fn-${f.founding.id}`}>Nombre propio de la Sala (prefijo NS, nunca un lugar)</label><input id={`fn-${f.founding.id}`} name="name" required placeholder="NS Ágora" defaultValue="NS " /></div>
+                  <button type="submit" className="btn primary" style={{ alignSelf: "end" }}>Fundar la Sala</button>
+                </form>
+              ) : null}
+              {f.chapter ? <div className="cand-actions">{f.members.filter((m) => m.status === "APPROVED").map((m) => <Link key={m.id} href={`/sala/alta?candidatura=${m.id}&sala=${f.chapter!.slug}`} className="btn small">Dar de alta a {m.companyName}</Link>)}</div> : null}
+            </article>
+          ))}
+        </section>
+      ) : null}
+
       <nav className="tabs" aria-label="Vistas">
         {VIEWS.map((v) => (
           <Link key={v.key} href={`/antesala?vista=${v.key}`} aria-current={v.key === view ? "page" : undefined}>{v.label} <span className="mono">{countFor[v.key]}</span></Link>
@@ -136,7 +180,7 @@ export default async function AntesalaPage({ searchParams }: { searchParams: Pro
         </Empty>
       ) : (
         <div className="stack" style={{ gap: 14 }}>
-          {triaged.map(({ c, t }) => <CandidacyCard key={c.id} c={c} t={t} view={view} />)}
+          {triaged.map(({ c, t }) => <CandidacyCard key={c.id} c={c} t={t} view={view} foundings={foundings} />)}
         </div>
       )}
 

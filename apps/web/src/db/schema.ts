@@ -414,6 +414,22 @@ export const agentSources = pgTable("agent_sources", {
   createdAt: createdAt(),
 });
 
+/** Fundación de una Sala nueva (D-041): la Promotora reúne fundadoras en la Antesala hasta el mínimo. */
+export const chapterFoundings = pgTable("chapter_foundings", {
+  id: id(),
+  zoneId: uuid("zone_id").notNull().references(() => zones.id),
+  promoterCandidacyId: uuid("promoter_candidacy_id").notNull(),
+  proposedName: text("proposed_name"),
+  status: text("status").notNull().default("OPEN"), // OPEN | READY (mínimo alcanzado) | ACTIVATED | CLOSED
+  minMembers: integer("min_members").notNull().default(12),
+  rewardText: text("reward_text"),
+  rewardGrantedAt: timestamp("reward_granted_at", { withTimezone: true }),
+  chapterId: uuid("chapter_id"),
+  createdByMemberId: uuid("created_by_member_id"),
+  createdAt: createdAt(),
+  updatedAt: updatedAt(),
+});
+
 export const betaRequests = pgTable("beta_requests", {
   id: id(),
   fullName: text("full_name").notNull(),
@@ -426,6 +442,7 @@ export const betaRequests = pgTable("beta_requests", {
   notes: text("notes"), // nota privada de la Directiva
   reviewedBy: uuid("reviewed_by"), // último miembro de la Directiva que la tocó
   companyId: uuid("company_id"), // empresa creada al activarla
+  foundingId: uuid("founding_id"), // Sala en fundación a la que se ha sumado (D-041)
   decidedAt: timestamp("decided_at", { withTimezone: true }),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   createdAt: createdAt(),
