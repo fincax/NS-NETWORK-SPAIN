@@ -5,6 +5,9 @@ import { requireMember } from "@/lib/session";
 import { closeDemand, createDemand } from "@/services/demands";
 import { addSource, removeSource, runOwnSources, SourceError } from "@/services/sources";
 import { redirect } from "next/navigation";
+import { AccountError, createInvite } from "@/lib/accounts";
+import { and, eq } from "drizzle-orm";
+import { schema } from "@/db/client";
 import type { BusinessTrigger } from "@/core/types";
 
 export async function createDemandAction(formData: FormData) {
@@ -55,4 +58,21 @@ export async function runOwnSourcesAction(formData: FormData) {
   await runOwnSources(db, company.id);
   revalidatePath(`/empresa/${String(formData.get("slug"))}`);
   revalidatePath("/hoy");
+}
+
+/** Enlace de acceso para el Timonel de una empresa (D-042). Solo la Directiva. */
+export async function inviteMemberAction(formData: FormData) {
+  const { member } = await requireMember();
+  const db = await getDb();
+  const slug = String(formData.get("slug"));
+  const company = await db.query.companies.findFirst({ where: eq(schema.companies.slug, slug) });
+  const target = company ? await db.query.members.findFirst({ where: and(eq(schema.members.companyId, company.id), eq(schema.members.isPrimary, true)) }) : undefined;
+  if (!target) redirect(`/empresa/${slug}?fuente=${encodeURIComponent("No hay Timonel que invitar.")}`);
+  try {
+    const { token } = await createInvite(db, { memberId: target.id, createdBy: member.id });
+    redirect(`/empresa/${slug}?invite=${encodeURIComponent(token)}`);
+  } catch (e) {
+    if (e instanceof AccountError) redirect(`/empresa/${slug}?fuente=${encodeURIComponent(e.message)}`);
+    throw e;
+  }
 }

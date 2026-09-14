@@ -50,6 +50,13 @@
       "when": 1789344638131,
       "tag": "0006_fundacion",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1789345300399,
+      "tag": "0007_cuentas",
+      "breakpoints": true
     }
   ]
 }

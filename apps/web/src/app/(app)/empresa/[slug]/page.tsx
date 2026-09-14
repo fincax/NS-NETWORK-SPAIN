@@ -7,14 +7,16 @@ import { balance } from "@/services/today";
 import { eur } from "@/lib/format";
 import { AgentAvatar } from "@/components/brand";
 import { openDemands } from "@/services/demands";
-import { createDemandAction, closeDemandAction, addSourceAction, removeSourceAction, runOwnSourcesAction } from "./actions";
+import { createDemandAction, closeDemandAction, addSourceAction, removeSourceAction, runOwnSourcesAction, inviteMemberAction } from "./actions";
+import { authMode } from "@/lib/auth";
 import { listSources, MAX_SOURCES_PER_AGENT } from "@/services/sources";
 import { dateTime } from "@/lib/format";
 
-export default async function EmpresaPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ fuente?: string; adn?: string }> }) {
+export default async function EmpresaPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ fuente?: string; adn?: string; invite?: string }> }) {
   const { slug } = await params;
-  const { fuente: sourceError, adn } = await searchParams;
-  const { company: me, chapter } = await requireMember();
+  const { fuente: sourceError, adn, invite } = await searchParams;
+  const { company: me, chapter, member: viewer } = await requireMember();
+  const publicUrl = process.env.NS_PUBLIC_URL ?? "http://localhost:3000";
   const db = await getDb();
   const company = await db.query.companies.findFirst({ where: eq(schema.companies.slug, slug) });
   if (!company || company.chapterId !== chapter.id) notFound();
@@ -39,6 +41,8 @@ export default async function EmpresaPage({ params, searchParams }: { params: Pr
         <AgentAvatar state={own ? "analizando" : "reposo"} label={own ? "Tu Agente, en la Mesa" : `Agente de ${company.name}`} />
       </div>
       {own && !dnaRow?.validatedAt ? <div className="notice amber row" style={{ justifyContent: "space-between" }}><span><strong>Tu ADN está sin validar.</strong> Hasta que termines la entrevista con tu Agente, trabajará con lo poco que sabe.</span><Link href="/entrevista" className="btn small primary">Hacer la entrevista</Link></div> : null}
+      {invite ? <div className="notice" style={{ borderColor: "var(--green)", display: "grid", gap: 6 }}><strong>Enlace de acceso para {person?.fullName} (un solo uso, siete días).</strong><span>Envíaselo por el canal que prefieras; al abrirlo elige su contraseña y entra. Este enlace no vuelve a mostrarse.</span><code className="invite-link" style={{ userSelect: "all", wordBreak: "break-all" }}>{`${publicUrl}/invitacion/${invite}`}</code></div> : null}
+      {viewer.isDirector && !own && authMode() === "real" ? <form action={inviteMemberAction}><input type="hidden" name="slug" value={company.slug} /><button className="btn small" type="submit">Enlace de acceso para el Timonel</button></form> : null}
       {own && adn === "validado" ? <div className="notice" style={{ borderColor: "var(--green)" }}>ADN validado. Tu Agente trabaja ya con la versión {dnaRow?.version} en la Mesa.</div> : null}
       <div className="grid grid-3">
         <div className="card kpi"><span className="value">{bal.given}</span><span className="label">Cesiones hechas</span></div>

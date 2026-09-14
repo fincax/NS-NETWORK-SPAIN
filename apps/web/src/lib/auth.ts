@@ -5,6 +5,16 @@
  */
 export const DEMO_COOKIE = "ns_demo";
 export const SESSION_DAYS = 30;
+/** Cookie de la sesión personal (D-042). */
+export const ACCOUNT_COOKIE = "ns_session";
+
+export type AuthMode = "demo" | "real";
+/** demo: puerta compartida + selector de Timonel (local por defecto). real: cuentas con contraseña (producción por defecto). */
+export function authMode(): AuthMode {
+  const v = process.env.NS_AUTH_MODE;
+  if (v === "demo" || v === "real") return v;
+  return process.env.NODE_ENV === "production" ? "real" : "demo";
+}
 
 function env(name: string, fallback?: string): string {
   const v = process.env[name];
