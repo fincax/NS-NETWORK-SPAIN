@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { getDb, schema } from "@/db/client";
 import { eq } from "drizzle-orm";
 import { requireMember } from "@/lib/session";
-import { onboardCompany, SeatTakenError } from "@/services/onboarding";
+import { onboardCompany, RulesNotAcceptedError, SeatTakenError } from "@/services/onboarding";
 import { activateCandidacy } from "@/services/antesala";
 import { cookies } from "next/headers";
 import { MEMBER_COOKIE } from "@/lib/session";
@@ -30,6 +30,7 @@ export async function onboardAction(formData: FormData) {
       specialtyCode: String(formData.get("specialtyCode")),
       person: { fullName: String(formData.get("personName")), role: String(formData.get("personRole")), email: String(formData.get("personEmail")) },
       validate: false, // el ADN lo valida el Timonel al terminar la entrevista (D-040)
+      acceptance: { rulesVersion: String(formData.get("normasVersion") ?? ""), rules: formData.getAll("normas").map(String) }, // D-043
       dna: {
         company: { description, locations: ["Sevilla"], website: String(formData.get("website") ?? "") || undefined, certifications: [], credibility: [] },
         offering: { services: [], products: [], differentiators: [], exclusions: [], capacity: "OPEN" },
@@ -42,7 +43,7 @@ export async function onboardAction(formData: FormData) {
       },
     }));
   } catch (e) {
-    const msg = e instanceof SeatTakenError ? `${e.message}. Puedes esperar en la Antesala o solicitar plaza en otra Sala de NS Sevilla.` : e instanceof Error ? e.message : "Error desconocido";
+    const msg = e instanceof SeatTakenError ? `${e.message}. Puedes esperar en la Antesala o solicitar plaza en otra Sala de NS Sevilla.` : e instanceof RulesNotAcceptedError ? e.message : e instanceof Error ? e.message : "Error desconocido";
     redirect(`/sala/alta?error=${encodeURIComponent(msg)}`);
   }
   const candidacyId = String(formData.get("candidacyId") ?? "");

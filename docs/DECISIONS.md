@@ -1049,3 +1049,26 @@ Semana 4   Notificación de baja de la titularidad. La empresa queda suspendida 
 
 **Revisit when.** Nunca en cuanto a la regla. El plus de Mérito por especialidades distintas y el peso de cada peldaño se calibran tras cuatro semanas de la Sala piloto.
 
+---
+
+## D-043 · Toda empresa acepta de forma expresa todas las Normas NS al suscribirse como titular; sin aceptación no hay alta
+
+**Status:** CONFIRMED (regla fijada por el fundador)
+**Date:** 2026-09-14
+
+**Context.** D-010 y D-025 ya decían que las reglas se comunican en la web, en la Candidatura y en el onboarding y que "el solicitante las acepta expresamente antes de la admisión", pero no había mecanismo: el alta creaba la empresa sin registrar ninguna aceptación. Con D-042 la regla del Compromiso tiene consecuencias duras (baja a la cuarta semana), y una consecuencia dura sin aceptación expresa previa es indefendible ante el miembro.
+
+**Choice.**
+
+- Existe un texto único y versionado de **Normas NS** (`apps/web/src/core/normas.ts`, versión `2026-09-14`): las cinco reglas inmutables (nunca contraprestación · Compromiso semanal con Escalera · calidad sobre cantidad · Comunicado semanal · Balanza pública) y la condición de la cuota por Tramos (D-025). Cada norma cita su decisión.
+- **Aceptación expresa en el alta.** El formulario de alta de plaza muestra las Normas una a una, cada una con su casilla obligatoria, y el botón dice "Acepto las Normas NS". El servicio de alta rechaza cualquier alta cuya aceptación no incluya **todas** las normas de la **versión vigente** (`RulesNotAcceptedError`); no existe camino de alta sin aceptación, tampoco desde el seed ni desde una Sala recién fundada.
+- **Registro.** Tabla `rules_acceptances` (migración 0008): Sala, empresa, Timonel que acepta, versión, códigos aceptados y fecha. El evento `MEMBER_ACTIVATED` de la Mesa lo menciona. El Dossier de la empresa muestra "Normas NS aceptadas de forma expresa (versión X) por [Timonel] el [fecha]".
+- **Cambio de Normas.** Si cambia el texto, sube la versión. Las altas nuevas firman la nueva; para los titulares existentes queda pendiente (revisit) el flujo de re-aceptación con un toque en Hoy y plazo.
+- **Web pública.** La portada enumera las Normas que se aceptarán al ocupar la plaza, para que nadie llegue al alta sin haberlas leído.
+
+**Why.** La exclusividad, la Escalera y la expulsión por contraprestación solo son legítimas si el titular las aceptó a sabiendas, con constancia de qué aceptó y cuándo. Convertir la aceptación en una puerta del sistema (no un texto legal aparte) es privacidad y cumplimiento como arquitectura, coherente con §15 de la constitución.
+
+**Consequences.** `core/normas.ts`, tabla `rules_acceptances`, campo obligatorio `acceptance` en `onboardCompany`, fieldset de Normas en `/sala/alta` y su acción, línea en el Dossier, portada, pruebas (`slice.test.ts`), seed y pruebas que ya aceptan todas las normas.
+
+**Revisit when.** Se redacten los textos legales (`docs/08_SECURITY_PRIVACY_GDPR.md`, condición 4 de `docs/17`) o cambie cualquier Norma: entonces se define la re-aceptación de los titulares existentes.
+

@@ -1362,7 +1362,7 @@ Y posteriormente:
 
 ## Reglas inmutables (D-010)
 
-Estas tres reglas están por encima de cualquier feature, decisión de diseño o modelo económico. No se revisan; se aplican.
+Estas reglas están por encima de cualquier feature, decisión de diseño o modelo económico. No se revisan; se aplican. **Toda empresa las acepta de forma expresa, una a una, al suscribirse como titular; sin esa aceptación no hay alta** (D-043). La aceptación queda registrada con versión, Timonel y fecha.
 
 1. **Nunca se cobra por un referido.** Ningún miembro puede pedir, ofrecer, aceptar o condicionar un referido a dinero, comisión, descuento, contraprestación o favor. NS tampoco cobra por referido (D-005). Hacerlo es **motivo de expulsión** de la Sala y de la red. El espíritu de NS es un network colaborativo: se da porque se pertenece.
 2. **Toda empresa debe ceder al menos una Cesión válida a la semana, sin excusas** (D-042). Pertenecer a NS es contribuir. Con una se cumple, pero no se destaca: NS promueve ceder varias y a varias especialidades. Cuatro semanas seguidas sin una sola Cesión válida suponen la baja de la titularidad: la segunda semana lleva aviso diplomático del Agente, la tercera aviso formal de la Directiva para aportar lo antes posible, y la cuarta la notificación de baja. El Agente de cada empresa trabaja para que su Timonel lo cumpla sin esfuerzo.

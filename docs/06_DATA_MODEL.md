@@ -87,6 +87,7 @@ Plazos (D-024) ejecutados por el Reloj de la Sala (D-030, `services/clock.ts`): 
 
 ## 5. Pendiente
 
+- Re-aceptación de las Normas NS por titulares existentes cuando cambie la versión (D-043): hoy `rules_acceptances` registra la aceptación del alta (empresa, Timonel, versión, códigos, fecha).
 - `MemberBalance` histórico de 12 semanas y `WeeklyPace` de Sala editable: hoy `weekly_pace` es un entero en la Sala (1 por defecto) y el Compromiso ya persiste en `contribution_weeks` (D-042: una fila por titular y semana con `valid_count`, `distinct_specialties`, `missed_streak`, `action`).
 - `Communique`, `ChapterGazette`, `MemberDossier` (Protocolo II) y `MemberCompass` (Protocolo III): no persisten todavía; el Dossier se deriva del ADN.
 - `FeeTier` / `AgentCostLedger` (D-025): solo la columna `fee_tier`.

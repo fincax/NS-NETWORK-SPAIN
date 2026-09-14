@@ -3,6 +3,7 @@ import { getDb, schema } from "@/db/client";
 import { requireMember } from "@/lib/session";
 import { onboardAction } from "./actions";
 import { SPECIALTY_NAME } from "@/db/nscat";
+import { NORMAS_NS, NORMAS_VERSION } from "@/core/normas";
 
 export default async function AltaPage({ searchParams }: { searchParams: Promise<{ error?: string; candidatura?: string; sala?: string }> }) {
   const { chapter: own } = await requireMember();
@@ -52,7 +53,20 @@ export default async function AltaPage({ searchParams }: { searchParams: Promise
           <div className="field"><label htmlFor="d">Qué hace la empresa, en una o dos frases</label><textarea id="d" name="description" required minLength={20} style={{ minHeight: 90 }} placeholder="Correduría de seguros para pymes industriales y flotas en la provincia de Sevilla. 12 personas, 20 años." defaultValue={fromCandidacy?.message ?? ""} /></div>
           <p className="hint">Lo demás (servicios, cliente ideal, señales, ticket, referido perfecto) lo pregunta el Agente en la entrevista, justo después de activar la plaza.</p>
         </fieldset>
-        <div className="actions"><button className="btn primary" type="submit">Activar la plaza y empezar la entrevista</button></div>
+        <fieldset>
+          <legend>Normas NS · aceptación expresa</legend>
+          <p className="hint" style={{ marginBottom: 12 }}>Sin aceptar cada una de estas normas no se ocupa la plaza. Quedan registradas con la versión {NORMAS_VERSION}, la fecha y el Timonel que las acepta.</p>
+          <div className="stack" style={{ gap: 10 }}>
+            {NORMAS_NS.map((n, i) => (
+              <label key={n.code} className="norma">
+                <input type="checkbox" name="normas" value={n.code} required />
+                <span><strong>{i + 1}. {n.title}</strong> {n.text} <span className="mono">{n.decision}</span></span>
+              </label>
+            ))}
+          </div>
+          <input type="hidden" name="normasVersion" value={NORMAS_VERSION} />
+        </fieldset>
+        <div className="actions"><button className="btn primary" type="submit">Acepto las Normas NS: activar la plaza y empezar la entrevista</button></div>
       </form>
     </div>
   );

@@ -83,6 +83,8 @@ Business DNA acumulado
 4. **Toda empresa da a conocer su trabajo a la Sala cada semana** (D-018): el Agente redacta el Comunicado, el Timonel lo aprueba, la Gaceta y el Dossier lo hacen accesible a todos.
 5. **Lo que se da y lo que se recibe se ve** (D-019): la Balanza de cada titular es pública en su Sala; la Brújula, privada.
 
+Toda empresa acepta estas normas, y la condición de la cuota por Tramos (D-025), de forma expresa y una a una al ocupar su plaza. Sin aceptación no hay alta (D-043).
+
 ## Pregunta de control antes de cualquier feature
 
 ```text

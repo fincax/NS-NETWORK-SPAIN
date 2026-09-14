@@ -254,6 +254,17 @@ export const referralTransitions = pgTable("referral_transitions", {
   occurredAt: createdAt(),
 });
 
+/** Aceptación expresa de las Normas NS al alta como titular (D-043). Queda la versión firmada y quién firmó. */
+export const rulesAcceptances = pgTable("rules_acceptances", {
+  id: id(),
+  chapterId: uuid("chapter_id").notNull().references(() => chapters.id),
+  companyId: uuid("company_id").notNull().references(() => companies.id),
+  memberId: uuid("member_id").notNull().references(() => members.id),
+  rulesVersion: text("rules_version").notNull(),
+  rules: jsonb("rules").$type<string[]>().notNull().default([]),
+  acceptedAt: createdAt(),
+});
+
 /** Compromiso semanal (D-042): una fila por titular y semana evaluada. La escalera vive aquí, no en la Cesión. */
 export const contributionWeeks = pgTable(
   "contribution_weeks",

@@ -6,6 +6,7 @@ import { seedChapter, SCENARIOS } from "@/db/seed";
 import { SEED_COMPANIES } from "@/db/seed-data";
 import { createSignal, publishSignal } from "@/services/signals";
 import { decide } from "@/services/referrals";
+import { acceptAllNormas } from "@/core/normas";
 import { onboardCompany } from "@/services/onboarding";
 import { runClock } from "@/services/clock";
 import { compromisoStatus, executeRelease, pendingReleases } from "@/services/compromiso";
@@ -104,7 +105,7 @@ describe("Escalera semana a semana", () => {
   });
 
   it("una empresa dada de alta a mitad de camino no se evalúa hasta su primera semana completa", async () => {
-    const r = await onboardCompany(db, { chapterId, name: "Redes Giralda", slug: "redes-giralda", specialtyCode: "TELECOMUNICACIONES", person: { fullName: "Q", role: "CEO", email: "q@giralda.es" }, dna: SEED_COMPANIES[4].dna });
+    const r = await onboardCompany(db, { chapterId, name: "Redes Giralda", slug: "redes-giralda", specialtyCode: "TELECOMUNICACIONES", person: { fullName: "Q", role: "CEO", email: "q@giralda.es" }, dna: SEED_COMPANIES[4].dna, acceptance: acceptAllNormas() });
     const rows = await db.query.contributionWeeks.findMany({ where: eq(schema.contributionWeeks.companyId, r.company.id) });
     expect(rows).toHaveLength(0);
   });

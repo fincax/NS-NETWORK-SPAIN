@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { getDb, schema } from "@/db/client";
 import { requireMember } from "@/lib/session";
 import { balance } from "@/services/today";
@@ -20,6 +20,8 @@ export default async function EmpresaPage({ params, searchParams }: { params: Pr
   if (!company || company.chapterId !== chapter.id) notFound();
   const dnaRow = await db.query.businessDna.findFirst({ where: eq(schema.businessDna.companyId, company.id) });
   const person = await db.query.members.findFirst({ where: and(eq(schema.members.companyId, company.id), eq(schema.members.isPrimary, true)) });
+  const acceptance = await db.query.rulesAcceptances.findFirst({ where: eq(schema.rulesAcceptances.companyId, company.id), orderBy: [desc(schema.rulesAcceptances.acceptedAt)] });
+  const acceptor = acceptance ? await db.query.members.findFirst({ where: eq(schema.members.id, acceptance.memberId) }) : undefined;
   const seat = await db.select({ name: schema.specialties.name }).from(schema.categorySeats).innerJoin(schema.specialties, eq(schema.specialties.id, schema.categorySeats.specialtyId)).where(eq(schema.categorySeats.companyId, company.id));
   const bal = await balance(db, chapter.id, company.id);
   const distinctions = await db.query.recognitions.findMany({ where: eq(schema.recognitions.toCompanyId, company.id) });
@@ -105,6 +107,7 @@ export default async function EmpresaPage({ params, searchParams }: { params: Pr
         <section className="card quiet">
           <p className="eyebrow">Solo tú ves esto</p>
           <p>Nunca se comparte: {dna.knowledge.never_share.join(", ") || "nada declarado"}. Tu ADN está en la versión {dnaRow.version}{dnaRow.validatedAt ? ", validado" : ", sin validar"}.</p>
+          <p className="mono" style={{ marginTop: 8 }}>{acceptance ? `Normas NS aceptadas de forma expresa (versión ${acceptance.rulesVersion}) por ${acceptor?.fullName ?? "el Timonel"} el ${dateTime(acceptance.acceptedAt)}.` : "Sin aceptación de las Normas NS registrada."}</p>
           <div className="actions"><Link href="/entrevista" className="btn small">{dnaRow.validatedAt ? "Ampliar mi ADN con la entrevista del Agente" : "Hacer la entrevista del Agente"}</Link></div>
         </section>
       ) : null}

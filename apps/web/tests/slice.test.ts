@@ -5,7 +5,9 @@ import { closeDb, getDb, schema, type Db } from "@/db/client";
 import { seedChapter, SCENARIOS } from "@/db/seed";
 import { createSignal, publishSignal } from "@/services/signals";
 import { authorizeIntro, confirmValue, decide, markIntroduced, submitVerdict, updateStage } from "@/services/referrals";
-import { onboardCompany, SeatTakenError } from "@/services/onboarding";
+import { acceptAllNormas } from "@/core/normas";
+import { onboardCompany, RulesNotAcceptedError, SeatTakenError } from "@/services/onboarding";
+import { NORMAS_NS, NORMAS_VERSION } from "@/core/normas";
 import { balance, mesaTimeline, todaySummary } from "@/services/today";
 import { SEED_COMPANIES } from "@/db/seed-data";
 import { runClock } from "@/services/clock";
@@ -32,13 +34,24 @@ afterAll(async () => {
 
 describe("Alta de empresa y exclusividad de plaza", () => {
   it("una segunda empresa de la misma especialidad no entra en la Sala", async () => {
-    await expect(onboardCompany(db, { chapterId, name: "Obras Bética", slug: "obras-betica", specialtyCode: "OBRA_INDUSTRIAL", person: { fullName: "P", role: "CEO", email: "p@betica.es" }, dna: SEED_COMPANIES[0].dna })).rejects.toBeInstanceOf(SeatTakenError);
+    await expect(onboardCompany(db, { chapterId, name: "Obras Bética", slug: "obras-betica", specialtyCode: "OBRA_INDUSTRIAL", person: { fullName: "P", role: "CEO", email: "p@betica.es" }, dna: SEED_COMPANIES[0].dna, acceptance: acceptAllNormas() })).rejects.toBeInstanceOf(SeatTakenError);
   });
-  it("una plaza vacante se ocupa y activa un Agente", async () => {
-    const r = await onboardCompany(db, { chapterId, name: "Redes Giralda", slug: "redes-giralda", specialtyCode: "TELECOMUNICACIONES", person: { fullName: "Q", role: "CEO", email: "q@giralda.es" }, dna: { ...SEED_COMPANIES[4].dna, ideal_customer: { ...SEED_COMPANIES[4].dna.ideal_customer, triggers: ["NEW_SITE"] }, commercial: { ...SEED_COMPANIES[4].dna.commercial, ticket_min: 5_000, ticket_max: 90_000 } } });
+  it("sin aceptar de forma expresa todas las Normas NS no hay alta (D-043)", async () => {
+    const base = { chapterId, name: "Sin Normas SL", slug: "sin-normas", specialtyCode: "TELECOMUNICACIONES", person: { fullName: "R", role: "CEO", email: "r@sinnormas.es" }, dna: SEED_COMPANIES[4].dna };
+    await expect(onboardCompany(db, { ...base, acceptance: { rulesVersion: NORMAS_VERSION, rules: [] } })).rejects.toBeInstanceOf(RulesNotAcceptedError);
+    await expect(onboardCompany(db, { ...base, acceptance: { rulesVersion: NORMAS_VERSION, rules: NORMAS_NS.slice(1).map((n) => n.code) } })).rejects.toThrow(/Nunca se cobra/);
+    await expect(onboardCompany(db, { ...base, acceptance: { rulesVersion: "2000-01-01", rules: NORMAS_NS.map((n) => n.code) } })).rejects.toBeInstanceOf(RulesNotAcceptedError);
+    expect(await db.query.companies.findFirst({ where: eq(schema.companies.slug, "sin-normas") })).toBeUndefined();
+  });
+  it("una plaza vacante se ocupa, queda la aceptación de las Normas y se activa un Agente", async () => {
+    const r = await onboardCompany(db, { chapterId, name: "Redes Giralda", slug: "redes-giralda", specialtyCode: "TELECOMUNICACIONES", person: { fullName: "Q", role: "CEO", email: "q@giralda.es" }, dna: { ...SEED_COMPANIES[4].dna, ideal_customer: { ...SEED_COMPANIES[4].dna.ideal_customer, triggers: ["NEW_SITE"] }, commercial: { ...SEED_COMPANIES[4].dna.commercial, ticket_min: 5_000, ticket_max: 90_000 } }, acceptance: acceptAllNormas() });
     expect(r.agent.kind).toBe("COMPANY");
     const seat = await db.query.categorySeats.findFirst({ where: eq(schema.categorySeats.companyId, r.company.id) });
     expect(seat?.status).toBe("ACTIVE");
+    const acc = await db.query.rulesAcceptances.findFirst({ where: eq(schema.rulesAcceptances.companyId, r.company.id) });
+    expect(acc?.rulesVersion).toBe(NORMAS_VERSION);
+    expect(acc?.rules).toHaveLength(NORMAS_NS.length);
+    expect(acc?.memberId).toBe(r.member.id);
   });
 });
 

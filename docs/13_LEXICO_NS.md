@@ -124,6 +124,7 @@ Alternativas consideradas para Tramo: "Escalón" y "Nivel de cuota" (descartado 
 | **NS-ATP** | NS Agentic Transparency Protocol: cómo se calculan, contrastan y publican la Balanza y el Ritmo, y cómo el Agente genera la Brújula y sus Movimientos. |
 | **NS-CAT** | Clasificación NS de Actividades: base CNAE + Especialidad NS, ampliable y versionada. |
 | **Especialidad** | Nivel de NS-CAT que otorga plaza. |
+| **Normas NS** | Texto único y versionado que toda empresa acepta de forma expresa, norma a norma, al ocupar su plaza: las cinco reglas inmutables y la condición de la cuota por Tramos. Sin aceptación no hay alta (D-043). | `RulesAcceptance{ rules_version }` |
 | **Reglas inmutables** | Nunca se cobra por una Cesión (expulsión); Compromiso obligatorio de una Cesión válida por semana con Escalera de cuatro semanas (D-010, D-042); calidad sobre cantidad; Comunicado semanal (D-018); Balanza pública (D-019). |
 
 ---

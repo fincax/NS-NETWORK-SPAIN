@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { closeDb, getDb, schema, type Db } from "@/db/client";
 import { seedChapter } from "@/db/seed";
 import { SEED_COMPANIES } from "@/db/seed-data";
+import { acceptAllNormas } from "@/core/normas";
 import { onboardCompany } from "@/services/onboarding";
 import { activeInterview, answerInterview, dnaGaps, finishInterview, InterviewError, startInterview } from "@/services/entrevista";
 import { euros, list, sizeBands } from "@/agents/interview-script";
@@ -27,7 +28,7 @@ beforeAll(async () => {
   chapterId = r.chapter.id;
   otherMemberId = r.companies["hispalis"].memberId;
   const minimal = { ...SEED_COMPANIES[0].dna, company: { description: "", locations: [], certifications: [], credibility: [] }, offering: { services: [], products: [], differentiators: [], exclusions: [], capacity: "OPEN" as const }, ideal_customer: { industries: [], company_size: [], geography: [], roles: [], triggers: [], problems: [], exclusions: [] }, commercial: { strategic_priority: 2 as const, urgency: "90D" as const }, referrals: { perfect_referral: "", acceptable_referral: "", poor_referral: "", disqualifiers: [], introduction_preferences: "" } };
-  const c = await onboardCompany(db, { chapterId, name: "Redes Giralda", slug: "redes-giralda-ent", website: "https://redesgiralda.example", specialtyCode: "TELECOMUNICACIONES", person: { fullName: "Lucía Romero", role: "CEO", email: "lucia@redesgiralda.example" }, dna: minimal, validate: false });
+  const c = await onboardCompany(db, { chapterId, name: "Redes Giralda", slug: "redes-giralda-ent", website: "https://redesgiralda.example", specialtyCode: "TELECOMUNICACIONES", person: { fullName: "Lucía Romero", role: "CEO", email: "lucia@redesgiralda.example" }, dna: minimal, validate: false, acceptance: acceptAllNormas() });
   companyId = c.company.id;
   memberId = c.member.id;
 });

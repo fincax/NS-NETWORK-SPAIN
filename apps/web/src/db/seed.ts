@@ -4,6 +4,7 @@ import type { Db } from "@/db/client";
 import { schema } from "@/db/client";
 import { NSCAT } from "./nscat";
 import { SEED_CANDIDACIES, SEED_COMPANIES } from "./seed-data";
+import { acceptAllNormas } from "@/core/normas";
 import { onboardCompany } from "@/services/onboarding";
 
 export async function seedChapter(db: Db) {
@@ -34,7 +35,7 @@ export async function seedChapter(db: Db) {
       companies[c.slug] = { companyId: existing.id, memberId: m!.id };
       continue;
     }
-    const r = await onboardCompany(db, { chapterId: chapter.id, name: c.name, slug: c.slug, legalName: c.legalName, website: c.website, specialtyCode: c.specialty, person: c.person, dna: c.dna });
+    const r = await onboardCompany(db, { chapterId: chapter.id, name: c.name, slug: c.slug, legalName: c.legalName, website: c.website, specialtyCode: c.specialty, person: c.person, dna: c.dna, acceptance: acceptAllNormas() });
     companies[c.slug] = { companyId: r.company.id, memberId: r.member.id };
   }
   const anyCandidacy = await db.query.betaRequests.findFirst();
