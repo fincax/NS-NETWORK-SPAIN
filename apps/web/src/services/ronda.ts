@@ -6,7 +6,8 @@
  *     fuentes propias (D-038), las que su Timonel le ha añadido. Los registros públicos
  *     nuevos se reparten: empieza el Agente que menos ha rastreado, para que los Indicios en borrador
  *     no caigan siempre en el mismo Timonel.
- *  3. Un evento RONDA por Sala en la Mesa Permanente, con el resumen, para que se vea que la red trabajó.
+ *  3. Destacados (D-043): se recalcula quién es Titular Destacado (Aval firme ≥ 85, sin incumplimientos) y la Crónica lo anuncia.
+ *  4. Un evento RONDA por Sala en la Mesa Permanente, con el resumen, para que se vea que la red trabajó.
  *
  * Idempotente: el Reloj marca cada acción y el Rastreo deduplica por referencia externa. Se puede lanzar
  * varias veces al día sin efectos dobles; solo la primera pasada de la mañana produce trabajo.
@@ -18,6 +19,7 @@ import { audit } from "@/lib/audit";
 import { runClock, type ClockResult } from "@/services/clock";
 import { runRastreo, SampleFeed, type PublicFeed } from "@/agents/rastreo";
 import { runOwnSources } from "@/services/sources";
+import { runDestacados } from "@/services/eco";
 import { fetchText as defaultFetch, type FetchText } from "@/agents/feeds";
 
 export interface RondaChapterResult {
@@ -26,6 +28,7 @@ export interface RondaChapterResult {
   clock: ClockResult;
   rastreo: { agents: number; drafts: number; skipped: number };
   ownSources: { sources: number; drafts: number; errors: number };
+  destacados: { gained: number; lost: number; total: number }; // D-043
 }
 
 export interface RondaResult {
@@ -61,7 +64,8 @@ export async function runRonda(db: Db, now = new Date(), feed: PublicFeed = new 
       ownSources.errors += o.errors;
     }
 
-    const worked = clock.reminders + clock.expired + clock.late + clock.nudges + rastreo.drafts + ownSources.drafts > 0;
+    const destacados = await runDestacados(db, chapter.id, now);
+    const worked = clock.reminders + clock.expired + clock.late + clock.nudges + rastreo.drafts + ownSources.drafts + destacados.gained + destacados.lost > 0;
     if (worked) {
       const parts = [
         clock.reminders ? `${clock.reminders} recordatorio(s)` : null,
@@ -70,10 +74,11 @@ export async function runRonda(db: Db, now = new Date(), feed: PublicFeed = new 
         clock.nudges ? `${clock.nudges} check-in(s)` : null,
         rastreo.drafts ? `${rastreo.drafts} Indicio(s) en borrador desde fuentes públicas` : null,
         ownSources.drafts ? `${ownSources.drafts} Indicio(s) en borrador desde fuentes propias de los Agentes` : null,
+        destacados.gained ? `${destacados.gained} nuevo(s) Titular(es) Destacado(s)` : null,
       ].filter(Boolean);
       await audit(db, { chapterId: chapter.id, kind: "RONDA", actor: { type: "AGENT", id: "ronda" }, subject: { type: "Chapter", id: chapter.id }, policyApplied: "ronda.daily", result: `Ronda de la mañana con ${rastreo.agents} Agentes en la Mesa: ${parts.join(", ")}.`, significant: true });
     }
-    out.chapters.push({ chapterId: chapter.id, chapterName: chapter.name, clock, rastreo, ownSources });
+    out.chapters.push({ chapterId: chapter.id, chapterName: chapter.name, clock, rastreo, ownSources, destacados });
   }
   return out;
 }

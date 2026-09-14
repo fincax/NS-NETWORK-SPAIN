@@ -54,6 +54,7 @@ export default async function EmpresaPage({ params, searchParams }: { params: Pr
         <div className="row" style={{ alignItems: "baseline", marginBottom: 10 }}>
           <p className="eyebrow" style={{ margin: 0 }}>Aval · público en la red</p>
           <span className="spacer" />
+          {aval.destacado ? <span className="badge green" title={aval.destacadoWhy}>Titular Destacado</span> : <span className="badge" title={aval.destacadoWhy}>Destacado: Aval firme ≥ 85</span>}
           <Link href={`/aval/${company.slug}`} className="mono" target="_blank" rel="noopener">Página pública del Aval ↗</Link>
           {aval.embassyEligible ? <span className="badge green">Elegible como Embajadora</span> : <span className="badge" title="Para acoger Embajadas hacen falta Aval, Ecos y voz de los Interesados">Embajadora: Aval ≥ {EMBASSY_ELIGIBILITY.minAval} · {EMBASSY_ELIGIBILITY.minEcos} Ecos · voz ≥ {Math.round(EMBASSY_ELIGIBILITY.minVoice * 100)}</span>}
         </div>
@@ -62,6 +63,7 @@ export default async function EmpresaPage({ params, searchParams }: { params: Pr
           <span className="lead" style={{ fontSize: 14 }}>Lo que dicen los Interesados a los que atendió, la calidad de lo que cede, cómo responde y cuánto se implica. Da prioridad en la Mesa y elegibilidad de Embajadora. Nunca un ranking.</span>
         </div>
         <TitularAvalBlocks aval={aval} />
+        <p className="mono" style={{ marginTop: 10 }}>{aval.destacado ? "Titular Destacado: " : "Para ser Titular Destacado: "}{aval.destacadoWhy}</p>
         {aval.publicEcos.length ? (
           <div className="stack" style={{ marginTop: 14 }}>
             <p className="eyebrow">Ecos publicados con permiso del Interesado</p>

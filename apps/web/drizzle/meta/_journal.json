@@ -57,6 +57,13 @@
       "when": 1789383489011,
       "tag": "0007_eco_aval",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1789385548218,
+      "tag": "0008_destacado",
+      "breakpoints": true
     }
   ]
 }

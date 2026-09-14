@@ -3,7 +3,7 @@ import { buildExplanation, computeNSMatchScore, hardGates, WEIGHTS, PENALTY_WEIG
 import { runComplianceGate, detectsReferralFee } from "@/core/compliance";
 import { assertTransition, canTransition, TransitionError } from "@/core/state-machine";
 import { computePromise, computeVerdictMerit } from "@/core/merit";
-import { avalBand, computeEcoMerit, computeReferralAval, computeTitularAval, EMBASSY_ELIGIBILITY } from "@/core/aval";
+import { avalBand, computeEcoMerit, computeReferralAval, computeTitularAval, DESTACADO, EMBASSY_ELIGIBILITY, isDestacado } from "@/core/aval";
 import { SEED_COMPANIES } from "@/db/seed-data";
 import type { ChapterLayer, NeedDraft, QualificationLayer, QualificationTurn, SignalEnvelope } from "@/core/types";
 
@@ -201,5 +201,28 @@ describe("D-042 · Eco y Aval", () => {
     expect(m.originator).toBe(30);
     expect(computeEcoMerit({ attention: 5, result: 5, recommend: 5 }, { embassy: true }).receiver).toBe(120);
     expect(computeEcoMerit({ attention: 1, result: 1, recommend: 1 })).toEqual({ receiver: 0, originator: 0 });
+  });
+});
+
+describe("D-043 · Titular Destacado (umbral 85 confirmado)", () => {
+  const disciplined = { responses: { onTime: 10, late: 0, ecoSent: 3, ecoMissed: 0 }, contribution: { validGiven: 12, weeks: 12, pace: 1, embassies: 0 } };
+  const eco = (m: number) => (m - 1) / 4;
+  it("85 es quien cumple todo con Ecos de 4/5 y lo cedido a 80; 80 no basta ni con Ecos perfectos y media disciplina", () => {
+    const justo = computeTitularAval({ ecosReceived: [eco(4), eco(4), eco(4)], givenAvals: [80, 80, 80], ...disciplined });
+    expect(justo.total).toBe(DESTACADO.minAval);
+    expect(isDestacado({ ...justo, breaches: 0 })).toBe(true);
+    const perfectosPeroVagos = computeTitularAval({ ecosReceived: [1, 1, 1], givenAvals: [90, 90, 90], responses: { onTime: 5, late: 5, ecoSent: 0, ecoMissed: 0 }, contribution: { validGiven: 6, weeks: 12, pace: 1, embassies: 0 } });
+    expect(perfectosPeroVagos.total).toBe(80);
+    expect(isDestacado({ ...perfectosPeroVagos, breaches: 0 })).toBe(false);
+    const discretos = computeTitularAval({ ecosReceived: [eco(3.5), eco(3.5), eco(3.5)], givenAvals: [80, 80, 80], ...disciplined });
+    expect(discretos.total).toBe(80);
+  });
+  it("exige Aval firme (3 Ecos y 3 Cesiones cedidas) y ningún incumplimiento en el Ejercicio", () => {
+    const pocosDatos = computeTitularAval({ ecosReceived: [1, 1], givenAvals: [90], ...disciplined });
+    expect(pocosDatos.total).toBeGreaterThanOrEqual(85);
+    expect(isDestacado({ ...pocosDatos, breaches: 0 })).toBe(false);
+    const excelente = computeTitularAval({ ecosReceived: [1, 1, 1], givenAvals: [90, 90, 90], ...disciplined });
+    expect(isDestacado({ ...excelente, breaches: 0 })).toBe(true);
+    expect(isDestacado({ ...excelente, breaches: 1 })).toBe(false);
   });
 });

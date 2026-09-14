@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireMember } from "@/lib/session";
-import { DESTACADO, normas, RULE_SCOPE_LABEL, RULE_STATUS_LABEL, ventajas, type Rule } from "@/core/rulebook";
+import { DESTACADO_CRITERIO, normas, RULE_SCOPE_LABEL, RULE_STATUS_LABEL, ventajas, type Rule } from "@/core/rulebook";
 
 /** Reglamento (D-043): las Normas de obligado cumplimiento y las Ventajas de los destacados, tal como las verifica NS. */
 export default async function ReglamentoPage() {
@@ -26,8 +26,8 @@ export default async function ReglamentoPage() {
       <section className="section">
         <h2>Ventajas · {v.filter((r) => r.status === "VIGENTE").length} vigentes de {v.length}</h2>
         <div className="card amber" style={{ marginBottom: 12 }}>
-          <p className="eyebrow">Quién es titular destacado · criterio propuesto, pendiente del fundador</p>
-          <p>{DESTACADO.text}</p>
+          <p className="eyebrow">Quién es Titular Destacado · umbral 85 confirmado por el fundador</p>
+          <p>{DESTACADO_CRITERIO.text}</p>
         </div>
         <div className="stack">{v.map((r) => <RuleCard key={r.id} rule={r} />)}</div>
       </section>

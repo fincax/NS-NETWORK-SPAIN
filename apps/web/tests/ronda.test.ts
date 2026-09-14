@@ -40,6 +40,7 @@ describe("Ronda de la mañana", () => {
     const cumbre = r.chapters.find((c) => c.chapterId === chapterId)!;
     expect(cumbre.rastreo.drafts).toBe(0);
     expect(cumbre.clock).toEqual({ reminders: 0, expired: 0, late: 0, nudges: 0, eco: { nudges: 0, missed: 0, followUps: 0, windowsClosed: 0 } });
+    expect(cumbre.destacados).toEqual({ gained: 0, lost: 0, total: 0 }); // nadie tiene todavía Aval firme
     const events = await db.query.auditEvents.findMany({ where: eq(schema.auditEvents.kind, "RONDA") });
     expect(events.length).toBe(1);
   });

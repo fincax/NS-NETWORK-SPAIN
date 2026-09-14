@@ -14,7 +14,7 @@ import type { Db } from "@/db/client";
 import { schema } from "@/db/client";
 import { audit } from "@/lib/audit";
 import { detectsReferralFee } from "@/core/compliance";
-import { computeEcoMerit, computeReferralAval, computeTitularAval, ECO_WINDOW_DAYS, ecoScore, type ReferralAval, type TitularAval } from "@/core/aval";
+import { BREACH_KINDS, computeEcoMerit, computeReferralAval, computeTitularAval, DESTACADO, ECO_WINDOW_DAYS, ecoScore, isDestacado, type ReferralAval, type TitularAval } from "@/core/aval";
 import { EcoInput, type EcoPhase, type EcoRecord, type ReferralState } from "@/core/types";
 
 const CLOSED: ReferralState[] = ["WON", "LOST", "NO_DECISION", "VALUE_CONFIRMED"];
@@ -201,6 +201,9 @@ export async function ecoOfReferral(db: Db, referralId: string) {
 
 export interface CompanyAvalView extends TitularAval {
   publicEcos: { id: string; displayName: string | null; comment: string | null; score: number; submittedAt: Date | null; referralId: string }[];
+  breaches: number; // incumplimientos del Reglamento en la ventana del Ejercicio
+  destacado: boolean; // Titular Destacado (D-043): Aval firme ≥ 85 y sin incumplimientos
+  destacadoWhy: string; // explicación en lenguaje de negocio
 }
 
 /** Aval del titular: cuatro bloques con evidencia, más los Ecos que el Interesado autorizó publicar. */
@@ -225,7 +228,19 @@ export async function avalOfCompany(db: Db, chapterId: string, companyId: string
     contribution: { validGiven: recent.length, weeks, pace: chapter?.weeklyPace ?? 1, embassies: recent.filter((r) => r.embassy).length },
   });
   const publicEcos = ecos.filter((e) => e.publicConsent && e.attention && e.result && e.recommend).map((e) => ({ id: e.id, displayName: e.displayName, comment: e.comment, score: Math.round(ecoScore({ attention: e.attention!, result: e.result!, recommend: e.recommend! }) * 100), submittedAt: e.submittedAt, referralId: e.referralId }));
-  return { ...titular, publicEcos };
+  const since = new Date(now.getTime() - DESTACADO.breachWindowDays * D);
+  const breachRows = await db.query.trustEvents.findMany({ where: and(eq(schema.trustEvents.companyId, companyId), inArray(schema.trustEvents.kind, [...BREACH_KINDS])) });
+  const breaches = breachRows.filter((e) => e.createdAt >= since).length;
+  const destacado = isDestacado({ total: titular.total, ecosCount: titular.ecosCount, givenCount: titular.givenCount, breaches });
+  const missing = DESTACADO.minAval - titular.total;
+  const destacadoWhy = destacado
+    ? `Aval firme ${titular.total} (≥ ${DESTACADO.minAval}), ${titular.ecosCount} Ecos, ${titular.givenCount} Cesiones cedidas con Veredicto y ningún incumplimiento en ${DESTACADO.breachWindowDays} días.`
+    : titular.ecosCount < DESTACADO.minEcos || titular.givenCount < DESTACADO.minGiven
+      ? `Aval todavía provisional: hacen falta ${DESTACADO.minEcos} Ecos (tiene ${titular.ecosCount}) y ${DESTACADO.minGiven} Cesiones cedidas con Veredicto (tiene ${titular.givenCount}).`
+      : missing > 0
+        ? `Le falta${missing === 1 ? "" : "n"} ${missing} punto${missing === 1 ? "" : "s"} de Aval para los ${DESTACADO.minAval} exigidos.`
+        : `${breaches} incumplimiento(s) del Reglamento en los últimos ${DESTACADO.breachWindowDays} días.`;
+  return { ...titular, publicEcos, breaches, destacado, destacadoWhy };
 }
 
 /** Cesiones cerradas del cesionario que todavía no han dado la palabra al Interesado: esperan el toque del Timonel. */
@@ -299,6 +314,7 @@ export interface PublicAvalPage {
   provisional: boolean;
   ecosCount: number;
   embassyEligible: boolean;
+  destacado: boolean;
   blocks: { key: string; label: string; value: number; weight: number; evidence: string; hasData: boolean }[];
   ecos: { displayName: string; score: number; comment: string | null; submittedAt: Date | null }[];
 }
@@ -320,7 +336,31 @@ export async function publicAvalPage(db: Db, slug: string): Promise<PublicAvalPa
     provisional: aval.provisional,
     ecosCount: aval.ecosCount,
     embassyEligible: aval.embassyEligible,
+    destacado: aval.destacado,
     blocks: aval.blocks.map((b) => ({ key: b.key, label: b.label, value: b.value, weight: b.weight, evidence: b.evidence, hasData: b.hasData })),
     ecos: aval.publicEcos.map((e) => ({ displayName: e.displayName ?? "Interesado", score: e.score, comment: e.comment, submittedAt: e.submittedAt })),
   };
+}
+
+/**
+ * Pasada de Destacados (D-043): cada mañana, en la Ronda, se recalcula quién es Titular Destacado. Al alcanzarlo, la Crónica lo
+ * anuncia a la Sala; al perderlo, solo lo sabe el titular. Idempotente: compara con destacado_since.
+ */
+export async function runDestacados(db: Db, chapterId: string, now = new Date()): Promise<{ gained: number; lost: number; total: number }> {
+  const res = { gained: 0, lost: 0, total: 0 };
+  const companies = await db.query.companies.findMany({ where: and(eq(schema.companies.chapterId, chapterId), eq(schema.companies.status, "ACTIVE")) });
+  for (const c of companies) {
+    const aval = await avalOfCompany(db, chapterId, c.id, now);
+    if (aval.destacado) res.total++;
+    if (aval.destacado && !c.destacadoSince) {
+      await db.update(schema.companies).set({ destacadoSince: now }).where(eq(schema.companies.id, c.id));
+      await audit(db, { chapterId, kind: "DESTACADO_GAINED", actor: { type: "AGENT", id: "ronda" }, subject: { type: "Company", id: c.id }, policyApplied: "reglamento.destacado_85", result: `${c.name} pasa a Titular Destacado: ${aval.destacadoWhy}`, significant: true });
+      res.gained++;
+    } else if (!aval.destacado && c.destacadoSince) {
+      await db.update(schema.companies).set({ destacadoSince: null }).where(eq(schema.companies.id, c.id));
+      await audit(db, { chapterId, kind: "DESTACADO_LOST", actor: { type: "AGENT", id: "ronda" }, subject: { type: "Company", id: c.id }, policyApplied: "reglamento.destacado_85", result: `Tu empresa deja de ser Titular Destacado. ${aval.destacadoWhy} Tu Agente te propondrá Movimientos para recuperarlo.`, significant: true, companyIds: [c.id] });
+      res.lost++;
+    }
+  }
+  return res;
 }

@@ -1055,7 +1055,7 @@ Cómo se aplica en el producto:
 
 ## D-043 · Reglamento: canal permanente de Normas de obligado cumplimiento para todos los titulares y Ventajas para los destacados, con protocolización inmediata o diferida a criterio del fundador
 
-**Status:** CONFIRMED (canal abierto por el fundador el 2026-09-14); criterio de "destacado" PROPOSED
+**Status:** CONFIRMED (canal abierto por el fundador el 2026-09-14); umbral de Titular Destacado **85, CONFIRMED** por el fundador el mismo día tras el cálculo de `docs/18` §2
 **Date:** 2026-09-14
 
 **Context.** El fundador va a crear normas internas de obligado cumplimiento y ventajas para titulares: normas para todos y ventajas para los destacados. Pide un canal para ir añadiéndolas en el tiempo y que se protocolicen de inmediato o cuando él lo diga. Hasta ahora las obligaciones vivían repartidas entre las reglas inmutables, los protocolos y decisiones sueltas; no había un registro único ni un lugar en la app donde el titular las viera con su estado.
@@ -1072,10 +1072,10 @@ Cómo se aplica en el producto:
 - **Visible en la Sala.** `/sala/reglamento` muestra todas las entradas con su estado, cómo se aplican y qué pasa si se incumplen. Nada se aplica por sorpresa.
 - **Integridad.** Una prueba comprueba que los identificadores son únicos, que toda entrada vigente tiene mecanismo y verificación, que toda Norma protocolizada tiene consecuencia, y que las verificaciones nombran eventos que existen en el protocolo.
 - **Siembra.** Las reglas inmutables (D-010, D-018, D-019, D-042) y las obligaciones ya en vigor (plazos de D-024 y D-030, Veredicto, plaza única y Timonel, autonomía externa, ADN validado) entran como Normas N-001 a N-012; la Embajada, la prioridad en la Mesa, la prima de Embajada, la Distinción, los Niveles y la gratificación de la Promotora entran como Ventajas V-001 a V-006.
-- **Destacado (propuesta).** Aval firme ≥ 85, En Ritmo o Por encima en las últimas 8 semanas, Comunicado al día y sin incumplimientos en el Ejercicio. Calculado cada noche, visible en el Dossier, nunca un ranking. Pendiente de que el fundador lo confirme o fije otro criterio.
+- **Titular Destacado (confirmado).** Aval firme ≥ 85 (al menos 3 Ecos y 3 Cesiones cedidas con Veredicto) y sin incumplimientos del Reglamento en los últimos 90 días. El Ritmo y el Comunicado ya pesan dentro del Aval y no se exigen aparte. Se recalcula cada mañana en la Ronda, se guarda en `companies.destacado_since` (migración 0008), se ve en Dossier, Balanza y página pública, y la Crónica lo anuncia. Por qué 85: es el titular que cumple plazos y Ritmo al 100 % con Ecos medios de 4/5 y lo cedido con Aval 80; con 80 se colarían Ecos perfectos con media disciplina o disciplina perfecta con Ecos discretos; 90 exigiría Ecos de 4,5/5, que dependen más del cliente que del titular.
 
 **Why.** Convierte las normas en producto: el titular las ve, el Reloj las empuja, el Aval y el Mérito las miden y la Directiva las aplica con evidencia. Da al fundador un canal de una línea para legislar y una garantía de que nada se pierde en conversaciones.
 
 **Consequences.** `docs/18_REGLAMENTO.md`, `core/rulebook.ts`, página `/sala/reglamento` con enlace desde Mi Sala, prueba `rulebook.test.ts`, términos Reglamento · Norma · Ventaja · Destacado en el léxico, referencia en `CLAUDE.md` y README.
 
-**Revisit when.** El fundador fije el criterio de Destacado, los parámetros del Compromiso (N-002) y las consecuencias pendientes (N-009, N-012), o cuando el Reglamento supere las veinte entradas y convenga agruparlas por capítulos.
+**Revisit when.** El fundador fije los parámetros del Compromiso (N-002) y las consecuencias pendientes (N-009, N-012), o cuando el Reglamento supere las veinte entradas y convenga agruparlas por capítulos.

@@ -32,11 +32,11 @@ Estados: **BORRADOR** (anotada, pendiente del fundador) → **PROTOCOLIZADA** (f
 
 Ámbitos: **Todos los titulares** · **Titulares destacados** · **NS** (obligación de NS con la Sala).
 
-## 2. Titular destacado (criterio PROPUESTO, pendiente del fundador)
+## 2. Titular Destacado (umbral 85 CONFIRMADO por el fundador el 2026-09-14 · PROTOCOLIZADA y VIGENTE)
 
-> Titular con Aval firme ≥ 85, En Ritmo o Por encima en las últimas 8 semanas, Comunicado al día y sin incumplimientos del Reglamento en el Ejercicio.
+> Titular con **Aval firme igual o superior a 85** (al menos 3 Ecos recibidos y 3 Cesiones cedidas con Veredicto) y **sin ningún incumplimiento del Reglamento en los últimos 90 días** (respuestas tardías, Peticiones de Eco no enviadas, Compromiso o Comunicado incumplidos, violaciones de política).
 
-Se calcula solo, cada noche, y se ve en el Dossier. Nunca es un ranking: es una condición que cualquiera puede alcanzar. El fundador puede fijar otro criterio o varios grados.
+El Ritmo y el Comunicado no se exigen aparte: ya pesan dentro del Aval (bloque Contribución y, cuando exista, el Comunicado). Se recalcula cada mañana en la Ronda (`runDestacados`), se ve en el Dossier, en la Balanza y en la página pública del Aval, y la Crónica anuncia a la Sala quien lo alcanza; quien lo pierde lo sabe solo él, con la razón y con Movimientos para recuperarlo. Nunca es un ranking: es una condición que cualquiera puede alcanzar. Las Ventajas de ámbito "destacados" que se añadan a partir de ahora se conceden por esta marca.
 
 ### Por qué 85 (cálculo con la fórmula real del Aval, 2026-09-14)
 
@@ -90,4 +90,5 @@ Ninguno todavía. Las próximas Normas y Ventajas del fundador se anotan aquí c
 
 ## 6. Historial
 
+- 2026-09-14 · El fundador confirma el umbral 85 de Titular Destacado. Criterio protocolizado y vigente: `destacado_since` en la empresa, pasada diaria en la Ronda, marca en Dossier, Balanza y página pública, evento en la Crónica.
 - 2026-09-14 · Canal abierto (D-043). Registro sembrado con las doce Normas y seis Ventajas ya en vigor o protocolizadas en la constitución y en D-001 a D-042. Criterio de Destacado propuesto.

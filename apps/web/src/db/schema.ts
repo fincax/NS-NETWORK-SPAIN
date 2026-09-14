@@ -80,6 +80,7 @@ export const companies = pgTable("companies", {
   status: text("status").notNull().default("ACTIVE"), // APPLICANT | ACTIVE | SUSPENDED | RELEASED
   tier: text("tier").notNull().default("MIEMBRO"),
   feeTier: text("fee_tier").notNull().default("ENTRADA"), // D-025
+  destacadoSince: timestamp("destacado_since", { withTimezone: true }), // Titular Destacado (D-043): lo fija la Ronda cada mañana
   createdAt: createdAt(),
 });
 

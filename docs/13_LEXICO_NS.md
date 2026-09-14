@@ -132,7 +132,7 @@ Alternativas consideradas para Tramo: "Escalón" y "Nivel de cuota" (descartado 
 | **Reglamento** | Registro vivo de Normas y Ventajas de los titulares, con estado (borrador, protocolizada, vigente), mecanismo, consecuencia y verificación. Lo alimenta el fundador; la Sala lo ve en la app (D-043). | `docs/18`, `core/rulebook.ts`, `/sala/reglamento` |
 | **Norma** | Regla de obligado cumplimiento para todos los titulares (o para NS con la Sala). N-0xx. Vigente solo cuando NS la verifica y la aplica. | `Rule{kind: NORMA}` |
 | **Ventaja** | Lo que gana el titular destacado. V-0xx. Amplía el acceso; nunca restringe el básico ni es dinero por referidos. | `Rule{kind: VENTAJA}` |
-| **Destacado** | Titular que cumple el criterio fijado por el fundador (propuesta: Aval firme ≥ 85, En Ritmo ocho semanas, Comunicado al día, sin incumplimientos). Condición, nunca ranking. | `DESTACADO` |
+| **Destacado** | Titular con Aval firme ≥ 85 (3 Ecos y 3 Cesiones cedidas con Veredicto) y sin incumplimientos del Reglamento en 90 días. Lo fija la Ronda cada mañana; la Crónica lo anuncia. Condición, nunca ranking (D-043, umbral confirmado por el fundador). | `DESTACADO`, `companies.destacado_since` |
 | **Reglas inmutables** | Nunca se cobra por una Cesión (expulsión); Compromiso obligatorio; calidad sobre cantidad (D-010); Comunicado semanal (D-018); Balanza pública (D-019); toda Cesión da la palabra al Interesado (D-042). |
 
 ---

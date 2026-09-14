@@ -1,0 +1,1 @@
+ALTER TABLE "companies" ADD COLUMN "destacado_since" timestamp with time zone;

@@ -17,6 +17,19 @@ export const ECO_MERIT = { receiverBase: 80, originatorBase: 30 } as const;
 /** Elegibilidad para acoger Embajadas (D-015 + D-042): Aval mínimo, Ecos mínimos como cesionario y voz de los Interesados mínima. */
 export const EMBASSY_ELIGIBILITY = { minAval: 70, minEcos: 3, minVoice: 0.7 } as const;
 
+/**
+ * Titular Destacado (D-043, umbral 85 confirmado por el fundador el 2026-09-14): Aval firme ≥ 85 y sin incumplimientos
+ * del Reglamento en el Ejercicio. Firme = al menos 3 Ecos recibidos y 3 Cesiones cedidas con Veredicto. Nunca un ranking.
+ */
+export const DESTACADO = { minAval: 85, minEcos: 3, minGiven: 3, breachWindowDays: 90 } as const;
+
+/** Hechos que cuentan como incumplimiento del Reglamento. */
+export const BREACH_KINDS = ["RESPONSE_LATE", "ECO_REQUEST_MISSED", "CONTRIBUTION_QUOTA_MISSED", "COMMUNIQUE_MISSED", "POLICY_VIOLATION", "REFERRAL_FEE_VIOLATION"] as const;
+
+export function isDestacado(i: { total: number; ecosCount: number; givenCount: number; breaches: number }): boolean {
+  return i.total >= DESTACADO.minAval && i.ecosCount >= DESTACADO.minEcos && i.givenCount >= DESTACADO.minGiven && i.breaches === 0;
+}
+
 /** Ventana del Interesado: días tras el cierre en los que puede dejar o revisar su Eco. Después, el Aval se cierra SIN_ECO. */
 export const ECO_WINDOW_DAYS = 30;
 
@@ -115,6 +128,7 @@ export interface TitularAval {
   provisional: boolean; // menos de tres hechos firmes: se muestra, pero no ordena
   blocks: TitularBlock[];
   ecosCount: number;
+  givenCount: number; // Cesiones cedidas con Veredicto
   embassyEligible: boolean;
 }
 
@@ -135,7 +149,7 @@ export function computeTitularAval(i: TitularAvalInput): TitularAval {
   const total = Math.round(100 * blocks.reduce((a, b) => a + b.weight * b.value, 0));
   const facts = i.ecosReceived.length + i.givenAvals.length;
   const embassyEligible = total >= EMBASSY_ELIGIBILITY.minAval && i.ecosReceived.length >= EMBASSY_ELIGIBILITY.minEcos && voice >= EMBASSY_ELIGIBILITY.minVoice;
-  return { total, provisional: facts < 3, blocks, ecosCount: i.ecosReceived.length, embassyEligible };
+  return { total, provisional: facts < 3, blocks, ecosCount: i.ecosReceived.length, givenCount: i.givenAvals.length, embassyEligible };
 }
 
 /** Mérito de Eco: al cesionario por lo que dice el Interesado; una parte al cedente, porque su referido acabó bien atendido. */

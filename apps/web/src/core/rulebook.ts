@@ -39,17 +39,18 @@ export const RULE_SCOPE_LABEL: Record<RuleScope, string> = {
 };
 
 /**
- * Criterio propuesto de titular Destacado (PROPUESTA, pendiente del fundador).
- * 85 es el titular que cumple plazos y Ritmo al 100 %, con Ecos medios de 4/5 y lo cedido con Aval 80 (docs/18 §2):
+ * Titular Destacado: umbral 85 CONFIRMADO por el fundador el 2026-09-14 (cálculo en docs/18 §2).
+ * 85 es el titular que cumple plazos y Ritmo al 100 %, con Ecos medios de 4/5 y lo cedido con Aval 80:
  * no se alcanza con Ecos perfectos y media disciplina (80) ni con disciplina perfecta y Ecos discretos (80).
+ * El Ritmo y el Comunicado ya pesan dentro del Aval (bloque Contribución y, cuando exista, Comunicado): no se exigen aparte.
  */
-export const DESTACADO = {
+export const DESTACADO_CRITERIO = {
   minAval: 85,
-  weeksInPace: 8,
-  requireCommunique: true,
-  noBreachesInPeriod: true,
-  text: "Titular con Aval firme ≥ 85, En Ritmo o Por encima en las últimas 8 semanas, Comunicado al día y sin incumplimientos del Reglamento en el Ejercicio.",
-} as const;
+  firme: "al menos 3 Ecos recibidos y 3 Cesiones cedidas con Veredicto",
+  breachWindowDays: 90,
+  status: "PROTOCOLIZADA" as const,
+  text: "Titular con Aval firme igual o superior a 85 (al menos 3 Ecos recibidos y 3 Cesiones cedidas con Veredicto) y sin ningún incumplimiento del Reglamento en los últimos 90 días. Se recalcula cada mañana en la Ronda; la Crónica anuncia quien lo alcanza. Nunca un ranking.",
+};
 
 export const RULEBOOK: Rule[] = [
   // ───────────── NORMAS · para todos los titulares ─────────────

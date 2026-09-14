@@ -29,7 +29,7 @@ export default async function AvalPublicoPage({ params }: { params: Promise<{ sl
         </Link>
 
         <div>
-          <p className="eyebrow">{p.specialtyName ? `Titular de ${p.specialtyName}` : "Miembro"}</p>
+          <p className="eyebrow">{p.specialtyName ? `Titular de ${p.specialtyName}` : "Miembro"}{p.destacado ? " · Titular Destacado" : ""}</p>
           <h1 style={{ fontSize: 30 }}>{p.companyName}</h1>
           <div className="row" style={{ alignItems: "baseline", gap: 18, marginTop: 12 }}>
             <span className="encaje" aria-label={`Aval ${p.total} sobre 100, ${band.label}`}>{p.total}<small>{p.provisional ? "Aval provisional" : band.label}</small></span>

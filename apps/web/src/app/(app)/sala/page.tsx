@@ -66,7 +66,7 @@ export default async function SalaPage() {
                   <td className="num">{b.given}</td><td className="num">{b.received}</td>
                   <td className="num money">{eur(b.valueGiven)}</td><td className="num money">{eur(b.valueReceived)}</td>
                   <td className="num">{b.merit}</td>
-                  <td><Link href={`/empresa/${c.slug}#aval`}><AvalBadge total={a.total} status={a.provisional ? "PROVISIONAL" : undefined} /></Link></td>
+                  <td><Link href={`/empresa/${c.slug}#aval`} className="row" style={{ gap: 6 }}><AvalBadge total={a.total} status={a.provisional ? "PROVISIONAL" : undefined} />{a.destacado ? <span className="badge green">Destacado</span> : null}</Link></td>
                 </tr>
               ))}
             </tbody>

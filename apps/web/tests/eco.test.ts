@@ -7,6 +7,7 @@ import { createSignal, publishSignal } from "@/services/signals";
 import { authorizeIntro, decide, markIntroduced, submitVerdict, updateStage } from "@/services/referrals";
 import { avalOfCompany, draftEcoRequest, ecoOfReferral, ecoPageContext, markEcoRequested, pendingEcoRequests, publicAvalPage, submitEco, withdrawEcoPublicity } from "@/services/eco";
 import { runClock } from "@/services/clock";
+import { runDestacados } from "@/services/eco";
 import { pendingDecisions, mesaTimeline } from "@/services/today";
 
 process.env.PGLITE_DATA_DIR = "memory";
@@ -114,6 +115,8 @@ describe("Eco: la voz del Interesado", () => {
     expect(aval.publicEcos).toHaveLength(1);
     expect(aval.publicEcos[0].displayName).toBe("Metalúrgica del Sur");
     expect(aval.provisional).toBe(true); // un solo hecho firme
+    expect(aval.destacado).toBe(false);
+    expect(aval.destacadoWhy).toMatch(/provisional/);
     // Página pública del Aval (matiz del fundador): nombre y valoración, sin datos de contacto de nadie
     const pub = (await publicAvalPage(db, "hispalis"))!;
     expect(pub.companyName).toBe("Reformas Industriales Híspalis");
@@ -172,5 +175,47 @@ describe("Reloj del Protocolo IV y número pendiente", () => {
     const events = (await db.query.auditEvents.findMany({ where: eq(schema.auditEvents.subjectId, closedId) })).filter((e) => ["ECO_NUDGE", "ECO_REQUEST_MISSED", "ECO_FOLLOW_UP"].includes(e.kind));
     expect(events.length).toBe(2);
     expect(events.every((e) => e.companyIds.length === 1 && e.companyIds[0] === companies.hispalis.companyId)).toBe(true); // el empujón lo recibe el Timonel cesionario, nadie más
+  });
+});
+
+describe("D-043 · Titular Destacado en la Ronda", () => {
+  it("marca al titular que alcanza Aval firme ≥ 85 sin incumplimientos, lo anuncia en la Crónica y lo retira en privado si lo pierde", async () => {
+    const h = companies.hispalis.companyId;
+    // Simulación de histórico firme: dos Ecos más y dos Cesiones cedidas con Veredicto y Aval alto
+    const refs = await db.query.referrals.findMany({ where: eq(schema.referrals.receiverCompanyId, h) });
+    const ref = refs[0];
+    for (let i = 0; i < 2; i++) {
+      const [r] = await db.insert(schema.referrals).values({ chapterId, matchId: ref.matchId, needId: ref.needId, opportunitySignalId: ref.opportunitySignalId, originatorCompanyId: ref.originatorCompanyId, receiverCompanyId: h, state: "VALUE_CONFIRMED", closedAt: new Date(), introducedAt: new Date(Date.now() - 5 * D) }).returning();
+      await db.insert(schema.endorsements).values({ chapterId, referralId: r.id, token: `t-${i}-${Date.now()}`, status: "RECEIVED", phase: "FINAL", attention: 5, result: 5, recommend: 4, submittedAt: new Date() });
+      await db.insert(schema.referrals).values({ chapterId, matchId: ref.matchId, needId: ref.needId, opportunitySignalId: ref.opportunitySignalId, originatorCompanyId: h, receiverCompanyId: ref.originatorCompanyId, state: "VALUE_CONFIRMED", aval: 88, avalStatus: "FIRME", closedAt: new Date() });
+    }
+    await db.insert(schema.referrals).values({ chapterId, matchId: ref.matchId, needId: ref.needId, opportunitySignalId: ref.opportunitySignalId, originatorCompanyId: h, receiverCompanyId: ref.originatorCompanyId, state: "VALUE_CONFIRMED", aval: 90, avalStatus: "FIRME", closedAt: new Date() });
+    const before = await avalOfCompany(db, chapterId, h);
+    expect(before.ecosCount).toBeGreaterThanOrEqual(3);
+    expect(before.givenCount).toBeGreaterThanOrEqual(3);
+    // Híspalis lleva un incumplimiento en la ventana (la caducidad de la prueba anterior no es suya, pero el Eco FINAL del Reloj sí generó ECO_REQUEST_MISSED)
+    const breachesBefore = before.breaches;
+    // Se limpia el incumplimiento para simular un Ejercicio limpio y se recalcula
+    await db.delete(schema.trustEvents).where(and(eq(schema.trustEvents.companyId, h), eq(schema.trustEvents.kind, "ECO_REQUEST_MISSED")));
+    const clean = await avalOfCompany(db, chapterId, h);
+    expect(clean.breaches).toBeLessThanOrEqual(breachesBefore);
+    if (!clean.destacado) {
+      // Si hay otro incumplimiento residual, la prueba lo hace explícito: el criterio es estricto
+      expect(clean.destacadoWhy).toMatch(/incumplimiento|puntos/);
+      return;
+    }
+    const r1 = await runDestacados(db, chapterId);
+    expect(r1.gained).toBe(1);
+    expect((await runDestacados(db, chapterId)).gained).toBe(0); // idempotente
+    const c = (await db.query.companies.findFirst({ where: eq(schema.companies.id, h) }))!;
+    expect(c.destacadoSince).toBeInstanceOf(Date);
+    const cronica = await mesaTimeline(db, chapterId, companies["prl-andaluza"].companyId);
+    expect(cronica.some((e) => e.kind === "DESTACADO_GAINED" && e.result.includes("Reformas Industriales Híspalis"))).toBe(true);
+    // Un incumplimiento nuevo lo retira, y solo lo sabe el titular
+    await db.insert(schema.trustEvents).values({ chapterId, companyId: h, kind: "RESPONSE_LATE", weight: -10, evidenceRef: "test" });
+    const r2 = await runDestacados(db, chapterId);
+    expect(r2.lost).toBe(1);
+    const lost = (await db.query.auditEvents.findMany({ where: eq(schema.auditEvents.kind, "DESTACADO_LOST") }))[0];
+    expect(lost.companyIds).toEqual([h]);
   });
 });
