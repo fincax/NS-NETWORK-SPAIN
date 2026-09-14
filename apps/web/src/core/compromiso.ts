@@ -9,6 +9,9 @@
  *      3 → aviso formal de la Directiva: aportar lo antes posible.
  *      4 → notificación de baja de la titularidad. La Directiva la ejecuta y la plaza vuelve a la Antesala.
  *  - Una Cesión válida (aceptada por el cesionario) pone la cuenta a cero.
+ *  - Principio del núcleo (D-045): la calidad del negocio cedido vale más que la cantidad, siempre. Por eso el
+ *    Mérito semanal no crece con el número de Cesiones, solo con la amplitud (especialidades distintas), y el
+ *    Mérito grande viene de la Promesa, el Veredicto y el Cierre de cada Cesión.
  */
 export const COMPROMISO = {
   weeklyMinimum: 1,

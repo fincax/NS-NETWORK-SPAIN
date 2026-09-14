@@ -144,12 +144,16 @@ export default async function AntesalaPage({ searchParams }: { searchParams: Pro
 
       {releases.length ? (
         <section id="bajas" className="stack" style={{ gap: 10 }}>
-          <h2 style={{ margin: 0 }}>Bajas notificadas por Compromiso</h2>
-          <p className="lead" style={{ fontSize: 14 }}>Cuatro semanas seguidas sin una sola Cesión válida suponen la baja de la titularidad (D-010, D-042). El sistema ya ha notificado a la empresa; la Directiva ejecuta la baja y la plaza vuelve a la Antesala.</p>
+          <h2 style={{ margin: 0 }}>Expedientes de baja por Compromiso</h2>
+          <p className="lead" style={{ fontSize: 14 }}>Cuatro semanas seguidas sin una sola Cesión válida suponen la baja de la titularidad (D-042). La empresa ya está fuera de la Mesa y sin acceso; la plaza queda bloqueada. La Directiva propone la baja y NS la confirma (D-044); entonces la plaza vuelve a la Antesala.</p>
           {releases.map((r) => (
             <article key={r.seatId} className="card red row" style={{ justifyContent: "space-between", gap: 12 }}>
-              <span><strong>{r.company.name}</strong> · plaza de {r.specialtyName}</span>
-              <form action={releaseAction}><input type="hidden" name="companyId" value={r.company.id} /><input type="hidden" name="view" value={view} /><button type="submit" className="btn small">Ejecutar la baja</button></form>
+              <span><strong>{r.company.name}</strong> · plaza de {r.specialtyName} · <span className="mono">{r.stage === "RELEASE_PENDING" ? "baja notificada · pendiente de proponer" : "propuesta a NS · pendiente de confirmar"}</span></span>
+              {r.stage === "RELEASE_PENDING" ? (
+                <form action={releaseAction}><input type="hidden" name="op" value="propose" /><input type="hidden" name="companyId" value={r.company.id} /><input type="hidden" name="view" value={view} /><button type="submit" className="btn small">Proponer la baja a NS</button></form>
+              ) : ctx.member.isNetwork ? (
+                <form action={releaseAction}><input type="hidden" name="op" value="confirm" /><input type="hidden" name="companyId" value={r.company.id} /><input type="hidden" name="view" value={view} /><button type="submit" className="btn small primary">Confirmar la baja (NS)</button></form>
+              ) : <span className="mono">Espera la confirmación de NS</span>}
             </article>
           ))}
         </section>

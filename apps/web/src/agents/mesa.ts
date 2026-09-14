@@ -71,9 +71,12 @@ export async function runMesa(db: Db, opportunitySignalId: string): Promise<Mesa
 
     // S4 · Discovery sobre el índice estructurado de capabilities de la Sala (≤ 8)
     const specialtyIds = need.specialty_hints.map((c) => specialtyByCode.get(c)?.id).filter((x): x is string => Boolean(x));
-    const caps = specialtyIds.length
+    const capsAll = specialtyIds.length
       ? await db.query.capabilities.findMany({ where: and(eq(schema.capabilities.chapterId, chapterId), inArray(schema.capabilities.specialtyId, specialtyIds), ne(schema.capabilities.companyId, os.originatorCompanyId)), limit: 8 })
       : [];
+    // Una empresa suspendida o dada de baja sale de la Mesa de esa Sala (D-044): no recibe Cesiones ni cualifica.
+    const activeIds = new Set((await db.query.companies.findMany({ where: and(eq(schema.companies.chapterId, chapterId), eq(schema.companies.status, "ACTIVE")), columns: { id: true } })).map((c) => c.id));
+    const caps = capsAll.filter((c) => activeIds.has(c.companyId));
     if (caps.length === 0) {
       // Si la única titular de la especialidad es la propia empresa originadora, no es una plaza vacante.
       const ownSeat = specialtyIds.length

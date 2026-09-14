@@ -7,8 +7,8 @@ import { BusinessDNA } from "@/core/types";
 import { missingNormas, NORMAS_NS, type RulesAcceptanceInput } from "@/core/normas";
 
 export class SeatTakenError extends Error {
-  constructor(public specialtyName: string, public holderName: string) {
-    super(`La plaza de ${specialtyName} está ocupada por ${holderName}`);
+  constructor(public specialtyName: string, public holderName: string, public inRelease = false) {
+    super(inRelease ? `La plaza de ${specialtyName} está en expediente de baja de ${holderName}; solo se libera cuando NS confirme la baja (D-044)` : `La plaza de ${specialtyName} está ocupada por ${holderName}`);
   }
 }
 
@@ -26,7 +26,7 @@ export interface OnboardingInput {
   website?: string;
   city?: string;
   specialtyCode: string;
-  person: { fullName: string; role: string; email: string; isDirector?: boolean };
+  person: { fullName: string; role: string; email: string; isDirector?: boolean; isNetwork?: boolean };
   dna: unknown;
   validate?: boolean;
   /** Aceptación expresa de todas las Normas NS por el Timonel (D-043). Sin ella no hay alta. */
@@ -38,18 +38,19 @@ export async function checkSeatAvailability(db: Db, chapterId: string, specialty
   if (!specialty) throw new Error(`Especialidad ${specialtyCode} no existe en NS-CAT`);
   const seat = await db.query.categorySeats.findFirst({ where: and(eq(schema.categorySeats.chapterId, chapterId), eq(schema.categorySeats.specialtyId, specialty.id)) });
   const holder = seat?.companyId ? await db.query.companies.findFirst({ where: eq(schema.companies.id, seat.companyId) }) : undefined;
-  return { specialty, seat, holder, available: !seat || seat.status !== "ACTIVE" };
+  // Una plaza con titular (activa o en expediente de baja) nunca está disponible: solo se libera al confirmar NS la baja (D-044).
+  return { specialty, seat, holder, available: !seat || !seat.companyId, inRelease: Boolean(seat && seat.companyId && seat.status !== "ACTIVE") };
 }
 
 export async function onboardCompany(db: Db, input: OnboardingInput) {
   const dna = BusinessDNA.parse(input.dna);
   const missing = missingNormas(input.acceptance);
   if (missing.length) throw new RulesNotAcceptedError(missing);
-  const { specialty, seat, holder, available } = await checkSeatAvailability(db, input.chapterId, input.specialtyCode);
-  if (!available && holder) throw new SeatTakenError(specialty.name, holder.name);
+  const { specialty, seat, holder, available, inRelease } = await checkSeatAvailability(db, input.chapterId, input.specialtyCode);
+  if (!available && holder) throw new SeatTakenError(specialty.name, holder.name, inRelease);
 
   const [company] = await db.insert(schema.companies).values({ chapterId: input.chapterId, name: input.name, slug: input.slug, legalName: input.legalName, website: input.website, city: input.city ?? "Sevilla", status: "ACTIVE" }).returning();
-  const [member] = await db.insert(schema.members).values({ companyId: company.id, chapterId: input.chapterId, fullName: input.person.fullName, role: input.person.role, email: input.person.email, isPrimary: true, isDirector: input.person.isDirector ?? false }).returning();
+  const [member] = await db.insert(schema.members).values({ companyId: company.id, chapterId: input.chapterId, fullName: input.person.fullName, role: input.person.role, email: input.person.email, isPrimary: true, isDirector: input.person.isDirector ?? false, isNetwork: input.person.isNetwork ?? false }).returning();
   await db.insert(schema.rulesAcceptances).values({ chapterId: input.chapterId, companyId: company.id, memberId: member.id, rulesVersion: input.acceptance.rulesVersion, rules: [...input.acceptance.rules] });
   await db.insert(schema.businessDna).values({ companyId: company.id, dna, validatedBy: input.validate === false ? null : member.id, validatedAt: input.validate === false ? null : new Date() });
   if (seat) {

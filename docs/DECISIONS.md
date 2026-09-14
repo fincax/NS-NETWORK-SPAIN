@@ -1039,7 +1039,7 @@ Semana 4   Notificación de baja de la titularidad. La empresa queda suspendida 
 ```
 
 - **Una Cesión válida pone la cuenta a cero.** La escalera cuenta semanas seguidas; cualquier semana cumplida la reinicia.
-- **Ejecución de la baja.** La notificación es automática y sin excepciones. La ejecución material (plaza vacante, empresa fuera de la Sala, Agente inactivo) la hace la Directiva con un toque desde la Antesala, porque es una operación irreversible y reputacionalmente sensible (constitución §7: las acciones irreversibles llevan una puerta humana). La Directiva no decide si procede la baja: la ejecuta. Mientras tanto, la empresa está suspendida y no participa en la Mesa.
+- **Ejecución de la baja.** La notificación es automática y sin excepciones. *(Modificado por D-044: la Directiva de la Sala propone la baja y NS la confirma; desde la notificación la empresa sale de la Mesa de esa Sala y su Timonel pierde el acceso; la plaza queda bloqueada hasta la confirmación.)*
 - **Semana y primera semana.** La semana va de lunes a domingo (UTC). La semana de alta no cuenta: la primera semana completa en la Sala es la primera evaluada. Se evalúa cada mañana en la Ronda, una sola vez por titular y semana.
 - **Coherencia con el resto.** El Ritmo (D-019) deja de ser "propuesta" y pasa a ser 1 por defecto, con la Sala pudiendo subirlo. El "Ejercicio" sigue existiendo para la Promesa, la cuota por Tramos (D-025) y la Embajada, pero el Compromiso ya no se mide por Ejercicio sino por semana. El Comunicado (D-018) mantiene su propia escalera, más suave, y solo "el incumplimiento reiterado" llega a la de D-042.
 
@@ -1071,4 +1071,49 @@ Semana 4   Notificación de baja de la titularidad. La empresa queda suspendida 
 **Consequences.** `core/normas.ts`, tabla `rules_acceptances`, campo obligatorio `acceptance` en `onboardCompany`, fieldset de Normas en `/sala/alta` y su acción, línea en el Dossier, portada, pruebas (`slice.test.ts`), seed y pruebas que ya aceptan todas las normas.
 
 **Revisit when.** Se redacten los textos legales (`docs/08_SECURITY_PRIVACY_GDPR.md`, condición 4 de `docs/17`) o cambie cualquier Norma: entonces se define la re-aceptación de los titulares existentes.
+
+---
+
+## D-044 · La baja por Compromiso es por Sala: la empresa suspendida sale de la Mesa y pierde el acceso; la plaza queda bloqueada; la Directiva propone la baja y NS la confirma
+
+**Status:** CONFIRMED (regla fijada por el fundador)
+**Date:** 2026-09-14
+
+**Context.** D-042 dejó la ejecución de la baja en manos de la Directiva y la auditoría de coherencia encontró tres cables sueltos: una empresa suspendida seguía recibiendo Cesiones en la Mesa, la plaza en expediente aparecía como disponible para una empresa nueva, y el Timonel de una empresa suspendida entraba en la aplicación como si nada. El fundador fija cómo debe ser.
+
+**Choice.**
+
+- **La expulsión es por Sala.** Una empresa suspendida sale de la Mesa y de la Sala donde no ha cumplido. Si la misma empresa es titular en varias Salas donde cumple, en esas Salas no cambia nada. En el modelo, cada titularidad es una fila de empresa por Sala, así que la suspensión no puede contagiarse.
+- **Fuera de la Mesa desde la notificación.** El Matchmaker solo consulta Agentes de empresas activas de la Sala; una empresa suspendida no recibe Cesiones ni cualifica. Su Agente queda inactivo al confirmarse la baja.
+- **Plaza bloqueada.** La plaza expedientada solo puede ocuparla otro titular cuando la baja de la anterior sea efectiva. La comprobación de plaza considera ocupada toda plaza con titular, activa o en expediente, y lo dice: "en expediente de baja; se libera cuando NS confirme".
+- **La Directiva propone, NS confirma.** Dos toques: la dirección de la Sala (cuyo nombre y composición se fijarán más adelante) propone la baja a NS desde la Antesala; NS la confirma. Solo entonces la plaza queda vacante y vuelve a la Antesala y la empresa pasa a baja. En la aplicación, NS es un rol de persona (`is_network`); en la demo la misma persona hace de Directiva y de NS.
+- **Sin acceso.** Desde la notificación, el Timonel no accede al panel de la Sala expulsada ni a su panel personal: cualquier pantalla le lleva a la de baja, que explica el estado, que afecta solo a esa Sala, y cómo hablar con la Directiva.
+
+**Why.** Una baja que no saca a la empresa de la Mesa no es una baja, y una plaza que se puede ocupar antes de la baja efectiva crea dos titulares. Separar quién propone (la Sala, que conoce el caso) de quién confirma (NS, que vela por la red y por la igualdad de trato entre Salas) es la misma puerta humana de la constitución §7 con la responsabilidad en el sitio correcto.
+
+**Consequences.** Estados de plaza `RELEASE_PENDING` (notificada) y `RELEASE_PROPOSED` (propuesta a NS); `members.is_network` (migración 0009); `proposeRelease` y `confirmRelease` en `services/compromiso.ts`; filtro de empresas activas en `agents/mesa.ts`; plaza en expediente no disponible en `services/onboarding.ts`; redirección a `/baja` en `requireMember`; pantalla `/baja`; Antesala con los dos pasos; pruebas.
+
+**Revisit when.** Se fije el nombre y la composición de la dirección de la Sala, o se construya el panel de NS (hoy NS actúa desde la Antesala de la Sala).
+
+---
+
+## D-045 · Principio del núcleo: la calidad del negocio cedido vale más que la cantidad, siempre; y la documentación viva es la que existe
+
+**Status:** CONFIRMED (regla fijada por el fundador)
+**Date:** 2026-09-14
+
+**Context.** El fundador pide memorizar y poner en el núcleo un principio que ya estaba en la regla inmutable 3, pero que con el Compromiso semanal y el Mérito necesita quedar por encima de cualquier métrica: la calidad del negocio cedido vale más que la cantidad. Siempre. En la misma sesión pide una propuesta de documentos para CLAUDE.md, porque la constitución exigía doce documentos de los que faltaban siete y el repositorio tiene otros que la constitución no nombra.
+
+**Choice.**
+
+- **Calidad sobre cantidad, siempre.** Queda en la constitución (principio no negociable 3 y regla inmutable 3), en el North Star, en las Normas NS que firma cada titular (versión `2026-09-14.2`) y en el código: `core/compromiso.ts` documenta que el Mérito semanal no crece con el número de Cesiones sino con su amplitud, y que el Mérito grande viene de la Promesa, el Veredicto y el Cierre de cada Cesión. Ninguna métrica, ranking, Balanza o Brújula de NS podrá premiar el número por encima de la calidad. Toda feature futura se evalúa contra esta frase.
+- **Documentación viva real.** CLAUDE.md §3 pasa a listar los documentos que existen y su función, más los dos que faltan y son obligatorios antes de producción: `08_SECURITY_PRIVACY_GDPR.md` (condición 4 de `docs/17`) y `PENDIENTES_DEL_FUNDADOR.md` (creado hoy). Requisitos, roles, arquitectura de información y analítica no se separan en documentos propios: viven en NS-ARP, el léxico, los protocolos y `docs/12`; `05_DESIGN_BRIEF.md` sustituye a `05_DESIGN_SYSTEM.md`; el roadmap es `docs/17`.
+- **Un solo sitio para lo que espera al fundador.** `docs/PENDIENTES_DEL_FUNDADOR.md` recoge todo lo que se ha dejado "para más adelante", con la decisión de origen. Claude lo recuerda cuando se le pide y cuando una feature lo toca.
+- **"Compromiso" significa una sola cosa.** El plazo de 48 h para responder al Interesado pasa a llamarse **Plazo de respuesta**; "Compromiso" queda solo para el mínimo semanal.
+
+**Why.** Un principio que está en el código y en lo que firma el titular no se pierde en una conversación. Una constitución que describe documentos inexistentes es una fuente de trabajo ficticio.
+
+**Consequences.** CLAUDE.md §3 y reglas, `00_NORTH_STAR.md`, `13_LEXICO_NS.md`, `15_TARJETA_DE_CESION.md`, `core/normas.ts`, `core/compromiso.ts`, `services/clock.ts`, nuevo `docs/PENDIENTES_DEL_FUNDADOR.md`, README.
+
+**Revisit when.** Nunca en cuanto al principio. La lista de documentos, cada vez que se cree o retire uno.
 

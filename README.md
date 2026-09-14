@@ -46,6 +46,7 @@ Sin configuración usa PGlite (Postgres embebido en `apps/web/.data`) y el prove
 | [`docs/07_AGENT_ARCHITECTURE.md`](./docs/07_AGENT_ARCHITECTURE.md) | Arquitectura de agentes implementada: roles, contrato con el modelo, lo que el modelo no decide, puertas humanas, observabilidad. |
 | [`apps/web/README.md`](./apps/web/README.md) | Estructura del código del vertical slice y comandos. |
 | [`brand/README.md`](./brand/README.md) | Monograma NS decidido (D-022): geometría, versiones SVG, reglas de uso y lockups. |
+| [`docs/PENDIENTES_DEL_FUNDADOR.md`](./docs/PENDIENTES_DEL_FUNDADOR.md) | Todo lo pospuesto por el fundador, con su decisión de origen. Claude lo recuerda cuando se le pide. |
 | [`docs/DECISIONS.md`](./docs/DECISIONS.md) | Registro de decisiones estratégicas y arquitectónicas. |
 
 Documentos pendientes según la constitución: `01_PRODUCT_REQUIREMENTS`, `03_USER_ROLES`, `04_INFORMATION_ARCHITECTURE`, `05_DESIGN_SYSTEM` (se derivará del brief y de los tokens entregados por Claude Design), `08_SECURITY_PRIVACY_GDPR`, `09_ANALYTICS`, `10_ROADMAP`.

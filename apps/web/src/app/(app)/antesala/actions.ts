@@ -5,7 +5,7 @@ import { getDb } from "@/db/client";
 import { requireMember } from "@/lib/session";
 import { updateCandidacy, CandidacyTransitionError, type CandidacyStatus } from "@/services/antesala";
 import { activateFounding, FoundingError, joinFounding, startFounding } from "@/services/fundacion";
-import { CompromisoError, executeRelease } from "@/services/compromiso";
+import { CompromisoError, confirmRelease, proposeRelease } from "@/services/compromiso";
 
 const STATUSES: CandidacyStatus[] = ["NEW", "CONTACTED", "INTERVIEW", "APPROVED", "WAITLISTED", "FOUNDING", "DECLINED", "ACTIVATED"];
 
@@ -56,15 +56,17 @@ export async function foundingAction(formData: FormData) {
   redirect(`/antesala?vista=${view}#fundacion`);
 }
 
-/** Baja de titularidad por Compromiso (D-042): la Directiva la ejecuta; la plaza vuelve a la Antesala. */
+/** Baja de titularidad por Compromiso (D-042, D-044): la Directiva la propone y NS la confirma; la plaza vuelve a la Antesala. */
 export async function releaseAction(formData: FormData) {
   const { member, chapter } = await requireMember();
   const db = await getDb();
   const view = String(formData.get("view") ?? "pendientes");
   try {
-    await executeRelease(db, { chapterId: chapter.id, companyId: String(formData.get("companyId") ?? ""), memberId: member.id });
+    const input = { chapterId: chapter.id, companyId: String(formData.get("companyId") ?? ""), memberId: member.id };
+    if (String(formData.get("op")) === "confirm") await confirmRelease(db, input);
+    else await proposeRelease(db, input);
   } catch (e) {
-    const msg = e instanceof CompromisoError ? e.message : "No se pudo ejecutar la baja.";
+    const msg = e instanceof CompromisoError ? e.message : "No se pudo gestionar la baja.";
     redirect(`/antesala?vista=${view}&error=${encodeURIComponent(msg)}#bajas`);
   }
   revalidatePath("/antesala");

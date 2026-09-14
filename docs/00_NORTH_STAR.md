@@ -60,7 +60,7 @@ Business DNA acumulado
 
 1. Una categoría por grupo.
 2. Empresas seleccionadas, no registro indiscriminado.
-3. Calidad del referido por encima de cantidad.
+3. La calidad del negocio cedido vale más que la cantidad. Siempre (D-045).
 4. IA 24/7; decisión humana donde existe riesgo real.
 5. Privacidad by design.
 6. Toda recomendación importante debe ser explicable.
@@ -78,8 +78,8 @@ Business DNA acumulado
 ## Reglas inmutables (D-010)
 
 1. **Nunca se cobra por un referido.** Ni entre miembros ni por parte de NS. Pedir, ofrecer o aceptar dinero, comisión o contraprestación por un referido es motivo de expulsión.
-2. **Toda empresa debe ceder al menos una Cesión válida a la semana, sin excusas** (D-042). Pertenecer es contribuir; para destacar, varias y a varias especialidades. Segunda semana sin ceder, aviso diplomático; tercera, aviso formal; cuarta, baja de la titularidad.
-3. **Calidad por encima de cantidad.** Solo cuenta el referido que el receptor cualifica como válido y NS puede auditar.
+2. **Toda empresa debe ceder al menos una Cesión válida a la semana, sin excusas** (D-042). Pertenecer es contribuir; para destacar, varias y a varias especialidades. Segunda semana sin ceder, aviso diplomático; tercera, aviso formal; cuarta, baja de la titularidad en esa Sala: la Directiva la propone y NS la confirma (D-044).
+3. **La calidad del negocio cedido vale más que la cantidad. Siempre.** Solo cuenta el referido que el receptor cualifica como válido y NS puede auditar; ninguna métrica premia el número.
 4. **Toda empresa da a conocer su trabajo a la Sala cada semana** (D-018): el Agente redacta el Comunicado, el Timonel lo aprueba, la Gaceta y el Dossier lo hacen accesible a todos.
 5. **Lo que se da y lo que se recibe se ve** (D-019): la Balanza de cada titular es pública en su Sala; la Brújula, privada.
 

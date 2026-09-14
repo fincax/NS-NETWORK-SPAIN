@@ -3,7 +3,7 @@
  * Son las reglas inmutables de la constitución más la condición de la cuota. Cambiar el texto obliga a subir la versión:
  * la aceptación queda registrada con la versión firmada, y el sistema no da de alta a nadie que no las haya aceptado todas.
  */
-export const NORMAS_VERSION = "2026-09-14";
+export const NORMAS_VERSION = "2026-09-14.2";
 
 export interface NormaNS {
   code: string;
@@ -27,8 +27,8 @@ export const NORMAS_NS: readonly NormaNS[] = [
   },
   {
     code: "CALIDAD",
-    title: "La calidad importa más que la cantidad.",
-    text: "Una Cesión cuenta cuando el cesionario la cualifica como válida y NS puede auditarla. Una Cesión floja no cumple el Compromiso ni suma Mérito; puede restar.",
+    title: "La calidad del negocio cedido vale más que la cantidad. Siempre.",
+    text: "Una Cesión cuenta cuando el cesionario la cualifica como válida y NS puede auditarla. Una Cesión floja no cumple el Compromiso ni suma Mérito; puede restar. Ninguna métrica de NS premia el número por encima de la calidad.",
     decision: "D-010",
   },
   {

@@ -19,7 +19,7 @@ Toda tarjeta muestra siempre **WHY · EVIDENCE · CONFIDENCE · UNKNOWN · NEXT 
 | **Jerarquía** | Qué es → quién la cede y con qué historial → cuánto promete y por qué → qué falta → decidir. |
 | **Bloque Promesa** | Valor a priori, Encaje, y cinco componentes con semáforo: necesidad real, información, decisor, plazo, presupuesto. |
 | **Qué no aparece** | La identidad del Interesado. Solo tras la Apertura del cedente (capa 2). |
-| **Compromiso al aceptar** | Responder al Interesado en **48 h** tras el Puente y emitir Veredicto al cerrar. |
+| **Plazo de respuesta** | Responder al Interesado en **48 h** tras el Puente y emitir Veredicto al cerrar. |
 | **Caducidad** | **7 días** sin respuesta (recordatorio a las 72 h). La Cesión vuelve al cedente, que puede proponerla a otra Sala. El silencio del cesionario cuenta en su Hoja de Méritos. |
 
 ## Cara B · el cedente autoriza la Apertura

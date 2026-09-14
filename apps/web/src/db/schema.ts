@@ -61,7 +61,7 @@ export const categorySeats = pgTable(
     chapterId: uuid("chapter_id").notNull().references(() => chapters.id),
     specialtyId: uuid("specialty_id").notNull().references(() => specialties.id),
     companyId: uuid("company_id"),
-    status: text("status").notNull().default("VACANT"), // ACTIVE | VACANT | WAITLISTED | RELEASED
+    status: text("status").notNull().default("VACANT"), // ACTIVE | VACANT | WAITLISTED | RELEASED | RELEASE_PENDING (baja notificada) | RELEASE_PROPOSED (Directiva propuso, NS confirma)
     grantedAt: timestamp("granted_at", { withTimezone: true }),
   },
   (t) => [uniqueIndex("seat_unique").on(t.chapterId, t.specialtyId)],
@@ -92,6 +92,7 @@ export const members = pgTable("members", {
   email: text("email").notNull().unique(),
   isPrimary: boolean("is_primary").notNull().default(true),
   isDirector: boolean("is_director").notNull().default(false),
+  isNetwork: boolean("is_network").notNull().default(false), // NS (la red): confirma bajas propuestas por la Directiva (D-044)
   createdAt: createdAt(),
 });
 

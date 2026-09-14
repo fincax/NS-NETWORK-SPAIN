@@ -9,7 +9,8 @@ import { decide } from "@/services/referrals";
 import { acceptAllNormas } from "@/core/normas";
 import { onboardCompany } from "@/services/onboarding";
 import { runClock } from "@/services/clock";
-import { compromisoStatus, executeRelease, pendingReleases } from "@/services/compromiso";
+import { compromisoStatus, confirmRelease, pendingReleases, proposeRelease } from "@/services/compromiso";
+import { onboardCompany as onboard, SeatTakenError } from "@/services/onboarding";
 import { addWeeks, ladderAction, lastCompletedWeekStart, weeklyMerit, weekStart } from "@/core/compromiso";
 
 process.env.PGLITE_DATA_DIR = "memory";
@@ -139,15 +140,28 @@ describe("Escalera semana a semana", () => {
     expect(released.label).toBe("Baja notificada");
   });
 
-  it("solo la Directiva ejecuta la baja; la plaza vuelve a la Antesala", async () => {
-    await expect(executeRelease(db, { chapterId, companyId: carlos().companyId, memberId: lucia().memberId })).rejects.toThrow(/Directiva/);
-    const r = await executeRelease(db, { chapterId, companyId: carlos().companyId, memberId: director().memberId });
+  it("la plaza expedientada no puede ocuparla otra empresa hasta la baja efectiva", async () => {
+    await expect(onboard(db, { chapterId, name: "Obras Bética", slug: "obras-betica-2", specialtyCode: "OBRA_INDUSTRIAL", person: { fullName: "P", role: "CEO", email: "p2@betica.es" }, dna: SEED_COMPANIES[0].dna, acceptance: acceptAllNormas() })).rejects.toThrow(/expediente de baja/);
+    await expect(onboard(db, { chapterId, name: "Obras Bética", slug: "obras-betica-2", specialtyCode: "OBRA_INDUSTRIAL", person: { fullName: "P", role: "CEO", email: "p2@betica.es" }, dna: SEED_COMPANIES[0].dna, acceptance: acceptAllNormas() })).rejects.toBeInstanceOf(SeatTakenError);
+  });
+
+  it("la Directiva propone la baja y NS la confirma; la plaza vuelve a la Antesala", async () => {
+    await expect(proposeRelease(db, { chapterId, companyId: carlos().companyId, memberId: lucia().memberId })).rejects.toThrow(/Directiva/);
+    await expect(confirmRelease(db, { chapterId, companyId: carlos().companyId, memberId: director().memberId })).rejects.toThrow(/propuesta/);
+    await proposeRelease(db, { chapterId, companyId: carlos().companyId, memberId: director().memberId });
+    expect((await pendingReleases(db, chapterId)).find((p) => p.company.id === carlos().companyId)?.stage).toBe("RELEASE_PROPOSED");
+    await expect(proposeRelease(db, { chapterId, companyId: carlos().companyId, memberId: director().memberId })).rejects.toThrow(/pendiente de proponer/);
+    await expect(confirmRelease(db, { chapterId, companyId: carlos().companyId, memberId: lucia().memberId })).rejects.toThrow(/NS/);
+    const r = await confirmRelease(db, { chapterId, companyId: carlos().companyId, memberId: director().memberId });
     expect(r.specialtyName).toBeTruthy();
     const seat = (await db.query.categorySeats.findFirst({ where: eq(schema.categorySeats.id, r.seatId) }))!;
     expect(seat).toMatchObject({ status: "VACANT", companyId: null });
     expect((await db.query.companies.findFirst({ where: eq(schema.companies.id, carlos().companyId) }))!.status).toBe("RELEASED");
     const ev = await db.query.auditEvents.findFirst({ where: eq(schema.auditEvents.kind, "SEAT_RELEASED") });
     expect(ev?.companyIds).toEqual([]);
-    await expect(executeRelease(db, { chapterId, companyId: carlos().companyId, memberId: director().memberId })).rejects.toThrow(/no tiene una baja/);
+    await expect(confirmRelease(db, { chapterId, companyId: carlos().companyId, memberId: director().memberId })).rejects.toThrow(/no tiene una baja/);
+    // Ya libre, la plaza vuelve a poder ocuparse.
+    const again = await onboard(db, { chapterId, name: "Obras Bética", slug: "obras-betica-3", specialtyCode: "OBRA_INDUSTRIAL", person: { fullName: "P", role: "CEO", email: "p3@betica.es" }, dna: SEED_COMPANIES[0].dna, acceptance: acceptAllNormas() });
+    expect(again.company.status).toBe("ACTIVE");
   });
 });

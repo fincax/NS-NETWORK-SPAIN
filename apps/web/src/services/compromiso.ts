@@ -4,7 +4,8 @@
  *  - Cuenta las Cesiones válidas cedidas (aceptadas por el cesionario, transición a APPROVED) en la semana.
  *  - Con una o más: la cuenta de semanas sin ceder vuelve a cero y el cedente suma Mérito; más si cede a varias especialidades.
  *  - Sin ninguna: sube la escalera. Semana 2, aviso diplomático del Agente. Semana 3, aviso formal de la Directiva.
- *    Semana 4, notificación de baja: la empresa queda suspendida y la plaza pendiente de que la Directiva ejecute la baja.
+ *    Semana 4, notificación de baja: la empresa queda suspendida en esa Sala (sale de la Mesa y pierde el acceso),
+ *    la plaza queda bloqueada, la Directiva propone la baja y NS la confirma (D-044).
  *  - Idempotente: una fila por titular y semana. No se evalúa la semana de alta: la primera semana completa cuenta.
  */
 import { and, desc, eq, gte, inArray, lt } from "drizzle-orm";
@@ -111,35 +112,50 @@ export async function evaluateCompromiso(db: Db, now: Date, chapterId: string): 
       res.releases++;
       await db.update(schema.companies).set({ status: "SUSPENDED" }).where(eq(schema.companies.id, company.id));
       await db.update(schema.categorySeats).set({ status: "RELEASE_PENDING" }).where(eq(schema.categorySeats.id, seat.id));
-      await audit(db, { chapterId, kind: "COMPROMISO_RELEASE_NOTICE", actor: { type: "SYSTEM", id: "clock" }, subject: { type: "Company", id: company.id }, policyApplied: "compromiso.ladder.week4", result: `Notificación de baja: ${company.name} lleva cuatro semanas seguidas sin una sola Cesión válida y pierde la titularidad de ${seatName} en ${chapter.name} (D-010, D-042). La Directiva ejecuta la baja y la plaza vuelve a la Antesala.`, significant: true, companyIds: [company.id, ...directors] });
+      await audit(db, { chapterId, kind: "COMPROMISO_RELEASE_NOTICE", actor: { type: "SYSTEM", id: "clock" }, subject: { type: "Company", id: company.id }, policyApplied: "compromiso.ladder.week4", result: `Notificación de baja: ${company.name} lleva cuatro semanas seguidas sin una sola Cesión válida y pierde la titularidad de ${seatName} en ${chapter.name} (D-010, D-042). Desde ahora no accede a esta Sala ni a su panel. La Directiva propone la baja, NS la confirma y la plaza vuelve a la Antesala.`, significant: true, companyIds: [company.id, ...directors] });
     }
   }
   return res;
 }
 
-/** La Directiva ejecuta una baja notificada: la plaza queda vacante y vuelve a la Antesala; la empresa sale de la Sala. */
-export async function executeRelease(db: Db, input: { chapterId: string; companyId: string; memberId: string }) {
+/** La Directiva de la Sala propone a NS la baja notificada (D-044). La plaza sigue bloqueada. */
+export async function proposeRelease(db: Db, input: { chapterId: string; companyId: string; memberId: string }) {
   const member = await db.query.members.findFirst({ where: eq(schema.members.id, input.memberId) });
-  if (!member || !member.isDirector || member.chapterId !== input.chapterId) throw new CompromisoError("Solo la Directiva de la Sala ejecuta una baja.");
+  if (!member || !member.isDirector || member.chapterId !== input.chapterId) throw new CompromisoError("Solo la Directiva de la Sala propone una baja.");
   const seat = await db.query.categorySeats.findFirst({ where: and(eq(schema.categorySeats.chapterId, input.chapterId), eq(schema.categorySeats.companyId, input.companyId)) });
-  if (!seat || seat.status !== "RELEASE_PENDING") throw new CompromisoError("Esta empresa no tiene una baja notificada por Compromiso.");
+  if (!seat || seat.status !== "RELEASE_PENDING") throw new CompromisoError("Esta empresa no tiene una baja notificada por Compromiso pendiente de proponer.");
   const company = (await db.query.companies.findFirst({ where: eq(schema.companies.id, input.companyId) }))!;
   const specialty = await db.query.specialties.findFirst({ where: eq(schema.specialties.id, seat.specialtyId) });
+  await db.update(schema.categorySeats).set({ status: "RELEASE_PROPOSED" }).where(eq(schema.categorySeats.id, seat.id));
+  const directors = await directorCompanyIds(db, input.chapterId);
+  await audit(db, { chapterId: input.chapterId, kind: "RELEASE_PROPOSED", actor: { type: "USER", id: member.id }, subject: { type: "CategorySeat", id: seat.id }, policyApplied: "compromiso.release.propose", result: `La Directiva propone a NS la baja de ${company.name} como titular de ${specialty?.name ?? "la especialidad"} por incumplir el Compromiso. La plaza sigue bloqueada hasta que NS confirme.`, significant: true, companyIds: [company.id, ...directors] });
+  return { seatId: seat.id, specialtyName: specialty?.name ?? "" };
+}
+
+/** NS confirma la baja propuesta por la Directiva (D-044): la plaza queda vacante y vuelve a la Antesala; la empresa sale de esa Sala. */
+export async function confirmRelease(db: Db, input: { chapterId: string; companyId: string; memberId: string }) {
+  const member = await db.query.members.findFirst({ where: eq(schema.members.id, input.memberId) });
+  if (!member || !member.isNetwork) throw new CompromisoError("Solo NS confirma una baja propuesta por la Directiva.");
+  const seat = await db.query.categorySeats.findFirst({ where: and(eq(schema.categorySeats.chapterId, input.chapterId), eq(schema.categorySeats.companyId, input.companyId)) });
+  if (!seat || seat.status !== "RELEASE_PROPOSED") throw new CompromisoError("Esta empresa no tiene una baja propuesta por la Directiva.");
+  const company = (await db.query.companies.findFirst({ where: eq(schema.companies.id, input.companyId) }))!;
+  const specialty = await db.query.specialties.findFirst({ where: eq(schema.specialties.id, seat.specialtyId) });
+  const chapter = await db.query.chapters.findFirst({ where: eq(schema.chapters.id, input.chapterId) });
   await db.update(schema.categorySeats).set({ status: "VACANT", companyId: null, grantedAt: null }).where(eq(schema.categorySeats.id, seat.id));
   await db.update(schema.companies).set({ status: "RELEASED" }).where(eq(schema.companies.id, company.id));
   await db.update(schema.agents).set({ status: "INACTIVE" }).where(and(eq(schema.agents.companyId, company.id), eq(schema.agents.kind, "COMPANY")));
   await db.insert(schema.trustEvents).values({ chapterId: input.chapterId, companyId: company.id, kind: "POLICY_VIOLATION", weight: 0, evidenceRef: `seat:${seat.id}:released` });
-  await audit(db, { chapterId: input.chapterId, kind: "SEAT_RELEASED", actor: { type: "USER", id: member.id }, subject: { type: "CategorySeat", id: seat.id }, policyApplied: "compromiso.release", result: `La plaza de ${specialty?.name ?? "la especialidad"} queda vacante y pasa a la Antesala. ${company.name} deja de ser titular en ${(await db.query.chapters.findFirst({ where: eq(schema.chapters.id, input.chapterId) }))?.name ?? "la Sala"} por incumplir el Compromiso.`, significant: true });
+  await audit(db, { chapterId: input.chapterId, kind: "SEAT_RELEASED", actor: { type: "USER", id: member.id }, subject: { type: "CategorySeat", id: seat.id }, policyApplied: "compromiso.release.confirm", result: `NS confirma la baja. La plaza de ${specialty?.name ?? "la especialidad"} queda vacante y pasa a la Antesala. ${company.name} deja de ser titular en ${chapter?.name ?? "la Sala"} por incumplir el Compromiso.`, significant: true });
   return { seatId: seat.id, specialtyName: specialty?.name ?? "" };
 }
 
-/** Bajas notificadas pendientes de que la Directiva las ejecute. */
+/** Expedientes de baja abiertos: notificados (la Directiva propone) y propuestos (NS confirma). */
 export async function pendingReleases(db: Db, chapterId: string) {
-  const seats = await db.query.categorySeats.findMany({ where: and(eq(schema.categorySeats.chapterId, chapterId), eq(schema.categorySeats.status, "RELEASE_PENDING")) });
+  const seats = await db.query.categorySeats.findMany({ where: and(eq(schema.categorySeats.chapterId, chapterId), inArray(schema.categorySeats.status, ["RELEASE_PENDING", "RELEASE_PROPOSED"])) });
   if (seats.length === 0) return [];
   const companies = await db.query.companies.findMany({ where: inArray(schema.companies.id, seats.map((s) => s.companyId as string)) });
   const specialties = await db.query.specialties.findMany({ where: inArray(schema.specialties.id, seats.map((s) => s.specialtyId)) });
-  return seats.map((s) => ({ seatId: s.id, company: companies.find((c) => c.id === s.companyId)!, specialtyName: specialties.find((x) => x.id === s.specialtyId)?.name ?? "" }));
+  return seats.map((s) => ({ seatId: s.id, stage: s.status as "RELEASE_PENDING" | "RELEASE_PROPOSED", company: companies.find((c) => c.id === s.companyId)!, specialtyName: specialties.find((x) => x.id === s.specialtyId)?.name ?? "" }));
 }
 
 export interface CompromisoStatus {
@@ -163,7 +179,7 @@ export async function compromisoStatus(db: Db, chapterId: string, companyId: str
   const metNow = live.validCount >= minimum;
   const label = lastAction === "RELEASE_NOTICE" ? ACTION_LABEL.RELEASE_NOTICE : metNow ? (live.distinctSpecialties > 1 ? "Por encima" : "En Ritmo") : streak === 0 ? "Pendiente esta semana" : `${ACTION_LABEL[lastAction]} · ${streak} ${streak === 1 ? "semana" : "semanas"} sin ceder`;
   const nextStep =
-    lastAction === "RELEASE_NOTICE" ? "La Directiva ejecutará la baja de la titularidad." :
+    lastAction === "RELEASE_NOTICE" ? "La Directiva propone la baja y NS la confirma." :
     metNow ? (live.distinctSpecialties > 1 ? "Semana cumplida con varias especialidades: así se destaca." : "Semana cumplida. Para destacar, cede otra a una especialidad distinta.") :
     streak >= COMPROMISO.formalNoticeWeek ? "Sin una Cesión válida esta semana se notifica la baja." :
     streak === COMPROMISO.diplomaticNoticeWeek ? "Sin una Cesión válida esta semana llega el aviso formal de la Directiva." :

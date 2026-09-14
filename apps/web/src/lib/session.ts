@@ -41,6 +41,8 @@ export async function requireMember() {
   await requireDemo();
   const ctx = await currentMember();
   if (!ctx) throw new Error("La Sala no está inicializada. Ejecuta `pnpm db:seed`.");
+  // Desde la notificación de baja, el Timonel no accede al panel de esa Sala ni a su panel personal (D-044).
+  if (ctx.company.status !== "ACTIVE") redirect("/baja");
   return ctx;
 }
 

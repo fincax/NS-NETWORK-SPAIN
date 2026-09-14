@@ -59,7 +59,7 @@ export async function runClock(db: Db, now = new Date(), chapterId?: string): Pr
   for (const r of toFlag) {
     await db.update(schema.referrals).set({ lateFlaggedAt: now }).where(eq(schema.referrals.id, r.id));
     await db.insert(schema.trustEvents).values({ chapterId: r.chapterId, companyId: r.receiverCompanyId, kind: "RESPONSE_LATE", weight: -10, evidenceRef: `referral:${r.id}` });
-    await audit(db, { chapterId: r.chapterId, kind: "RESPONSE_LATE", actor: { type: "AGENT", id: "clock" }, subject: { type: "Referral", id: r.id }, policyApplied: "timeouts.response_48h", result: "Han pasado 48 h desde el Puente sin un hito. Responde al Interesado y actualiza el seguimiento: el compromiso de 48 h cuenta en tu Hoja de Méritos.", significant: true, companyIds: [r.receiverCompanyId] });
+    await audit(db, { chapterId: r.chapterId, kind: "RESPONSE_LATE", actor: { type: "AGENT", id: "clock" }, subject: { type: "Referral", id: r.id }, policyApplied: "timeouts.response_48h", result: "Han pasado 48 h desde el Puente sin un hito. Responde al Interesado y actualiza el seguimiento: el plazo de respuesta de 48 h cuenta en tu Hoja de Méritos.", significant: true, companyIds: [r.receiverCompanyId] });
     res.late++;
   }
 

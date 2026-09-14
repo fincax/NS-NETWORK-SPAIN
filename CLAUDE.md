@@ -1047,26 +1047,31 @@ Si ninguna respuesta es sí, cuestiona la feature.
 
 ## 3. Crea documentación viva
 
-Mantener como mínimo:
+Estos son los documentos vivos del proyecto (D-045). Cada uno tiene una función; no se crean documentos que no correspondan al producto real.
 
 ```text
 /
-├── CLAUDE.md
-├── README.md
+├── CLAUDE.md                              Constitución del producto (este documento).
+├── README.md                              Cómo arrancar, probar y desplegar; índice de docs.
 ├── docs/
-│   ├── 00_NORTH_STAR.md
-│   ├── 01_PRODUCT_REQUIREMENTS.md
-│   ├── 02_NS_AGENTIC_REFERRAL_PROTOCOL.md
-│   ├── 03_USER_ROLES.md
-│   ├── 04_INFORMATION_ARCHITECTURE.md
-│   ├── 05_DESIGN_SYSTEM.md
-│   ├── 06_DATA_MODEL.md
-│   ├── 07_AGENT_ARCHITECTURE.md
-│   ├── 08_SECURITY_PRIVACY_GDPR.md
-│   ├── 09_ANALYTICS.md
-│   ├── 10_ROADMAP.md
-│   └── DECISIONS.md
+│   ├── 00_NORTH_STAR.md                   Tesis, mantra, métricas, reglas inmutables.
+│   ├── 02_NS_AGENTIC_REFERRAL_PROTOCOL.md NS-ARP: objetos, fases, score, compliance, auditoría.
+│   ├── 05_DESIGN_BRIEF.md                 Dirección visual y brief de diseño.
+│   ├── 06_DATA_MODEL.md                   Modelo de datos implementado y pendientes.
+│   ├── 07_AGENT_ARCHITECTURE.md           Agentes, proveedores de modelo, Ronda, Rastreo.
+│   ├── 08_SECURITY_PRIVACY_GDPR.md        (por escribir · obligatorio antes de producción, docs/17 condición 4)
+│   ├── 11_IDEAS_DISRUPTIVAS.md            Banco de ideas; lo adoptado pasa a DECISIONS.
+│   ├── 12_SALAS.md                        Zonas, saturación, NS-CAT, plaza, Embajada, fundación.
+│   ├── 13_LEXICO_NS.md                    Léxico oficial y mapeo a identificadores técnicos.
+│   ├── 14_PROTOCOLOS_DE_SALA.md           Protocolos II y III, Ritmo, Escalera, Balanza, Brújula.
+│   ├── 15_TARJETA_DE_CESION.md            La Cesión a dos caras: plazos y estados.
+│   ├── 16_COMPETENCIA.md                  Competencia y qué tomamos o no de cada una.
+│   ├── 17_DESPLIEGUE.md                   Condiciones para producción y fases (hace de roadmap).
+│   ├── DECISIONS.md                       Registro de decisiones (D-001…).
+│   └── PENDIENTES_DEL_FUNDADOR.md         Todo lo pospuesto, con su decisión de origen.
 ```
+
+Requisitos, roles, arquitectura de información y analítica no tienen documento propio: viven en NS-ARP, el léxico, los protocolos de Sala y `docs/12`. Si alguno crece hasta necesitarlo, se crea y se añade aquí.
 
 No crear documentación ficticia que no coincida con el producto real. Actualizarla cuando cambie una decisión estructural.
 
@@ -1345,7 +1350,7 @@ Y posteriormente:
 
 1. Una categoría por grupo.
 2. Empresas seleccionadas, no registro indiscriminado.
-3. Calidad del referido por encima de cantidad.
+3. **La calidad del negocio cedido vale más que la cantidad. Siempre** (D-045). Ninguna métrica, ranking, Balanza o Brújula premia el número por encima de la calidad.
 4. IA 24/7; decisión humana donde existe riesgo real.
 5. Privacidad by design.
 6. Toda recomendación importante debe ser explicable.
@@ -1365,8 +1370,8 @@ Y posteriormente:
 Estas reglas están por encima de cualquier feature, decisión de diseño o modelo económico. No se revisan; se aplican. **Toda empresa las acepta de forma expresa, una a una, al suscribirse como titular; sin esa aceptación no hay alta** (D-043). La aceptación queda registrada con versión, Timonel y fecha.
 
 1. **Nunca se cobra por un referido.** Ningún miembro puede pedir, ofrecer, aceptar o condicionar un referido a dinero, comisión, descuento, contraprestación o favor. NS tampoco cobra por referido (D-005). Hacerlo es **motivo de expulsión** de la Sala y de la red. El espíritu de NS es un network colaborativo: se da porque se pertenece.
-2. **Toda empresa debe ceder al menos una Cesión válida a la semana, sin excusas** (D-042). Pertenecer a NS es contribuir. Con una se cumple, pero no se destaca: NS promueve ceder varias y a varias especialidades. Cuatro semanas seguidas sin una sola Cesión válida suponen la baja de la titularidad: la segunda semana lleva aviso diplomático del Agente, la tercera aviso formal de la Directiva para aportar lo antes posible, y la cuarta la notificación de baja. El Agente de cada empresa trabaja para que su Timonel lo cumpla sin esfuerzo.
-3. **La calidad importa más que la cantidad.** Un referido cuenta cuando el receptor lo cualifica como válido y NS puede auditarlo. Un referido flojo no cumple el mínimo ni suma reputación; puede restar.
+2. **Toda empresa debe ceder al menos una Cesión válida a la semana, sin excusas** (D-042). Pertenecer a NS es contribuir. Con una se cumple, pero no se destaca: NS promueve ceder varias y a varias especialidades. Cuatro semanas seguidas sin una sola Cesión válida suponen la baja de la titularidad: la segunda semana lleva aviso diplomático del Agente, la tercera aviso formal de la Directiva para aportar lo antes posible, y la cuarta la notificación de baja. La baja es por Sala: la empresa sale de la Mesa y pierde el acceso desde la notificación, la plaza queda bloqueada, la dirección de la Sala propone la baja y NS la confirma (D-044). El Agente de cada empresa trabaja para que su Timonel lo cumpla sin esfuerzo.
+3. **La calidad del negocio cedido vale más que la cantidad. Siempre** (D-045). Un referido cuenta cuando el receptor lo cualifica como válido y NS puede auditarlo. Un referido flojo no cumple el mínimo ni suma reputación; puede restar. El Mérito no crece con el número de Cesiones, sino con lo que cada una vale.
 4. **Toda empresa da a conocer su trabajo a la Sala cada semana** (D-018). El Agente redacta el Comunicado; el Timonel lo aprueba. Sin conocimiento mutuo no hay referidos de calidad.
 5. **Lo que se da y lo que se recibe se ve** (D-019). La Balanza de cada titular es pública en su Sala, exacta y contrastada. Lo que hay que hacer para mejorar solo lo ve quien tiene que hacerlo.
 
