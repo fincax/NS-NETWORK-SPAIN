@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>NS Network Spain · Resumen técnico para el programador</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm 18mm 16mm; }
+  * { box-sizing: border-box; }
+  body { font-family: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif; font-size: 10.5pt; line-height: 1.45; color: #111; margin: 0; }
+  h1 { font-size: 24pt; margin: 0 0 4pt; letter-spacing: -0.01em; }
+  h2 { font-size: 15pt; margin: 22pt 0 8pt; padding-bottom: 4pt; border-bottom: 1.5px solid #0F2A4A; color: #0F2A4A; page-break-after: avoid; }
+  h3 { font-size: 11.5pt; margin: 14pt 0 5pt; page-break-after: avoid; }
+  p { margin: 0 0 7pt; }
+  .sub { color: #555; font-size: 10pt; }
+  .meta { font-family: "IBM Plex Mono", Menlo, Consolas, monospace; font-size: 8.5pt; color: #666; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 14pt; }
+  code, pre { font-family: "IBM Plex Mono", Menlo, Consolas, monospace; font-size: 9pt; }
+  code { background: #f1f1f1; padding: 0 3px; border-radius: 3px; }
+  pre { background: #f5f5f5; border: 1px solid #ddd; border-radius: 4px; padding: 8pt 10pt; white-space: pre-wrap; margin: 6pt 0 10pt; page-break-inside: avoid; }
+  table { border-collapse: collapse; width: 100%; margin: 6pt 0 12pt; font-size: 9.5pt; page-break-inside: auto; }
+  th, td { border: 1px solid #ccc; padding: 4pt 6pt; vertical-align: top; text-align: left; }
+  th { background: #eef2f7; font-weight: 600; }
+  tr { page-break-inside: avoid; }
+  ul, ol { margin: 0 0 8pt 18pt; padding: 0; }
+  li { margin-bottom: 3pt; }
+  .box { border: 1px solid #0F2A4A; border-left: 4px solid #0F2A4A; padding: 8pt 10pt; margin: 8pt 0 12pt; background: #f7f9fc; page-break-inside: avoid; }
+  .warn { border-color: #b8781f; background: #fdf7ec; }
+  .cover { page-break-after: always; }
+  .cover .big { font-size: 13pt; color: #333; margin-top: 18pt; }
+  .toc li { margin-bottom: 2pt; }
+  .small { font-size: 9pt; color: #555; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <p class="meta">NS Network Spain · Documento de traspaso técnico · 13 de septiembre de 2026</p>
+  <h1>NS Network Spain</h1>
+  <p class="sub">Agentic Business Referral Network · Resumen de todo lo construido hasta ahora, para el programador que continúe el trabajo.</p>
+  <p class="big">Un club privado de empresas donde un Agente de IA representa a cada una y trabaja 24/7 con los Agentes de las demás para descubrir, cualificar y ceder negocio entre ellas. Una empresa por especialidad. La IA descubre; las personas deciden.</p>
+  <div class="box">
+    <strong>Estado en una línea.</strong> Aplicación web completa, ejecutable en local con un comando, con la primera Sala de demostración (NS Cumbre, Sevilla, diez empresas ficticias), el protocolo NS-ARP implementado de principio a fin, portada pública en modo beta, demo protegida por contraseña, y 64 pruebas automáticas más un recorrido de navegador de 26 comprobaciones. Lista para publicarse como demo en <strong>networkspain.com</strong>. No lista para empresas reales (faltan tres condiciones, sección 11).
+  </div>
+  <h3>Contenido</h3>
+  <ol class="toc">
+    <li>Qué es NS y qué no es</li>
+    <li>Vocabulario que verás en el código (léxico NS)</li>
+    <li>Repositorio, stack y cómo arrancar</li>
+    <li>Arquitectura de carpetas</li>
+    <li>Modelo de datos</li>
+    <li>El protocolo NS-ARP en el código</li>
+    <li>Los Agentes y el contrato del proveedor de razonamiento</li>
+    <li>Pantallas y rutas</li>
+    <li>Tareas de fondo: la Ronda</li>
+    <li>Seguridad, privacidad y reglas inmutables</li>
+    <li>Pruebas y calidad</li>
+    <li>Despliegue y variables de entorno</li>
+    <li>Decisiones registradas (D-001 a D-040)</li>
+    <li>Lo que falta y en qué orden</li>
+  </ol>
+  <p class="small">Fuentes de verdad en el repositorio: <code>CLAUDE.md</code> (constitución del producto), <code>docs/DECISIONS.md</code> (toda decisión con contexto, opciones y consecuencias; prevalece sobre la constitución cuando entran en conflicto), <code>docs/02_NS_AGENTIC_REFERRAL_PROTOCOL.md</code> (el protocolo), <code>docs/13_LEXICO_NS.md</code> (vocabulario), <code>docs/17_DESPLIEGUE.md</code> (cómo publicar).</p>
+</div>
+
+<h2>1. Qué es NS y qué no es</h2>
+<p>NS no es un CRM, ni un directorio, ni un marketplace de leads, ni una red social. Es una infraestructura de cooperación comercial B2B: cada empresa miembro de una <strong>Sala</strong> (círculo privado de 12 a 35 empresas, una por especialidad) tiene un <strong>Agente</strong> que conoce su negocio a fondo (el <strong>ADN de Empresa</strong>) y se reúne permanentemente con los Agentes de las demás para encontrar oportunidades que sus dueños no habrían visto tan rápido.</p>
+<p>El circuito central es la <strong>Cesión</strong> (referido): un miembro cuenta a su Agente algo que sabe (un <strong>Indicio</strong>), los Agentes lo analizan, cualifican y puntúan (una <strong>Pista</strong> con su <strong>Encaje</strong> explicado), Compliance da su <strong>Salvoconducto</strong>, y las personas deciden: el cedente da el visto bueno, el cesionario acepta, el cedente hace la <strong>Apertura</strong> (revela identidad) y tiende el <strong>Puente</strong> (presentación cálida). Después, seguimiento, <strong>Veredicto</strong> y valor contrastado. Nada llega a un tercero sin decisión humana.</p>
+<div class="box warn"><strong>Principio que gobierna todo el diseño: el Timonel manda.</strong> La persona que representa a la empresa se llama Timonel (D-027). El Agente rema y vigila; el Timonel decide. Cualquier pantalla que convierta al Timonel en espectador de su Agente es un error de producto.</div>
+
+<h2>2. Vocabulario que verás en el código</h2>
+<table>
+<tr><th>Término NS</th><th>Qué es</th><th>En el código</th></tr>
+<tr><td>Sala</td><td>Círculo privado de empresas; unidad de exclusividad. Varias por zona (NS Sevilla). No es territorial.</td><td><code>chapters</code></td></tr>
+<tr><td>Plaza</td><td>Puesto exclusivo por especialidad (NS-CAT, base CNAE) en una Sala.</td><td><code>category_seats</code>, <code>specialties</code>, <code>db/nscat.ts</code></td></tr>
+<tr><td>Titular / Timonel</td><td>La empresa que ocupa una plaza / la persona que decide por ella.</td><td><code>companies</code> / <code>members.is_primary</code></td></tr>
+<tr><td>Directiva</td><td>Presidencia de la Sala. Ve la Antesala y las excepciones.</td><td><code>members.is_director</code></td></tr>
+<tr><td>ADN de Empresa</td><td>Conocimiento estructurado del negocio (oferta, cliente ideal, señales, ticket, referido perfecto, permisos).</td><td><code>business_dna</code>, zod <code>BusinessDNA</code></td></tr>
+<tr><td>Indicio</td><td>Señal de negocio que un Timonel entrega a su Agente. Se estructura en cuatro capas de privacidad.</td><td><code>business_signals</code> + <code>opportunity_signals</code> (<code>SignalEnvelope</code>)</td></tr>
+<tr><td>Apunte</td><td>Captura móvil de un posible referido en 30 segundos; entra como Indicio en borrador.</td><td>fuente <code>APUNTE</code>, <code>services/apunte.ts</code></td></tr>
+<tr><td>Pista</td><td>Candidato de Cesión que los Agentes proponen, con Encaje y Fundamento.</td><td><code>match_candidates</code></td></tr>
+<tr><td>Encaje / Fundamento</td><td>NS Match Score explicable (por qué, evidencia, incógnitas).</td><td><code>core/scoring.ts</code>, <code>Explanation</code></td></tr>
+<tr><td>Salvoconducto</td><td>Veredicto del Trust &amp; Compliance Agent.</td><td><code>core/compliance.ts</code></td></tr>
+<tr><td>Cesión</td><td>El referido en curso, con máquina de estados y plazos.</td><td><code>referrals</code>, <code>core/state-machine.ts</code></td></tr>
+<tr><td>Apertura / Puente</td><td>Revelar identidad / presentación que envía el cedente.</td><td><code>introductions</code>, <code>IntroPackage</code></td></tr>
+<tr><td>Promesa / Veredicto / Distinción / Mérito</td><td>Valor a priori, valoración a posteriori en tres ejes, reconocimiento escaso, reputación.</td><td><code>core/merit.ts</code>, <code>verdicts</code>, <code>recognitions</code>, <code>trust_events</code></td></tr>
+<tr><td>Balanza / Brújula</td><td>Lo dado y recibido, público en la Sala / guía privada del Agente.</td><td><code>services/today.ts balance()</code> / pendiente</td></tr>
+<tr><td>Encargo</td><td>Lo que un titular busca ahora; los Agentes lo usan para priorizar.</td><td><code>demands</code></td></tr>
+<tr><td>Rastreo / Fuente propia</td><td>Prospección en fuentes públicas / direcciones RSS que añade el Timonel.</td><td><code>agents/rastreo.ts</code>, <code>agent_sources</code>, <code>agents/feeds.ts</code></td></tr>
+<tr><td>Reloj de la Sala / Ronda</td><td>Plazos y empujones / pasada de cada mañana (Reloj + Rastreo) para todas las Salas.</td><td><code>services/clock.ts</code>, <code>services/ronda.ts</code>, <code>GET /api/clock</code></td></tr>
+<tr><td>Mesa Permanente</td><td>La reunión 24/7 de los Agentes, visible como línea de tiempo de eventos significativos.</td><td><code>audit_events.significant</code></td></tr>
+<tr><td>Antesala / Candidatura</td><td>Lista de espera y proceso de admisión que despacha la Directiva.</td><td><code>beta_requests</code>, <code>services/antesala.ts</code></td></tr>
+<tr><td>Entrevista</td><td>Conversación del Agente con su Timonel para construir el ADN.</td><td><code>dna_interviews</code>, <code>services/entrevista.ts</code></td></tr>
+</table>
+
+<h2>3. Repositorio, stack y cómo arrancar</h2>
+<p><strong>Repositorio:</strong> <code>github.com/fincax/NS-NETWORK-SPAIN</code>, rama principal <code>main</code> (37 commits). Trabajo mediante ramas y pull requests; cada PR se ha fusionado con las pruebas en verde.</p>
+<table>
+<tr><th>Pieza</th><th>Elección (D-026)</th></tr>
+<tr><td>Lenguaje</td><td>TypeScript 5.9, ESM (<code>"type": "module"</code>)</td></tr>
+<tr><td>Framework</td><td>Next.js 16.3 (App Router, Server Components, Server Functions, <code>proxy.ts</code> en lugar de middleware), React 19.2</td></tr>
+<tr><td>Base de datos</td><td>PostgreSQL vía Drizzle ORM 0.45. En local y en pruebas, <strong>PGlite</strong> (Postgres embebido en <code>.data/ns.pglite</code>, o en memoria con <code>PGLITE_DATA_DIR=memory</code>). En servidor, <code>DATABASE_URL</code> con node-postgres. Migraciones SQL en <code>drizzle/</code> (0000 a 0005), aplicadas automáticamente al abrir la conexión.</td></tr>
+<tr><td>Validación</td><td>zod 4.6: todos los primitives de dominio y las salidas del modelo se validan.</td></tr>
+<tr><td>IA</td><td><code>@anthropic-ai/sdk</code> 0.125, salidas estructuradas con <code>messages.parse</code> + <code>zodOutputFormat</code>, modelo por defecto <code>claude-opus-5</code>. Opcional: sin clave, proveedor determinista.</td></tr>
+<tr><td>Pruebas</td><td>Vitest 5 (unitarias e integración sobre PGlite en memoria) y Playwright 1.56 (recorrido de navegador contra <code>next dev</code>).</td></tr>
+<tr><td>Monorepo</td><td>pnpm workspace; la app vive en <code>apps/web</code>.</td></tr>
+</table>
+<pre>git clone git@github.com:fincax/NS-NETWORK-SPAIN.git
+cd NS-NETWORK-SPAIN/apps/web
+pnpm install
+pnpm db:seed          # crea NS Cumbre, 10 empresas con ADN, escenarios A/C/D, candidaturas, Rastreo
+pnpm dev              # http://localhost:3000  · portada pública en /, demo en /acceso (demo / nscumbre)
+
+pnpm test             # 64 pruebas (Vitest, PGlite en memoria)
+pnpm typecheck && pnpm lint
+pnpm e2e              # con `next dev -p 3113` levantado: 26 comprobaciones de navegador
+pnpm db:reset         # borra .data y vuelve a sembrar
+pnpm clock            # ejecuta la Ronda (Reloj + Rastreo) a mano
+pnpm demo             # imprime Cesiones y Mesa por consola
+pnpm icons            # regenera los PNG de la app instalable desde public/icon.svg
+pnpm db:generate --name x   # tras cambiar src/db/schema.ts</pre>
+<p class="small">Persona en la demo: el Timonel activo se elige en el selector de la cabecera (cookie <code>ns_member</code>); no hay usuarios reales todavía. Inés Domínguez (Bufete Alameda) es Directiva.</p>
+
+<h2>4. Arquitectura de carpetas (<code>apps/web/src</code>)</h2>
+<table>
+<tr><th>Carpeta</th><th>Qué contiene</th><th>Regla</th></tr>
+<tr><td><code>core/</code></td><td><code>types.ts</code> (zod: BusinessDNA, SignalEnvelope de cuatro capas, NeedDraft, NSMatchScore, Explanation, ComplianceVerdict, ReferralState, Promise, Verdict, IntroPackage, AuditEventInput), <code>scoring.ts</code> (puertas duras + Match Score ponderado + explicación), <code>compliance.ts</code> (diez comprobaciones, detector de contraprestación D-010), <code>state-machine.ts</code> (transiciones por actor, plazos), <code>merit.ts</code> (Promesa, Veredicto, Mérito, prima de Embajada).</td><td>Puro. Sin base de datos ni red. Es donde vive la propiedad intelectual.</td></tr>
+<tr><td><code>agents/</code></td><td><code>provider.ts</code> (contrato LLMProvider y <code>getProvider()</code>), <code>deterministic.ts</code> (reglas), <code>anthropic.ts</code> (Claude), <code>interview-script.ts</code> (guion de la entrevista), <code>mesa.ts</code> (orquestador NS-ARP S4 a S9), <code>rastreo.ts</code> (fuentes públicas), <code>feeds.ts</code> (lector RSS/Atom).</td><td>Los LLM razonan; el sistema mantiene el estado. Ninguna salida del modelo cambia estado sin validar.</td></tr>
+<tr><td><code>services/</code></td><td>Casos de uso con base de datos: <code>onboarding</code>, <code>signals</code> (S0 a S3), <code>referrals</code> (puertas humanas), <code>today</code> (Hoy, Mesa, Balanza, pendientes), <code>clock</code>, <code>ronda</code>, <code>demands</code>, <code>antesala</code>, <code>apunte</code>, <code>sources</code>, <code>entrevista</code>.</td><td>Cada acción significativa escribe un <code>audit_event</code>.</td></tr>
+<tr><td><code>db/</code></td><td><code>schema.ts</code> (22 tablas), <code>client.ts</code> (PGlite o pg, migraciones al abrir), <code>nscat.ts</code> (15 especialidades), <code>seed-data.ts</code> y <code>seed.ts</code> (datos de demostración verosímiles).</td><td>Nunca "Company A": empresas ficticias creíbles de Sevilla.</td></tr>
+<tr><td><code>app/</code></td><td>Rutas Next: portada pública <code>/</code>, <code>/acceso</code>, grupo <code>(app)</code> con todas las pantallas privadas, <code>api/clock</code>, <code>api/pending</code>, <code>manifest.ts</code>.</td><td>Server Components + Server Functions (formularios). Muy poco JavaScript en cliente (selector de persona, botón flotante, número del icono, invitación a instalar).</td></tr>
+<tr><td><code>lib/</code></td><td><code>auth.ts</code> (puerta de la demo, HMAC), <code>session.ts</code> (Timonel activo, <code>requireDemo</code>, <code>requireMember</code>, <code>requireDirector</code>), <code>audit.ts</code>, <code>format.ts</code>, <code>website.ts</code>.</td><td></td></tr>
+<tr><td><code>components/</code></td><td><code>brand.tsx</code> (monograma, avatar del Agente), <code>ui.tsx</code> (badges, Encaje, vacío).</td><td>Diseño: obsidian/porcelain/azul institucional/verde señal/ámbar oportunidad. Sin degradados "IA".</td></tr>
+</table>
+
+<h2>5. Modelo de datos (22 tablas)</h2>
+<table>
+<tr><th>Grupo</th><th>Tablas</th><th>Notas</th></tr>
+<tr><td>Estructura</td><td><code>zones</code>, <code>chapters</code>, <code>specialties</code>, <code>category_seats</code>, <code>companies</code>, <code>members</code></td><td>Jerarquía Global → País → Zona → Sala → Empresa → Persona. <code>category_seats</code> tiene índice único (sala, especialidad): una empresa por plaza.</td></tr>
+<tr><td>Conocimiento</td><td><code>business_dna</code>, <code>capabilities</code>, <code>agents</code>, <code>dna_interviews</code>, <code>agent_sources</code></td><td>ADN versionado con <code>validated_by/at</code>. Agentes por empresa (COMPANY) y de Sala (MATCHMAKER, COMPLIANCE, CHAPTER_INTELLIGENCE, BRIEFING).</td></tr>
+<tr><td>Flujo NS-ARP</td><td><code>business_signals</code>, <code>opportunity_signals</code>, <code>needs</code>, <code>interest_claims</code>, <code>qualifications</code>, <code>match_candidates</code>, <code>referrals</code>, <code>referral_transitions</code>, <code>human_decisions</code>, <code>introductions</code></td><td>Nunca se mezclan señal, pista, cesión, puente y oportunidad. Toda transición de estado se registra.</td></tr>
+<tr><td>Reputación</td><td><code>verdicts</code>, <code>recognitions</code>, <code>trust_events</code></td><td>Reputación basada en hechos verificables, nunca un número opaco.</td></tr>
+<tr><td>Operación</td><td><code>audit_events</code>, <code>agent_interactions</code>, <code>public_records</code>, <code>demands</code>, <code>beta_requests</code></td><td><code>audit_events.significant</code> alimenta la Mesa; <code>company_ids</code> limita quién lo ve.</td></tr>
+</table>
+<p>Multi-tenancy: todas las tablas de negocio llevan <code>chapter_id</code>. Hoy la demo tiene una Sala; el diseño soporta muchas. Las consultas deben filtrar siempre por Sala y por empresa en el servidor, nunca solo en la interfaz.</p>
+
+<h2>6. El protocolo NS-ARP en el código</h2>
+<pre>S0  business_signals        Indicio en bruto (fuente: MEMBER_INPUT | APUNTE | PUBLIC_RECORD | ...)    services/signals.ts createSignal
+S1  extracción              provider.extractSignal → SignalEnvelope (capas 0-3) + NeedDraft[]         agents/provider.ts
+S2  privacidad              personas físicas nunca en capa 0/1; visibilidad CHAPTER o COMPANY_ONLY     services/signals.ts
+S3  publicación             el Timonel previsualiza y publica (o autoriza búsqueda interna)             publishSignal
+S4  discovery               qué plazas de la Sala cubren cada necesidad; plaza propia = SELF             agents/mesa.ts
+S5  puertas duras           geografía, ticket mínimo, capacidad, exclusiones, Encargos abiertos          core/scoring.ts hardGates
+S6  cualificación           tres preguntas fijas agente-a-agente sobre capa 1                            provider.answerQualification
+S7  Encaje                  NS Match Score ponderado + Explanation (why/evidence/unknowns/next)          computeNSMatchScore
+S8  Salvoconducto           diez comprobaciones de compliance; D-010 bloquea                             core/compliance.ts
+S9  Cesión                  referrals en ORIGINATOR_PENDING → RECEIVER_PENDING → ... → VALUE_CONFIRMED    services/referrals.ts</pre>
+<p><strong>Estados de la Cesión:</strong> ORIGINATOR_PENDING, RECEIVER_PENDING, DIRECTOR_PENDING (solo excepciones), APPROVED, INTRO_AUTHORIZED, INTRODUCED, MEETING, COMMERCIAL_OPPORTUNITY, WON / LOST / NO_DECISION, VALUE_CONFIRMED; terminales BLOCKED, REJECTED_BY_MEMBER, DISQUALIFIED, EXPIRED. <strong>Plazos</strong> (<code>TIMEOUTS</code>): recordatorio 72 h, caducidad 7 días, respuesta al Interesado 48 h tras el Puente, check-in cada 14 días.</p>
+<p><strong>Encaje:</strong> suma ponderada (pesos en <code>WEIGHTS</code>, suman 1,00) de semántica, señal, geografía, sector, perfil de cliente, tamaño de operación, momento, capacidad, relación (sube a 0,85 o más si el Interesado está avisado, D-029), reputación, histórico, calidad del camino y prioridad estratégica (máxima si responde a un Encargo, D-032); menos penalizaciones por conflicto, privacidad, duplicado y descalificación. Bandas HIGH / GOOD / PARTIAL / LOW. La interfaz nunca muestra un porcentaje sin su explicación.</p>
+<p><strong>Escenarios de referencia sembrados:</strong> A (nueva sede, Guadalquivir → Híspalis, Interesado avisado), C (falso positivo por ticket mínimo: Mobiliario Delta, 120.000 €), D (confidencialidad COMPANY_ONLY: búsqueda interna sin publicar). E (conflicto de categoría) vive en la Antesala.</p>
+
+<h2>7. Los Agentes y el contrato del proveedor</h2>
+<p>Todo razonamiento pasa por <code>LLMProvider</code> (<code>agents/provider.ts</code>) con cuatro métodos y salidas validadas con zod:</p>
+<ul>
+<li><code>extractSignal</code>: Indicio en bruto → envelope de cuatro capas, necesidades por especialidad con plausibilidad, evidencia e incógnitas, señales.</li>
+<li><code>answerQualification</code>: responde a una pregunta de otro Agente solo con lo que hay en la capa 1 y las notas privadas; puede decir <code>insufficient</code>.</li>
+<li><code>draftIntro</code>: redacta el Puente que el cedente envía desde su propio correo. Nunca menciona dinero.</li>
+<li><code>interview</code>: entrevista del ADN; devuelve pregunta, tema, ADN completo actualizado, lo aprendido y progreso.</li>
+</ul>
+<p><code>getProvider()</code> elige <strong>Anthropic</strong> si hay <code>ANTHROPIC_API_KEY</code> (o <code>NS_LLM_PROVIDER=anthropic</code>) y, si no, el <strong>determinista</strong> (<code>NS_LLM_PROVIDER=deterministic</code> lo fuerza; las pruebas lo usan). El determinista son reglas explícitas (expresiones regulares de señales, sectores, ciudades, cifras) que nunca inventan: lo que no está en el texto sale como insuficiente. La interfaz es idéntica con ambos, por eso la demo funciona sin red.</p>
+<p><strong>Regla de oro:</strong> los Agentes pueden analizar, cualificar, puntuar y redactar solos; revelar identidad, contactar a un tercero, enviar el Puente y todo lo que afecte a dinero o reputación exige acción humana. En el MVP ningún Agente envía nada a nadie fuera de NS.</p>
+
+<h2>8. Pantallas y rutas</h2>
+<table>
+<tr><th>Ruta</th><th>Quién</th><th>Qué hace</th></tr>
+<tr><td><code>/</code></td><td>Público</td><td>Portada en modo beta: narrativa, disponibilidad real de plazas, candidatura ("Solicitar plaza en la beta") → <code>beta_requests</code>.</td></tr>
+<tr><td><code>/acceso</code></td><td>Público</td><td>Puerta de la demo: usuario y contraseña compartidos; cookie <code>ns_demo</code> firmada con HMAC. Todo lo demás la exige (<code>proxy.ts</code> + <code>requireDemo</code>).</td></tr>
+<tr><td><code>/hoy</code></td><td>Timonel</td><td>"Mientras estabas fuera": KPIs de 7 días, Cesiones que esperan tu toque, Apuntes, Rastreo, Solo para ti, En marcha. Avisos: instalar la app, ADN sin validar, Antesala (Directiva). Ejecuta el Reloj como máximo cada 10 minutos (red de seguridad).</td></tr>
+<tr><td><code>/mesa</code></td><td>Timonel</td><td>Mesa Permanente: línea de tiempo de eventos significativos visibles para la empresa.</td></tr>
+<tr><td><code>/indicio/nuevo</code>, <code>/indicio/[id]</code></td><td>Timonel</td><td>Entregar un Indicio al Agente; previsualizar exactamente lo que verá la Sala; publicar o retirar.</td></tr>
+<tr><td><code>/apunte</code></td><td>Timonel (móvil)</td><td>Captura en 30 segundos; botón flotante en toda la app; atajo en el icono instalado.</td></tr>
+<tr><td><code>/cesiones</code>, <code>/cesiones/[id]</code></td><td>Timonel</td><td>Tarjeta de Cesión a dos caras (D-024): cara A del cedente, cara B del cesionario, Promesa, seguimiento, Puente, Veredicto y Distinción.</td></tr>
+<tr><td><code>/sala</code>, <code>/sala/alta</code></td><td>Timonel / Directiva</td><td>Plazas, Encargos abiertos, Balanza. Alta en dos tiempos que desemboca en la entrevista.</td></tr>
+<tr><td><code>/empresa/[slug]</code></td><td>Timonel</td><td>Dossier: ADN, Balanza, Encargos, fuentes propias del Agente, enlace a la entrevista.</td></tr>
+<tr><td><code>/entrevista</code></td><td>Timonel</td><td>Conversación con el Agente que construye el ADN a la vista; validación al final.</td></tr>
+<tr><td><code>/antesala</code></td><td>Directiva</td><td>Candidaturas con veredicto de plaza automático; despacho con un toque; nunca se aprueba una plaza ocupada.</td></tr>
+<tr><td><code>GET /api/clock</code></td><td>Cron</td><td>Lanza la Ronda. Protegida con <code>CRON_SECRET</code>; 503 en producción sin secreto.</td></tr>
+<tr><td><code>GET /api/pending</code></td><td>Sesión</td><td>Número de decisiones pendientes para el icono de la app.</td></tr>
+<tr><td><code>/manifest.webmanifest</code></td><td>Público</td><td>App instalable: iconos, arranque en Hoy, atajo "Apuntar un referido".</td></tr>
+</table>
+
+<h2>9. Tareas de fondo: la Ronda</h2>
+<p><code>services/ronda.ts</code> ejecuta cada mañana, para todas las Salas: (1) el Reloj (recordatorios, caducidades, respuestas tardías, check-ins); (2) el Rastreo con el Agente de cada empresa activa, repartiendo los registros nuevos empezando por el Agente que menos ha rastreado; (3) las fuentes propias de cada Agente (RSS/Atom); (4) un evento RONDA por Sala si hubo trabajo. Es idempotente. <code>vercel.json</code> la programa a las 06:00 UTC; <code>pnpm clock</code> la ejecuta a mano.</p>
+<p class="small">Hoy la fuente pública es un lote de ejemplo (<code>SAMPLE_FEED</code>). Los adaptadores reales (BORME vía datos.gob.es, PLACE, licencias municipales, empleo) implementan la misma interfaz <code>PublicFeed</code> y se añaden uno a uno.</p>
+
+<h2>10. Seguridad, privacidad y reglas inmutables</h2>
+<ul>
+<li><strong>Cuatro capas del Indicio</strong>: capa 0 (Sala, sin identidad ni personas), capa 1 (contexto para Agentes con interés declarado), capa 2 (identidad, solo tras Apertura), capa 3 (nunca sale de la empresa). El código separa <em>conocer</em> de <em>poder usar</em>: permisos READ / INFER / STORE / SHARE / REVEAL_IDENTITY / CONTACT por señal.</li>
+<li><strong>D-010, regla inmutable en código</strong>: <code>detectsReferralFee</code> bloquea cualquier texto con comisión o contraprestación en Indicios, Apuntes, notas, Puentes y Veredictos. No es configurable.</li>
+<li><strong>Auditoría</strong>: qué agente actuó, con qué entradas, qué política aplicó, qué resultado produjo, quién aprobó y cuándo. Nunca razonamientos internos.</li>
+<li><strong>Demo</strong>: puerta compartida (cookie HMAC del secreto y la contraseña vigente: cambiar la contraseña expulsa a todos). Sin usuarios reales ni RBAC todavía: <strong>no meter datos reales</strong>.</li>
+<li><strong>GDPR</strong>: diseñado para minimización, finalidad y trazabilidad; falta el documento <code>docs/08_SECURITY_PRIVACY_GDPR.md</code> y los textos legales (sección 14).</li>
+</ul>
+
+<h2>11. Pruebas y calidad</h2>
+<table>
+<tr><th>Archivo</th><th>Cubre</th></tr>
+<tr><td><code>tests/core.test.ts</code> (20)</td><td>Puertas duras, Match Score, explicación, compliance, máquina de estados, Promesa y Mérito.</td></tr>
+<tr><td><code>tests/slice.test.ts</code> (12)</td><td>Recorrido completo sobre PGlite: alta y exclusividad, Indicio → Pista → Cesión → vistos buenos → Puente → Veredicto; escenarios A, C, D; Reloj; Rastreo; Encargos.</td></tr>
+<tr><td><code>tests/antesala.test.ts</code> (10)</td><td>Veredicto de plaza (vacante, ocupada, solapada, sin clasificar, duplicado, fuera de zona), transiciones, auditoría, alta desde candidatura.</td></tr>
+<tr><td><code>tests/ronda.test.ts</code> (5)</td><td>Ronda, reparto, idempotencia, <code>/api/clock</code> con y sin secreto.</td></tr>
+<tr><td><code>tests/apunte.test.ts</code> (4), <code>fuentes.test.ts</code> (5), <code>pending.test.ts</code> (2), <code>entrevista.test.ts</code> (8)</td><td>Apunte y D-010, lector RSS/Atom y fuentes propias, número pendiente, entrevista completa con validación.</td></tr>
+<tr><td><code>scripts/e2e-demo.mjs</code> (26)</td><td>Playwright: portada, candidatura, puerta, Hoy, tarjeta, app instalable, Apunte en móvil, fuentes, entrevista, Antesala, alta en dos tiempos, salida.</td></tr>
+</table>
+<p>Convenciones: <code>pnpm typecheck</code> y <code>pnpm lint</code> limpios antes de cada PR; ESLint con las reglas de React 19 (sin <code>setState</code> síncrono en efectos, sin <code>Date.now()</code> en componentes de servidor: usar <code>lib/format.ts</code>). Playwright debe ser la versión 1.56.1 (coincide con el Chromium preinstalado en el entorno de desarrollo remoto).</p>
+
+<h2>12. Despliegue y variables de entorno</h2>
+<p>Guía completa para no programadores en <code>docs/17_DESPLIEGUE.md</code>. Resumen: Vercel (Root Directory <code>apps/web</code>, región Frankfurt) + Neon PostgreSQL (UE) + dominio <code>networkspain.com</code>. Primera vez: entrar en <code>/acceso</code> y pulsar "Preparar NS Cumbre (demo)" en Hoy.</p>
+<table>
+<tr><th>Variable</th><th>Uso</th></tr>
+<tr><td><code>DATABASE_URL</code></td><td>Postgres en servidor. Sin ella, PGlite en <code>.data/</code>.</td></tr>
+<tr><td><code>DEMO_USER</code>, <code>DEMO_PASSWORD</code>, <code>DEMO_SESSION_SECRET</code></td><td>Puerta de la demo. En local, por defecto <code>demo</code> / <code>nscumbre</code>. Obligatorias en producción.</td></tr>
+<tr><td><code>CRON_SECRET</code></td><td>Autoriza <code>GET /api/clock</code> (Vercel lo envía como <code>Authorization: Bearer</code>).</td></tr>
+<tr><td><code>ANTHROPIC_API_KEY</code>, <code>NS_LLM_MODEL</code>, <code>NS_LLM_PROVIDER</code></td><td>Razonamiento con Claude (opcional); modelo por defecto <code>claude-opus-5</code>; <code>deterministic</code> fuerza las reglas.</td></tr>
+<tr><td><code>NS_PUBLIC_URL</code></td><td>Dirección pública para metadatos (<code>https://networkspain.com</code>).</td></tr>
+<tr><td><code>PGLITE_DATA_DIR</code></td><td><code>memory</code> en pruebas.</td></tr>
+</table>
+
+<h2>13. Decisiones registradas</h2>
+<p>Las cuarenta decisiones están en <code>docs/DECISIONS.md</code> con contexto, opciones, elección, motivo, consecuencias y cuándo revisar. Las que más condicionan el código:</p>
+<ul>
+<li><strong>D-001, D-011, D-013, D-014</strong>: exclusividad por especialidad y por Sala; la Sala no es territorial; NS-CAT con base CNAE.</li>
+<li><strong>D-005, D-025</strong>: NS cobra cuota (incorporación + membresía por Tramos), nunca porcentaje ni cargo por Cesión; el Tramo sube solo con valor contrastado recibido.</li>
+<li><strong>D-010</strong>: reglas inmutables (nunca se cobra por un referido; aportación mínima; calidad sobre cantidad; Comunicado semanal; Balanza pública).</li>
+<li><strong>D-015</strong>: Embajada (cesión a otra Sala con plaza vacante, prima de Mérito x2,5).</li>
+<li><strong>D-016, D-027, D-028</strong>: léxico NS; Timonel; solo NS Network Spain es marca registrada.</li>
+<li><strong>D-018, D-019</strong>: tres protocolos de Sala (Generar Negocio, Dar a Conocer, Cuentas Claras). II y III especificados en <code>docs/14</code>, pendientes de implementar.</li>
+<li><strong>D-020, D-021, D-024</strong>: Veredicto en tres ejes, Distinción, Promesa a priori, tarjeta de Cesión a dos caras.</li>
+<li><strong>D-026</strong>: stack. <strong>D-029 a D-032</strong>: Interesado avisado, Reloj, Rastreo, Encargo (mejoras sobre la competencia, <code>docs/16</code>).</li>
+<li><strong>D-033 a D-040</strong>: beta privada, marca fuera de España, Antesala, Ronda, Apunte, fuentes propias, app instalable, entrevista del Agente.</li>
+</ul>
+<p>Decisiones que siguen esperando al fundador: tipografía (D-023), importes y Tramos de la cuota y si existe cuota de incorporación (D-025), parámetros del Compromiso (D-010), lista definitiva de especialidades fundadoras de NS Cumbre, Ritmo por defecto y calendario de la Gaceta.</p>
+
+<h2>14. Lo que falta y en qué orden</h2>
+<table>
+<tr><th>#</th><th>Qué</th><th>Por qué</th><th>Estimación</th></tr>
+<tr><td>1</td><td><strong>Usuarios con contraseña y permisos por Sala y empresa</strong> (sustituye la puerta compartida y el selector de persona; RBAC: Timonel, suplente, Directiva, NS)</td><td>Sin ello no pueden entrar empresas reales.</td><td>1 semana</td></tr>
+<tr><td>2</td><td><strong>Copias de seguridad diarias y registro de accesos</strong></td><td>NS promete trazabilidad.</td><td>2 días</td></tr>
+<tr><td>3</td><td><strong>Textos legales y GDPR</strong> (<code>docs/08</code>, aviso de privacidad, condiciones de la plaza, base jurídica de datos de terceros, retención y borrado)</td><td>Con un abogado.</td><td>1 semana</td></tr>
+<tr><td>4</td><td><strong>Notificaciones push</strong> ("Tu Agente tiene una Cesión para ti"): service worker, suscripciones, política de avisos, envío desde la Ronda y la Mesa</td><td>Decidido en D-039; exige el dominio publicado.</td><td>2-3 días</td></tr>
+<tr><td>5</td><td><strong>Mesa en segundo plano con Claude</strong>: cola de trabajo y reintentos para que la extracción y la cualificación no bloqueen la pantalla</td><td>Hoy la Mesa corre al publicar, en segundos, con reglas.</td><td>1 semana</td></tr>
+<tr><td>6</td><td><strong>Protocolo II (Comunicado semanal y Gaceta) y Brújula</strong> (Protocolo III privado)</td><td>Reglas inmutables 4 y 5 aún sin producto.</td><td>1-2 semanas</td></tr>
+<tr><td>7</td><td><strong>Fuentes reales de Rastreo</strong>: BORME, PLACE, licencias, empleo, con límites de volumen por Agente</td><td>Misma interfaz <code>PublicFeed</code>.</td><td>Por fuente</td></tr>
+<tr><td>8</td><td><strong>NS Radar</strong> (visualización útil de la actividad), Embajada en la interfaz, varias Salas por zona, Command Center de Directiva</td><td>Fases 2 y 3 del roadmap.</td><td>Después</td></tr>
+</table>
+<div class="box">
+<strong>Cómo trabajar en este repositorio.</strong> Antes de tocar algo, leer <code>CLAUDE.md</code> y la decisión correspondiente en <code>docs/DECISIONS.md</code>; si una petición contradice una decisión, la decisión registrada más reciente prevalece y toda decisión nueva se registra con el mismo formato. Primitives antes que pantallas; recorridos verticales completos antes que capas; cada pantalla con sus estados vacío, error, carga y sin permiso; cada acción significativa con su evento de auditoría; cada PR con tipos, lint, pruebas y recorrido de navegador en verde. El léxico NS se respeta en interfaz, código y documentación.
+</div>
+<p class="small">Generado el 13 de septiembre de 2026 a partir del estado de la rama <code>main</code> tras la solicitud de fusión #7. Contacto del fundador: fincaxsevilla@gmail.com.</p>
+
+</body>
+</html>
