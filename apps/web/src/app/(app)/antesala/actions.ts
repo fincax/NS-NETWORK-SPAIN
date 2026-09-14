@@ -4,8 +4,9 @@ import { redirect } from "next/navigation";
 import { getDb } from "@/db/client";
 import { requireMember } from "@/lib/session";
 import { updateCandidacy, CandidacyTransitionError, type CandidacyStatus } from "@/services/antesala";
+import { activateFounding, FoundingError, joinFounding, startFounding } from "@/services/fundacion";
 
-const STATUSES: CandidacyStatus[] = ["NEW", "CONTACTED", "INTERVIEW", "APPROVED", "WAITLISTED", "DECLINED", "ACTIVATED"];
+const STATUSES: CandidacyStatus[] = ["NEW", "CONTACTED", "INTERVIEW", "APPROVED", "WAITLISTED", "FOUNDING", "DECLINED", "ACTIVATED"];
 
 /** Un toque de la Directiva: cambio de estado, reclasificación o nota. */
 export async function candidacyAction(formData: FormData) {
@@ -32,4 +33,24 @@ export async function candidacyAction(formData: FormData) {
   revalidatePath("/antesala");
   revalidatePath("/hoy");
   redirect(`/antesala?vista=${view}#c-${candidacyId}`);
+}
+
+/** Fundación de Sala (D-041): promover, sumar y fundar. */
+export async function foundingAction(formData: FormData) {
+  const { member, chapter } = await requireMember();
+  const db = await getDb();
+  const op = String(formData.get("op") ?? "");
+  const view = String(formData.get("view") ?? "espera");
+  const candidacyId = String(formData.get("id") ?? "");
+  try {
+    if (op === "start") await startFounding(db, { zoneId: chapter.zoneId, candidacyId, memberId: member.id });
+    else if (op === "join") await joinFounding(db, { foundingId: String(formData.get("foundingId")), candidacyId, memberId: member.id });
+    else if (op === "activate") await activateFounding(db, { foundingId: String(formData.get("foundingId")), name: String(formData.get("name") ?? ""), memberId: member.id });
+  } catch (e) {
+    const msg = e instanceof FoundingError ? e.message : "No se pudo gestionar la fundación.";
+    redirect(`/antesala?vista=${view}&error=${encodeURIComponent(msg)}#fundacion`);
+  }
+  revalidatePath("/antesala");
+  revalidatePath("/hoy");
+  redirect(`/antesala?vista=${view}#fundacion`);
 }

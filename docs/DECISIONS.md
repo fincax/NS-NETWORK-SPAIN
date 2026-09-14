@@ -988,3 +988,29 @@ La Ronda es idempotente: se puede lanzar varias veces al día sin efectos dobles
 **Consequences.** Tabla `dna_interviews` (migración 0005), `agents/interview-script.ts`, método `interview` en el contrato del proveedor y en ambos proveedores, `services/entrevista.ts`, `lib/website.ts`, ruta `/entrevista`, alta simplificada que desemboca en la entrevista, avisos en Dossier y Hoy, pruebas. Condición 5 de `docs/17` cumplida en su primera versión.
 
 **Revisit when.** Se conecte el Agente a fuentes autorizadas (CRM, correo) para preguntar menos y proponer más, o se añada dictado por voz en el móvil.
+
+---
+
+## D-041 · Fundación: la empresa con plaza ocupada promueve la siguiente Sala y, si reúne el mínimo, recibe una gratificación
+
+**Status:** CONFIRMED (regla fijada por el fundador)
+**Date:** 2026-09-14
+
+**Context.** Cuando una empresa pretende entrar en una Sala y su plaza (misma especialidad NS-CAT, base CNAE) ya está ocupada, NS no debe perderla. `docs/12` §2.2 preveía abrir una Sala nueva cuando hubiera 12–15 admitidas en espera; faltaba decir quién empuja y qué gana.
+
+**Choice.** Regla del fundador: **NS ayuda a esa empresa a promover, promocionar e iniciar una nueva Sala**. Si consigue el número mínimo de fundadoras que se exija (a determinar en la práctica), como compensación recibe una **gratificación**, por ejemplo unos meses de cuota gratis u otra que NS anuncie.
+
+Cómo se aplica en el producto:
+
+- **Promotora.** En la Antesala, toda candidatura con plaza ocupada ofrece "Promotora de nueva Sala". Al aceptarlo, la candidatura pasa al estado "En fundación" y nace una **Sala en fundación** en la zona, con su mínimo y su gratificación anunciada.
+- **Fundadoras.** Las demás candidaturas (sobre todo las que también tienen la plaza ocupada) se suman a la Sala en fundación desde su ficha. Una plaza por especialidad también antes de nacer: no entran dos fundadoras de la misma especialidad.
+- **Mínimo.** Es un parámetro de cada fundación (por defecto 12, D-006), no una constante del código, porque se ajustará en la práctica. La Antesala muestra el progreso ("7 de 12") y las especialidades ya cubiertas. Al alcanzarlo, la fundación pasa a "lista".
+- **Fundar.** La Directiva funda la Sala con un nombre propio: prefijo NS, nunca una ciudad, barrio, provincia, región ni país (D-014, comprobado en código), único en la red. Se crea la Sala en estado "en formación" con el nombre pendiente de autorización de NS y todas sus plazas vacantes; las fundadoras pasan a "Plaza aprobada" para darlas de alta en la Sala nueva.
+- **Gratificación.** Se concede en el momento de fundar, no al alcanzar la cuenta, y queda registrada en la Mesa. El texto por defecto ("3 meses de cuota gratis para la Promotora") es una propuesta: el fundador fija la definitiva y NS la anuncia públicamente. Nunca es dinero por referidos (D-010) ni condiciona ninguna Cesión.
+- **NS promociona.** La portada explica la vía a quien tiene la especialidad ocupada. Falta, para más adelante, el kit de promoción de la Promotora (página propia de la Sala en fundación, invitaciones, seguimiento).
+
+**Why.** Convierte cada "plaza ocupada" en una fuerza de captación: quien más interés tiene en entrar es quien mejor recluta. Alinea el crecimiento del número de Salas (docs/12) con un incentivo explícito, público y ajeno al circuito de referidos.
+
+**Consequences.** Tabla `chapter_foundings` y columna `founding_id` en candidaturas (migración 0006), estado "En fundación", `services/fundacion.ts`, sección "Salas en fundación" y botones en la Antesala, alta en una Sala recién fundada, aviso en la portada, Sala en fundación de demostración (Correduría Giralda como Promotora, 3 de 12), pruebas.
+
+**Revisit when.** Se conozca el mínimo real tras las primeras fundaciones, se fije la gratificación definitiva, o se construya el kit de promoción de la Promotora.

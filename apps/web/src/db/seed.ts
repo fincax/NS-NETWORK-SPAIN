@@ -39,7 +39,13 @@ export async function seedChapter(db: Db) {
   }
   const anyCandidacy = await db.query.betaRequests.findFirst();
   if (!anyCandidacy) {
-    await db.insert(schema.betaRequests).values(SEED_CANDIDACIES.map((c) => { const at = new Date(Date.now() - c.daysAgo * 86_400_000); return { fullName: c.fullName, companyName: c.companyName, email: c.email, specialtyCode: c.specialtyCode, city: c.city, message: c.message, status: c.status, notes: c.notes ?? null, createdAt: at, updatedAt: at }; }));
+    const rows = await db.insert(schema.betaRequests).values(SEED_CANDIDACIES.map((c) => { const at = new Date(Date.now() - c.daysAgo * 86_400_000); return { fullName: c.fullName, companyName: c.companyName, email: c.email, specialtyCode: c.specialtyCode, city: c.city, message: c.message, status: c.status, notes: c.notes ?? null, createdAt: at, updatedAt: at }; })).returning();
+    // Sala en fundación (D-041): la Promotora es la candidatura con la plaza de Seguros ocupada.
+    const promoter = rows.find((r) => r.companyName === "Correduría Giralda");
+    if (promoter) {
+      const [f] = await db.insert(schema.chapterFoundings).values({ zoneId: zone.id, promoterCandidacyId: promoter.id, minMembers: 12, rewardText: "3 meses de cuota gratis para la Promotora" }).returning();
+      for (const r of rows.filter((r) => r.status === "FOUNDING")) await db.update(schema.betaRequests).set({ foundingId: f.id }).where(eq(schema.betaRequests.id, r.id));
+    }
   }
 
   return { zone, chapter, companies };

@@ -89,6 +89,10 @@ try {
   await first.locator("button:has-text('Contactada')").click();
   await page.waitForURL(/vista=pendientes/);
   check(await page.locator(`article.cand:has(h3:text-is("${firstName}")) .badge:has-text("Contactada")`).count() > 0, "candidatura despachada con un toque");
+  // Fundación (D-041): la Sala en fundación se ve con su progreso y una candidatura con plaza ocupada puede sumarse.
+  check(await page.locator("#fundacion").count() > 0 && await page.locator("text=de 12 fundadoras").count() > 0, "la Antesala muestra la Sala en fundación con su progreso");
+  await page.goto(`${base}/antesala?vista=espera`);
+  check(await page.locator(".badge:has-text('En fundación')").count() >= 3, "las fundadoras aparecen como En fundación");
   await page.screenshot({ path: process.env.E2E_SHOT ?? "/tmp/antesala.png", fullPage: true });
   // Alta en dos tiempos (D-040): la Directiva da de alta una empresa y la sesión pasa a su Timonel, que empieza la entrevista.
   await page.goto(`${base}/sala/alta`);
