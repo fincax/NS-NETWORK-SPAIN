@@ -63,11 +63,11 @@ export const RULEBOOK: Rule[] = [
     verification: ["REFERRAL_FEE_VIOLATION"],
   },
   {
-    id: "N-002", kind: "NORMA", scope: "TODOS", status: "PROTOCOLIZADA", since: "2026-09-11", source: "D-010", immutable: true,
-    title: "Compromiso: un mínimo de Cesiones válidas por Ejercicio",
-    text: "Toda empresa aporta el número mínimo de Cesiones válidas que fije su Sala en cada Ejercicio. Pertenecer es contribuir. El Ritmo semanal es el paso que lleva al Compromiso.",
-    mechanism: "Ritmo por Sala (weekly_pace) y bloque Contribución del Aval. El objeto ContributionQuota por Ejercicio y la escalera de consecuencias están pendientes de parámetros del fundador.",
-    consequence: "Escalera: aviso del Agente → conversación con la Directiva → plan de contribución → plaza en revisión → baja.",
+    id: "N-002", kind: "NORMA", scope: "TODOS", status: "VIGENTE", since: "2026-09-14", source: "D-010, D-044 · Norma 1 del fundador", immutable: true,
+    title: "Ceder al menos una Cesión válida a la semana",
+    text: "Cada semana, todo titular cede al menos una Cesión con un mínimo de calidad a quien corresponda: al titular de la especialidad en su Sala o, si la plaza está vacante, por Embajada. Cuenta la Cesión que el cedente ofrece con Salvoconducto y que no es declinada por falta de calidad, descartada ni caducada. La primera semana sin ceder, el Agente empuja con Movimientos. La segunda seguida, primer aviso con diplomacia. La tercera, segundo aviso tajante, con la Directiva al tanto. La cuarta, la titularidad de la plaza en NS Network queda suspendida. La cuenta se reinicia con la primera Cesión válida.",
+    mechanism: "Cada lunes, en la Ronda, se evalúa la semana completa anterior de cada titular (vistos buenos del cedente con Salvoconducto, descontando las declinadas, descartadas y caducadas) frente al Ritmo de la Sala (por defecto 1). Semanas seguidas sin ceder y peldaño en compromiso_weeks_without y compromiso_level. Los avisos los recibe el Timonel en Hoy; la suspensión la ve la Sala.",
+    consequence: "Semana 2: primer aviso. Semana 3: segundo aviso, tajante, con copia a la Directiva. Semana 4: suspensión de la titularidad (empresa, plaza y Agente suspendidos; CONTRIBUTION_QUOTA_MISSED −100). Reincorporación: protocolo pendiente del fundador.",
     verification: ["CONTRIBUTION_QUOTA_MET", "CONTRIBUTION_QUOTA_MISSED"],
   },
   {

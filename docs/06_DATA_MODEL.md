@@ -31,7 +31,7 @@ RASTREO Y ENCARGOS    public_records (D-031) · demands (D-032)
 | Sala | `chapters` | Nombre único en la red (D-014). `value_threshold_eur` (umbral de Directiva), `weekly_pace` (Ritmo), `protocol_version`. |
 | Especialidad (NS-CAT) | `specialties` | `nscat_code`, `cnae_class`, `status` OFFICIAL/NS_EXTENDED/PROVISIONAL, `regulated`, `overlaps_with[]`. Catálogo inicial en `src/db/nscat.ts`. |
 | Plaza | `category_seats` | Única por (Sala, especialidad). `status` ACTIVE/VACANT/WAITLISTED/RELEASED. |
-| Titular | `companies` | `status`, `tier` (Niveles), `fee_tier` (Tramo, D-025), `destacado_since` (Titular Destacado, D-043: lo fija la Ronda). |
+| Titular | `companies` | `status`, `tier` (Niveles), `fee_tier` (Tramo, D-025), `destacado_since` (Titular Destacado, D-043), `compromiso_weeks_without` · `compromiso_level` · `compromiso_checked_week` (Norma 1, D-044). `status` SUSPENDED tras la cuarta semana sin Cesión válida. |
 | Timonel | `members` | La persona que decide por la empresa (D-027). `is_primary` marca al Timonel; un segundo registro con `is_primary = false` es el Timonel suplente. `is_director` marca a la Directiva. |
 | ADN de Empresa | `business_dna` | JSONB validado por `BusinessDNA` (zod), versionado, `validated_by/at`. |
 | Capability | `capabilities` | Lo que la empresa cubre; `is_primary_seat` marca la plaza (prioridad D-001). |

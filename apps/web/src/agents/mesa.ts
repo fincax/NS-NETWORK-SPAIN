@@ -106,6 +106,7 @@ export async function runMesa(db: Db, opportunitySignalId: string): Promise<Mesa
       const companyAgent = await db.query.agents.findFirst({ where: and(eq(schema.agents.companyId, cap.companyId), eq(schema.agents.kind, "COMPANY")) });
       const specialty = specialtyById.get(cap.specialtyId);
       if (!company || !dnaRow || !companyAgent || !specialty) continue;
+      if (company.status !== "ACTIVE") continue; // titularidad suspendida (N-002): su Agente deja la Mesa
       const demandsOfReceiver = await openDemands(db, chapterId, company.id);
       const openDemand = matchingDemand(demandsOfReceiver, envelope.qualification_layer?.triggers ?? [], envelope.chapter_layer.industry);
       const capView: CapabilityView = {

@@ -64,6 +64,13 @@
       "when": 1789385548218,
       "tag": "0008_destacado",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1789386100584,
+      "tag": "0009_compromiso",
+      "breakpoints": true
     }
   ]
 }

@@ -62,7 +62,7 @@ export const categorySeats = pgTable(
     chapterId: uuid("chapter_id").notNull().references(() => chapters.id),
     specialtyId: uuid("specialty_id").notNull().references(() => specialties.id),
     companyId: uuid("company_id"),
-    status: text("status").notNull().default("VACANT"), // ACTIVE | VACANT | WAITLISTED | RELEASED
+    status: text("status").notNull().default("VACANT"), // ACTIVE | VACANT | WAITLISTED | RELEASED | SUSPENDED (N-002)
     grantedAt: timestamp("granted_at", { withTimezone: true }),
   },
   (t) => [uniqueIndex("seat_unique").on(t.chapterId, t.specialtyId)],
@@ -81,6 +81,10 @@ export const companies = pgTable("companies", {
   tier: text("tier").notNull().default("MIEMBRO"),
   feeTier: text("fee_tier").notNull().default("ENTRADA"), // D-025
   destacadoSince: timestamp("destacado_since", { withTimezone: true }), // Titular Destacado (D-043): lo fija la Ronda cada mañana
+  // Norma 1 del fundador (N-002, D-044): semanas seguidas sin Cesión válida, peldaño de la escalera y última semana evaluada
+  compromisoWeeksWithout: integer("compromiso_weeks_without").notNull().default(0),
+  compromisoLevel: integer("compromiso_level").notNull().default(0), // 0 · 1 primer aviso · 2 segundo aviso · 3 suspendida
+  compromisoCheckedWeek: text("compromiso_checked_week"), // "AAAA-MM-DD" del lunes que cierra la semana evaluada
   createdAt: createdAt(),
 });
 

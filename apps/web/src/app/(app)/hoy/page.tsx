@@ -14,6 +14,7 @@ import { candidacyCounts } from "@/services/antesala";
 import { InstallHint } from "../install-hint";
 import { activeInterview } from "@/services/entrevista";
 import { pendingEcoRequests } from "@/services/eco";
+import { compromisoStatus } from "@/services/compromiso";
 
 export default async function HoyPage() {
   await requireDemo();
@@ -52,6 +53,7 @@ export default async function HoyPage() {
   const apuntes = drafts.filter((d) => !recordBySignal.has(d.id) && draftSources.get(d.businessSignalId)?.source === "APUNTE");
   const ownDrafts = drafts.filter((d) => !recordBySignal.has(d.id) && !apuntes.includes(d) && d.visibility !== "COMPANY_ONLY");
   const ecosToRequest = await pendingEcoRequests(db, chapter.id, company.id);
+  const compromiso = await compromisoStatus(db, company.id);
   const agentState = forMe.length || ecosToRequest.length ? "esperando" : summary.matches ? "encontrado" : "analizando";
   const candidacies = member.isDirector ? await candidacyCounts(db) : null;
   const dnaRow = await db.query.businessDna.findFirst({ where: eq(schema.businessDna.companyId, company.id), columns: { validatedAt: true } });
@@ -78,6 +80,18 @@ export default async function HoyPage() {
       </div>
 
       <InstallHint />
+
+      {compromiso?.suspended ? (
+        <div className="notice error"><strong>Titularidad suspendida.</strong> {compromiso.step.message}</div>
+      ) : compromiso && compromiso.level >= 1 ? (
+        <div className="card amber" style={{ display: "grid", gap: 6 }}>
+          <p className="eyebrow">Reglamento · N-002 · {compromiso.level === 1 ? "primer aviso" : "segundo aviso"}</p>
+          <p>{compromiso.step.message}</p>
+          <p className="mono">Esta semana: {compromiso.offeredThisWeek} de {compromiso.pace} Cesión(es) válida(s). <Link href="/indicio/nuevo">Ceder un Indicio</Link> · <Link href="/sala/reglamento">Ver el Reglamento</Link></p>
+        </div>
+      ) : compromiso ? (
+        <p className="mono">Compromiso semanal (N-002): {compromiso.offeredThisWeek} de {compromiso.pace} Cesión(es) válida(s) esta semana{compromiso.weeksWithout === 1 ? " · la semana pasada no cediste ninguna: tu Agente tiene Movimientos" : ""}.</p>
+      ) : null}
 
       {dnaRow && !dnaRow.validatedAt ? (
         <Link href="/entrevista" className="card amber row" style={{ justifyContent: "space-between", textDecoration: "none" }}>

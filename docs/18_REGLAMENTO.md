@@ -61,7 +61,7 @@ Conclusión: **85** es exactamente el titular que hace todo lo que depende de é
 | Id | Norma | Estado | Fuente | Cómo se aplica | Si se incumple |
 | --- | --- | --- | --- | --- | --- |
 | **N-001** · inmutable | Nunca se cobra por una Cesión ni por una valoración. | VIGENTE | D-010 | Filtro de contraprestación en notas, Puente, Veredicto, Petición de Eco y comentarios; `REFERRAL_FEE_VIOLATION`. | Expulsión de la Sala y de la red. |
-| **N-002** · inmutable | Compromiso: mínimo de Cesiones válidas por Ejercicio. | PROTOCOLIZADA | D-010 | Ritmo por Sala y bloque Contribución del Aval. Parámetros del Compromiso pendientes del fundador. | Escalera: aviso → Directiva → plan → plaza en revisión → baja. |
+| **N-002** · inmutable · **Norma 1 del fundador** | Ceder al menos una Cesión válida a la semana, a quien corresponda. | VIGENTE | D-010, D-044 | Cada lunes la Ronda evalúa la semana anterior: vistos buenos del cedente con Salvoconducto, descontando declinadas, descartadas y caducadas, frente al Ritmo de la Sala (1). Avisos en Hoy; suspensión visible en la Sala. | Semana 2: primer aviso, con diplomacia. Semana 3: segundo aviso, tajante, con la Directiva al tanto. Semana 4: suspensión de la titularidad en NS Network (empresa, plaza y Agente suspendidos; −100 de Mérito). Reincorporación: protocolo pendiente del fundador. |
 | **N-003** · inmutable | Calidad por encima de cantidad: solo cuenta la Cesión con Veredicto válido. | VIGENTE | D-010 | Balanza y Compromiso cuentan solo válidas; `PROMISE_REVOKED` y Aval nulo si el Indicio era falso. | La Cesión no cuenta; se retira el Mérito de Promesa. |
 | **N-004** · inmutable | Comunicado semanal a la Sala. | PROTOCOLIZADA | D-018 | Protocolo II (docs/14); persistencia y Reloj semanal pendientes. | Misma escalera que el Compromiso. |
 | **N-005** · inmutable · NS | Lo que se da y lo que se recibe se ve (Balanza pública). | VIGENTE | D-019 | Balanza en Mi Sala y Dossier. | — |
@@ -84,11 +84,24 @@ Conclusión: **85** es exactamente el titular que hace todo lo que depende de é
 | **V-005** | Niveles que amplían el acceso (Contribuidor, Referente, Consejero, Fundador). | PROTOCOLIZADA | D-009, D-016 | Columna `tier`; umbrales y automatismo pendientes del fundador. | Prioridad en empates, Cesiones de otras Salas, red nacional, asiento en el consejo. |
 | **V-006** · todos | Gratificación a la Promotora de una Sala nueva. | VIGENTE | D-041 | `reward_text` al fundar la Sala. | Meses de cuota gratis u otra que NS anuncie. |
 
+## 4bis. Norma 1 del fundador, con nuestras palabras (N-002)
+
+> **Cada semana, una Cesión.** Todo titular cede al menos una Cesión con un mínimo de calidad a quien corresponda: al titular de la especialidad en su Sala o, si la plaza está vacante, por Embajada. Cuenta la Cesión que el cedente ofrece con Salvoconducto y que el cesionario no declina por falta de calidad, ni se descarta ni caduca.
+>
+> **La escalera.** La primera semana sin ceder, el Agente empuja: deja Movimientos en la Brújula y lo dice en Hoy. La segunda semana seguida, primer aviso, con toda la consideración: la Sala cuenta contigo y con una Cesión basta para volver a estar al día. La tercera, segundo aviso, tajante: si la semana siguiente termina sin Cesión, la titularidad queda suspendida, y la Directiva ya lo sabe. La cuarta, suspensión de la titularidad en NS Network: la empresa, su plaza y su Agente quedan suspendidos, y la Sala lo ve como un hecho, sin más comentario.
+>
+> **Volver a estar al día.** La primera Cesión válida reinicia la cuenta de avisos. Una empresa recién llegada no se evalúa hasta que completa su primera semana en la Sala.
+>
+> **Reincorporación.** El protocolo lo fijará el fundador. Hasta entonces, la plaza suspendida no se ofrece en la Antesala ni se cubre por Embajada sin decisión de la Directiva.
+
+Detalle técnico: `core/compromiso.ts` (semana evaluada, escalera y textos), `services/compromiso.ts` (cuenta y consecuencias), pasada en la Ronda, columnas `compromiso_weeks_without`, `compromiso_level` y `compromiso_checked_week` (migración 0009), estados `SUSPENDED` en empresa, plaza y Agente; la Mesa excluye a las suspendidas.
+
 ## 5. Borradores
 
 Ninguno todavía. Las próximas Normas y Ventajas del fundador se anotan aquí con su identificador siguiente (N-013, V-007) y pasan a las tablas cuando se fijan.
 
 ## 6. Historial
 
+- 2026-09-14 · **Norma 1 del fundador** (N-002 pasa a VIGENTE, D-044): una Cesión válida a la semana; avisos en la segunda y tercera semana; suspensión de la titularidad en la cuarta. Implementada en la Ronda.
 - 2026-09-14 · El fundador confirma el umbral 85 de Titular Destacado. Criterio protocolizado y vigente: `destacado_since` en la empresa, pasada diaria en la Ronda, marca en Dossier, Balanza y página pública, evento en la Crónica.
 - 2026-09-14 · Canal abierto (D-043). Registro sembrado con las doce Normas y seis Ventajas ya en vigor o protocolizadas en la constitución y en D-001 a D-042. Criterio de Destacado propuesto.

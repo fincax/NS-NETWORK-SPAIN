@@ -1079,3 +1079,26 @@ Cómo se aplica en el producto:
 **Consequences.** `docs/18_REGLAMENTO.md`, `core/rulebook.ts`, página `/sala/reglamento` con enlace desde Mi Sala, prueba `rulebook.test.ts`, términos Reglamento · Norma · Ventaja · Destacado en el léxico, referencia en `CLAUDE.md` y README.
 
 **Revisit when.** El fundador fije los parámetros del Compromiso (N-002) y las consecuencias pendientes (N-009, N-012), o cuando el Reglamento supere las veinte entradas y convenga agruparlas por capítulos.
+
+---
+
+## D-044 · Norma 1 del fundador: una Cesión válida a la semana; avisos en la segunda y tercera semana sin ceder; suspensión de la titularidad en la cuarta
+
+**Status:** CONFIRMED (dictada por el fundador el 2026-09-14 por el canal del Reglamento); protocolo de reincorporación PENDING
+**Date:** 2026-09-14
+
+**Context.** D-010 fijaba el Compromiso como regla inmutable con parámetros por estipular. El fundador los fija: hay que dar al menos un referido a la semana, a quien corresponda; a la cuarta semana sin ofrecer referidos con un mínimo de calidad, expulsión de NS Network; en la segunda semana, primer aviso con diplomacia; en la tercera, segundo aviso más tajante; en la cuarta, suspensión de la titularidad. La reincorporación se dirá más adelante.
+
+**Choice.** N-002 del Reglamento pasa a VIGENTE con estos parámetros, dichos en léxico NS (`docs/18` §4bis):
+
+- **Unidad y plazo.** Una Cesión válida por semana natural (lunes a domingo), frente al Ritmo de la Sala (por defecto 1). Cuenta la Cesión que el cedente ofrece con Salvoconducto (su visto bueno) y que no es declinada por falta de calidad, descartada, bloqueada ni caducada. Vale ceder a un titular de la Sala o, con la plaza vacante, por Embajada.
+- **Escalera.** Semana 1 sin ceder: empujón del Agente con Movimientos. Semana 2: primer aviso, diplomático, privado. Semana 3: segundo aviso, tajante, privado y con la Directiva al tanto. Semana 4: suspensión de la titularidad: empresa, plaza y Agente pasan a SUSPENDED, `CONTRIBUTION_QUOTA_MISSED` (−100), la Sala ve la plaza suspendida, la Mesa deja de proponer a ese titular.
+- **Reinicio.** La primera Cesión válida reinicia la cuenta (`CONTRIBUTION_QUOTA_MET`). Una empresa no se evalúa hasta completar su primera semana en la Sala.
+- **Ejecución.** Cada mañana, en la Ronda, se evalúa una sola vez la semana completa anterior (idempotente por semana). Hoy muestra el estado del Compromiso y los avisos.
+- **Reincorporación.** Pendiente del fundador. Mientras tanto, la plaza suspendida no se ofrece en la Antesala ni se cubre por Embajada sin decisión de la Directiva.
+
+**Why.** Es la regla inmutable 2 con números: un ritmo alcanzable (una a la semana), avisos graduales que respetan a la persona y una consecuencia cierta. El Agente hace casi todo el trabajo de encontrar qué ceder; la Norma solo exige que el Timonel decida una vez por semana.
+
+**Consequences.** `core/compromiso.ts`, `services/compromiso.ts`, pasada en la Ronda, migración 0009, exclusión de suspendidas en la Mesa, aviso en Hoy, N-002 en `rulebook.ts`, `docs/18` §4bis, prueba `compromiso.test.ts`.
+
+**Revisit when.** El fundador fije el protocolo de reincorporación; se conozca la proporción de titulares que llegan al segundo aviso en la Sala piloto; se decida si la Directiva puede conceder una semana de gracia justificada.

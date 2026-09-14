@@ -6,6 +6,8 @@
  *     fuentes propias (D-038), las que su Timonel le ha añadido. Los registros públicos
  *     nuevos se reparten: empieza el Agente que menos ha rastreado, para que los Indicios en borrador
  *     no caigan siempre en el mismo Timonel.
+ *  2b. Compromiso (N-002, Norma 1 del fundador): cada lunes se evalúa la semana anterior; avisos en la 2.ª y 3.ª semana
+ *     sin Cesión válida, suspensión de la titularidad en la 4.ª.
  *  3. Destacados (D-043): se recalcula quién es Titular Destacado (Aval firme ≥ 85, sin incumplimientos) y la Crónica lo anuncia.
  *  4. Un evento RONDA por Sala en la Mesa Permanente, con el resumen, para que se vea que la red trabajó.
  *
@@ -20,6 +22,7 @@ import { runClock, type ClockResult } from "@/services/clock";
 import { runRastreo, SampleFeed, type PublicFeed } from "@/agents/rastreo";
 import { runOwnSources } from "@/services/sources";
 import { runDestacados } from "@/services/eco";
+import { runCompromiso, type CompromisoResult } from "@/services/compromiso";
 import { fetchText as defaultFetch, type FetchText } from "@/agents/feeds";
 
 export interface RondaChapterResult {
@@ -29,6 +32,7 @@ export interface RondaChapterResult {
   rastreo: { agents: number; drafts: number; skipped: number };
   ownSources: { sources: number; drafts: number; errors: number };
   destacados: { gained: number; lost: number; total: number }; // D-043
+  compromiso: CompromisoResult; // N-002 · Norma 1 del fundador
 }
 
 export interface RondaResult {
@@ -64,8 +68,9 @@ export async function runRonda(db: Db, now = new Date(), feed: PublicFeed = new 
       ownSources.errors += o.errors;
     }
 
+    const compromiso = await runCompromiso(db, chapter.id, now);
     const destacados = await runDestacados(db, chapter.id, now);
-    const worked = clock.reminders + clock.expired + clock.late + clock.nudges + rastreo.drafts + ownSources.drafts + destacados.gained + destacados.lost > 0;
+    const worked = clock.reminders + clock.expired + clock.late + clock.nudges + rastreo.drafts + ownSources.drafts + destacados.gained + destacados.lost + compromiso.firstWarnings + compromiso.secondWarnings + compromiso.suspensions > 0;
     if (worked) {
       const parts = [
         clock.reminders ? `${clock.reminders} recordatorio(s)` : null,
@@ -75,10 +80,12 @@ export async function runRonda(db: Db, now = new Date(), feed: PublicFeed = new 
         rastreo.drafts ? `${rastreo.drafts} Indicio(s) en borrador desde fuentes públicas` : null,
         ownSources.drafts ? `${ownSources.drafts} Indicio(s) en borrador desde fuentes propias de los Agentes` : null,
         destacados.gained ? `${destacados.gained} nuevo(s) Titular(es) Destacado(s)` : null,
+        compromiso.firstWarnings + compromiso.secondWarnings ? `${compromiso.firstWarnings + compromiso.secondWarnings} aviso(s) del Reglamento` : null,
+        compromiso.suspensions ? `${compromiso.suspensions} titularidad(es) suspendida(s)` : null,
       ].filter(Boolean);
       await audit(db, { chapterId: chapter.id, kind: "RONDA", actor: { type: "AGENT", id: "ronda" }, subject: { type: "Chapter", id: chapter.id }, policyApplied: "ronda.daily", result: `Ronda de la mañana con ${rastreo.agents} Agentes en la Mesa: ${parts.join(", ")}.`, significant: true });
     }
-    out.chapters.push({ chapterId: chapter.id, chapterName: chapter.name, clock, rastreo, ownSources, destacados });
+    out.chapters.push({ chapterId: chapter.id, chapterName: chapter.name, clock, rastreo, ownSources, destacados, compromiso });
   }
   return out;
 }
