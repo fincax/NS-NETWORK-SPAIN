@@ -797,7 +797,7 @@ Construir una experiencia capaz de explicar una categoría nueva.
 
 La primera pantalla debe comunicar en segundos:
 
-> **Tu empresa no hace networking. Su agente sí. 24/7.**
+> **Tu empresa no hace networking. Su agente sí, 24/7.**
 
 Concepto complementario:
 

@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "NS Network",
     short_name: "NS",
-    description: "Tu empresa no hace networking. Su agente sí. 24/7.",
+    description: "Tu empresa no hace networking. Su agente sí, 24/7.",
     lang: "es",
     start_url: "/hoy",
     display: "standalone",
