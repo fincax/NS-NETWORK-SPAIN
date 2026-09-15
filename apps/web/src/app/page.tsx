@@ -126,7 +126,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
       </section>
 
       <footer className="public-footer">
-        <span className="mono">NS Network Spain · Beta privada · Sevilla · {new Date().getFullYear()}</span>
+        <span className="mono">NS Network Spain · Be Trendy, S.L. · Sevilla · {new Date().getFullYear()}</span>
         <span className="spacer" />
         <Link href="/privacidad" className="mono">Privacidad</Link>
         <Link href="/acceso" className="mono">Acceso a la demostración</Link>

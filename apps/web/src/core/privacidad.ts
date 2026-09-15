@@ -6,11 +6,15 @@
  * Los datos de terceros que manejarán los Agentes con empresas reales se regulan en docs/08 y exigen revisión jurídica
  * antes de producción (docs/17, condición 4).
  */
-export const PRIVACIDAD_VERSION = "2026-09-15.1";
+export const PRIVACIDAD_VERSION = "2026-09-15.2";
 
-/** Quién responde de los datos. Pendiente del fundador: razón social, NIF y domicilio (PENDIENTES_DEL_FUNDADOR). */
+/** Quién responde de los datos: la sociedad propietaria de NS Network Spain. */
 export const RESPONSABLE = {
   nombre: "NS Network Spain",
+  razonSocial: "Be Trendy, S.L.",
+  nif: "B90130725",
+  domicilio: "calle Valparaíso, 18, 41013 Sevilla",
+  telefono: "627 542 045",
   /** Buzón de privacidad. Se fija con NS_CONTACT_EMAIL en el servidor; el valor por defecto debe existir como buzón real. */
   contacto: process.env.NS_CONTACT_EMAIL ?? "privacidad@networkspain.com",
 } as const;
@@ -24,7 +28,7 @@ export const PRIVACIDAD_SECCIONES: readonly SeccionPrivacidad[] = [
   {
     title: "Quién trata tus datos",
     paragraphs: [
-      `${RESPONSABLE.nombre}, promotora de la red empresarial NS Network en España, con contacto en ${RESPONSABLE.contacto}.`,
+      `${RESPONSABLE.razonSocial}, con NIF ${RESPONSABLE.nif} y domicilio en ${RESPONSABLE.domicilio}, propietaria y promotora de ${RESPONSABLE.nombre}. Contacto para todo lo relativo a tus datos: ${RESPONSABLE.contacto} o el teléfono ${RESPONSABLE.telefono}.`,
       "Este aviso cubre la web pública networkspain.com y la demostración privada que se enseña desde ella. Cuando NS abra Salas con empresas reales, publicará las condiciones de la plaza y el tratamiento de los datos que manejan los Agentes, y pedirá de nuevo tu conformidad.",
     ],
   },
@@ -77,4 +81,4 @@ export const PRIVACIDAD_SECCIONES: readonly SeccionPrivacidad[] = [
 ] as const;
 
 /** Texto de la casilla de consentimiento de la candidatura. Se guarda la versión con la que se aceptó. */
-export const CONSENTIMIENTO_CANDIDATURA = `He leído el aviso de privacidad y acepto que ${RESPONSABLE.nombre} trate mis datos solo para gestionar mi candidatura.`;
+export const CONSENTIMIENTO_CANDIDATURA = `He leído el aviso de privacidad y acepto que ${RESPONSABLE.razonSocial} (${RESPONSABLE.nombre}) trate mis datos solo para gestionar mi candidatura.`;

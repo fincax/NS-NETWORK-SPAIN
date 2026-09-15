@@ -42,4 +42,4 @@ Lo que se ha dejado deliberadamente "para más adelante". Claude lo recuerda cua
 - Tipografía definitiva (D-023).
 - Política de notificaciones push (D-039).
 - Textos legales y GDPR (`docs/08`, condición 4 de `docs/17`). Hecho el aviso de privacidad de la web pública (D-055); falta el resto de `docs/08` §3 con el abogado.
-- **Responsable del tratamiento** (D-055): razón social, NIF y domicilio para el aviso de privacidad, y crear el buzón `privacidad@networkspain.com` o fijar `NS_CONTACT_EMAIL` en el servidor.
+- ~~Responsable del tratamiento~~ → Be Trendy, S.L. (D-055, aviso 2026-09-15.2). Pendiente: crear el buzón `privacidad@networkspain.com` o fijar `NS_CONTACT_EMAIL` en el servidor.

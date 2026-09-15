@@ -33,7 +33,7 @@ export default function PrivacidadPage() {
             {s.paragraphs.map((p, i) => <p key={i}>{p}</p>)}
           </section>
         ))}
-        <p className="mono" style={{ marginTop: 32 }}>Contacto para todo lo relativo a tus datos: {RESPONSABLE.contacto}</p>
+        <p className="mono" style={{ marginTop: 32 }}>{RESPONSABLE.razonSocial} · NIF {RESPONSABLE.nif} · {RESPONSABLE.domicilio} · {RESPONSABLE.contacto} · {RESPONSABLE.telefono}</p>
       </main>
 
       <footer className="public-footer">
