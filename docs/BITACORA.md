@@ -22,7 +22,7 @@ Punto de parada y siguiente paso. Se actualiza al cerrar cada sesión de trabajo
 4. Al día siguiente, mirar `/var/log/ns-ronda.log` en el servidor: es la primera Ronda con las fuentes públicas reales (D-051).
 5. Opcional: poner `ANTHROPIC_API_KEY` en `.env.production` (docs/17 §4c, paso 6) para que los Agentes razonen con Claude y la Mesa corra en segundo plano (D-053).
 6. Envío de correos para invitaciones y recuperación de contraseña (D-054); después notificaciones push (D-039), que ya tienen dominio publicado.
-7. Fusionar y aplicar las copias con `actualizar.sh`; guardar la clave; configurar el remoto `ns-copias`. Después: resto de `docs/08` con el abogado, Protocolo II (Comunicado y Gaceta) y Brújula.
+7. Después: resto de `docs/08` con el abogado, Protocolo II (Comunicado y Gaceta) y Brújula.
 
 **Para actualizar el servidor** cuando haya código nuevo en `main`: `bash /opt/ns-network/deploy/actualizar.sh`.
 
