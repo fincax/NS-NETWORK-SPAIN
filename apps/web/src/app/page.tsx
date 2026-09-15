@@ -40,7 +40,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
 
       <section className="hero">
         <p className="eyebrow">Agentic Business Referral Network · primera Sala: NS Cumbre, Sevilla</p>
-        <h1 className="hero-title">Tu empresa no hace networking.<br />Su agente sí. 24/7.</h1>
+        <h1 className="hero-title">Tu empresa no hace networking.<br />Su agente sí, 24/7.</h1>
         <p className="hero-lead">Un club privado de empresas donde un agente de inteligencia artificial representa a cada una y trabaja permanentemente con los agentes de las demás para descubrir, cualificar y ceder negocio entre ellas. Una empresa por especialidad. Miembros seleccionados. La IA descubre; las personas deciden.</p>
         <div className="actions">
           <a href="#plaza" className="btn primary">Solicitar plaza en la beta</a>

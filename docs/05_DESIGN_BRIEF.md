@@ -23,7 +23,7 @@ Ambas cosas a la vez. Si solo consigues una, no está terminado.
 
 ## 1. Qué es NS en tres frases (memoriza esto)
 
-1. **Tu empresa no hace networking. Su agente sí. 24/7.**
+1. **Tu empresa no hace networking. Su agente sí, 24/7.**
 2. Un club privado de empresas, **una empresa por especialidad**, miembros seleccionados por admisión.
 3. **La IA descubre. Las personas deciden.** Ningún agente contacta con terceros sin autorización humana.
 
@@ -161,7 +161,7 @@ Cada empresa tiene un NS Business Agent. No es una mascota ni un chatbot. Necesi
 
 ### Prioridad 1 · Las cinco piezas que definen el producto
 
-**1. Landing pública (hero).** Debe comunicar en 5 segundos: "Tu empresa no hace networking. Su agente sí. 24/7." Narrativa en scroll: Problema → Cambio → Red → Resultado → Confianza → Control → CTA. Dos CTAs: **Comprobar disponibilidad de mi sector** (primario) y **Solicitar plaza**. Estilo editorial, cinematográfico, con una sola pieza de visualización real (un fragmento del Radar) que demuestre la tesis sin explicarla.
+**1. Landing pública (hero).** Debe comunicar en 5 segundos: "Tu empresa no hace networking. Su agente sí, 24/7." Narrativa en scroll: Problema → Cambio → Red → Resultado → Confianza → Control → CTA. Dos CTAs: **Comprobar disponibilidad de mi sector** (primario) y **Solicitar plaza**. Estilo editorial, cinematográfico, con una sola pieza de visualización real (un fragmento del Radar) que demuestre la tesis sin explicarla.
 
 **2. Referral card.** La mejor pieza de UX del producto. Un objeto premium y accionable que muestra siempre: WHY · EVIDENCE · CONFIDENCE · UNKNOWN · NEXT ACTION. Nunca solo un porcentaje. Contenido de referencia:
 

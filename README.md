@@ -2,7 +2,7 @@
 
 **Agentic Business Referral Network.** Un club privado de empresas donde cada miembro dispone de un agente de IA que representa sus intereses comerciales y trabaja 24/7 junto a los agentes de las demás empresas para descubrir, cualificar y facilitar negocio entre ellas.
 
-> Tu empresa no hace networking. Su agente sí. 24/7.
+> Tu empresa no hace networking. Su agente sí, 24/7.
 
 Primera implantación: **NS Sevilla · NS Cumbre** (primera Sala de la zona), una empresa por especialidad en cada Sala. Las Salas llevan nombre propio autorizado por NS; el nombre de la ciudad queda reservado a la zona (D-014).
 
