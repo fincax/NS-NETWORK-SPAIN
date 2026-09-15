@@ -157,5 +157,5 @@ Marca           Paraguas "NS Network" + país (D-034). Dominios paraguas a reser
 ## 5. Resumen
 
 - **Hoy:** fusionamos todo en la rama principal. La aplicación funciona de principio a fin en local con un comando.
-- **Ahora:** el código de la demo privada y la portada beta está listo. Publicarla en networkspain.com son los cinco pasos del apartado 4, con tus cuentas.
+- **Ahora:** la demo privada y la portada beta están publicadas en https://networkspain.com desde el 15 de septiembre de 2026, en un servidor propio (apartado 4c). Para actualizarla con lo nuevo de `main`: `bash /opt/ns-network/deploy/actualizar.sh`.
 - **Producción:** cuando estén las cinco condiciones y la puerta de Fase 1. Unas 4 a 6 semanas de trabajo, y solo entonces con empresas reales.
