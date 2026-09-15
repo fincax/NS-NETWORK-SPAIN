@@ -114,7 +114,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
             </div>
             <div className="field" style={{ gridColumn: "1 / -1" }}><label htmlFor="msg">Cuéntanos en una frase a quién sirve tu empresa (opcional)</label><input id="msg" name="message" maxLength={280} /></div>
             <div className="actions" style={{ gridColumn: "1 / -1" }}><button className="btn primary" type="submit">Presentar candidatura</button></div>
-            <p className="mono" style={{ gridColumn: "1 / -1" }}>Reglas que aceptarás al entrar: nunca se cobra por un referido; toda empresa aporta un mínimo de referidos de calidad; lo que se da y lo que se recibe se ve. La cuota empieza baja y solo sube cuando NS te ha generado negocio.</p>
+            <p className="mono" style={{ gridColumn: "1 / -1" }}>Normas NS que aceptarás de forma expresa al ocupar tu plaza: nunca se cobra por un referido; al menos una Cesión válida a la semana, sin excusas (cuatro semanas sin ceder suponen la baja); la calidad importa más que la cantidad; dar a conocer tu trabajo a la Sala cada semana; lo que se da y lo que se recibe se ve. La cuota empieza baja y solo sube cuando NS te ha generado negocio.</p>
           </form>
         )}
       </section>

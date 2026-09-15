@@ -81,11 +81,11 @@ Cada paso emite un `AuditEvent{ kind, actor, subject, inputs_used[{type,id,layer
 
 ## 6. Runtime
 
-En v0.1 la Mesa se ejecuta de forma síncrona al publicar un Indicio (segundos con el proveedor determinista). Con el proveedor Anthropic la extracción y las cualificaciones son llamadas de red; el siguiente paso es moverlas a un job en segundo plano con cola persistente, idempotencia por `opportunity_signal_id` y estado `NEEDS_HUMAN` ante fallos repetidos, sin cambiar el contrato de los agentes.
+La Mesa corre de dos formas (D-053): **en línea** al publicar (demo y pruebas, proveedor determinista, segundos) o **en cola** (`agent_jobs`) con el modelo real: un trabajo por Indicio, reclamación exclusiva, tres intentos con espera creciente y `NEEDS_HUMAN` con aviso al cedente. La cola se drena tras responder a la publicación (`after()`), en cada Ronda antes del Reloj y por `GET /api/jobs`. El contrato de los agentes no cambia. Además de la Mesa, la Ronda ejecuta el Reloj (plazos y Compromiso), el Rastreo (fuentes públicas reales con `NS_PUBLIC_FEEDS=real`, D-051; empresas en Prueba de Valor incluidas, D-050) y las fuentes propias.
 
 ## 7. Pendiente
 
-- Adaptadores reales de Rastreo (BORME, PLACE, licencias, empleo) y Sondeo (grafo de relaciones).
+- Adaptadores de Rastreo pendientes: BORME (PDF por provincia), licencias y empleo; Sondeo (grafo de relaciones). PLACE y prensa, hechos (D-051).
 - Cualificación real agente-a-agente con preguntas generadas por el Agente receptor (hoy: tres preguntas críticas fijas).
 - Recalibración de pesos a partir de S14 (`historical_conversion`, `member_reputation` son priors fijos).
 - Protocolos II y III: Comunicado, Gaceta, Brújula y Movimientos.

@@ -1,6 +1,7 @@
 import { getDb } from "@/db/client";
 import { requireMember } from "@/lib/session";
 import { mesaTimeline } from "@/services/today";
+import { mesaLoad } from "@/services/jobs";
 import { time, dateTime } from "@/lib/format";
 import { Empty } from "@/components/ui";
 
@@ -21,6 +22,7 @@ export default async function MesaPage() {
   const { company, chapter } = await requireMember();
   const db = await getDb();
   const events = await mesaTimeline(db, chapter.id, company.id, 60);
+  const load = await mesaLoad(db, chapter.id, company.id);
   return (
     <div className="stack" style={{ gap: 24 }}>
       <div className="page-head">
@@ -28,6 +30,7 @@ export default async function MesaPage() {
           <p className="eyebrow">{chapter.name} · Mesa Permanente</p>
           <h1>Los Agentes de la Sala, reunidos 24/7.</h1>
           <p className="lead">Solo eventos significativos. Los razonamientos internos no se registran; las decisiones, la evidencia y la política aplicada, sí.</p>
+          <p className="mono" aria-live="polite">{load.total ? `En la Mesa ahora: ${load.total} Indicio(s) en cualificación${load.mine ? `, ${load.mine} tuyo(s)` : ""}.` : "La Mesa está al día: ningún Indicio pendiente de cualificar."}{load.needsHuman ? ` · ${load.needsHuman} tuyo(s) esperan tu revisión.` : ""}</p>
         </div>
       </div>
       {events.length === 0 ? (

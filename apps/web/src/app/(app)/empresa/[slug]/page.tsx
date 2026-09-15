@@ -1,25 +1,35 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { getDb, schema } from "@/db/client";
 import { requireMember } from "@/lib/session";
 import { balance } from "@/services/today";
 import { eur } from "@/lib/format";
 import { AgentAvatar } from "@/components/brand";
 import { openDemands } from "@/services/demands";
-import { createDemandAction, closeDemandAction, addSourceAction, removeSourceAction, runOwnSourcesAction } from "./actions";
+import { createDemandAction, closeDemandAction, addSourceAction, removeSourceAction, runOwnSourcesAction, addSeatAction, inviteMemberAction } from "./actions";
+import { authMode } from "@/lib/auth";
+import { valoracionActual } from "@/services/valoracion";
+import { VALORACION } from "@/core/valoracion";
 import { listSources, MAX_SOURCES_PER_AGENT } from "@/services/sources";
 import { dateTime } from "@/lib/format";
 
-export default async function EmpresaPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ fuente?: string; adn?: string }> }) {
+export default async function EmpresaPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ fuente?: string; adn?: string; error?: string; invite?: string }> }) {
   const { slug } = await params;
-  const { fuente: sourceError, adn } = await searchParams;
-  const { company: me, chapter } = await requireMember();
+  const { fuente: sourceError, adn, error, invite } = await searchParams;
+  const { company: me, chapter, member: viewer } = await requireMember();
+  const publicUrl = process.env.NS_PUBLIC_URL ?? "http://localhost:3000";
   const db = await getDb();
   const company = await db.query.companies.findFirst({ where: eq(schema.companies.slug, slug) });
   if (!company || company.chapterId !== chapter.id) notFound();
   const dnaRow = await db.query.businessDna.findFirst({ where: eq(schema.businessDna.companyId, company.id) });
   const person = await db.query.members.findFirst({ where: and(eq(schema.members.companyId, company.id), eq(schema.members.isPrimary, true)) });
+  const acceptance = await db.query.rulesAcceptances.findFirst({ where: eq(schema.rulesAcceptances.companyId, company.id), orderBy: [desc(schema.rulesAcceptances.acceptedAt)] });
+  const acceptor = acceptance ? await db.query.members.findFirst({ where: eq(schema.members.id, acceptance.memberId) }) : undefined;
+  const valoracion = await valoracionActual(db, company.chapterId, company.id);
+  const mySeats = await db.select({ name: schema.specialties.name }).from(schema.categorySeats).innerJoin(schema.specialties, eq(schema.specialties.id, schema.categorySeats.specialtyId)).where(and(eq(schema.categorySeats.companyId, company.id), eq(schema.categorySeats.status, "ACTIVE")));
+  const vacantSeats = company.id === me.id ? await db.select({ code: schema.specialties.nscatCode, name: schema.specialties.name }).from(schema.categorySeats).innerJoin(schema.specialties, eq(schema.specialties.id, schema.categorySeats.specialtyId)).where(and(eq(schema.categorySeats.chapterId, company.chapterId), eq(schema.categorySeats.status, "VACANT"))) : [];
+  const pct = (x: number | null) => (x === null ? "—" : `${Math.round(x * 100)} %`);
   const seat = await db.select({ name: schema.specialties.name }).from(schema.categorySeats).innerJoin(schema.specialties, eq(schema.specialties.id, schema.categorySeats.specialtyId)).where(eq(schema.categorySeats.companyId, company.id));
   const bal = await balance(db, chapter.id, company.id);
   const distinctions = await db.query.recognitions.findMany({ where: eq(schema.recognitions.toCompanyId, company.id) });
@@ -39,6 +49,9 @@ export default async function EmpresaPage({ params, searchParams }: { params: Pr
         <AgentAvatar state={own ? "analizando" : "reposo"} label={own ? "Tu Agente, en la Mesa" : `Agente de ${company.name}`} />
       </div>
       {own && !dnaRow?.validatedAt ? <div className="notice amber row" style={{ justifyContent: "space-between" }}><span><strong>Tu ADN está sin validar.</strong> Hasta que termines la entrevista con tu Agente, trabajará con lo poco que sabe.</span><Link href="/entrevista" className="btn small primary">Hacer la entrevista</Link></div> : null}
+      {error ? <div className="notice error">{error}</div> : null}
+      {invite ? <div className="notice" style={{ borderColor: "var(--green)", display: "grid", gap: 6 }}><strong>Enlace de acceso para {person?.fullName} (un solo uso, siete días).</strong><span>Envíaselo por el canal que prefieras; al abrirlo elige su contraseña y entra. Este enlace no vuelve a mostrarse.</span><code className="invite-link" style={{ userSelect: "all", wordBreak: "break-all" }}>{`${publicUrl}/invitacion/${invite}`}</code></div> : null}
+      {viewer.isDirector && !own && authMode() === "real" ? <form action={inviteMemberAction}><input type="hidden" name="slug" value={company.slug} /><button className="btn small" type="submit">Enlace de acceso para el Timonel</button></form> : null}
       {own && adn === "validado" ? <div className="notice" style={{ borderColor: "var(--green)" }}>ADN validado. Tu Agente trabaja ya con la versión {dnaRow?.version} en la Mesa.</div> : null}
       <div className="grid grid-3">
         <div className="card kpi"><span className="value">{bal.given}</span><span className="label">Cesiones hechas</span></div>
@@ -101,11 +114,34 @@ export default async function EmpresaPage({ params, searchParams }: { params: Pr
           {sources.length ? <form action={runOwnSourcesAction} style={{ marginTop: 10 }}><input type="hidden" name="slug" value={company.slug} /><button className="btn small ghost" type="submit">Leer mis fuentes ahora</button></form> : null}
         </section>
       ) : null}
+      <section className="card" aria-label="Valoración">
+        <div className="row" style={{ justifyContent: "space-between" }}>
+          <div><p className="eyebrow">Valoración · {valoracion.decisive.monthLabel}</p><strong style={{ fontSize: 22 }}>{pct(valoracion.decisive.score)}</strong> <span className="mono">· en curso ({valoracion.current.monthLabel}): {pct(valoracion.current.score)}</span></div>
+          <div className="row" style={{ gap: 8 }}>
+            <span className={`badge ${valoracion.decisive.eligibleEmbajada ? "green" : ""}`}>{valoracion.decisive.eligibleEmbajada ? "Apta para Embajada" : `Embajada: ≥ ${Math.round(VALORACION.threshold * 100)} % un mes`}</span>
+            <span className={`badge ${valoracion.decisive.eligibleDireccion ? "green" : ""}`}>{valoracion.decisive.eligibleDireccion ? "Candidata a Director/a de Sala" : "Dirección: mismo umbral"}</span>
+          </div>
+        </div>
+        <ul className="plain" style={{ marginTop: 10 }}>
+          {valoracion.decisive.components.map((c) => <li key={c.key} className="row"><span style={{ minWidth: 170 }}>{c.label}</span><span className="mono">peso {Math.round(c.weight * 100)} %</span><span className="mono">{pct(c.value)}</span><span className="mono">{c.detail}</span></li>)}
+        </ul>
+        <p className="mono" style={{ marginTop: 8 }}>Mide calidad y fiabilidad, nunca cantidad (D-045). Los componentes sin datos no cuentan ni a favor ni en contra. Titularidades en esta Sala: {mySeats.map((s) => s.name).join(" · ") || "—"}.</p>
+      </section>
+
       {own ? (
         <section className="card quiet">
           <p className="eyebrow">Solo tú ves esto</p>
           <p>Nunca se comparte: {dna.knowledge.never_share.join(", ") || "nada declarado"}. Tu ADN está en la versión {dnaRow.version}{dnaRow.validatedAt ? ", validado" : ", sin validar"}.</p>
+          <p className="mono" style={{ marginTop: 8 }}>{acceptance ? `Normas NS aceptadas de forma expresa (versión ${acceptance.rulesVersion}) por ${acceptor?.fullName ?? "el Timonel"} el ${dateTime(acceptance.acceptedAt)}.` : "Sin aceptación de las Normas NS registrada."}</p>
           <div className="actions"><Link href="/entrevista" className="btn small">{dnaRow.validatedAt ? "Ampliar mi ADN con la entrevista del Agente" : "Hacer la entrevista del Agente"}</Link></div>
+          {vacantSeats.length ? (
+            <form action={addSeatAction} className="row" style={{ marginTop: 14, alignItems: "end" }}>
+              <input type="hidden" name="slug" value={company.slug} />
+              <div className="field" style={{ minWidth: 280 }}><label htmlFor="seat2">Otra especialidad de tu empresa (otro CNAE) en esta Sala</label><select id="seat2" name="specialtyCode" required defaultValue=""><option value="" disabled>Plazas vacantes…</option>{vacantSeats.map((s) => <option key={s.code} value={s.code}>{s.name}</option>)}</select></div>
+              <button className="btn small" type="submit">Ocupar también esta plaza</button>
+              <span className="mono" style={{ flexBasis: "100%" }}>Cada plaza es una titularidad con su propio Compromiso semanal. NS premia con Mérito de Red llevar la siguiente especialidad a otra Sala de la zona (D-047).</span>
+            </form>
+          ) : null}
         </section>
       ) : null}
     </div>

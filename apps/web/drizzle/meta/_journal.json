@@ -50,6 +50,55 @@
       "when": 1789344638131,
       "tag": "0006_fundacion",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1789423288754,
+      "tag": "0007_compromiso",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1789424582863,
+      "tag": "0008_normas",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1789425655247,
+      "tag": "0009_expediente_baja",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1789427746182,
+      "tag": "0010_valoracion",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1789429913999,
+      "tag": "0011_prueba_de_valor",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1789430387564,
+      "tag": "0012_agent_jobs",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1789431001741,
+      "tag": "0013_cuentas",
+      "breakpoints": true
     }
   ]
 }

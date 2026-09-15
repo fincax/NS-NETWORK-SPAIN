@@ -145,6 +145,8 @@ NS Sevilla
 
 Puede haber varias Salas en una misma ciudad.
 
+**Varios CNAE, varias titularidades (D-047).** Una empresa con varias especialidades puede ocupar varias plazas en la misma Sala, cada una con su titularidad y su Compromiso. NS premia con Mérito de Red que lleve cada especialidad a una Sala distinta, porque así se crean Salas.
+
 **Plaza ocupada, Sala nueva (D-041).** Cuando una empresa pretende entrar y su plaza ya está ocupada por otra del mismo sector, NS la ayuda a promover, promocionar e iniciar una nueva Sala. Si consigue el número mínimo de fundadoras que se exija (a determinar en la práctica), recibe como compensación una gratificación que NS anuncia, por ejemplo unos meses de cuota gratis. Nunca es dinero por referidos.
 
 **La Sala no es territorial (D-014).** Una Sala se define por sus empresas, no por un mapa. No tiene barrio, distrito ni radio. Su nombre no debe dar ninguna pista territorial: el nombre de la ciudad o municipio está reservado a NS para agrupar las Salas de la zona ("NS Sevilla"), y ninguna Sala puede llevar el nombre de una ciudad, municipio, provincia, comunidad autónoma, país, barrio o distrito. Cada Sala elige un nombre propio, con el prefijo NS, autorizado por NS y único en toda la red: "NS Cumbre", "NS Ágora". Las Salas de una zona se encuentran entre sí (encuentros entre Salas) porque generan negocio, no porque compartan territorio.
@@ -316,6 +318,8 @@ Otro CTA poderoso: **Comprobar disponibilidad de mi sector**.
 
 La exclusividad de categoría es simultáneamente una regla operativa y un elemento comercial.
 
+**Prueba de Valor (D-050).** Antes de la plaza, siete días de Agente: el candidato ve lo que su Agente habría cedido a la Sala y, en agregado y sin identidad, lo que la Sala ya encontró para su especialidad. Las dos caras miran a los demás. Es el argumento de venta de NS.
+
 ## 9. El agente empresarial
 
 Cada empresa debe disponer de su **NS Business Agent**.
@@ -427,6 +431,8 @@ Durante las últimas 24 horas:
 ```
 
 La directiva no debe verse obligada a leer conversaciones completas. Debe recibir inteligencia ejecutiva.
+
+**Director/a de Sala (D-046, D-048).** Quien dirige una Sala se llama Director/a de Sala. Es candidata quien alcanza un 80 % de Valoración durante un mes. Promueve acciones entre Salas y resuelve dudas entre Timoneles, y todo ello suma Valoración: dirigir bien se ve y cuenta.
 
 ### Global Routing Agent
 
@@ -603,6 +609,7 @@ La empresa que acoge la cesión se convierte en **Embajadora** de esa especialid
 Reglas del core:
 
 - Solo procede cuando la plaza está vacante en la Sala del cedente. El sistema lo verifica. Con la plaza ocupada, la prioridad es siempre de la propia Sala.
+- **Solo puede ser Embajadora una titular con al menos un 80 % de Valoración durante un mes completo** (D-046). La Valoración es un porcentaje mensual explicable que mide calidad y fiabilidad, nunca cantidad: Veredictos recibidos, Compromiso, plazo de respuesta, Comunicado y servicio a la red. Con ese mismo umbral, la titular es candidata a **Director/a de Sala**.
 - Si resuelve (veredicto válido de la Embajadora, y más aún si llega a valor contrastado), el cedente recibe una **prima de Mérito muy superior** a la de una cesión ordinaria. La Embajadora recibe Mérito como en cualquier cesión y la mención "Embajadora de [especialidad] en [Sala]" en su Hoja de Méritos. Parámetros propuestos en D-015.
 - La condición de Embajadora es temporal: termina cuando la plaza se cubre o al cierre del Ejercicio siguiente si no hay nuevas Embajadas. Una empresa puede ser Embajadora en un máximo de dos Salas a la vez, para que la figura no se convierta en una membresía múltiple encubierta. La Embajadora no adquiere derecho ni prioridad sobre la plaza.
 - Cada Embajada deja constancia de una plaza que la Sala debería cubrir desde la Antesala. Tres Embajadas de una misma especialidad en un Ejercicio abren candidatura preferente para esa plaza.
@@ -1047,26 +1054,31 @@ Si ninguna respuesta es sí, cuestiona la feature.
 
 ## 3. Crea documentación viva
 
-Mantener como mínimo:
+Estos son los documentos vivos del proyecto (D-045). Cada uno tiene una función; no se crean documentos que no correspondan al producto real.
 
 ```text
 /
-├── CLAUDE.md
-├── README.md
+├── CLAUDE.md                              Constitución del producto (este documento).
+├── README.md                              Cómo arrancar, probar y desplegar; índice de docs.
 ├── docs/
-│   ├── 00_NORTH_STAR.md
-│   ├── 01_PRODUCT_REQUIREMENTS.md
-│   ├── 02_NS_AGENTIC_REFERRAL_PROTOCOL.md
-│   ├── 03_USER_ROLES.md
-│   ├── 04_INFORMATION_ARCHITECTURE.md
-│   ├── 05_DESIGN_SYSTEM.md
-│   ├── 06_DATA_MODEL.md
-│   ├── 07_AGENT_ARCHITECTURE.md
-│   ├── 08_SECURITY_PRIVACY_GDPR.md
-│   ├── 09_ANALYTICS.md
-│   ├── 10_ROADMAP.md
-│   └── DECISIONS.md
+│   ├── 00_NORTH_STAR.md                   Tesis, mantra, métricas, reglas inmutables.
+│   ├── 02_NS_AGENTIC_REFERRAL_PROTOCOL.md NS-ARP: objetos, fases, score, compliance, auditoría.
+│   ├── 05_DESIGN_BRIEF.md                 Dirección visual y brief de diseño.
+│   ├── 06_DATA_MODEL.md                   Modelo de datos implementado y pendientes.
+│   ├── 07_AGENT_ARCHITECTURE.md           Agentes, proveedores de modelo, Ronda, Rastreo.
+│   ├── 08_SECURITY_PRIVACY_GDPR.md        (por escribir · obligatorio antes de producción, docs/17 condición 4)
+│   ├── 11_IDEAS_DISRUPTIVAS.md            Banco de ideas; lo adoptado pasa a DECISIONS.
+│   ├── 12_SALAS.md                        Zonas, saturación, NS-CAT, plaza, Embajada, fundación.
+│   ├── 13_LEXICO_NS.md                    Léxico oficial y mapeo a identificadores técnicos.
+│   ├── 14_PROTOCOLOS_DE_SALA.md           Protocolos II y III, Ritmo, Escalera, Balanza, Brújula.
+│   ├── 15_TARJETA_DE_CESION.md            La Cesión a dos caras: plazos y estados.
+│   ├── 16_COMPETENCIA.md                  Competencia y qué tomamos o no de cada una.
+│   ├── 17_DESPLIEGUE.md                   Condiciones para producción y fases (hace de roadmap).
+│   ├── DECISIONS.md                       Registro de decisiones (D-001…).
+│   └── PENDIENTES_DEL_FUNDADOR.md         Todo lo pospuesto, con su decisión de origen.
 ```
+
+Requisitos, roles, arquitectura de información y analítica no tienen documento propio: viven en NS-ARP, el léxico, los protocolos de Sala y `docs/12`. Si alguno crece hasta necesitarlo, se crea y se añade aquí.
 
 No crear documentación ficticia que no coincida con el producto real. Actualizarla cuando cambie una decisión estructural.
 
@@ -1345,7 +1357,7 @@ Y posteriormente:
 
 1. Una categoría por grupo.
 2. Empresas seleccionadas, no registro indiscriminado.
-3. Calidad del referido por encima de cantidad.
+3. **La calidad del negocio cedido vale más que la cantidad. Siempre** (D-045). Ninguna métrica, ranking, Balanza o Brújula premia el número por encima de la calidad.
 4. IA 24/7; decisión humana donde existe riesgo real.
 5. Privacidad by design.
 6. Toda recomendación importante debe ser explicable.
@@ -1359,16 +1371,18 @@ Y posteriormente:
 14. El producto debe generar negocio medible.
 15. Cada mejora debe fortalecer el Network Effect.
 16. La Sala no es territorial: se define por sus empresas, no por su mapa.
+17. **Nadie busca para sí** (D-049). Los titulares y sus Agentes buscan negocio para los demás titulares de su Sala. El negocio para la propia empresa no entra en NS: solo entra lo que se cede a uno o varios cesionarios. Lo que recibes lo han buscado los demás para ti.
 
 ## Reglas inmutables (D-010)
 
-Estas tres reglas están por encima de cualquier feature, decisión de diseño o modelo económico. No se revisan; se aplican.
+Estas reglas están por encima de cualquier feature, decisión de diseño o modelo económico. No se revisan; se aplican. **Toda empresa las acepta de forma expresa, una a una, al suscribirse como titular; sin esa aceptación no hay alta** (D-043). La aceptación queda registrada con versión, Timonel y fecha.
 
 1. **Nunca se cobra por un referido.** Ningún miembro puede pedir, ofrecer, aceptar o condicionar un referido a dinero, comisión, descuento, contraprestación o favor. NS tampoco cobra por referido (D-005). Hacerlo es **motivo de expulsión** de la Sala y de la red. El espíritu de NS es un network colaborativo: se da porque se pertenece.
-2. **Toda empresa debe aportar un número mínimo de referidos en los plazos que se estipulen.** Pertenecer a NS es contribuir. El mínimo y el plazo se fijan por Sala y se aplican con una escalera de consecuencias que termina en la pérdida de la plaza. El agente de cada empresa trabaja para que su miembro lo cumpla sin esfuerzo.
-3. **La calidad importa más que la cantidad.** Un referido cuenta cuando el receptor lo cualifica como válido y NS puede auditarlo. Un referido flojo no cumple el mínimo ni suma reputación; puede restar.
+2. **Toda empresa debe ceder al menos una Cesión válida a la semana, sin excusas** (D-042). Pertenecer a NS es contribuir. Con una se cumple, pero no se destaca: NS promueve ceder varias y a varias especialidades. Cuatro semanas seguidas sin una sola Cesión válida suponen la baja de la titularidad: la segunda semana lleva aviso diplomático del Agente, la tercera aviso formal de la Directiva para aportar lo antes posible, y la cuarta la notificación de baja. La baja es por Sala: la empresa sale de la Mesa y pierde el acceso desde la notificación, la plaza queda bloqueada, la dirección de la Sala propone la baja y NS la confirma (D-044). El Agente de cada empresa trabaja para que su Timonel lo cumpla sin esfuerzo.
+3. **La calidad del negocio cedido vale más que la cantidad. Siempre** (D-045). Un referido cuenta cuando el receptor lo cualifica como válido y NS puede auditarlo. Un referido flojo no cumple el mínimo ni suma reputación; puede restar. El Mérito no crece con el número de Cesiones, sino con lo que cada una vale.
 4. **Toda empresa da a conocer su trabajo a la Sala cada semana** (D-018). El Agente redacta el Comunicado; el Timonel lo aprueba. Sin conocimiento mutuo no hay referidos de calidad.
 5. **Lo que se da y lo que se recibe se ve** (D-019). La Balanza de cada titular es pública en su Sala, exacta y contrastada. Lo que hay que hacer para mejorar solo lo ve quien tiene que hacerlo.
+6. **Tu Agente y tú buscáis para los demás** (D-049). Ningún Agente NS trabaja para su propia empresa. Una licitación a la que podrías presentarte, un cliente para ti: eso no es NS. NS es lo que cedes.
 
 # NORTH STAR
 

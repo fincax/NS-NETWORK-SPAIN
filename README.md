@@ -37,6 +37,7 @@ Sin configuración usa PGlite (Postgres embebido en `apps/web/.data`) y el prove
 | [`docs/05_DESIGN_BRIEF.md`](./docs/05_DESIGN_BRIEF.md) | Brief para Claude Design: identidad, logo, dirección visual, pantallas prioritarias, datos demo y entregables. |
 | [`docs/11_IDEAS_DISRUPTIVAS.md`](./docs/11_IDEAS_DISRUPTIVAS.md) | Banco de ideas disruptivas sobre el núcleo: prospección agentic, calidad verificada, reconocimiento escalable, efecto red. |
 | [`docs/12_SALAS.md`](./docs/12_SALAS.md) | La Sala como eje: zonas y saturación, apertura de nuevas Salas, clasificación NS-CAT (base CNAE ampliable), plazas y casuística de sectores, enrutamiento Sala → Zona → Red, ciclo de vida de la Sala. |
+| [`docs/BITACORA.md`](./docs/BITACORA.md) | Punto de parada de la última sesión de trabajo y siguiente paso acordado. |
 | [`docs/13_LEXICO_NS.md`](./docs/13_LEXICO_NS.md) | Léxico oficial de NS: nombres propios para la estructura (Sala, Plaza, Titular, Timonel, Antesala, Pleno, Confluencia), el flujo (Indicio, Pista, Cesión, Embajada, Puente, Valor contrastado), la reputación (Veredicto, Contraste, Mérito, Compromiso) y el día a día (Mesa Permanente, Despacho, Encargo, Rastreo, Sondeo, Parte, Crónica). |
 | [`docs/14_PROTOCOLOS_DE_SALA.md`](./docs/14_PROTOCOLOS_DE_SALA.md) | Los tres protocolos obligatorios: Generar Negocio (Cesión, NS-ARP), Dar a Conocer (Comunicado, Gaceta, Dossier, NS-ADP) y Cuentas Claras (Balanza, Ritmo, Brújula, Movimiento, NS-ATP), con especificación agentic completa. |
 | [`docs/15_TARJETA_DE_CESION.md`](./docs/15_TARJETA_DE_CESION.md) | La tarjeta de Cesión a dos caras: objetivo, acciones, jerarquía, Promesa, capa 2, plazos, estados, Veredicto y Distinción. |
@@ -46,6 +47,7 @@ Sin configuración usa PGlite (Postgres embebido en `apps/web/.data`) y el prove
 | [`docs/07_AGENT_ARCHITECTURE.md`](./docs/07_AGENT_ARCHITECTURE.md) | Arquitectura de agentes implementada: roles, contrato con el modelo, lo que el modelo no decide, puertas humanas, observabilidad. |
 | [`apps/web/README.md`](./apps/web/README.md) | Estructura del código del vertical slice y comandos. |
 | [`brand/README.md`](./brand/README.md) | Monograma NS decidido (D-022): geometría, versiones SVG, reglas de uso y lockups. |
+| [`docs/PENDIENTES_DEL_FUNDADOR.md`](./docs/PENDIENTES_DEL_FUNDADOR.md) | Todo lo pospuesto por el fundador, con su decisión de origen. Claude lo recuerda cuando se le pide. |
 | [`docs/DECISIONS.md`](./docs/DECISIONS.md) | Registro de decisiones estratégicas y arquitectónicas. |
 
 Documentos pendientes según la constitución: `01_PRODUCT_REQUIREMENTS`, `03_USER_ROLES`, `04_INFORMATION_ARCHITECTURE`, `05_DESIGN_SYSTEM` (se derivará del brief y de los tokens entregados por Claude Design), `08_SECURITY_PRIVACY_GDPR`, `09_ANALYTICS`, `10_ROADMAP`.

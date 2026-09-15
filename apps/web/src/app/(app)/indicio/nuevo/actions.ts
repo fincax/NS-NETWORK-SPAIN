@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { getDb } from "@/db/client";
 import { requireMember } from "@/lib/session";
 import { createSignal, publishSignal, withdrawSignal } from "@/services/signals";
+import { mesaMode, runJobs } from "@/services/jobs";
+import { after } from "next/server";
 import type { LegalBasis, Visibility } from "@/core/types";
 
 export async function createSignalAction(formData: FormData) {
@@ -24,10 +26,12 @@ export async function createSignalAction(formData: FormData) {
 }
 
 export async function publishSignalAction(formData: FormData) {
-  const { member } = await requireMember();
+  const { member, chapter } = await requireMember();
   const db = await getDb();
   const id = String(formData.get("id"));
-  await publishSignal(db, id, member.id);
+  const mode = mesaMode();
+  const res = await publishSignal(db, id, member.id, { mode });
+  if ("queued" in res) after(() => runJobs(db, { chapterId: chapter.id, max: 3 })); // la Mesa corre tras responder (D-053)
   revalidatePath("/", "layout");
   redirect("/mesa");
 }

@@ -15,7 +15,8 @@
     "typecheck": "tsc --noEmit",
     "clock": "tsx scripts/clock.ts",
     "e2e": "node scripts/e2e-demo.mjs",
-    "icons": "node scripts/icons.mjs"
+    "icons": "node scripts/icons.mjs",
+    "e2e:auth": "node scripts/e2e-auth.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "0.125.0",

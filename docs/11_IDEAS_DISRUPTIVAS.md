@@ -131,7 +131,7 @@ Antes de recibir su primer referido, el agente de un miembro nuevo genera candid
 
 ### B8 · Cuota de contribución asistida por el agente
 
-El mínimo obligatorio de referidos (D-010) no debe vivirse como una amenaza sino como un objetivo que el agente ayuda a alcanzar. El agente muestra en "Hoy" el estado del periodo ("2 de 3 referidos válidos · quedan 19 días"), propone candidatos concretos desde el grafo de relaciones y la prospección pública, y avisa con antelación. Solo cuentan los referidos que el receptor cualifica como válidos. Escalera de consecuencias propuesta: aviso del agente → conversación con la Directiva → plan de contribución de un periodo → plaza en revisión → baja. Un miembro que no aporta libera una plaza valiosa para otro que sí lo hará.
+El mínimo obligatorio de referidos (D-010) no debe vivirse como una amenaza sino como un objetivo que el agente ayuda a alcanzar. El agente muestra en "Hoy" el estado de la semana ("1 de 1 Cesión válida · para destacar, otra a una especialidad distinta"), propone candidatos concretos desde el grafo de relaciones y la prospección pública, y avisa con antelación. Solo cuentan los referidos que el receptor cualifica como válidos. Escalera fijada en D-042: 1.ª semana sin ceder, constancia; 2.ª, aviso diplomático del Agente; 3.ª, aviso formal de la Directiva; 4.ª, baja de la titularidad. Un miembro que no aporta libera una plaza valiosa para otro que sí lo hará.
 
 ### B9 · Cero retribución, tolerancia cero
 

@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { closeDb, getDb, schema, type Db } from "@/db/client";
 import { seedChapter } from "@/db/seed";
 import { SEED_COMPANIES } from "@/db/seed-data";
+import { acceptAllNormas } from "@/core/normas";
 import { onboardCompany } from "@/services/onboarding";
 import { activateCandidacy, candidacyCounts, CandidacyTransitionError, listCandidacies, triageCandidacy, updateCandidacy } from "@/services/antesala";
 
@@ -94,7 +95,7 @@ describe("Despacho de la Directiva", () => {
     expect(events.length).toBeGreaterThanOrEqual(2);
     expect(events.some((e) => e.significant && e.policyApplied === "seat.exclusivity")).toBe(true);
 
-    const r = await onboardCompany(db, { chapterId, name: c.companyName, slug: "beltran-consultores", specialtyCode: "LOGISTICA", person: { fullName: c.fullName, role: "Socio", email: c.email }, dna: SEED_COMPANIES[0].dna });
+    const r = await onboardCompany(db, { chapterId, name: c.companyName, slug: "beltran-consultores", specialtyCode: "LOGISTICA", person: { fullName: c.fullName, role: "Socio", email: c.email }, dna: SEED_COMPANIES[0].dna, acceptance: acceptAllNormas() });
     const activated = await activateCandidacy(db, c.id, r.company.id);
     expect(activated?.status).toBe("ACTIVATED");
     expect(activated?.companyId).toBe(r.company.id);

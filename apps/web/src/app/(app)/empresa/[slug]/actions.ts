@@ -4,7 +4,11 @@ import { getDb } from "@/db/client";
 import { requireMember } from "@/lib/session";
 import { closeDemand, createDemand } from "@/services/demands";
 import { addSource, removeSource, runOwnSources, SourceError } from "@/services/sources";
+import { addSeat } from "@/services/onboarding";
 import { redirect } from "next/navigation";
+import { AccountError, createInvite } from "@/lib/accounts";
+import { and, eq } from "drizzle-orm";
+import { schema } from "@/db/client";
 import type { BusinessTrigger } from "@/core/types";
 
 export async function createDemandAction(formData: FormData) {
@@ -55,4 +59,36 @@ export async function runOwnSourcesAction(formData: FormData) {
   await runOwnSources(db, company.id);
   revalidatePath(`/empresa/${String(formData.get("slug"))}`);
   revalidatePath("/hoy");
+}
+
+/** D-047: otra especialidad de la misma empresa en la misma Sala. */
+export async function addSeatAction(formData: FormData) {
+  const { member, company, chapter } = await requireMember();
+  const db = await getDb();
+  const slug = String(formData.get("slug") ?? company.slug);
+  try {
+    await addSeat(db, { chapterId: chapter.id, companyId: company.id, specialtyCode: String(formData.get("specialtyCode") ?? ""), memberId: member.id });
+  } catch (e) {
+    redirect(`/empresa/${slug}?error=${encodeURIComponent(e instanceof Error ? e.message : "No se pudo ocupar la plaza.")}`);
+  }
+  revalidatePath(`/empresa/${slug}`);
+  revalidatePath("/sala");
+  redirect(`/empresa/${slug}`);
+}
+
+/** Enlace de acceso para el Timonel de una empresa (D-054). Solo la Directiva. */
+export async function inviteMemberAction(formData: FormData) {
+  const { member } = await requireMember();
+  const db = await getDb();
+  const slug = String(formData.get("slug"));
+  const company = await db.query.companies.findFirst({ where: eq(schema.companies.slug, slug) });
+  const target = company ? await db.query.members.findFirst({ where: and(eq(schema.members.companyId, company.id), eq(schema.members.isPrimary, true)) }) : undefined;
+  if (!target) redirect(`/empresa/${slug}?fuente=${encodeURIComponent("No hay Timonel que invitar.")}`);
+  try {
+    const { token } = await createInvite(db, { memberId: target.id, createdBy: member.id });
+    redirect(`/empresa/${slug}?invite=${encodeURIComponent(token)}`);
+  } catch (e) {
+    if (e instanceof AccountError) redirect(`/empresa/${slug}?fuente=${encodeURIComponent(e.message)}`);
+    throw e;
+  }
 }

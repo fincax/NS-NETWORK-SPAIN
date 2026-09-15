@@ -131,7 +131,7 @@ Accesos: desde Mi Sala (lista de miembros), desde cualquier Cesión o Pista ("ve
 ### 7. Cumplimiento
 
 - Un Comunicado aprobado por semana es obligatorio. Un Comunicado de continuidad cumple, pero dos de continuidad seguidos generan aviso del Agente y tres, aviso de la Directiva.
-- `TrustEvent`: `COMMUNIQUE_MET` / `COMMUNIQUE_MISSED`. El incumplimiento reiterado sigue la misma escalera que el Compromiso (D-010).
+- `TrustEvent`: `COMMUNIQUE_MET` / `COMMUNIQUE_MISSED`. El incumplimiento reiterado sigue la Escalera del Compromiso (D-010, D-042).
 - Cada Agente receptor debe acusar recibo (`COMMUNIQUE_ACKED`) y actualizar su índice. Es automático; su ausencia es un fallo técnico, no del miembro.
 - Métrica de salud de la Sala: **conocimiento mutuo** = proporción de Timoneles que han consultado la Gaceta o algún Dossier en la semana. Métrica de eficacia: mejora de la precisión de las Pistas tras los Comunicados.
 
@@ -205,7 +205,7 @@ BRÚJULA · Híspalis · Semana 37
 
 1 · Dónde estás
     Ritmo         En Ritmo · 2 de 2 esta semana · racha de 5 semanas
-    Compromiso    2 de 3 en el Ejercicio · quedan 19 días · a tiempo
+    Compromiso    En Ritmo · 2 Cesiones válidas esta semana a 2 especialidades · Por encima
     Comunicado    Aprobado el domingo · 3 semanas seguidas
     Recibes       61.000 € contrastados este mes · 2 Cesiones aceptadas de 2 (100 %)
     Das           38.000 € · tus Cesiones se aceptan al 87 % (media de la Sala 74 %)
@@ -235,13 +235,18 @@ Reglas:
 3. El bloque "Por qué" usa evidencia real: Veredictos recibidos, tiempos de respuesta, tipos de Indicio que convierten. Nunca consejos genéricos.
 4. El bloque "Qué ganas" enlaza cada objetivo con una consecuencia concreta (nivel, Distinción, prima de Embajada, plaza que se abre). La motivación es tangible o no se muestra.
 5. El bloque "Cuota" (D-025) muestra el Tramo actual, el valor contrastado recibido en el Ejercicio, la relación cuota/valor y el umbral del siguiente Tramo. Es la única pantalla donde aparece la cuota; la Balanza pública nunca la muestra. Cualquier cambio de Tramo se anuncia aquí al menos un Ejercicio antes.
-6. Si el titular va Por debajo del Ritmo dos semanas, la Brújula sube de tono: el Agente propone cinco Movimientos en lugar de tres y ofrece agendar un Despacho de 10 minutos. Si van tres, avisa de que la Directiva lo verá en el Parte.
+6. La Brújula sigue la Escalera de D-042. Tras una semana sin ceder, el Agente propone cinco Movimientos en lugar de tres y ofrece agendar un Despacho de 10 minutos. Tras dos, entrega el aviso diplomático y dice en una línea qué pasa la tercera y la cuarta semana. Tras tres, muestra el aviso formal de la Directiva. Tras cuatro, la notificación de baja.
+
+### 4bis. La Valoración (pública en la Sala)
+
+Porcentaje mensual de cada titular, explicable componente a componente (D-046): calidad de lo cedido 40 %, Compromiso 25 %, plazo de respuesta 15 %, Comunicado 10 %, servicio a la red 10 %. Los componentes sin datos reparten su peso. El mes que decide es el último completo. Con ≥ 80 %: apta para Embajada y candidata a Director/a de Sala. Se ve en el Dossier con su desglose. Nunca mide cantidad.
 
 ### 5. El Ritmo
 
-- Lo fija la Sala (Directiva, ratificado en Pleno) al inicio de cada Ejercicio; si no lo fija, rige el Ritmo de NS por defecto (propuesta inicial: 1 Cesión válida por semana y titular).
-- El Ritmo es el paso semanal; el Compromiso (D-010) es el mínimo del Ejercicio. Un titular puede cumplir el Compromiso sin ir siempre En Ritmo, y la Balanza lo muestra con honestidad.
-- Un Ritmo de Sala no puede ser inferior al que garantiza el Compromiso del Ejercicio.
+- El Ritmo de NS es **1 Cesión válida por semana y titular**, y es también el Compromiso mínimo (D-042). La Sala (Directiva, ratificado en Pleno) puede fijar un Ritmo mayor al inicio de cada Ejercicio; nunca menor.
+- Con el mínimo se cumple, pero nunca se destaca: NS promueve ceder varias y a varias especialidades. El Mérito semanal suma una base por cumplir y un plus por cada especialidad distinta a la que se cede; la Balanza marca "Por encima" a quien lo hace.
+- **Sin excusas.** Cada semana completa (lunes a domingo) sin una sola Cesión válida consta en la Balanza y en la Brújula y resta en la Hoja de Méritos. La semana de alta no cuenta.
+- **Escalera** por semanas seguidas sin ceder: 1.ª constancia; 2.ª aviso diplomático del Agente; 3.ª aviso formal de la Directiva para aportar lo antes posible; 4.ª notificación de baja de la titularidad en esa Sala. Desde ese momento la empresa está fuera de la Mesa y sin acceso, y la plaza queda bloqueada; la Directiva propone la baja y NS la confirma (D-044), y la plaza vuelve a la Antesala. Si la empresa es titular en otras Salas donde cumple, allí no cambia nada. Una Cesión válida pone la cuenta a cero.
 - El Chapter Intelligence Agent propone ajustar el Ritmo cuando más del 60 % de los titulares está Por encima (subirlo) o más del 40 % está Por debajo dos semanas seguidas (revisarlo o revisar la captación de Indicios).
 
 ### 6. Especificación agentic (NS-ATP v0.1)

@@ -59,8 +59,15 @@ Criterios de cada nombre: castellano; una palabra siempre que sea posible; insti
 | **Mérito** | Unidad de reputación verificable. Nace en tres momentos: Mérito de Promesa (al aceptarse la Cesión), Mérito de Veredicto (al valorarla el cesionario) y Mérito de Cierre (al contrastarse el valor). Nunca de cantidad. | `TrustEvent.weight` |
 | **Hoja de Méritos** | Panel público (dentro de la red) de comportamientos verificables de una empresa: cesiones, calidad media, valor contrastado, tiempo de respuesta, fiabilidad como cesionario. Nunca un número opaco. | `ReputationProfile` |
 | **Distinción** | Reconocimiento que el cesionario otorga al cedente por una Cesión concreta, nombrando el eje que destacó (Facilidad, Negocio o Trato) y una línea de motivo. Escasa: máximo una por titular y mes. Se publica en la Crónica y alimenta el Mérito. De entre las Distinciones del mes sale la **Cesión del mes** de la Sala. | `Recognition{axis, reason}` |
-| **Compromiso** | Mínimo de Cesiones válidas por Ejercicio que toda empresa debe aportar (D-010). | `ContributionQuota` |
-| **Ejercicio** | Periodo de cómputo del Compromiso (por estipular: mes o trimestre). | `QuotaPeriod` |
+| **Compromiso** | Mínimo de Cesiones válidas que toda empresa debe ceder: al menos una por semana, sin excusas (D-010, D-042). Con una se cumple; para destacar, varias y a varias especialidades. | `ContributionWeek` |
+| **Prueba de Valor** | Siete días de Agente para un candidato antes de la plaza. Informe público por enlace con dos caras: lo que su Agente habría cedido y lo que la Sala ya encontró para su especialidad, en agregado (D-050). La empresa en prueba no tiene plaza, voto ni acceso y nunca recibe Cesiones. | `ValueTrial`, `Company{status: TRIAL}` |
+| **Para los demás** | Norma y principio: nadie en NS busca para sí; el negocio propio no entra, solo lo que se cede (D-049). | Norma `PARA_LOS_DEMAS` |
+| **Valoración** | Porcentaje mensual y explicable de cada titular en su Sala: calidad de lo cedido (Veredictos), Compromiso, plazo de respuesta, Comunicado y servicio a la red. Nunca mide cantidad. Con ≥ 80 % en el último mes completo, apta para Embajada y candidata a Director/a de Sala (D-046). | `MonthlyRating` |
+| **Director/a de Sala** | Quien dirige la Sala: despacha la Antesala, propone bajas a NS, promueve acciones entre Salas y resuelve dudas entre Timoneles, lo que le suma Valoración (D-048). Candidata: ≥ 80 % de Valoración un mes. Elección y mandato pendientes. Sustituye al provisional "Directiva". | `Member{ is_director }` |
+| **Titularidad** | Cada plaza ocupada por una empresa en una Sala. Una empresa con varios CNAE puede tener varias titularidades en la misma Sala, cada una con su Compromiso; NS premia repartirlas por Salas distintas con **Mérito de Red** (D-047). | `CategorySeat`, `TrustEvent{NETWORK_SEAT_BONUS}` |
+| **Plazo de respuesta** | Las 48 h que tiene el cesionario para responder al Interesado tras el Puente (D-024). Antes se llamaba "compromiso de 48 h"; "Compromiso" queda solo para el mínimo semanal (D-045). | `TrustEvent{RESPONSE_ON_TIME | RESPONSE_LATE}` |
+| **Escalera** | Consecuencias de las semanas seguidas sin una sola Cesión válida: 1.ª constancia, 2.ª **Aviso diplomático** del Agente, 3.ª **Aviso formal** de la Directiva, 4.ª **Baja** de la titularidad en esa Sala: la empresa sale de la Mesa y pierde el acceso, la plaza queda bloqueada, la Directiva propone la baja y NS la confirma; entonces la plaza vuelve a la Antesala (D-042, D-044). Una Cesión válida pone la cuenta a cero. | `ContributionWeek{ missed_streak, action }` |
+| **Ejercicio** | Periodo de cómputo de la Promesa, la cuota por Tramos y la Embajada (por estipular: mes o trimestre). El Compromiso se mide por semana. | `Period` |
 | **Niveles** | Miembro · Contribuidor · Referente · Consejero · Fundador. Se ganan con Mérito; amplían acceso, nunca lo restringen. ("Embajador" queda reservado a la Embajada.) | `MembershipTier` |
 | **Arbitraje** | Resolución de disputas entre cedente y cesionario por la Directiva. | `Dispute` |
 | **Cuota** | El precio de la suscripción a NS: lo que paga una empresa a NS por su plaza y su Agente. Coste inicial (por decidir si existe) y cuota mensual por Tramos. Son los ingresos de NS. Es un plano distinto de la regla entre miembros: nunca es un porcentaje del negocio ni un cargo por Cesión (D-005, D-025). | `MembershipPlan` |
@@ -123,7 +130,8 @@ Alternativas consideradas para Tramo: "Escalón" y "Nivel de cuota" (descartado 
 | **NS-ATP** | NS Agentic Transparency Protocol: cómo se calculan, contrastan y publican la Balanza y el Ritmo, y cómo el Agente genera la Brújula y sus Movimientos. |
 | **NS-CAT** | Clasificación NS de Actividades: base CNAE + Especialidad NS, ampliable y versionada. |
 | **Especialidad** | Nivel de NS-CAT que otorga plaza. |
-| **Reglas inmutables** | Nunca se cobra por una Cesión (expulsión); Compromiso obligatorio; calidad sobre cantidad (D-010). |
+| **Normas NS** | Texto único y versionado que toda empresa acepta de forma expresa, norma a norma, al ocupar su plaza: las cinco reglas inmutables y la condición de la cuota por Tramos. Sin aceptación no hay alta (D-043). | `RulesAcceptance{ rules_version }` |
+| **Reglas inmutables** | Nunca se cobra por una Cesión (expulsión); Compromiso obligatorio de una Cesión válida por semana con Escalera de cuatro semanas (D-010, D-042); calidad sobre cantidad; Comunicado semanal (D-018); Balanza pública (D-019). |
 
 ---
 

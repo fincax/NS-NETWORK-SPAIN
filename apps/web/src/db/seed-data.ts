@@ -7,7 +7,7 @@ export interface SeedCompany {
   legalName: string;
   website: string;
   specialty: string;
-  person: { fullName: string; role: string; email: string; isDirector?: boolean };
+  person: { fullName: string; role: string; email: string; isDirector?: boolean; isNetwork?: boolean };
   dna: BusinessDNA;
 }
 
@@ -149,7 +149,7 @@ export const SEED_COMPANIES: SeedCompany[] = [
     legalName: "Bufete Alameda Abogados, S.L.P.",
     website: "https://bufetealameda.es",
     specialty: "LEGAL_MA",
-    person: { fullName: "Inés Domínguez", role: "Socia", email: "ines@bufetealameda.es", isDirector: true },
+    person: { fullName: "Inés Domínguez", role: "Socia", email: "ines@bufetealameda.es", isDirector: true, isNetwork: true }, // en la demo, la misma persona hace de Directiva y de NS
     dna: base({
       company: { description: "Despacho mercantil especializado en compraventa de empresas y due diligence. 14 abogados.", locations: ["Sevilla"], website: "https://bufetealameda.es", certifications: ["Colegio de Abogados de Sevilla"], credibility: ["60 operaciones cerradas"] },
       offering: { services: ["Compraventa de empresas", "Due diligence legal", "Pactos de socios", "Reestructuraciones societarias"], products: [], differentiators: ["Equipo dedicado por operación"], exclusions: ["Laboral", "Penal"], capacity: "OPEN" },

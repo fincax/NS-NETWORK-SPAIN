@@ -39,7 +39,8 @@ describe("Ronda de la mañana", () => {
     const r = await runRonda(db, new Date(), new SampleFeed(SAMPLE_FEED));
     const cumbre = r.chapters.find((c) => c.chapterId === chapterId)!;
     expect(cumbre.rastreo.drafts).toBe(0);
-    expect(cumbre.clock).toEqual({ reminders: 0, expired: 0, late: 0, nudges: 0 });
+    expect(cumbre.clock).toEqual({ reminders: 0, expired: 0, late: 0, nudges: 0, compromiso: { evaluated: 0, met: 0, notices: 0, releases: 0 } });
+    expect(cumbre.jobs).toEqual({ done: 0, failed: 0, needsHuman: 0 });
     const events = await db.query.auditEvents.findMany({ where: eq(schema.auditEvents.kind, "RONDA") });
     expect(events.length).toBe(1);
   });

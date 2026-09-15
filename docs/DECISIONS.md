@@ -293,7 +293,7 @@ Reglas derivadas:
 
 **Consequences.** `CLAUDE.md` y `00_NORTH_STAR.md` incorporan una sección "Reglas inmutables". NS-ARP v0.2 añade la comprobación 10 de Compliance, los nuevos `TrustEvent` y el objeto `ContributionQuota`. La solicitud de membresía y el onboarding incluyen aceptación expresa. El banco de ideas (`11_IDEAS_DISRUPTIVAS.md`) reformula el pilar 2 como "con suelo, sin techo".
 
-**Revisit when.** Nunca en cuanto a las tres reglas. Los parámetros de la cuota (número, periodo, consecuencias) se revisan tras el primer periodo completo de NS Sevilla.
+**Revisit when.** Nunca en cuanto a las tres reglas. Los parámetros de la cuota (número, periodo, consecuencias) quedaron fijados por el fundador en **D-042** (2026-09-14): mínimo de 1 Cesión válida por semana y escalera de cuatro semanas hasta la baja.
 
 **Aclaración del fundador (2026-09-11).** Los referidos NS son ajenos a la circulación de negocio ordinaria entre empresas miembro. Que dos miembros se contraten entre sí no es un referido ni está sujeto a estas reglas; lo prohibido es condicionar un referido a cualquier contraprestación.
 
@@ -1014,3 +1014,315 @@ Cómo se aplica en el producto:
 **Consequences.** Tabla `chapter_foundings` y columna `founding_id` en candidaturas (migración 0006), estado "En fundación", `services/fundacion.ts`, sección "Salas en fundación" y botones en la Antesala, alta en una Sala recién fundada, aviso en la portada, Sala en fundación de demostración (Correduría Giralda como Promotora, 3 de 12), pruebas.
 
 **Revisit when.** Se conozca el mínimo real tras las primeras fundaciones, se fije la gratificación definitiva, o se construya el kit de promoción de la Promotora.
+
+---
+
+## D-042 · Compromiso: mínimo de 1 Cesión válida por semana, sin excusas; cuatro semanas sin ceder suponen la baja de la titularidad (aviso diplomático en la 2.ª, aviso formal en la 3.ª, notificación de baja en la 4.ª)
+
+**Status:** CONFIRMED (regla fijada por el fundador)
+**Date:** 2026-09-14
+
+**Context.** D-010 dejó la regla inmutable de aportación mínima con los parámetros pendientes: número, periodo y escalera de consecuencias. Hasta hoy la especificación hablaba de un "Ejercicio" por estipular (mes o trimestre), de un Ritmo de NS "propuesto" de 1 por semana y de una escalera larga con plan de contribución y plaza en revisión. El fundador fija los parámetros y los endurece.
+
+**Choice.** Regla del fundador, literal en lo esencial:
+
+- **Mínimo: 1 Cesión válida a la semana.** Válida es la que el cesionario acepta (transición a `APPROVED`, momento en que ya cuenta para el Compromiso según D-024) y que NS puede auditar. El mínimo es el suelo de NS; una Sala puede fijar un Ritmo mayor, nunca menor.
+- **Con el mínimo se cumple, pero nunca se destaca.** NS promueve que cada titular ceda **varias** Cesiones **a varias especialidades**. El Mérito semanal lo refleja: base por cumplir y un plus por cada especialidad distinta a la que se cede. La Brújula lo dice con esas palabras cuando el titular cumple con una sola.
+- **No se debe fallar, sin excusas.** Cada semana completa sin una sola Cesión válida consta en la Balanza y en la Brújula y resta en la Hoja de Méritos. No hay periodos de gracia, planes de contribución ni plazas en revisión.
+- **Escalera de cuatro semanas seguidas sin una sola Cesión válida:**
+
+```text
+Semana 1   Constancia: la Balanza y la Brújula lo muestran; el Agente propone Movimientos.
+Semana 2   Aviso diplomático del Agente al Timonel.
+Semana 3   Aviso formal de la Directiva: aportar lo antes posible. Lo ven la empresa y la Directiva.
+Semana 4   Notificación de baja de la titularidad. La empresa queda suspendida y su plaza vuelve a la Antesala.
+```
+
+- **Una Cesión válida pone la cuenta a cero.** La escalera cuenta semanas seguidas; cualquier semana cumplida la reinicia.
+- **Ejecución de la baja.** La notificación es automática y sin excepciones. *(Modificado por D-044: la Directiva de la Sala propone la baja y NS la confirma; desde la notificación la empresa sale de la Mesa de esa Sala y su Timonel pierde el acceso; la plaza queda bloqueada hasta la confirmación.)*
+- **Semana y primera semana.** La semana va de lunes a domingo (UTC). La semana de alta no cuenta: la primera semana completa en la Sala es la primera evaluada. Se evalúa cada mañana en la Ronda, una sola vez por titular y semana.
+- **Coherencia con el resto.** El Ritmo (D-019) deja de ser "propuesta" y pasa a ser 1 por defecto, con la Sala pudiendo subirlo. El "Ejercicio" sigue existiendo para la Promesa, la cuota por Tramos (D-025) y la Embajada, pero el Compromiso ya no se mide por Ejercicio sino por semana. El Comunicado (D-018) mantiene su propia escalera, más suave, y solo "el incumplimiento reiterado" llega a la de D-042.
+
+**Why.** Un club en el que se puede no ceder durante un mes sin consecuencias no es un club de contribución. La escalera corta y pública convierte la regla inmutable 2 en algo que se cumple sin esfuerzo la inmensa mayoría de las semanas, porque el Agente trabaja para ello, y que libera la plaza rápido cuando una empresa no aporta. El plus por especialidades distintas empuja hacia el comportamiento que hace red: ceder a muchos, no solo al vecino de plaza.
+
+**Consequences.** Nuevo `apps/web/src/core/compromiso.ts` (reglas puras: escalera, semana, Mérito semanal), tabla `contribution_weeks` (migración 0007), `services/compromiso.ts` (evaluación semanal idempotente, avisos, notificación de baja, ejecución por la Directiva, estado para Brújula y Balanza), paso 5 del Reloj de la Sala dentro de la Ronda, tarjeta de Compromiso en Hoy, columna Ritmo en la Balanza, sección "Bajas notificadas por Compromiso" en la Antesala, pruebas (`tests/compromiso.test.ts`). Documentación: regla inmutable 2 en `CLAUDE.md` y `00_NORTH_STAR.md`, léxico (Compromiso, Ejercicio, Aviso diplomático, Aviso formal, Baja), `14_PROTOCOLOS_DE_SALA.md` §5 y §4, NS-ARP pendiente 6 cerrado, `06_DATA_MODEL.md`, `11_IDEAS_DISRUPTIVAS.md` B8, `17_DESPLIEGUE.md`.
+
+**Revisit when.** Nunca en cuanto a la regla. El plus de Mérito por especialidades distintas y el peso de cada peldaño se calibran tras cuatro semanas de la Sala piloto.
+
+---
+
+## D-043 · Toda empresa acepta de forma expresa todas las Normas NS al suscribirse como titular; sin aceptación no hay alta
+
+**Status:** CONFIRMED (regla fijada por el fundador)
+**Date:** 2026-09-14
+
+**Context.** D-010 y D-025 ya decían que las reglas se comunican en la web, en la Candidatura y en el onboarding y que "el solicitante las acepta expresamente antes de la admisión", pero no había mecanismo: el alta creaba la empresa sin registrar ninguna aceptación. Con D-042 la regla del Compromiso tiene consecuencias duras (baja a la cuarta semana), y una consecuencia dura sin aceptación expresa previa es indefendible ante el miembro.
+
+**Choice.**
+
+- Existe un texto único y versionado de **Normas NS** (`apps/web/src/core/normas.ts`, versión `2026-09-14`): las cinco reglas inmutables (nunca contraprestación · Compromiso semanal con Escalera · calidad sobre cantidad · Comunicado semanal · Balanza pública) y la condición de la cuota por Tramos (D-025). Cada norma cita su decisión.
+- **Aceptación expresa en el alta.** El formulario de alta de plaza muestra las Normas una a una, cada una con su casilla obligatoria, y el botón dice "Acepto las Normas NS". El servicio de alta rechaza cualquier alta cuya aceptación no incluya **todas** las normas de la **versión vigente** (`RulesNotAcceptedError`); no existe camino de alta sin aceptación, tampoco desde el seed ni desde una Sala recién fundada.
+- **Registro.** Tabla `rules_acceptances` (migración 0008): Sala, empresa, Timonel que acepta, versión, códigos aceptados y fecha. El evento `MEMBER_ACTIVATED` de la Mesa lo menciona. El Dossier de la empresa muestra "Normas NS aceptadas de forma expresa (versión X) por [Timonel] el [fecha]".
+- **Cambio de Normas.** Si cambia el texto, sube la versión. Las altas nuevas firman la nueva; para los titulares existentes queda pendiente (revisit) el flujo de re-aceptación con un toque en Hoy y plazo.
+- **Web pública.** La portada enumera las Normas que se aceptarán al ocupar la plaza, para que nadie llegue al alta sin haberlas leído.
+
+**Why.** La exclusividad, la Escalera y la expulsión por contraprestación solo son legítimas si el titular las aceptó a sabiendas, con constancia de qué aceptó y cuándo. Convertir la aceptación en una puerta del sistema (no un texto legal aparte) es privacidad y cumplimiento como arquitectura, coherente con §15 de la constitución.
+
+**Consequences.** `core/normas.ts`, tabla `rules_acceptances`, campo obligatorio `acceptance` en `onboardCompany`, fieldset de Normas en `/sala/alta` y su acción, línea en el Dossier, portada, pruebas (`slice.test.ts`), seed y pruebas que ya aceptan todas las normas.
+
+**Revisit when.** Se redacten los textos legales (`docs/08_SECURITY_PRIVACY_GDPR.md`, condición 4 de `docs/17`) o cambie cualquier Norma: entonces se define la re-aceptación de los titulares existentes.
+
+---
+
+## D-044 · La baja por Compromiso es por Sala: la empresa suspendida sale de la Mesa y pierde el acceso; la plaza queda bloqueada; la Directiva propone la baja y NS la confirma
+
+**Status:** CONFIRMED (regla fijada por el fundador)
+**Date:** 2026-09-14
+
+**Context.** D-042 dejó la ejecución de la baja en manos de la Directiva y la auditoría de coherencia encontró tres cables sueltos: una empresa suspendida seguía recibiendo Cesiones en la Mesa, la plaza en expediente aparecía como disponible para una empresa nueva, y el Timonel de una empresa suspendida entraba en la aplicación como si nada. El fundador fija cómo debe ser.
+
+**Choice.**
+
+- **La expulsión es por Sala.** Una empresa suspendida sale de la Mesa y de la Sala donde no ha cumplido. Si la misma empresa es titular en varias Salas donde cumple, en esas Salas no cambia nada. En el modelo, cada titularidad es una fila de empresa por Sala, así que la suspensión no puede contagiarse.
+- **Fuera de la Mesa desde la notificación.** El Matchmaker solo consulta Agentes de empresas activas de la Sala; una empresa suspendida no recibe Cesiones ni cualifica. Su Agente queda inactivo al confirmarse la baja.
+- **Plaza bloqueada.** La plaza expedientada solo puede ocuparla otro titular cuando la baja de la anterior sea efectiva. La comprobación de plaza considera ocupada toda plaza con titular, activa o en expediente, y lo dice: "en expediente de baja; se libera cuando NS confirme".
+- **La Directiva propone, NS confirma.** Dos toques: la dirección de la Sala (cuyo nombre y composición se fijarán más adelante) propone la baja a NS desde la Antesala; NS la confirma. Solo entonces la plaza queda vacante y vuelve a la Antesala y la empresa pasa a baja. En la aplicación, NS es un rol de persona (`is_network`); en la demo la misma persona hace de Directiva y de NS.
+- **Sin acceso.** Desde la notificación, el Timonel no accede al panel de la Sala expulsada ni a su panel personal: cualquier pantalla le lleva a la de baja, que explica el estado, que afecta solo a esa Sala, y cómo hablar con la Directiva.
+
+**Why.** Una baja que no saca a la empresa de la Mesa no es una baja, y una plaza que se puede ocupar antes de la baja efectiva crea dos titulares. Separar quién propone (la Sala, que conoce el caso) de quién confirma (NS, que vela por la red y por la igualdad de trato entre Salas) es la misma puerta humana de la constitución §7 con la responsabilidad en el sitio correcto.
+
+**Consequences.** Estados de plaza `RELEASE_PENDING` (notificada) y `RELEASE_PROPOSED` (propuesta a NS); `members.is_network` (migración 0009); `proposeRelease` y `confirmRelease` en `services/compromiso.ts`; filtro de empresas activas en `agents/mesa.ts`; plaza en expediente no disponible en `services/onboarding.ts`; redirección a `/baja` en `requireMember`; pantalla `/baja`; Antesala con los dos pasos; pruebas.
+
+**Revisit when.** Se fije el nombre y la composición de la dirección de la Sala, o se construya el panel de NS (hoy NS actúa desde la Antesala de la Sala).
+
+---
+
+## D-045 · Principio del núcleo: la calidad del negocio cedido vale más que la cantidad, siempre; y la documentación viva es la que existe
+
+**Status:** CONFIRMED (regla fijada por el fundador)
+**Date:** 2026-09-14
+
+**Context.** El fundador pide memorizar y poner en el núcleo un principio que ya estaba en la regla inmutable 3, pero que con el Compromiso semanal y el Mérito necesita quedar por encima de cualquier métrica: la calidad del negocio cedido vale más que la cantidad. Siempre. En la misma sesión pide una propuesta de documentos para CLAUDE.md, porque la constitución exigía doce documentos de los que faltaban siete y el repositorio tiene otros que la constitución no nombra.
+
+**Choice.**
+
+- **Calidad sobre cantidad, siempre.** Queda en la constitución (principio no negociable 3 y regla inmutable 3), en el North Star, en las Normas NS que firma cada titular (versión `2026-09-14.2`) y en el código: `core/compromiso.ts` documenta que el Mérito semanal no crece con el número de Cesiones sino con su amplitud, y que el Mérito grande viene de la Promesa, el Veredicto y el Cierre de cada Cesión. Ninguna métrica, ranking, Balanza o Brújula de NS podrá premiar el número por encima de la calidad. Toda feature futura se evalúa contra esta frase.
+- **Documentación viva real.** CLAUDE.md §3 pasa a listar los documentos que existen y su función, más los dos que faltan y son obligatorios antes de producción: `08_SECURITY_PRIVACY_GDPR.md` (condición 4 de `docs/17`) y `PENDIENTES_DEL_FUNDADOR.md` (creado hoy). Requisitos, roles, arquitectura de información y analítica no se separan en documentos propios: viven en NS-ARP, el léxico, los protocolos y `docs/12`; `05_DESIGN_BRIEF.md` sustituye a `05_DESIGN_SYSTEM.md`; el roadmap es `docs/17`.
+- **Un solo sitio para lo que espera al fundador.** `docs/PENDIENTES_DEL_FUNDADOR.md` recoge todo lo que se ha dejado "para más adelante", con la decisión de origen. Claude lo recuerda cuando se le pide y cuando una feature lo toca.
+- **"Compromiso" significa una sola cosa.** El plazo de 48 h para responder al Interesado pasa a llamarse **Plazo de respuesta**; "Compromiso" queda solo para el mínimo semanal.
+
+**Why.** Un principio que está en el código y en lo que firma el titular no se pierde en una conversación. Una constitución que describe documentos inexistentes es una fuente de trabajo ficticio.
+
+**Consequences.** CLAUDE.md §3 y reglas, `00_NORTH_STAR.md`, `13_LEXICO_NS.md`, `15_TARJETA_DE_CESION.md`, `core/normas.ts`, `core/compromiso.ts`, `services/clock.ts`, nuevo `docs/PENDIENTES_DEL_FUNDADOR.md`, README.
+
+**Revisit when.** Nunca en cuanto al principio. La lista de documentos, cada vez que se cree o retire uno.
+
+---
+
+## D-046 · Valoración mensual del titular: para ser Embajadora hace falta al menos un 80 % durante un mes; con ese mismo umbral se es candidata a Director/a de Sala
+
+**Status:** CONFIRMED (regla fijada por el fundador); componentes y pesos PROPOSED
+**Date:** 2026-09-14
+
+**Context.** La Embajada (D-015) y la dirección de la Sala necesitan un criterio verificable de quién merece representar una especialidad fuera de su Sala o dirigirla. El fundador fija el umbral: 80 % de valoración durante un mes. Faltaba definir qué es la Valoración de forma que no sea un número mágico (constitución §14) y que respete que la calidad vale más que la cantidad (D-045).
+
+**Choice.**
+
+- **Valoración** es un porcentaje mensual por titular y Sala, explicable componente a componente. Mide calidad y fiabilidad, nunca cantidad:
+
+```text
+Calidad de lo cedido     40 %   media de los Veredictos recibidos en el mes sobre Cesiones cedidas (Facilidad, Negocio, Trato sobre 15); necesidad falsa = 0
+Compromiso semanal       25 %   semanas del mes con el Compromiso cumplido / semanas evaluadas
+Plazo de respuesta       15 %   como cesionario: respuestas al Interesado en 48 h / Puentes recibidos
+Comunicado semanal       10 %   Comunicados aprobados / semanas (sin datos hasta el Protocolo II)
+Servicio a la red        10 %   solo suma: acciones de dirección del mes (3 = 100 %), ver D-048
+```
+
+- Los componentes sin datos en el mes no cuentan ni a favor ni en contra: su peso se reparte entre los que sí tienen datos. Sin datos en ningún componente no hay Valoración y no se cumple ningún umbral.
+- **El mes que decide es el último completo.** La del mes en curso se muestra como orientación.
+- **Embajada:** solo puede proponerse como Embajadora (D-015) una titular con Valoración ≥ 80 % en el último mes completo. El sistema lo verifica y lo muestra en el Dossier ("Apta para Embajada").
+- **Candidatura a Director/a de Sala:** el mismo umbral. Cómo se elige y por cuánto tiempo queda en `PENDIENTES_DEL_FUNDADOR.md`. La figura pasa a llamarse **Director/a de Sala** (hasta hoy "Directiva", provisional).
+- Pesos y umbral de acciones se calibran tras el primer mes de la Sala piloto.
+
+**Why.** Un umbral público y explicable convierte la Embajada y la dirección en algo que se gana con comportamiento verificable, no con antigüedad ni volumen. Al medir Veredictos, Compromiso y plazos, premia exactamente lo que hace buena a una Cesión.
+
+**Consequences.** `core/valoracion.ts` (cálculo puro), `services/valoracion.ts` (lectura del mes, `eligibleForEmbajada`), tarjeta de Valoración en el Dossier con desglose y las dos aptitudes, pruebas. Léxico: Valoración, Director/a de Sala.
+
+**Revisit when.** Tras el primer mes completo de NS Cumbre, con Valoraciones reales; y cuando exista el Protocolo II (componente Comunicado con datos).
+
+---
+
+## D-047 · Una empresa con varios CNAE puede ocupar varias plazas en la misma Sala, cada una con su titularidad; NS premia con Mérito de Red que lleve cada especialidad a una Sala distinta
+
+**Status:** CONFIRMED (regla fijada por el fundador)
+**Date:** 2026-09-14
+
+**Context.** `docs/12` §4 solo permitía una segunda plaza en la misma Sala de forma excepcional. El fundador decide lo contrario: se permite, pero se premia hacerlo en Salas distintas, porque cada plaza llevada a otra Sala ayuda a crear Salas.
+
+**Choice.**
+
+- **Titularidades múltiples en la misma Sala.** Una empresa con varias especialidades (varios CNAE) puede ocupar varias plazas en la misma Sala. Cada plaza es una titularidad: exclusividad propia, Compromiso propio. El Compromiso mínimo semanal de la empresa en esa Sala se multiplica por su número de plazas. Ceder algo pero menos que el mínimo consta como "Por debajo del mínimo" y resta Mérito, pero no sube la Escalera: la Escalera solo cuenta semanas sin una sola Cesión válida (D-042).
+- **Mérito de Red.** Cuando la misma empresa (mismo CIF) ocupa plaza en otra Sala de la zona, recibe Mérito de Red al darse de alta, con constancia en la Mesa. El CIF se registra en el alta. Propuesta: +50 por Sala adicional.
+- **Salas en fundación.** Una empresa con la segunda especialidad puede ser fundadora o Promotora de una Sala nueva (D-041) con esa especialidad; es la vía preferida y la que NS promociona en el Dossier junto al botón de "otra plaza".
+- Se sustituye la casuística "empresa multiservicio" de `docs/12` §4.
+
+**Why.** No hay razón para impedir que una empresa aporte todo lo que sabe hacer; sí la hay para empujarla a repartirlo por la zona, porque cada plaza en otra Sala densifica la red y adelanta la siguiente fundación.
+
+**Consequences.** `addSeat` en `services/onboarding.ts`, capability secundaria, `companies.legal_id` (migración 0010), bono `NETWORK_SEAT_BONUS`, mínimo por titularidad y acción `BELOW` en el Compromiso, formulario "Ocupar también esta plaza" en el Dossier, pruebas. `docs/12` §4 actualizado.
+
+**Revisit when.** Se conozca cuántas empresas piden segunda plaza en la Sala piloto y cuántas eligen otra Sala.
+
+---
+
+## D-048 · Los Directores/as de Sala promueven acciones entre Salas y resuelven dudas entre Timoneles, y eso suma Valoración
+
+**Status:** CONFIRMED (regla fijada por el fundador)
+**Date:** 2026-09-14
+
+**Context.** Dirigir una Sala es trabajo para la red. Debe verse y contar.
+
+**Choice.**
+
+- Un Director/a registra en la Antesala sus **acciones de dirección**: "Acción entre Salas" (encuentros, cruces de plazas vacantes, Embajadas facilitadas) y "Duda resuelta entre Timoneles". Cada acción exige una frase (qué se hizo y con quién) y queda en la Mesa, visible para la Sala.
+- Cada acción suma **puntos de Valoración** a la empresa del Director/a en el componente "Servicio a la red" (D-046): tres acciones en el mes valen el 100 % del componente. Solo suma; nunca resta. Mérito propuesto: +15 por acción entre Salas, +10 por duda resuelta.
+- El Contraste puede revisar acciones vacías o repetidas. Las acciones entre Salas nutren los encuentros entre Salas (`docs/12` §6bis).
+
+**Why.** Sin esto, dirigir solo cuesta. Con esto, dirigir bien abre la puerta a la Embajada y a seguir dirigiendo, y la red gana quien la cuida.
+
+**Consequences.** `services/direccion.ts`, `TrustEvent` `DIRECTOR_INTERCHAPTER_ACTION` y `DIRECTOR_QUERY_RESOLVED`, sección "Acciones de dirección" en la Antesala, componente en la Valoración, pruebas.
+
+**Revisit when.** Se defina la elección y el mandato del Director/a de Sala.
+
+---
+
+## D-049 · Nadie busca para sí: los titulares (Agentes y Timoneles) buscan negocio para los demás titulares de su Sala; el negocio propio no entra en NS
+
+**Status:** CONFIRMED (principio fijado por el fundador)
+**Date:** 2026-09-14
+
+**Context.** Al proponer la Prueba de Valor se describió el informe como "señales que encajan con tu cliente ideal". El fundador corrige y fija el principio: dentro de NS, cada titular y su Agente buscan referidos para sus compañeros de Sala. Cualquier negocio para uno mismo no entra en NS; solo entra el negocio que se puede ceder a uno o varios cesionarios. Lo que un titular recibe lo han buscado los demás para él.
+
+**Choice.**
+
+- Principio del núcleo, con rango de Norma NS que firma todo titular ("Para los demás", versión `2026-09-14.3`).
+- En el sistema ya se cumplía y ahora está escrito: el Matchmaker nunca propone a la empresa originadora como cesionaria; el Rastreo produce Indicios en borrador "para otros titulares"; una necesidad que solo cubre la especialidad del propio originador no es plaza vacante ni Cesión. Las fuentes públicas solo aportan hechos de terceros que anticipan necesidades (por ejemplo, adjudicaciones: quien gana el contrato es quien va a necesitar cosas), nunca "oportunidades para ti" (una licitación abierta a la que un miembro podría presentarse es negocio propio y no entra).
+- La Prueba de Valor (D-050) tiene dos caras y las dos miran a los demás: lo que el Agente del candidato habría cedido, y lo que los Agentes de la Sala ya encontraron para su especialidad.
+- Los Encargos ("lo que busco ahora") no contradicen el principio: son la forma de que los demás sepan qué ceder.
+
+**Why.** Es lo que distingue a NS de un buscador de leads: la red trabaja para cada miembro porque cada miembro trabaja para la red. Sin esta regla, el Agente degeneraría en prospección propia y la reciprocidad desaparecería.
+
+**Consequences.** Norma nueva en `core/normas.ts`; constitución (principio 17 y regla 6); North Star; léxico; adaptadores de fuentes con el filtro explícito; informe de la Prueba de Valor. Prueba en `tests/prueba.test.ts`.
+
+**Revisit when.** Nunca.
+
+---
+
+## D-050 · Prueba de Valor: siete días de Agente para el candidato, antes de la plaza, con un informe de dos caras
+
+**Status:** CONFIRMED (el fundador aprueba la propuesta "implementa todo, paso a paso")
+**Date:** 2026-09-14
+
+**Context.** El "wow" comercial de NS no es una pantalla: es que una empresa vea negocio real antes de haber hecho nada. Hasta hoy la demo funcionaba con datos ficticios y el candidato solo veía una portada.
+
+**Choice.**
+
+- Un Director/a inicia desde la Antesala la **Prueba de Valor** de una candidatura con especialidad clasificada. Se crea una empresa en estado `TRIAL`: sin plaza, sin voto, sin acceso, con un ADN provisional (mensaje de la candidatura y, cuando exista, su web) y un Agente en estado de prueba.
+- Durante **siete días** su Agente rastrea en la Ronda como cualquier otro, para los demás (D-049). Rastrea con su propia clave de deduplicación: sus borradores no quitan a los titulares ningún hecho público. Nunca recibe Cesiones: la Mesa solo consulta titulares activos.
+- Al terminar (o antes, a petición del Director/a), se genera el **informe**, público por enlace con token: **cara 1**, lo que su Agente habría cedido (hechos, necesidades, especialidades y titulares que las habrían recibido); **cara 2**, lo que la Sala ya encontró para su especialidad en el último mes, en agregado y sin identidad (recuento, Agentes que lo encontraron, cuántas se quedaron sin titular, sectores, valor estimado, plazos). El candidato no es miembro: nunca ve capa 0 ni nombres de terceros.
+- El informe termina con la solicitud de plaza y las Normas.
+
+**Why.** Enseña las dos cosas que venden NS: que su Agente trabajaría para la Sala desde el primer día, y que la Sala ya trabaja para su especialidad. Ningún club, directorio ni red profesional puede enseñar eso.
+
+**Consequences.** Tabla `value_trials` (migración 0011), `services/prueba.ts`, `core/prueba.ts`, estado `TRIAL` en empresas y Agentes, Ronda con empresas en prueba, ruta pública `/prueba/[token]` fuera de la puerta de la demo, botones en la Antesala, pruebas.
+
+**Revisit when.** Se conozca la conversión candidatura → plaza con y sin Prueba de Valor; o se decida enviar el informe por correo automáticamente.
+
+---
+
+## D-051 · Fuentes públicas reales para el Rastreo: adjudicaciones de PLACE y prensa económica local; BORME y licencias, pendientes
+
+**Status:** CONFIRMED en la decisión; adaptadores PROPOSED hasta validarlos en el servidor
+**Date:** 2026-09-14
+
+**Context.** El Rastreo (D-031) funcionaba con un lote de muestra. La Prueba de Valor y la Ronda solo impresionan con hechos reales de la zona.
+
+**Choice.**
+
+- **PLACE** (Plataforma de Contratación del Sector Público, Atom de licitaciones): solo entradas con **resultado de adjudicación** cuya provincia, ciudad u órgano contengan la zona. La adjudicataria es la que va a necesitar personal, seguros, subcontratas o financiación (D-049). Nunca licitaciones abiertas.
+- **Prensa económica local** por RSS (Diario de Sevilla, ABC Sevilla, El Correo): titulares y entradillas; el modelo extrae después el Indicio. Una cabecera caída nunca rompe la Ronda.
+- Lectores sin dependencias (expresiones regulares tolerantes sobre XML). Se activan con `NS_PUBLIC_FEEDS=real`; sin esa variable, el lote de muestra. Las pruebas usan fixtures con el formato real.
+- **Pendientes:** BORME (los actos por empresa están en PDF por provincia; hace falta extracción de texto), licencias de obra municipales (sin fuente abierta estable) y empleo (sin RSS público fiable). Todos en `PENDIENTES_DEL_FUNDADOR.md`.
+- Los adaptadores no han podido probarse contra los servidores reales desde el entorno de desarrollo (sin salida de red a esos dominios). Primera validación: en el servidor desplegado.
+
+**Why.** Adjudicaciones y prensa son las dos fuentes con formato estable, abiertas y ricas en hechos de terceros. Empezar por ellas da Indicios reales en días.
+
+**Consequences.** `agents/feeds-public.ts`, `defaultPublicFeed()` en la Ronda, pruebas con fixtures, variable de entorno documentada en `docs/17`.
+
+**Revisit when.** Se valide en el servidor el volumen y la calidad de Indicios por fuente; entonces se añade BORME.
+
+---
+
+## D-052 · Apunte por voz: el Timonel dicta y el Agente estructura
+
+**Status:** CONFIRMED (el fundador aprueba la propuesta)
+**Date:** 2026-09-14
+
+**Context.** El Apunte (D-037) es la segunda prioridad móvil. En la calle se habla, no se escribe.
+
+**Choice.** En el Apunte, los campos "Qué necesita" y "Observaciones" llevan un botón de dictado que usa el reconocimiento de voz del propio móvil (castellano). Si el dispositivo no lo ofrece, el botón no aparece. El texto cae en el campo y el circuito sigue igual: el Agente lo estructura y el Timonel decide si se publica. Ningún audio sale del dispositivo hacia NS.
+
+**Why.** Convierte treinta segundos de conversación en un Indicio sin fricción, sin infraestructura de audio ni datos personales de voz en los servidores de NS.
+
+**Consequences.** `components/dictation.tsx`, Apunte con dictado. Pendiente (móvil real): afinar la puntuación y probar en iOS y Android.
+
+**Revisit when.** El dictado del navegador no sea suficiente (ruido, precisión) y merezca transcripción en servidor.
+
+---
+
+## D-053 · Mesa en directo: la Mesa corre en segundo plano con cola persistente, reintentos y puerta humana ante fallos repetidos
+
+**Status:** CONFIRMED (el fundador aprueba la propuesta)
+**Date:** 2026-09-15
+
+**Context.** La Mesa (extracción, discovery, cualificación entre Agentes, score, compliance) se ejecutaba al publicar, en la misma petición. Con el modelo real cada Indicio tarda y no puede bloquear la pantalla del Timonel. `docs/17` lo señalaba como condición 2 para producción.
+
+**Choice.**
+
+- **Cola persistente** `agent_jobs`: un trabajo por Indicio (clave única por tipo y sujeto: encolar dos veces no duplica). Estados `QUEUED → RUNNING → DONE`, con `FAILED` transitorio y `NEEDS_HUMAN` final.
+- **Reclamación exclusiva**: solo gana el proceso que pasa el trabajo de `QUEUED` a `RUNNING` en una actualización condicional; dos procesos nunca cualifican el mismo Indicio a la vez. La Mesa ya era idempotente por Indicio, así que un reintento nunca duplica Cesiones.
+- **Reintentos** con espera creciente (inmediato, 1 minuto, 5 minutos) hasta tres intentos; después `NEEDS_HUMAN` y aviso al cedente en Hoy: "tu Agente lo deja en tus manos".
+- **Cuándo corre**: tras responder a la publicación (`after()`, sin bloquear la redirección), en cada Ronda antes del Reloj, y por la ruta programada `GET /api/jobs` cada cinco minutos donde el alojamiento lo permita (misma protección que el Reloj).
+- **Modo**: `NS_MESA_MODE=async|inline`. Sin variable, asíncrono si hay clave del modelo y no se fuerza el proveedor determinista; en línea para la demo y las pruebas. El contrato de los Agentes no cambia.
+- **Visible**: la Mesa muestra "En la Mesa ahora: N Indicios en cualificación, M tuyos" y los que esperan revisión humana; la Ronda lo resume en su evento.
+
+**Why.** Convierte la tesis "los Agentes se reúnen 24/7" en algo que ocurre de verdad en segundo plano, con el modelo real, sin que nadie espere mirando una pantalla, y sin perder ningún Indicio por un fallo de red.
+
+**Consequences.** Tabla `agent_jobs` (migración 0012), `services/jobs.ts`, `publishSignal` con modo, acción de publicar con `after()`, Ronda con drenaje, `GET /api/jobs`, cron en `vercel.json`, estado en la Mesa, pruebas (`tests/jobs.test.ts`). Condición 2 de `docs/17` cumplida en su primera versión.
+
+**Revisit when.** Haya volumen real: entonces, prioridad por Encargos abiertos, límite de trabajos por Agente y presupuesto de tokens por Tramo (D-025).
+
+---
+
+## D-054 · Cuentas personales: cada Timonel entra con su contraseña, sus sesiones se ven y cada acceso queda registrado
+
+*(Numerada D-042 en su rama de origen, PR #9; renumerada a D-054 al integrarla, porque D-042 ya era el Compromiso.)*
+
+**Status:** CONFIRMED (delegado por el fundador tras fusionar la #8)
+**Date:** 2026-09-14
+
+**Context.** La demo usa una puerta compartida y un selector de persona (D-033). Con empresas reales, cada Timonel debe entrar solo a lo suyo, y NS promete trazabilidad. Era la condición 1 de `docs/17` para producción.
+
+**Choice.**
+
+- **Dos modos**, elegidos por `NS_AUTH_MODE`: `demo` (por defecto en local: puerta compartida y selector) y `real` (por defecto en producción: cuentas personales). Toda la aplicación, las Server Functions y el proxy respetan el modo; el resto del código no cambia porque ya trabajaba sobre "el Timonel activo".
+- **Contraseña por persona**, guardada con scrypt y sal; mínimo diez caracteres. **Sesiones** de treinta días con token aleatorio en la cookie y solo su hash en la base de datos; se ven y se cierran una a una en "Mi acceso", y cambiar la contraseña cierra las demás.
+- **Invitaciones**: enlace de un solo uso y siete días para fijar la primera contraseña o recuperarla. Lo genera la Directiva desde el Dossier del Timonel (o la propia persona); el alta de una empresa en modo real termina mostrando ese enlace a la Directiva. El envío por correo llega después; mientras tanto el enlace se muestra una sola vez a quien lo genera.
+- **Registro de accesos**: entrada, fallo, salida, invitación, activación y cambio de contraseña quedan en el audit log con la persona y la empresa.
+- **Permisos**: los servicios ya comprobaban propiedad por empresa y Directiva; con cuentas reales esas comprobaciones dejan de depender de un selector. Un Timonel sin Directiva no ve la Antesala ni las Cesiones ajenas.
+- **Demo intacta**: en modo demo nada cambia. La semilla da a los Timoneles ficticios una contraseña conocida (`NS_SEED_PASSWORD`, en local "nscumbre-demo") para probar el modo real; en producción no se siembra ninguna si no se define.
+
+**Why.** Es la pieza mínima y honesta para que entre una empresa real: sin terceros, sin correos todavía, con lo que un Timonel espera de una red de confianza (saber dónde está abierta su sesión y poder cerrarla). Separar el modo permite seguir enseñando la demo con un solo clic.
+
+**Consequences.** Tablas `credentials`, `sessions`, `invites` (migración 0007), `lib/accounts.ts`, `/acceso` en dos versiones, `/invitacion/[token]`, `/cuenta`, enlace de acceso en el Dossier, alta en modo real, `pnpm e2e:auth`, pruebas. Condición 1 de `docs/17` cumplida; condición 3 (registro de accesos) cubierta en su parte de accesos.
+
+**Revisit when.** Se conecte el envío de correos (invitaciones y recuperación sin pasar por la Directiva), se añada un segundo factor para la Directiva, o NS necesite un rol de administración de red por encima de las Salas.

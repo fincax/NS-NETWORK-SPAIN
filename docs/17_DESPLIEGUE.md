@@ -46,13 +46,15 @@ Estas son las cinco cosas que faltan hoy y que hacen imprudente abrir la puerta 
 
 | # | Qué falta | Por qué es imprescindible | Esfuerzo estimado |
 | --- | --- | --- | --- |
-| 1 | **Usuarios con contraseña y permisos por Sala** | Hoy se elige la persona en un desplegable. Con datos reales, cada Timonel debe entrar solo a lo suyo. | 1 semana |
-| 2 | **Los Agentes en segundo plano con el modelo real** | Hoy la Mesa se ejecuta al publicar, en segundos, con reglas fijas. Con Claude cada Indicio tarda más y no puede bloquear la pantalla; hace falta una cola de trabajo y reintentos. | 1 semana |
-| 3 | **Copias de seguridad y registro de accesos** | Sin copias diarias un fallo borra la Sala. Sin registro de accesos no se puede demostrar quién vio qué (y NS promete trazabilidad). | 2 días |
+| 1 | **Usuarios con contraseña y permisos por Sala** | Hecho (D-054): cuentas personales con `NS_AUTH_MODE=real`, sesiones visibles, enlaces de acceso de un solo uso y registro de accesos. Falta el envío de correos de invitación. | Hecha · correos 1 día |
+| 2 | **Los Agentes en segundo plano con el modelo real** | Hecha en su primera versión (D-053): cola persistente `agent_jobs`, reintentos, `NEEDS_HUMAN`, drenaje tras publicar, en la Ronda y por `/api/jobs`. Falta probarla con la clave del modelo en el servidor y medir tiempos. | Hecha · validar 2 días |
+| 3 | **Copias de seguridad y registro de accesos** | El registro de accesos ya existe (D-054). Faltan las copias diarias (Neon las ofrece; hay que activarlas y probar una restauración). | 1 día |
 | 4 | **Textos legales y GDPR** | Aviso de privacidad, condiciones de la plaza (con las reglas inmutables y la cuota por Tramos), base jurídica de los datos de terceros, retención y borrado. Es `docs/08_SECURITY_PRIVACY_GDPR.md`, que aún no existe. | 1 semana con un abogado |
 | 5 | **La entrevista del ADN por el Agente** | Hecha en su primera versión (D-040): el alta desemboca en la entrevista, el ADN se construye conversando y se valida al final. Falta afinarla con Timoneles reales y con la clave del modelo en el servidor. | Hecha · afinar 2 días |
 
-A esto se suman las decisiones de producto que siguen esperándote y que la web pública y el onboarding necesitan: importes de la cuota y Tramos (D-025), parámetros del Compromiso (D-010), lista de especialidades fundadoras de NS Cumbre, tipografía (D-023).
+**Fuentes públicas reales (D-051).** Con `NS_PUBLIC_FEEDS=real` la Ronda lee adjudicaciones de PLACE y prensa económica local en lugar del lote de muestra. Los adaptadores están probados con fixtures; la primera validación contra los servidores reales se hace en el despliegue (desde el entorno de desarrollo no hay salida de red a esos dominios).
+
+A esto se suman las decisiones de producto que siguen esperándote y que la web pública y el onboarding necesitan: importes de la cuota y Tramos (D-025), lista de especialidades fundadoras de NS Cumbre, tipografía (D-023). Los parámetros del Compromiso quedaron fijados en D-042.
 
 **Estimación honesta:** unas 4 a 6 semanas de trabajo del equipo fundador desde que se decida, más el tiempo del abogado. Antes de eso, la "producción" sería una demo con datos reales, que es lo peor de los dos mundos.
 
@@ -72,7 +74,7 @@ Los cinco pasos, en orden. Ninguno requiere programar; todos requieren tus cuent
 
 1. **Base de datos.** Crea una cuenta en Neon (neon.tech) y un proyecto en la región de Frankfurt (eu-central-1). Copia la cadena de conexión (empieza por `postgres://`).
 2. **Alojamiento.** Crea una cuenta en Vercel (vercel.com) con tu GitHub, importa el repositorio `fincax/NS-NETWORK-SPAIN` y, en la configuración del proyecto, pon **Root Directory = `apps/web`**. Vercel detecta Next.js solo.
-3. **Variables de entorno** en Vercel (Settings → Environment Variables): `DATABASE_URL` (la cadena de Neon), `DEMO_USER`, `DEMO_PASSWORD` (elige una buena), `DEMO_SESSION_SECRET` (una frase larga y aleatoria), `CRON_SECRET` (otra frase larga y aleatoria; con ella Vercel lanza la Ronda cada mañana), `NS_PUBLIC_URL=https://networkspain.com`. Opcional: `ANTHROPIC_API_KEY`. Pulsa Deploy.
+3. **Variables de entorno** en Vercel (Settings → Environment Variables): `DATABASE_URL` (la cadena de Neon), `DEMO_USER`, `DEMO_PASSWORD` (elige una buena), `DEMO_SESSION_SECRET` (una frase larga y aleatoria), `CRON_SECRET` (otra frase larga y aleatoria; con ella Vercel lanza la Ronda cada mañana), `NS_PUBLIC_URL=https://networkspain.com`. Para la demo con datos ficticios, `NS_AUTH_MODE=demo` (puerta compartida y selector de Timonel); para empresas reales, `NS_AUTH_MODE=real` (cuentas personales, D-042). Opcional: `ANTHROPIC_API_KEY`. Pulsa Deploy.
 4. **Datos de la demo.** La primera vez, entra en la dirección que te da Vercel, ve a `/acceso`, entra con el usuario y la contraseña y pulsa "Preparar NS Cumbre (demo)" en Hoy. Eso crea la Sala, los diez titulares y los escenarios en la base de datos de Neon.
 5. **Dominio.** En Vercel, Settings → Domains, añade `networkspain.com` y `www.networkspain.com`. Vercel te dice qué registro DNS crear en el panel donde compraste el dominio (un registro A o CNAME). En unas horas la portada responde en networkspain.com y la demo en networkspain.com/acceso.
 
@@ -83,7 +85,7 @@ La **Ronda** de cada mañana (D-036) ya viene programada en el código (`vercel.
 ```text
 Alojamiento     Vercel (región fra1) o servidor propio con Node 22 y pnpm.
 Base de datos   PostgreSQL 16 gestionado en la UE. Variable DATABASE_URL. Las migraciones se aplican al arrancar.
-Variables       DATABASE_URL · DEMO_USER · DEMO_PASSWORD · DEMO_SESSION_SECRET · CRON_SECRET · NS_PUBLIC_URL · ANTHROPIC_API_KEY (opcional) · NS_LLM_MODEL · NS_LLM_PROVIDER
+Variables       DATABASE_URL · NS_AUTH_MODE · DEMO_USER · DEMO_PASSWORD · DEMO_SESSION_SECRET · NS_SEED_PASSWORD (solo demo) · CRON_SECRET · NS_PUBLIC_URL · ANTHROPIC_API_KEY (opcional) · NS_LLM_MODEL · NS_LLM_PROVIDER
 Comandos        pnpm install && pnpm build && pnpm start   ·   pnpm db:seed (solo demo)   ·   pnpm clock (Ronda diaria, equivale a GET /api/clock)
 Tareas          La Ronda (Reloj + Rastreo) cada mañana: vercel.json la programa; en otro alojamiento, un cron que llame a /api/clock con el CRON_SECRET.
 Copias          Copia diaria de la base de datos con retención de 30 días.

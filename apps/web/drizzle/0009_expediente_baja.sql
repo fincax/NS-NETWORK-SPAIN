@@ -1,0 +1,1 @@
+ALTER TABLE "members" ADD COLUMN "is_network" boolean DEFAULT false NOT NULL;

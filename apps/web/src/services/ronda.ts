@@ -11,18 +11,21 @@
  * Idempotente: el Reloj marca cada acción y el Rastreo deduplica por referencia externa. Se puede lanzar
  * varias veces al día sin efectos dobles; solo la primera pasada de la mañana produce trabajo.
  */
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import type { Db } from "@/db/client";
 import { schema } from "@/db/client";
 import { audit } from "@/lib/audit";
 import { runClock, type ClockResult } from "@/services/clock";
-import { runRastreo, SampleFeed, type PublicFeed } from "@/agents/rastreo";
+import { runRastreo, type PublicFeed } from "@/agents/rastreo";
+import { defaultPublicFeed } from "@/agents/feeds-public";
 import { runOwnSources } from "@/services/sources";
+import { runJobs, type JobsResult } from "@/services/jobs";
 import { fetchText as defaultFetch, type FetchText } from "@/agents/feeds";
 
 export interface RondaChapterResult {
   chapterId: string;
   chapterName: string;
+  jobs: JobsResult;
   clock: ClockResult;
   rastreo: { agents: number; drafts: number; skipped: number };
   ownSources: { sources: number; drafts: number; errors: number };
@@ -33,14 +36,16 @@ export interface RondaResult {
   chapters: RondaChapterResult[];
 }
 
-export async function runRonda(db: Db, now = new Date(), feed: PublicFeed = new SampleFeed(), reader: FetchText = defaultFetch): Promise<RondaResult> {
+export async function runRonda(db: Db, now = new Date(), feed: PublicFeed = defaultPublicFeed(), reader: FetchText = defaultFetch): Promise<RondaResult> {
   const chapters = await db.query.chapters.findMany();
   const out: RondaResult = { ranAt: now.toISOString(), chapters: [] };
 
   for (const chapter of chapters) {
+    const jobs = await runJobs(db, { now, chapterId: chapter.id, max: 20 }); // la Mesa pendiente, primero (D-053)
     const clock = await runClock(db, now, chapter.id);
 
-    const companies = await db.query.companies.findMany({ where: and(eq(schema.companies.chapterId, chapter.id), eq(schema.companies.status, "ACTIVE")) });
+    // Titulares activos y empresas en Prueba de Valor (D-050): todos rastrean para los demás (D-049). Nadie rastrea para sí.
+    const companies = await db.query.companies.findMany({ where: and(eq(schema.companies.chapterId, chapter.id), inArray(schema.companies.status, ["ACTIVE", "TRIAL"])) });
     const records = await db.query.publicRecords.findMany({ where: eq(schema.publicRecords.chapterId, chapter.id), columns: { ingestedByCompanyId: true } });
     const ingestedBy = new Map<string, number>();
     for (const r of records) if (r.ingestedByCompanyId) ingestedBy.set(r.ingestedByCompanyId, (ingestedBy.get(r.ingestedByCompanyId) ?? 0) + 1);
@@ -61,19 +66,21 @@ export async function runRonda(db: Db, now = new Date(), feed: PublicFeed = new 
       ownSources.errors += o.errors;
     }
 
-    const worked = clock.reminders + clock.expired + clock.late + clock.nudges + rastreo.drafts + ownSources.drafts > 0;
+    const worked = jobs.done + jobs.needsHuman + clock.reminders + clock.expired + clock.late + clock.nudges + clock.compromiso.evaluated + rastreo.drafts + ownSources.drafts > 0;
     if (worked) {
       const parts = [
+        jobs.done ? `${jobs.done} Indicio(s) cualificado(s) en la Mesa` : null,
         clock.reminders ? `${clock.reminders} recordatorio(s)` : null,
         clock.expired ? `${clock.expired} Cesión(es) caducada(s)` : null,
         clock.late ? `${clock.late} respuesta(s) tardía(s)` : null,
         clock.nudges ? `${clock.nudges} check-in(s)` : null,
+        clock.compromiso.evaluated ? `Compromiso de la semana evaluado a ${clock.compromiso.evaluated} titular(es): ${clock.compromiso.met} cumplen${clock.compromiso.notices ? `, ${clock.compromiso.notices} aviso(s)` : ""}${clock.compromiso.releases ? `, ${clock.compromiso.releases} baja(s) notificada(s)` : ""}` : null,
         rastreo.drafts ? `${rastreo.drafts} Indicio(s) en borrador desde fuentes públicas` : null,
         ownSources.drafts ? `${ownSources.drafts} Indicio(s) en borrador desde fuentes propias de los Agentes` : null,
       ].filter(Boolean);
       await audit(db, { chapterId: chapter.id, kind: "RONDA", actor: { type: "AGENT", id: "ronda" }, subject: { type: "Chapter", id: chapter.id }, policyApplied: "ronda.daily", result: `Ronda de la mañana con ${rastreo.agents} Agentes en la Mesa: ${parts.join(", ")}.`, significant: true });
     }
-    out.chapters.push({ chapterId: chapter.id, chapterName: chapter.name, clock, rastreo, ownSources });
+    out.chapters.push({ chapterId: chapter.id, chapterName: chapter.name, jobs, clock, rastreo, ownSources });
   }
   return out;
 }

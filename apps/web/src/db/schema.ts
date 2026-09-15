@@ -15,6 +15,7 @@ import type {
   ReferralVerdict,
   SignalEnvelope,
 } from "@/core/types";
+import type { ValueTrialReport } from "@/core/prueba";
 
 const id = () => uuid("id").primaryKey().defaultRandom();
 const createdAt = () => timestamp("created_at", { withTimezone: true }).notNull().defaultNow();
@@ -61,7 +62,7 @@ export const categorySeats = pgTable(
     chapterId: uuid("chapter_id").notNull().references(() => chapters.id),
     specialtyId: uuid("specialty_id").notNull().references(() => specialties.id),
     companyId: uuid("company_id"),
-    status: text("status").notNull().default("VACANT"), // ACTIVE | VACANT | WAITLISTED | RELEASED
+    status: text("status").notNull().default("VACANT"), // ACTIVE | VACANT | WAITLISTED | RELEASED | RELEASE_PENDING (baja notificada) | RELEASE_PROPOSED (Directiva propuso, NS confirma)
     grantedAt: timestamp("granted_at", { withTimezone: true }),
   },
   (t) => [uniqueIndex("seat_unique").on(t.chapterId, t.specialtyId)],
@@ -74,6 +75,7 @@ export const companies = pgTable("companies", {
   name: text("name").notNull(),
   slug: text("slug").notNull().unique(),
   legalName: text("legal_name"),
+  legalId: text("legal_id"), // CIF/NIF: identifica a la misma empresa en varias Salas (D-047)
   website: text("website"),
   city: text("city").notNull().default("Sevilla"),
   status: text("status").notNull().default("ACTIVE"), // APPLICANT | ACTIVE | SUSPENDED | RELEASED
@@ -92,6 +94,40 @@ export const members = pgTable("members", {
   email: text("email").notNull().unique(),
   isPrimary: boolean("is_primary").notNull().default(true),
   isDirector: boolean("is_director").notNull().default(false),
+  isNetwork: boolean("is_network").notNull().default(false), // NS (la red): confirma bajas propuestas por la Directiva (D-044)
+  createdAt: createdAt(),
+});
+
+// ───────────── Cuentas de acceso (D-054): contraseña por Timonel, sesiones e invitaciones ─────────────
+export const credentials = pgTable("credentials", {
+  memberId: uuid("member_id").primaryKey().references(() => members.id),
+  passwordHash: text("password_hash").notNull(),
+  updatedAt: updatedAt(),
+  createdAt: createdAt(),
+});
+
+export const sessions = pgTable(
+  "sessions",
+  {
+    id: id(),
+    memberId: uuid("member_id").notNull().references(() => members.id),
+    tokenHash: text("token_hash").notNull().unique(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    lastSeenAt: timestamp("last_seen_at", { withTimezone: true }).notNull().defaultNow(),
+    userAgent: text("user_agent"),
+    revokedAt: timestamp("revoked_at", { withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  (t) => [index("sessions_member_idx").on(t.memberId)],
+);
+
+export const invites = pgTable("invites", {
+  id: id(),
+  memberId: uuid("member_id").notNull().references(() => members.id),
+  tokenHash: text("token_hash").notNull().unique(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  usedAt: timestamp("used_at", { withTimezone: true }),
+  createdByMemberId: uuid("created_by_member_id"),
   createdAt: createdAt(),
 });
 
@@ -253,6 +289,68 @@ export const referralTransitions = pgTable("referral_transitions", {
   reason: text("reason"),
   occurredAt: createdAt(),
 });
+
+/** Cola de trabajos de los Agentes (D-053): la Mesa corre en segundo plano con el modelo real. */
+export const agentJobs = pgTable(
+  "agent_jobs",
+  {
+    id: id(),
+    chapterId: uuid("chapter_id").notNull().references(() => chapters.id),
+    kind: text("kind").notNull(), // MESA
+    subjectId: uuid("subject_id").notNull(), // opportunity_signal_id
+    status: text("status").notNull().default("QUEUED"), // QUEUED | RUNNING | DONE | FAILED | NEEDS_HUMAN
+    attempts: integer("attempts").notNull().default(0),
+    lastError: text("last_error"),
+    runAfter: timestamp("run_after", { withTimezone: true }).notNull().defaultNow(),
+    startedAt: timestamp("started_at", { withTimezone: true }),
+    finishedAt: timestamp("finished_at", { withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  (t) => [uniqueIndex("agent_job_subject").on(t.kind, t.subjectId), index("agent_job_status").on(t.status, t.runAfter)],
+);
+
+/** Prueba de Valor (D-050): siete días de Agente para un candidato, antes de la plaza. */
+export const valueTrials = pgTable("value_trials", {
+  id: id(),
+  chapterId: uuid("chapter_id").notNull().references(() => chapters.id),
+  candidacyId: uuid("candidacy_id").notNull().references(() => betaRequests.id).unique(),
+  companyId: uuid("company_id").notNull().references(() => companies.id), // empresa en estado TRIAL, sin plaza
+  specialtyCode: text("specialty_code").notNull(),
+  token: text("token").notNull().unique(), // enlace público del informe
+  startedAt: createdAt(),
+  endsAt: timestamp("ends_at", { withTimezone: true }).notNull(),
+  reportGeneratedAt: timestamp("report_generated_at", { withTimezone: true }),
+  report: jsonb("report").$type<ValueTrialReport>(),
+  startedBy: uuid("started_by"),
+});
+
+/** Aceptación expresa de las Normas NS al alta como titular (D-043). Queda la versión firmada y quién firmó. */
+export const rulesAcceptances = pgTable("rules_acceptances", {
+  id: id(),
+  chapterId: uuid("chapter_id").notNull().references(() => chapters.id),
+  companyId: uuid("company_id").notNull().references(() => companies.id),
+  memberId: uuid("member_id").notNull().references(() => members.id),
+  rulesVersion: text("rules_version").notNull(),
+  rules: jsonb("rules").$type<string[]>().notNull().default([]),
+  acceptedAt: createdAt(),
+});
+
+/** Compromiso semanal (D-042): una fila por titular y semana evaluada. La escalera vive aquí, no en la Cesión. */
+export const contributionWeeks = pgTable(
+  "contribution_weeks",
+  {
+    id: id(),
+    chapterId: uuid("chapter_id").notNull().references(() => chapters.id),
+    companyId: uuid("company_id").notNull().references(() => companies.id),
+    weekStart: timestamp("week_start", { withTimezone: true }).notNull(), // lunes 00:00 UTC
+    validCount: integer("valid_count").notNull().default(0),
+    distinctSpecialties: integer("distinct_specialties").notNull().default(0),
+    missedStreak: integer("missed_streak").notNull().default(0), // semanas seguidas sin Cesión válida, incluida esta
+    action: text("action").notNull().default("NONE"), // NONE | MISSED | DIPLOMATIC_NOTICE | FORMAL_NOTICE | RELEASE_NOTICE
+    createdAt: createdAt(),
+  },
+  (t) => [uniqueIndex("contribution_week_unique").on(t.companyId, t.weekStart), index("contribution_chapter_week").on(t.chapterId, t.weekStart)],
+);
 
 export const humanDecisions = pgTable("human_decisions", {
   id: id(),

@@ -70,7 +70,7 @@ Una empresa pertenece a **una sola Sala por zona**. Una empresa con unidades loc
 La Directiva de Zona abre la Sala N+1 cuando se cumplen las tres condiciones:
 
 1. **Demanda real.** Existe una lista de espera de solicitantes **ya admitidos** (D-004) que no caben en las Salas existentes porque su especialidad está ocupada, y suman al menos 12–15 empresas fundadoras (D-006) que cubren las especialidades más demandadas de la zona (construcción/reforma, legal, fiscal, seguros, IT, marketing, RR.HH., financiación, inmobiliario, consultoría).
-2. **Profundidad de mercado.** El censo de empresas objetivo de la zona (DIRCE por CNAE y tamaño, filtrado por los ICP de las especialidades fundadoras) soporta una Sala más sin que el flujo esperado de referidos válidos por miembro caiga por debajo del umbral configurado (propuesta: ≥ 3× la cuota mínima de D-010).
+2. **Profundidad de mercado.** El censo de empresas objetivo de la zona (DIRCE por CNAE y tamaño, filtrado por los ICP de las especialidades fundadoras) soporta una Sala más sin que el flujo esperado de referidos válidos por miembro caiga por debajo del umbral configurado (propuesta: ≥ 3× el Compromiso semanal de D-042).
 3. **Salud de las Salas existentes.** Las Salas activas están en o por encima del objetivo de 25–35 plazas y su tasa de cumplimiento de cuota es sana. No se abre una Sala nueva para descargar una Sala que no funciona.
 
 **Quién empuja (D-041).** La empresa cuya plaza está ocupada no se queda en lista: NS le ofrece ser **Promotora** de la siguiente Sala. Reúne fundadoras en la Antesala (una por especialidad), la Directiva funda la Sala al alcanzar el mínimo, y la Promotora recibe una **gratificación** anunciada por NS (propuesta: meses de cuota gratis). Reglas completas en D-041.
@@ -155,7 +155,7 @@ Con datos reales, la taxonomía se corrige sola: si los referidos de dos especia
 
 Reglas (integran D-001 y D-004):
 
-1. Una empresa, una plaza principal por Sala. Capabilities secundarias sin exclusividad.
+1. Una empresa, una plaza principal por Sala y, si tiene varias especialidades (varios CNAE), tantas titularidades como plazas vacantes ocupe (D-047). Cada titularidad tiene su exclusividad y su Compromiso. NS premia con Mérito de Red llevar cada especialidad a una Sala distinta.
 2. Especialidad ocupada en la Sala solicitada → el solicitante admitido elige: otra Sala de la zona con la plaza libre, lista de espera de esa Sala, o lista de fundadores de la próxima Sala.
 3. Solapamiento `ADJACENT` → revisión de la Directiva de Sala antes de admitir. `CONFLICT` → no en esa Sala.
 4. La plaza se conserva cumpliendo la cuota de contribución (D-010) y las reglas inmutables. Se pierde por incumplimiento reiterado o expulsión.
@@ -165,7 +165,7 @@ Reglas (integran D-001 y D-004):
 
 | Caso | Regla |
 | --- | --- |
-| Empresa multiservicio (legal + fiscal + laboral) | Una plaza principal. Puede solicitar una segunda plaza en la misma Sala solo si esa especialidad lleva ≥ 2 periodos vacante sin lista de espera, y asume cuota completa por cada plaza. Pierde la segunda en cuanto aparece un solicitante admitido para ella. |
+| Empresa multiservicio (legal + fiscal + laboral) | Puede ocupar una plaza por especialidad en la misma Sala, cada una con su titularidad y su Compromiso semanal (D-047). NS le propone llevar la siguiente especialidad a otra Sala de la zona, o fundarla (D-041), y lo premia con Mérito de Red. |
 | Generalista frente a especialista | El generalista ocupa una especialidad concreta, nunca la clase CNAE. Un especialista posterior tiene prioridad en las especialidades que el generalista no ocupa. |
 | Franquicia o red de oficinas | La plaza la ocupa la unidad local, no la marca. Dos oficinas de la misma marca no pueden estar en la misma Sala; sí en dos Salas de la zona. |
 | Empresa nacional o 100 % remota | Puede ocupar plaza en una Sala de la zona donde tenga equipo o clientes verificables. No puede ocupar la misma especialidad en dos Salas de la misma zona. |
@@ -255,5 +255,5 @@ ReferralRoute { referral_id, origin_chapter_id, target_chapter_id, level: CHAPTE
 1. Delimitar la Zona NS Sevilla (solo capital, o capital + área metropolitana).
 2. Confirmar la lista de especialidades fundadoras de la primera Sala de NS Sevilla (30–40) y su primera versión NS-CAT.
 5. Decidir el formato y ritmo de los encuentros entre Salas (§6bis).
-3. Fijar los umbrales de apertura y saturación (propuesta: ≥ 3× cuota de D-010; dos periodos de caída de flujo).
+3. Fijar los umbrales de apertura y saturación (propuesta: ≥ 3× el Compromiso semanal de D-042, es decir, 3 Cesiones válidas por titular y semana en el flujo esperado; dos periodos de caída de flujo).
 4. Decidir si el enrutamiento a otras Salas de la zona requiere consentimiento del originador en cada caso o una preferencia general en su Business DNA.
