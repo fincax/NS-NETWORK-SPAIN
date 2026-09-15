@@ -13,7 +13,7 @@ La privacidad es arquitectura, no una pantalla legal posterior (constitución §
 - Ruta pública `/privacidad`, fuera de la puerta de la demo. Enlazada desde el pie de la portada y desde el propio formulario.
 - Texto único y versionado en `apps/web/src/core/privacidad.ts` (`PRIVACIDAD_VERSION`). Cambiar el texto obliga a subir la versión: así la versión registrada en cada candidatura es exactamente la que estaba publicada.
 - Secciones: quién trata, qué datos y para qué, base jurídica, conservación, destinatarios y ubicación, derechos y reclamación ante la AEPD, la demo (datos ficticios; prohibido introducir datos reales), cookies (solo una técnica de sesión).
-- Responsable: **Be Trendy, S.L.**, NIF B90130725, calle Valparaíso, 18, 41013 Sevilla, propietaria de NS Network Spain. Contacto `NS_CONTACT_EMAIL` (por defecto `privacidad@networkspain.com`) y teléfono 627 542 045. Versión vigente del aviso: 2026-09-15.2.
+- Responsable: **Be Trendy, S.L.**, NIF B90130725, calle Valparaíso, 18, 41013 Sevilla, propietaria de NS Network Spain. Contacto `NS_CONTACT_EMAIL` (por defecto `hola@networkspain.com`) y teléfono 627 542 045. Versión vigente del aviso: 2026-09-15.3.
 
 ### 2.2 Consentimiento en la candidatura
 
@@ -37,7 +37,7 @@ La privacidad es arquitectura, no una pantalla legal posterior (constitución §
 
 ## 3. Pendiente antes de empresas reales
 
-1. ~~Identidad del responsable~~ (hecho: Be Trendy, S.L.). Falta que el buzón `privacidad@networkspain.com` exista o fijar `NS_CONTACT_EMAIL`.
+1. ~~Identidad del responsable~~ (hecho: Be Trendy, S.L.). Falta que el buzón `hola@networkspain.com` exista o fijar `NS_CONTACT_EMAIL`.
 2. **Condiciones de la plaza**: contrato con las Normas NS (D-043), la cuota por Tramos (D-025) y el tratamiento de datos de la empresa titular. Se aceptan en el alta, con versión, como las Normas.
 3. **Datos de terceros en los Indicios**: base jurídica (interés legítimo del cedente, con ponderación documentada), deber de información al Interesado en el Puente, y la regla ya implementada de que nadie contacta sin autorización humana.
 4. **Registro de actividades de tratamiento** y, si procede, evaluación de impacto por el uso de Agentes sobre datos de terceros.

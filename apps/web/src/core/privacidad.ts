@@ -6,7 +6,7 @@
  * Los datos de terceros que manejarán los Agentes con empresas reales se regulan en docs/08 y exigen revisión jurídica
  * antes de producción (docs/17, condición 4).
  */
-export const PRIVACIDAD_VERSION = "2026-09-15.2";
+export const PRIVACIDAD_VERSION = "2026-09-15.3";
 
 /** Quién responde de los datos: la sociedad propietaria de NS Network Spain. */
 export const RESPONSABLE = {
@@ -16,7 +16,7 @@ export const RESPONSABLE = {
   domicilio: "calle Valparaíso, 18, 41013 Sevilla",
   telefono: "627 542 045",
   /** Buzón de privacidad. Se fija con NS_CONTACT_EMAIL en el servidor; el valor por defecto debe existir como buzón real. */
-  contacto: process.env.NS_CONTACT_EMAIL ?? "privacidad@networkspain.com",
+  contacto: process.env.NS_CONTACT_EMAIL ?? "hola@networkspain.com",
 } as const;
 
 export interface SeccionPrivacidad {

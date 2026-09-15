@@ -1338,11 +1338,11 @@ Servicio a la red        10 %   solo suma: acciones de dirección del mes (3 = 1
 
 **Options.** (a) Un enlace a un texto genérico en el pie. (b) Aviso propio, versionado, con casilla obligatoria y registro de la aceptación, igual que las Normas NS (D-043). (c) Retirar el formulario hasta tener los textos del abogado.
 
-**Choice.** (b). Texto único en `core/privacidad.ts` con `PRIVACIDAD_VERSION`; página pública `/privacidad`; casilla obligatoria en el formulario con campo oculto de versión; el servidor rechaza sin consentimiento y guarda `privacy_version` y `privacy_accepted_at` en la candidatura. Responsable `NS Network Spain` con buzón `NS_CONTACT_EMAIL` (por defecto `privacidad@networkspain.com`). Se abre `docs/08` con lo que existe y lo pendiente.
+**Choice.** (b). Texto único en `core/privacidad.ts` con `PRIVACIDAD_VERSION`; página pública `/privacidad`; casilla obligatoria en el formulario con campo oculto de versión; el servidor rechaza sin consentimiento y guarda `privacy_version` y `privacy_accepted_at` en la candidatura. Responsable `NS Network Spain` con buzón `NS_CONTACT_EMAIL` (por defecto `hola@networkspain.com`). Se abre `docs/08` con lo que existe y lo pendiente.
 
 **Why.** Informar y registrar el consentimiento es lo mínimo que exige el RGPD y lo que NS promete: privacidad como arquitectura. Versionar el texto y guardar la versión aceptada es el mismo patrón que las Normas NS, y evita discutir después qué leyó cada candidato. Retirar el formulario habría dejado la web sin su llamada a la acción el día que se publica.
 
-**Consequences.** Migración 0014, `services/candidatura.ts` (probado), `/privacidad` fuera de la puerta de la demo, enlace en el pie de la portada, `docs/08` v0.1. El fundador aportó el responsable el mismo día: Be Trendy, S.L., NIF B90130725, calle Valparaíso, 18, 41013 Sevilla (aviso 2026-09-15.2). Pendiente: que exista el buzón de privacidad. Las candidaturas anteriores a esta fecha no tienen consentimiento registrado.
+**Consequences.** Migración 0014, `services/candidatura.ts` (probado), `/privacidad` fuera de la puerta de la demo, enlace en el pie de la portada, `docs/08` v0.1. El fundador aportó el responsable el mismo día: Be Trendy, S.L., NIF B90130725, calle Valparaíso, 18, 41013 Sevilla (aviso 2026-09-15.3). Pendiente: que exista el buzón de privacidad. Las candidaturas anteriores a esta fecha no tienen consentimiento registrado.
 
 **Revisit when.** El abogado entregue los textos definitivos (subir versión), o se recojan datos nuevos en la web pública (web del candidato en la Prueba de Valor, D-050).
 
