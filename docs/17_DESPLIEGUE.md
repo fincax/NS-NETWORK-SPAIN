@@ -80,6 +80,67 @@ Los cinco pasos, en orden. Ninguno requiere programar; todos requieren tus cuent
 
 La **Ronda** de cada mañana (D-036) ya viene programada en el código (`vercel.json`): Vercel llama a `GET /api/clock` a las 06:00 UTC con el `CRON_SECRET`, y los Agentes ejecutan el Reloj y el Rastreo de todas las Salas sin que nadie abra la aplicación. Se comprueba en Vercel, Settings → Cron Jobs, donde debe aparecer la tarea y sus últimas ejecuciones. En otro alojamiento, programa una tarea diaria que llame a esa dirección con la cabecera `Authorization: Bearer <CRON_SECRET>`, o ejecuta `pnpm clock`.
 
+## 4c. Paso a paso en un servidor propio (Clouding, como root, desde PowerShell)
+
+Alternativa al apartado 4 para quien prefiere su propio servidor en España. Todo lo hace un script; tú solo copias y pegas. Tiempo: media hora, más la espera del DNS.
+
+**Paso 0 · Que el código esté en `main`.** Los scripts viven en `deploy/`. Si acabas de recibirlos en un PR, fusiónalo primero.
+
+**Paso 1 · Crear el servidor en Clouding.** Panel de Clouding → Crear servidor → Ubuntu 24.04 (vale 22.04), 2 vCPU, 4 GB de RAM, 40 GB de disco. Cuando esté creado, anota su **IP pública** y la **contraseña de root** que te da Clouding.
+
+**Paso 2 · Apuntar el dominio.** En el panel donde compraste `networkspain.com`, en la zona DNS, crea dos registros de tipo **A**: nombre `@` con la IP del servidor, y nombre `www` con la misma IP. Puede tardar de minutos a unas horas en propagarse. Puedes seguir con el paso 3 mientras tanto.
+
+**Paso 3 · Entrar en el servidor desde PowerShell.** Abre PowerShell y escribe (cambia la IP por la tuya):
+
+```powershell
+ssh root@203.0.113.10
+```
+
+La primera vez pregunta si confías en el servidor: escribe `yes`. Después pide la contraseña de root (al escribirla no se ve nada; es normal). Cuando veas `root@...:~#`, estás dentro.
+
+**Paso 4 · Lanzar la instalación.** Pega estas dos líneas (cambia el dominio y el correo; el correo es para el certificado HTTPS):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/fincax/NS-NETWORK-SPAIN/main/deploy/instalar.sh -o instalar.sh
+bash instalar.sh networkspain.com tucorreo@tuempresa.es
+```
+
+Tarda de cinco a diez minutos. Instala Node, PostgreSQL, nginx y el certificado; descarga el código, lo construye, lo arranca vigilado por `pm2` y programa la Ronda (06:00) y la Mesa (cada cinco minutos). Al final imprime el **usuario y la contraseña de la demo**: cópialos en un sitio seguro. Si el DNS aún no apuntaba al servidor, el certificado queda pendiente: cuando apunte, vuelve a lanzar la misma línea `bash instalar.sh ...` y termina.
+
+**Paso 5 · Preparar la Sala.** En el navegador, entra en `https://networkspain.com/acceso` con el usuario y la contraseña del paso 4. En Hoy, pulsa **"Preparar NS Cumbre (demo)"**. Eso crea la Sala, los diez titulares ficticios y los escenarios. Ya puedes enseñarla.
+
+**Paso 6 (opcional) · Que los Agentes razonen con Claude.** En el servidor:
+
+```bash
+nano /opt/ns-network/apps/web/.env.production
+```
+
+Busca la línea `# ANTHROPIC_API_KEY=sk-ant-...`, quítale la almohadilla y pega tu clave. Guarda con `Ctrl+O`, `Enter`, y sal con `Ctrl+X`. Después:
+
+```bash
+pm2 restart ns-network --update-env
+```
+
+Con la clave, la Mesa pasa sola a segundo plano (D-053) y el Rastreo usa fuentes reales (`NS_PUBLIC_FEEDS=real` ya viene puesto).
+
+**Para actualizar cuando haya código nuevo en `main`:**
+
+```bash
+bash /opt/ns-network/deploy/actualizar.sh
+```
+
+**Para mirar si todo va bien:**
+
+```bash
+pm2 status                      # debe decir "online"
+pm2 logs ns-network --lines 50  # lo último que ha hecho la aplicación (Ctrl+C para salir)
+tail -n 20 /var/log/ns-ronda.log   # la Ronda de las mañanas
+```
+
+**Si algo falla:** vuelve a lanzar `bash instalar.sh networkspain.com tucorreo@tuempresa.es`. No borra nada: respeta las contraseñas y la base de datos que ya existan.
+
+**Para pasar a empresas reales** (cuando se cumpla la puerta de Fase 1): en `.env.production` cambia `NS_AUTH_MODE=demo` por `NS_AUTH_MODE=real`, reinicia con `pm2 restart ns-network --update-env`, y la Directiva genera desde el Dossier de cada Timonel su enlace de acceso (D-054).
+
 ## 4b. Cómo se despliega, técnicamente (para quien lo haga)
 
 ```text
