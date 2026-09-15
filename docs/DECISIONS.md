@@ -1346,3 +1346,29 @@ Servicio a la red        10 %   solo suma: acciones de dirección del mes (3 = 1
 
 **Revisit when.** El abogado entregue los textos definitivos (subir versión), o se recojan datos nuevos en la web pública (web del candidato en la Prueba de Valor, D-050).
 
+---
+
+## D-056 · Copias de seguridad: cifradas, probadas en cada copia, fuera del servidor y visibles para la Directiva
+
+**Status:** CONFIRMED (el fundador pidió "que marque la diferencia")
+**Date:** 2026-09-15
+
+**Context.** La demo corre en un servidor propio con PostgreSQL local y, desde el mismo día, la portada guarda candidaturas reales. No había ninguna copia. Era la condición 3 de `docs/17` para producción, y con datos reales ya no podía esperar.
+
+**Options.** (a) Un `pg_dump` en cron a una carpeta del servidor. (b) Copia gestionada por el proveedor de la máquina (instantáneas del disco). (c) Copia propia que se prueba a sí misma restaurándose, cifrada, con salida fuera del servidor y estado visible en la aplicación.
+
+**Choice.** (c), en `deploy/copias.sh`:
+
+- **Cada noche a las 03:30**: `pg_dump` en formato custom, cifrado con AES-256 y una clave que solo existe en `/root/.ns-copias-clave` y en manos del fundador.
+- **Cada copia se prueba**: se restaura en una base de datos de prueba con el usuario de la aplicación, se comparan tablas y empresas con la base real y se borra. Una copia que no se restaura no se conserva y se registra como fallo.
+- **30 días** de copias locales; las mismas se sincronizan con `rclone` a un remoto llamado `ns-copias` si existe (Backblaze B2 recomendado, región europea). Sin remoto, la copia se hace igual pero el estado lo señala.
+- **Estado en un JSON** (`/var/lib/ns-network/copias.json`) que la aplicación lee y muestra a la Directiva en Hoy como semáforo explicado: verde (al día y fuera del servidor), ámbar (hecha pero no sale, o sin copias), rojo (falló, no se pudo restaurar o lleva más de 30 horas sin copia).
+- **Restauración completa** con una orden: la copia se restaura en una base nueva y se intercambia con la real, que queda renombrada por si hay que volver atrás.
+- Se instala y se mantiene con `instalar.sh` y `actualizar.sh` (idempotente), así el servidor nunca queda sin copias por olvido.
+
+**Why.** Una copia que nadie ha restaurado es una hipótesis. Probarla cada noche convierte la copia en un hecho, y mostrarlo en Hoy convierte un asunto de sistemas en algo que la Directiva ve sin entrar en el servidor. El cifrado permite guardarla en cualquier sitio barato fuera del servidor sin exponer datos. Las instantáneas del proveedor no se descartan, pero no sustituyen a una copia que NS controla y puede llevarse a otro proveedor.
+
+**Consequences.** `deploy/copias.sh`, cambios en `instalar.sh` y `actualizar.sh`, `services/copias.ts` con pruebas, tarjeta en Hoy para la Directiva, `docs/17` §4c y §4b, `docs/08` §3. Pendientes del fundador: guardar la clave fuera del servidor y configurar el remoto `ns-copias`. Probado en el entorno de desarrollo contra un PostgreSQL real con los datos de la demo: copia, prueba, restauración completa, fallo por clave incorrecta y fallo por base inexistente.
+
+**Revisit when.** Haya varias Salas o la base supere unos cientos de MB (copias incrementales o `pg_basebackup`), o cuando NS tenga panel de red propio (llevar el estado allí además de a Hoy).
+

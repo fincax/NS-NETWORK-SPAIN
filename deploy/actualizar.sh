@@ -12,4 +12,6 @@ set -a; source $APP/.env.production; set +a
 pnpm build
 pm2 restart ns-network --update-env
 pm2 save >/dev/null
+# Las copias de seguridad se instalan o actualizan con el código (idempotente): clave, cron y una copia probada.
+bash $DIR/deploy/copias.sh instalar
 echo "Actualizado a $(git -C $DIR log --oneline -1)"

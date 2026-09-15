@@ -14,6 +14,7 @@ import { SOURCE_LABEL } from "@/agents/rastreo";
 import { candidacyCounts } from "@/services/antesala";
 import { InstallHint } from "../install-hint";
 import { activeInterview } from "@/services/entrevista";
+import { leerEstadoCopias, mostrarEstadoCopias, valorarCopias } from "@/services/copias";
 
 export default async function HoyPage() {
   await requireDemo();
@@ -55,6 +56,7 @@ export default async function HoyPage() {
   const ownDrafts = drafts.filter((d) => !recordBySignal.has(d.id) && !apuntes.includes(d) && d.visibility !== "COMPANY_ONLY");
   const agentState = forMe.length ? "esperando" : summary.matches ? "encontrado" : "analizando";
   const candidacies = member.isDirector ? await candidacyCounts(db) : null;
+  const copias = member.isDirector && mostrarEstadoCopias() ? valorarCopias(await leerEstadoCopias()) : null;
   const dnaRow = await db.query.businessDna.findFirst({ where: eq(schema.businessDna.companyId, company.id), columns: { validatedAt: true } });
   const interview = dnaRow?.validatedAt ? null : await activeInterview(db, company.id);
 
@@ -90,6 +92,13 @@ export default async function HoyPage() {
           <span><strong>Tu Agente quiere conocerte.</strong> {interview ? `Entrevista al ${interview.progress} %: retómala cuando quieras.` : "Diez preguntas y tu ADN queda listo para la Mesa."}</span>
           <span className="mono">{interview ? "Continuar →" : "Empezar →"}</span>
         </Link>
+      ) : null}
+
+      {copias ? (
+        <section className={`card ${copias.tone} row`} style={{ justifyContent: "space-between", gap: 14 }} aria-label="Copias de seguridad">
+          <span><strong>{copias.headline}</strong> {copias.detail}</span>
+          <span className="mono">Servidor · solo Directiva</span>
+        </section>
       ) : null}
 
       {candidacies && candidacies.pendientes > 0 ? (

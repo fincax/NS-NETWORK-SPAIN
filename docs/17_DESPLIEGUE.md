@@ -48,7 +48,7 @@ Estas son las cinco cosas que faltan hoy y que hacen imprudente abrir la puerta 
 | --- | --- | --- | --- |
 | 1 | **Usuarios con contraseña y permisos por Sala** | Hecho (D-054): cuentas personales con `NS_AUTH_MODE=real`, sesiones visibles, enlaces de acceso de un solo uso y registro de accesos. Falta el envío de correos de invitación. | Hecha · correos 1 día |
 | 2 | **Los Agentes en segundo plano con el modelo real** | Hecha en su primera versión (D-053): cola persistente `agent_jobs`, reintentos, `NEEDS_HUMAN`, drenaje tras publicar, en la Ronda y por `/api/jobs`. Falta probarla con la clave del modelo en el servidor y medir tiempos. | Hecha · validar 2 días |
-| 3 | **Copias de seguridad y registro de accesos** | El registro de accesos ya existe (D-054). Faltan las copias diarias (Neon las ofrece; hay que activarlas y probar una restauración). | 1 día |
+| 3 | **Copias de seguridad y registro de accesos** | Hecho (D-054, D-056): registro de accesos; copia nocturna cifrada con restauración probada en cada copia, 30 días, estado visible para la Directiva en Hoy (`deploy/copias.sh`). Falta que el fundador configure el remoto para que salgan del servidor y guarde la clave. | Hecha · remoto 1 hora |
 | 4 | **Textos legales y GDPR** | Hecho el aviso de privacidad de la web pública con consentimiento registrado en la candidatura (D-055, `docs/08` §2). Faltan condiciones de la plaza (con las reglas inmutables y la cuota por Tramos), base jurídica de los datos de terceros, retención y borrado (`docs/08` §3). | 1 semana con un abogado |
 | 5 | **La entrevista del ADN por el Agente** | Hecha en su primera versión (D-040): el alta desemboca en la entrevista, el ADN se construye conversando y se valida al final. Falta afinarla con Timoneles reales y con la clave del modelo en el servidor. | Hecha · afinar 2 días |
 
@@ -123,6 +123,26 @@ pm2 restart ns-network --update-env
 
 Con la clave, la Mesa pasa sola a segundo plano (D-053) y el Rastreo usa fuentes reales (`NS_PUBLIC_FEEDS=real` ya viene puesto).
 
+**Copias de seguridad (D-056).** Desde la primera actualización con este código, cada noche a las 03:30 el servidor hace una copia cifrada de la base de datos, la restaura en una base de datos de prueba para comprobar que sirve, la borra, y guarda 30 días de copias en `/var/backups/ns-network`. La Directiva ve el estado en Hoy: verde, ámbar o rojo, con el motivo. Tres cosas que solo puedes hacer tú:
+
+1. **Guarda la clave de cifrado.** La imprime `actualizar.sh` (o `instalar.sh`) la primera vez, y está en `/root/.ns-copias-clave`. Cópiala en un gestor de contraseñas. Sin ella, las copias no se pueden abrir; y si solo está en el servidor, una copia fuera del servidor no sirve de nada.
+2. **Haz que salgan del servidor.** Hasta entonces Hoy lo muestra en ámbar: "no sale del servidor". Hace falta un sitio fuera (recomendado: Backblaze B2 en región europea, unos céntimos al mes; sirve también Hetzner Storage Box, Google Drive o cualquier S3). En el servidor:
+
+```bash
+apt-get install -y rclone
+rclone config          # n (nuevo) → nombre: ns-copias → tipo según el proveedor → pega las claves que te dé → q
+bash /opt/ns-network/deploy/copias.sh hacer   # la siguiente copia ya se envía; Hoy pasa a verde
+```
+
+3. **Prueba una restauración completa una vez**, para saber que sabes hacerlo el día que haga falta. Es reversible: la base anterior queda guardada con otro nombre.
+
+```bash
+bash /opt/ns-network/deploy/copias.sh listar                                   # ver las copias
+bash /opt/ns-network/deploy/copias.sh restaurar /var/backups/ns-network/ns-AAAAMMDD-HHMMSS.dump.enc
+```
+
+Para mirar cómo van: `bash /opt/ns-network/deploy/copias.sh listar` y `tail -n 20 /var/log/ns-copias.log`.
+
 **Para actualizar cuando haya código nuevo en `main`:**
 
 ```bash
@@ -149,7 +169,7 @@ Base de datos   PostgreSQL 16 gestionado en la UE. Variable DATABASE_URL. Las mi
 Variables       DATABASE_URL · NS_AUTH_MODE · DEMO_USER · DEMO_PASSWORD · DEMO_SESSION_SECRET · NS_SEED_PASSWORD (solo demo) · CRON_SECRET · NS_PUBLIC_URL · ANTHROPIC_API_KEY (opcional) · NS_LLM_MODEL · NS_LLM_PROVIDER
 Comandos        pnpm install && pnpm build && pnpm start   ·   pnpm db:seed (solo demo)   ·   pnpm clock (Ronda diaria, equivale a GET /api/clock)
 Tareas          La Ronda (Reloj + Rastreo) cada mañana: vercel.json la programa; en otro alojamiento, un cron que llame a /api/clock con el CRON_SECRET.
-Copias          Copia diaria de la base de datos con retención de 30 días.
+Copias          deploy/copias.sh: pg_dump cifrado (AES-256, clave en /root/.ns-copias-clave), restauración de prueba en cada copia, 30 días, rclone → remoto "ns-copias", estado en /var/lib/ns-network/copias.json (NS_BACKUP_STATUS_FILE).
 Dominio         Hoy: networkspain.com sirve portada y demo. Con producción: demo.networkspain.com para la demo y networkspain.com para la web y la app reales.
 Marca           Paraguas "NS Network" + país (D-034). Dominios paraguas a reservar y marca europea a registrar antes de salir en prensa con empresas reales.
 ```
