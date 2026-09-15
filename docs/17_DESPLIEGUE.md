@@ -49,7 +49,7 @@ Estas son las cinco cosas que faltan hoy y que hacen imprudente abrir la puerta 
 | 1 | **Usuarios con contraseña y permisos por Sala** | Hecho (D-054): cuentas personales con `NS_AUTH_MODE=real`, sesiones visibles, enlaces de acceso de un solo uso y registro de accesos. Falta el envío de correos de invitación. | Hecha · correos 1 día |
 | 2 | **Los Agentes en segundo plano con el modelo real** | Hecha en su primera versión (D-053): cola persistente `agent_jobs`, reintentos, `NEEDS_HUMAN`, drenaje tras publicar, en la Ronda y por `/api/jobs`. Falta probarla con la clave del modelo en el servidor y medir tiempos. | Hecha · validar 2 días |
 | 3 | **Copias de seguridad y registro de accesos** | El registro de accesos ya existe (D-054). Faltan las copias diarias (Neon las ofrece; hay que activarlas y probar una restauración). | 1 día |
-| 4 | **Textos legales y GDPR** | Aviso de privacidad, condiciones de la plaza (con las reglas inmutables y la cuota por Tramos), base jurídica de los datos de terceros, retención y borrado. Es `docs/08_SECURITY_PRIVACY_GDPR.md`, que aún no existe. | 1 semana con un abogado |
+| 4 | **Textos legales y GDPR** | Hecho el aviso de privacidad de la web pública con consentimiento registrado en la candidatura (D-055, `docs/08` §2). Faltan condiciones de la plaza (con las reglas inmutables y la cuota por Tramos), base jurídica de los datos de terceros, retención y borrado (`docs/08` §3). | 1 semana con un abogado |
 | 5 | **La entrevista del ADN por el Agente** | Hecha en su primera versión (D-040): el alta desemboca en la entrevista, el ADN se construye conversando y se valida al final. Falta afinarla con Timoneles reales y con la clave del modelo en el servidor. | Hecha · afinar 2 días |
 
 **Fuentes públicas reales (D-051).** Con `NS_PUBLIC_FEEDS=real` la Ronda lee adjudicaciones de PLACE y prensa económica local en lugar del lote de muestra. Los adaptadores están probados con fixtures; la primera validación contra los servidores reales se hace en el despliegue (desde el entorno de desarrollo no hay salida de red a esos dominios).
@@ -157,5 +157,5 @@ Marca           Paraguas "NS Network" + país (D-034). Dominios paraguas a reser
 ## 5. Resumen
 
 - **Hoy:** fusionamos todo en la rama principal. La aplicación funciona de principio a fin en local con un comando.
-- **Ahora:** el código de la demo privada y la portada beta está listo. Publicarla en networkspain.com son los cinco pasos del apartado 4, con tus cuentas.
+- **Ahora:** la demo privada y la portada beta están publicadas en https://networkspain.com desde el 15 de septiembre de 2026, en un servidor propio (apartado 4c). Para actualizarla con lo nuevo de `main`: `bash /opt/ns-network/deploy/actualizar.sh`.
 - **Producción:** cuando estén las cinco condiciones y la puerta de Fase 1. Unas 4 a 6 semanas de trabajo, y solo entonces con empresas reales.

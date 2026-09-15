@@ -4,6 +4,7 @@ import { getDb, schema } from "@/db/client";
 import { NSCAT } from "@/db/nscat";
 import { Monogram } from "@/components/brand";
 import { betaRequestAction } from "./beta-actions";
+import { CONSENTIMIENTO_CANDIDATURA, PRIVACIDAD_VERSION } from "@/core/privacidad";
 
 export const dynamic = "force-dynamic";
 
@@ -100,7 +101,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
           <div className="notice amber" style={{ marginTop: 16 }}>Recibido. Te escribiremos en pocos días para contarte el siguiente paso. Gracias por querer estar en la primera Sala.</div>
         ) : (
           <form action={betaRequestAction} className="form-grid" style={{ marginTop: 16, maxWidth: 820 }}>
-            {error ? <div className="notice error" style={{ gridColumn: "1 / -1" }}>Revisa el nombre, la empresa y el correo.</div> : null}
+            {error === "privacidad" ? <div className="notice error" style={{ gridColumn: "1 / -1" }}>Para presentar la candidatura necesitamos tu conformidad con el aviso de privacidad.</div> : error ? <div className="notice error" style={{ gridColumn: "1 / -1" }}>Revisa el nombre, la empresa y el correo.</div> : null}
             <div className="field"><label htmlFor="fn">Tu nombre</label><input id="fn" name="fullName" required autoComplete="name" /></div>
             <div className="field"><label htmlFor="cn">Empresa</label><input id="cn" name="companyName" required autoComplete="organization" /></div>
             <div className="field"><label htmlFor="em">Correo</label><input id="em" name="email" type="email" required autoComplete="email" /></div>
@@ -113,6 +114,11 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
               </select>
             </div>
             <div className="field" style={{ gridColumn: "1 / -1" }}><label htmlFor="msg">Cuéntanos en una frase a quién sirve tu empresa (opcional)</label><input id="msg" name="message" maxLength={280} /></div>
+            <label className="norma" style={{ gridColumn: "1 / -1" }}>
+              <input type="checkbox" name="privacy" required />
+              <span>{CONSENTIMIENTO_CANDIDATURA} Solo los usamos para estudiarla y escribirte; no los cedemos a nadie. <Link href="/privacidad" style={{ textDecoration: "underline", textUnderlineOffset: 3 }}>Leer el aviso de privacidad</Link>.</span>
+            </label>
+            <input type="hidden" name="privacyVersion" value={PRIVACIDAD_VERSION} />
             <div className="actions" style={{ gridColumn: "1 / -1" }}><button className="btn primary" type="submit">Presentar candidatura</button></div>
             <p className="mono" style={{ gridColumn: "1 / -1" }}>Normas NS que aceptarás de forma expresa al ocupar tu plaza: nunca se cobra por un referido; al menos una Cesión válida a la semana, sin excusas (cuatro semanas sin ceder suponen la baja); la calidad importa más que la cantidad; dar a conocer tu trabajo a la Sala cada semana; lo que se da y lo que se recibe se ve. La cuota empieza baja y solo sube cuando NS te ha generado negocio.</p>
           </form>
@@ -120,8 +126,9 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
       </section>
 
       <footer className="public-footer">
-        <span className="mono">NS Network Spain · Beta privada · Sevilla · {new Date().getFullYear()}</span>
+        <span className="mono">NS Network Spain · Be Trendy, S.L. · Sevilla · {new Date().getFullYear()}</span>
         <span className="spacer" />
+        <Link href="/privacidad" className="mono">Privacidad</Link>
         <Link href="/acceso" className="mono">Acceso a la demostración</Link>
       </footer>
     </div>

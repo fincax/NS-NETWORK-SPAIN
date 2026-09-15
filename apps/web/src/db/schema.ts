@@ -536,6 +536,8 @@ export const betaRequests = pgTable("beta_requests", {
   specialtyCode: text("specialty_code"),
   city: text("city").notNull().default("Sevilla"),
   message: text("message"),
+  privacyVersion: text("privacy_version"), // versión del aviso de privacidad aceptado (D-055); nulo en candidaturas anteriores
+  privacyAcceptedAt: timestamp("privacy_accepted_at", { withTimezone: true }),
   status: text("status").notNull().default("NEW"), // CandidacyStatus (services/antesala.ts)
   notes: text("notes"), // nota privada de la Directiva
   reviewedBy: uuid("reviewed_by"), // último miembro de la Directiva que la tocó
