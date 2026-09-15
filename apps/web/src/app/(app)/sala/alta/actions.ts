@@ -8,6 +8,8 @@ import { onboardCompany, RulesNotAcceptedError, SeatTakenError } from "@/service
 import { activateCandidacy } from "@/services/antesala";
 import { cookies } from "next/headers";
 import { MEMBER_COOKIE } from "@/lib/session";
+import { authMode } from "@/lib/auth";
+import { createInvite } from "@/lib/accounts";
 
 const slugify = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
@@ -48,9 +50,14 @@ export async function onboardAction(formData: FormData) {
   }
   const candidacyId = String(formData.get("candidacyId") ?? "");
   if (candidacyId) await activateCandidacy(db, candidacyId, company.id);
-  // En la demo, la sesión pasa al nuevo Timonel para que haga la entrevista; en producción entrará con su propio usuario.
+  revalidatePath("/", "layout");
+  if (authMode() === "real") {
+    // Cuentas personales (D-054): la Directiva recibe el enlace de acceso del nuevo Timonel; él hará la entrevista al entrar.
+    const { token } = await createInvite(db, { memberId: member.id, createdBy: (await requireMember()).member.id });
+    redirect(`/empresa/${company.slug}?invite=${encodeURIComponent(token)}`);
+  }
+  // En la demo, la sesión pasa al nuevo Timonel para que haga la entrevista.
   const jar = await cookies();
   jar.set(MEMBER_COOKIE, member.id, { path: "/", sameSite: "lax" });
-  revalidatePath("/", "layout");
   redirect("/entrevista");
 }

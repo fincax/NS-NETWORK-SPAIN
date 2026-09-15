@@ -92,6 +92,13 @@
       "when": 1789430387564,
       "tag": "0012_agent_jobs",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1789431001741,
+      "tag": "0013_cuentas",
+      "breakpoints": true
     }
   ]
 }

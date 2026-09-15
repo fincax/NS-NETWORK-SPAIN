@@ -98,6 +98,39 @@ export const members = pgTable("members", {
   createdAt: createdAt(),
 });
 
+// ───────────── Cuentas de acceso (D-054): contraseña por Timonel, sesiones e invitaciones ─────────────
+export const credentials = pgTable("credentials", {
+  memberId: uuid("member_id").primaryKey().references(() => members.id),
+  passwordHash: text("password_hash").notNull(),
+  updatedAt: updatedAt(),
+  createdAt: createdAt(),
+});
+
+export const sessions = pgTable(
+  "sessions",
+  {
+    id: id(),
+    memberId: uuid("member_id").notNull().references(() => members.id),
+    tokenHash: text("token_hash").notNull().unique(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    lastSeenAt: timestamp("last_seen_at", { withTimezone: true }).notNull().defaultNow(),
+    userAgent: text("user_agent"),
+    revokedAt: timestamp("revoked_at", { withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  (t) => [index("sessions_member_idx").on(t.memberId)],
+);
+
+export const invites = pgTable("invites", {
+  id: id(),
+  memberId: uuid("member_id").notNull().references(() => members.id),
+  tokenHash: text("token_hash").notNull().unique(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  usedAt: timestamp("used_at", { withTimezone: true }),
+  createdByMemberId: uuid("created_by_member_id"),
+  createdAt: createdAt(),
+});
+
 export const businessDna = pgTable("business_dna", {
   id: id(),
   companyId: uuid("company_id").notNull().references(() => companies.id).unique(),

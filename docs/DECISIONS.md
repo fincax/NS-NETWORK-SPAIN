@@ -1301,3 +1301,28 @@ Servicio a la red        10 %   solo suma: acciones de dirección del mes (3 = 1
 
 **Revisit when.** Haya volumen real: entonces, prioridad por Encargos abiertos, límite de trabajos por Agente y presupuesto de tokens por Tramo (D-025).
 
+---
+
+## D-054 · Cuentas personales: cada Timonel entra con su contraseña, sus sesiones se ven y cada acceso queda registrado
+
+*(Numerada D-042 en su rama de origen, PR #9; renumerada a D-054 al integrarla, porque D-042 ya era el Compromiso.)*
+
+**Status:** CONFIRMED (delegado por el fundador tras fusionar la #8)
+**Date:** 2026-09-14
+
+**Context.** La demo usa una puerta compartida y un selector de persona (D-033). Con empresas reales, cada Timonel debe entrar solo a lo suyo, y NS promete trazabilidad. Era la condición 1 de `docs/17` para producción.
+
+**Choice.**
+
+- **Dos modos**, elegidos por `NS_AUTH_MODE`: `demo` (por defecto en local: puerta compartida y selector) y `real` (por defecto en producción: cuentas personales). Toda la aplicación, las Server Functions y el proxy respetan el modo; el resto del código no cambia porque ya trabajaba sobre "el Timonel activo".
+- **Contraseña por persona**, guardada con scrypt y sal; mínimo diez caracteres. **Sesiones** de treinta días con token aleatorio en la cookie y solo su hash en la base de datos; se ven y se cierran una a una en "Mi acceso", y cambiar la contraseña cierra las demás.
+- **Invitaciones**: enlace de un solo uso y siete días para fijar la primera contraseña o recuperarla. Lo genera la Directiva desde el Dossier del Timonel (o la propia persona); el alta de una empresa en modo real termina mostrando ese enlace a la Directiva. El envío por correo llega después; mientras tanto el enlace se muestra una sola vez a quien lo genera.
+- **Registro de accesos**: entrada, fallo, salida, invitación, activación y cambio de contraseña quedan en el audit log con la persona y la empresa.
+- **Permisos**: los servicios ya comprobaban propiedad por empresa y Directiva; con cuentas reales esas comprobaciones dejan de depender de un selector. Un Timonel sin Directiva no ve la Antesala ni las Cesiones ajenas.
+- **Demo intacta**: en modo demo nada cambia. La semilla da a los Timoneles ficticios una contraseña conocida (`NS_SEED_PASSWORD`, en local "nscumbre-demo") para probar el modo real; en producción no se siembra ninguna si no se define.
+
+**Why.** Es la pieza mínima y honesta para que entre una empresa real: sin terceros, sin correos todavía, con lo que un Timonel espera de una red de confianza (saber dónde está abierta su sesión y poder cerrarla). Separar el modo permite seguir enseñando la demo con un solo clic.
+
+**Consequences.** Tablas `credentials`, `sessions`, `invites` (migración 0007), `lib/accounts.ts`, `/acceso` en dos versiones, `/invitacion/[token]`, `/cuenta`, enlace de acceso en el Dossier, alta en modo real, `pnpm e2e:auth`, pruebas. Condición 1 de `docs/17` cumplida; condición 3 (registro de accesos) cubierta en su parte de accesos.
+
+**Revisit when.** Se conecte el envío de correos (invitaciones y recuperación sin pasar por la Directiva), se añada un segundo factor para la Directiva, o NS necesite un rol de administración de red por encima de las Salas.

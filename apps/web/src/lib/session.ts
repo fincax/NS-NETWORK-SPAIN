@@ -6,7 +6,8 @@ import { cookies } from "next/headers";
 import { asc, eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { getDb, schema } from "@/db/client";
-import { DEMO_COOKIE, isValidSession } from "@/lib/auth";
+import { ACCOUNT_COOKIE, DEMO_COOKIE, authMode, isValidSession } from "@/lib/auth";
+import { memberFromSessionToken } from "@/lib/accounts";
 
 export const MEMBER_COOKIE = "ns_member";
 
@@ -19,10 +20,16 @@ export async function listMembers() {
 export async function currentMember() {
   const db = await getDb();
   const jar = await cookies();
-  const id = jar.get(MEMBER_COOKIE)?.value;
-  let member = id ? await db.query.members.findFirst({ where: eq(schema.members.id, id) }) : undefined;
-  if (!member) {
-    member = await db.query.members.findFirst({ where: eq(schema.members.email, "carlos@hispalis-industrial.es") }) ?? (await db.query.members.findFirst());
+  let member: typeof schema.members.$inferSelect | undefined;
+  if (authMode() === "real") {
+    // Cuenta personal (D-054): la sesión decide quién eres; nunca el selector.
+    member = (await memberFromSessionToken(db, jar.get(ACCOUNT_COOKIE)?.value)) ?? undefined;
+  } else {
+    const id = jar.get(MEMBER_COOKIE)?.value;
+    member = id ? await db.query.members.findFirst({ where: eq(schema.members.id, id) }) : undefined;
+    if (!member) {
+      member = await db.query.members.findFirst({ where: eq(schema.members.email, "carlos@hispalis-industrial.es") }) ?? (await db.query.members.findFirst());
+    }
   }
   if (!member) return null;
   const company = await db.query.companies.findFirst({ where: eq(schema.companies.id, member.companyId) });
@@ -31,9 +38,14 @@ export async function currentMember() {
   return { member, company, chapter };
 }
 
-/** Comprueba la sesión de la demo (D-033). El proxy ya la exige, pero las Server Functions no deben fiarse solo de él. */
+/** Comprueba el acceso (D-033 demo / D-054 cuentas). El proxy ya lo exige, pero las Server Functions no deben fiarse solo de él. */
 export async function requireDemo() {
   const jar = await cookies();
+  if (authMode() === "real") {
+    const db = await getDb();
+    if (!(await memberFromSessionToken(db, jar.get(ACCOUNT_COOKIE)?.value))) redirect("/acceso");
+    return;
+  }
   if (!(await isValidSession(jar.get(DEMO_COOKIE)?.value))) redirect("/acceso");
 }
 
