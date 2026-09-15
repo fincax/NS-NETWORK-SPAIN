@@ -2,7 +2,7 @@
 
 Lo que se ha dejado deliberadamente "para más adelante". Claude lo recuerda cuando se le pide y cuando una feature toca uno de estos puntos. Cuando un punto se decide, pasa a `DECISIONS.md` y se tacha aquí con la referencia.
 
-**Última revisión:** 2026-09-14
+**Última revisión:** 2026-09-15
 
 ## Protocolos de Sala (D-018, D-019) · detalles pospuestos el 2026-09-14
 
@@ -41,4 +41,5 @@ Lo que se ha dejado deliberadamente "para más adelante". Claude lo recuerda cua
 
 - Tipografía definitiva (D-023).
 - Política de notificaciones push (D-039).
-- Textos legales y GDPR (`docs/08`, condición 4 de `docs/17`).
+- Textos legales y GDPR (`docs/08`, condición 4 de `docs/17`). Hecho el aviso de privacidad de la web pública (D-055); falta el resto de `docs/08` §3 con el abogado.
+- **Responsable del tratamiento** (D-055): razón social, NIF y domicilio para el aviso de privacidad, y crear el buzón `privacidad@networkspain.com` o fijar `NS_CONTACT_EMAIL` en el servidor.

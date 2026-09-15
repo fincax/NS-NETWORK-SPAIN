@@ -1066,7 +1066,7 @@ Estos son los documentos vivos del proyecto (D-045). Cada uno tiene una función
 │   ├── 05_DESIGN_BRIEF.md                 Dirección visual y brief de diseño.
 │   ├── 06_DATA_MODEL.md                   Modelo de datos implementado y pendientes.
 │   ├── 07_AGENT_ARCHITECTURE.md           Agentes, proveedores de modelo, Ronda, Rastreo.
-│   ├── 08_SECURITY_PRIVACY_GDPR.md        (por escribir · obligatorio antes de producción, docs/17 condición 4)
+│   ├── 08_SECURITY_PRIVACY_GDPR.md        Seguridad, privacidad y RGPD: lo hecho (D-055) y lo pendiente antes de producción.
 │   ├── 11_IDEAS_DISRUPTIVAS.md            Banco de ideas; lo adoptado pasa a DECISIONS.
 │   ├── 12_SALAS.md                        Zonas, saturación, NS-CAT, plaza, Embajada, fundación.
 │   ├── 13_LEXICO_NS.md                    Léxico oficial y mapeo a identificadores técnicos.

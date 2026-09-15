@@ -252,3 +252,11 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 .dna-rows li { display: grid; grid-template-columns: 96px 1fr; gap: 10px; font-size: 14px; align-items: start; }
 .dna-rows .mono { padding-top: 2px; }
 @media (max-width: 860px) { .interview { grid-template-columns: 1fr; } .dna-preview { position: static; } .bubble { max-width: 100%; } }
+
+/* Textos legales públicos (privacidad). Lectura cómoda, sin adornos. */
+.legal { max-width: 68ch; }
+.legal h1 { font-size: 34px; margin: 6px 0 10px; }
+.legal section { margin-top: 28px; }
+.legal h2 { font-size: 20px; margin-bottom: 8px; }
+.legal p { font-size: 15px; line-height: 1.6; color: var(--porcelain); }
+.legal p + p { margin-top: 10px; }
