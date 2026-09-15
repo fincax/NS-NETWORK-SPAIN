@@ -19,11 +19,13 @@ import { runClock, type ClockResult } from "@/services/clock";
 import { runRastreo, type PublicFeed } from "@/agents/rastreo";
 import { defaultPublicFeed } from "@/agents/feeds-public";
 import { runOwnSources } from "@/services/sources";
+import { runJobs, type JobsResult } from "@/services/jobs";
 import { fetchText as defaultFetch, type FetchText } from "@/agents/feeds";
 
 export interface RondaChapterResult {
   chapterId: string;
   chapterName: string;
+  jobs: JobsResult;
   clock: ClockResult;
   rastreo: { agents: number; drafts: number; skipped: number };
   ownSources: { sources: number; drafts: number; errors: number };
@@ -39,6 +41,7 @@ export async function runRonda(db: Db, now = new Date(), feed: PublicFeed = defa
   const out: RondaResult = { ranAt: now.toISOString(), chapters: [] };
 
   for (const chapter of chapters) {
+    const jobs = await runJobs(db, { now, chapterId: chapter.id, max: 20 }); // la Mesa pendiente, primero (D-053)
     const clock = await runClock(db, now, chapter.id);
 
     // Titulares activos y empresas en Prueba de Valor (D-050): todos rastrean para los demás (D-049). Nadie rastrea para sí.
@@ -63,9 +66,10 @@ export async function runRonda(db: Db, now = new Date(), feed: PublicFeed = defa
       ownSources.errors += o.errors;
     }
 
-    const worked = clock.reminders + clock.expired + clock.late + clock.nudges + clock.compromiso.evaluated + rastreo.drafts + ownSources.drafts > 0;
+    const worked = jobs.done + jobs.needsHuman + clock.reminders + clock.expired + clock.late + clock.nudges + clock.compromiso.evaluated + rastreo.drafts + ownSources.drafts > 0;
     if (worked) {
       const parts = [
+        jobs.done ? `${jobs.done} Indicio(s) cualificado(s) en la Mesa` : null,
         clock.reminders ? `${clock.reminders} recordatorio(s)` : null,
         clock.expired ? `${clock.expired} Cesión(es) caducada(s)` : null,
         clock.late ? `${clock.late} respuesta(s) tardía(s)` : null,
@@ -76,7 +80,7 @@ export async function runRonda(db: Db, now = new Date(), feed: PublicFeed = defa
       ].filter(Boolean);
       await audit(db, { chapterId: chapter.id, kind: "RONDA", actor: { type: "AGENT", id: "ronda" }, subject: { type: "Chapter", id: chapter.id }, policyApplied: "ronda.daily", result: `Ronda de la mañana con ${rastreo.agents} Agentes en la Mesa: ${parts.join(", ")}.`, significant: true });
     }
-    out.chapters.push({ chapterId: chapter.id, chapterName: chapter.name, clock, rastreo, ownSources });
+    out.chapters.push({ chapterId: chapter.id, chapterName: chapter.name, jobs, clock, rastreo, ownSources });
   }
   return out;
 }

@@ -33,9 +33,9 @@ Lo que se ha dejado deliberadamente "para más adelante". Claude lo recuerda cua
 - **Envío automático del informe** de la Prueba de Valor por correo al candidato y su duración definitiva (hoy 7 días).
 - **Web del candidato en la Prueba**: la candidatura pública aún no pide la web; con ella el ADN provisional sería mejor.
 
-## Mesa en directo (siguiente paso del plan)
+## Mesa en directo (D-053)
 
-- Cola de trabajos para que la Mesa (extracción, cualificación entre Agentes) corra en segundo plano con el modelo real; hoy se ejecuta al publicar, con reglas fijas si no hay clave.
+- ~~Cola de trabajos~~ hecha. Pendiente: validarla con la clave del modelo en el servidor, medir tiempos por Indicio y fijar el presupuesto de tokens por Tramo (D-025).
 
 ## Producto
 

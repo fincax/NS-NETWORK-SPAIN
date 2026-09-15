@@ -257,6 +257,25 @@ export const referralTransitions = pgTable("referral_transitions", {
   occurredAt: createdAt(),
 });
 
+/** Cola de trabajos de los Agentes (D-053): la Mesa corre en segundo plano con el modelo real. */
+export const agentJobs = pgTable(
+  "agent_jobs",
+  {
+    id: id(),
+    chapterId: uuid("chapter_id").notNull().references(() => chapters.id),
+    kind: text("kind").notNull(), // MESA
+    subjectId: uuid("subject_id").notNull(), // opportunity_signal_id
+    status: text("status").notNull().default("QUEUED"), // QUEUED | RUNNING | DONE | FAILED | NEEDS_HUMAN
+    attempts: integer("attempts").notNull().default(0),
+    lastError: text("last_error"),
+    runAfter: timestamp("run_after", { withTimezone: true }).notNull().defaultNow(),
+    startedAt: timestamp("started_at", { withTimezone: true }),
+    finishedAt: timestamp("finished_at", { withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  (t) => [uniqueIndex("agent_job_subject").on(t.kind, t.subjectId), index("agent_job_status").on(t.status, t.runAfter)],
+);
+
 /** Prueba de Valor (D-050): siete días de Agente para un candidato, antes de la plaza. */
 export const valueTrials = pgTable("value_trials", {
   id: id(),

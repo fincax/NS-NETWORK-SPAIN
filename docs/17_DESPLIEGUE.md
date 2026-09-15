@@ -47,7 +47,7 @@ Estas son las cinco cosas que faltan hoy y que hacen imprudente abrir la puerta 
 | # | Qué falta | Por qué es imprescindible | Esfuerzo estimado |
 | --- | --- | --- | --- |
 | 1 | **Usuarios con contraseña y permisos por Sala** | Hoy se elige la persona en un desplegable. Con datos reales, cada Timonel debe entrar solo a lo suyo. | 1 semana |
-| 2 | **Los Agentes en segundo plano con el modelo real** | Hoy la Mesa se ejecuta al publicar, en segundos, con reglas fijas. Con Claude cada Indicio tarda más y no puede bloquear la pantalla; hace falta una cola de trabajo y reintentos. | 1 semana |
+| 2 | **Los Agentes en segundo plano con el modelo real** | Hecha en su primera versión (D-053): cola persistente `agent_jobs`, reintentos, `NEEDS_HUMAN`, drenaje tras publicar, en la Ronda y por `/api/jobs`. Falta probarla con la clave del modelo en el servidor y medir tiempos. | Hecha · validar 2 días |
 | 3 | **Copias de seguridad y registro de accesos** | Sin copias diarias un fallo borra la Sala. Sin registro de accesos no se puede demostrar quién vio qué (y NS promete trazabilidad). | 2 días |
 | 4 | **Textos legales y GDPR** | Aviso de privacidad, condiciones de la plaza (con las reglas inmutables y la cuota por Tramos), base jurídica de los datos de terceros, retención y borrado. Es `docs/08_SECURITY_PRIVACY_GDPR.md`, que aún no existe. | 1 semana con un abogado |
 | 5 | **La entrevista del ADN por el Agente** | Hecha en su primera versión (D-040): el alta desemboca en la entrevista, el ADN se construye conversando y se valida al final. Falta afinarla con Timoneles reales y con la clave del modelo en el servidor. | Hecha · afinar 2 días |

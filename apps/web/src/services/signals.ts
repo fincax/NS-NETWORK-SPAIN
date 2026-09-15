@@ -4,7 +4,8 @@ import type { Db } from "@/db/client";
 import { schema } from "@/db/client";
 import { audit } from "@/lib/audit";
 import { getProvider } from "@/agents/provider";
-import { runMesa } from "@/agents/mesa";
+import { enqueueMesa } from "@/services/jobs";
+import { runMesa, type MesaResult } from "@/agents/mesa";
 import type { PermissionVerb, SignalEnvelope, Visibility } from "@/core/types";
 
 export interface CreateSignalInput {
@@ -64,7 +65,13 @@ export async function createSignal(db: Db, input: CreateSignalInput) {
 }
 
 /** S3 · el cedente publica la capa 0 (o, si es COMPANY_ONLY, solo autoriza la búsqueda interna). */
-export async function publishSignal(db: Db, opportunitySignalId: string, memberId?: string) {
+export type PublishResult = MesaResult | { queued: true; jobId: string };
+
+/** Publica el Indicio y convoca la Mesa: en línea (demo, pruebas) o en cola (modelo real, D-053). */
+export async function publishSignal(db: Db, opportunitySignalId: string, memberId?: string, opts?: { mode?: "inline" }): Promise<MesaResult>;
+export async function publishSignal(db: Db, opportunitySignalId: string, memberId: string | undefined, opts: { mode: "async" }): Promise<{ queued: true; jobId: string }>;
+export async function publishSignal(db: Db, opportunitySignalId: string, memberId: string | undefined, opts: { mode: "inline" | "async" }): Promise<PublishResult>;
+export async function publishSignal(db: Db, opportunitySignalId: string, memberId?: string, opts: { mode?: "inline" | "async" } = {}): Promise<PublishResult> {
   const os = await db.query.opportunitySignals.findFirst({ where: eq(schema.opportunitySignals.id, opportunitySignalId) });
   if (!os) throw new Error("Señal no encontrada");
   const internal = os.visibility === "COMPANY_ONLY";
@@ -73,6 +80,11 @@ export async function publishSignal(db: Db, opportunitySignalId: string, memberI
     await audit(db, { chapterId: os.chapterId, kind: "HUMAN_DECISION", actor: { type: "USER", id: memberId ?? "member" }, subject: { type: "OpportunitySignal", id: os.id }, policyApplied: "human_gate.publish", result: "El cedente revisó la capa 0 y publicó el Indicio en la Sala.", significant: false, companyIds: [os.originatorCompanyId] });
   } else {
     await audit(db, { chapterId: os.chapterId, kind: "INTERNAL_SEARCH_AUTHORIZED", actor: { type: "USER", id: memberId ?? "member" }, subject: { type: "OpportunitySignal", id: os.id }, policyApplied: "visibility.company_only", result: "El titular autorizó a su Agente a buscar internamente sin publicar nada.", significant: false, companyIds: [os.originatorCompanyId] });
+  }
+  if ((opts.mode ?? "inline") === "async") {
+    const job = await enqueueMesa(db, os.chapterId, os.id);
+    await audit(db, { chapterId: os.chapterId, kind: "MESA_QUEUED", actor: { type: "AGENT", id: "jobs" }, subject: { type: "OpportunitySignal", id: os.id }, policyApplied: "jobs.async", result: "Tu Agente ha llevado el Indicio a la Mesa. Los Agentes de la Sala lo cualifican ahora en segundo plano; te avisará en Hoy.", significant: true, companyIds: [os.originatorCompanyId] });
+    return { queued: true, jobId: job.id };
   }
   return runMesa(db, os.id);
 }

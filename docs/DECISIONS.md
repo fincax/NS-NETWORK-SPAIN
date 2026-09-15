@@ -1277,3 +1277,27 @@ Servicio a la red        10 %   solo suma: acciones de dirección del mes (3 = 1
 
 **Revisit when.** El dictado del navegador no sea suficiente (ruido, precisión) y merezca transcripción en servidor.
 
+---
+
+## D-053 · Mesa en directo: la Mesa corre en segundo plano con cola persistente, reintentos y puerta humana ante fallos repetidos
+
+**Status:** CONFIRMED (el fundador aprueba la propuesta)
+**Date:** 2026-09-15
+
+**Context.** La Mesa (extracción, discovery, cualificación entre Agentes, score, compliance) se ejecutaba al publicar, en la misma petición. Con el modelo real cada Indicio tarda y no puede bloquear la pantalla del Timonel. `docs/17` lo señalaba como condición 2 para producción.
+
+**Choice.**
+
+- **Cola persistente** `agent_jobs`: un trabajo por Indicio (clave única por tipo y sujeto: encolar dos veces no duplica). Estados `QUEUED → RUNNING → DONE`, con `FAILED` transitorio y `NEEDS_HUMAN` final.
+- **Reclamación exclusiva**: solo gana el proceso que pasa el trabajo de `QUEUED` a `RUNNING` en una actualización condicional; dos procesos nunca cualifican el mismo Indicio a la vez. La Mesa ya era idempotente por Indicio, así que un reintento nunca duplica Cesiones.
+- **Reintentos** con espera creciente (inmediato, 1 minuto, 5 minutos) hasta tres intentos; después `NEEDS_HUMAN` y aviso al cedente en Hoy: "tu Agente lo deja en tus manos".
+- **Cuándo corre**: tras responder a la publicación (`after()`, sin bloquear la redirección), en cada Ronda antes del Reloj, y por la ruta programada `GET /api/jobs` cada cinco minutos donde el alojamiento lo permita (misma protección que el Reloj).
+- **Modo**: `NS_MESA_MODE=async|inline`. Sin variable, asíncrono si hay clave del modelo y no se fuerza el proveedor determinista; en línea para la demo y las pruebas. El contrato de los Agentes no cambia.
+- **Visible**: la Mesa muestra "En la Mesa ahora: N Indicios en cualificación, M tuyos" y los que esperan revisión humana; la Ronda lo resume en su evento.
+
+**Why.** Convierte la tesis "los Agentes se reúnen 24/7" en algo que ocurre de verdad en segundo plano, con el modelo real, sin que nadie espere mirando una pantalla, y sin perder ningún Indicio por un fallo de red.
+
+**Consequences.** Tabla `agent_jobs` (migración 0012), `services/jobs.ts`, `publishSignal` con modo, acción de publicar con `after()`, Ronda con drenaje, `GET /api/jobs`, cron en `vercel.json`, estado en la Mesa, pruebas (`tests/jobs.test.ts`). Condición 2 de `docs/17` cumplida en su primera versión.
+
+**Revisit when.** Haya volumen real: entonces, prioridad por Encargos abiertos, límite de trabajos por Agente y presupuesto de tokens por Tramo (D-025).
+
