@@ -20,12 +20,12 @@ DIR=/opt/ns-network
 APP=$DIR/apps/web
 ENV=$APP/.env.production
 
-echo "== 1/8 · Paquetes del sistema"
+echo "== 1/9 · Paquetes del sistema"
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -q
 apt-get install -y -q curl git ufw nginx postgresql postgresql-contrib certbot python3-certbot-nginx openssl
 
-echo "== 2/8 · Node 22 y pnpm"
+echo "== 2/9 · Node 22 y pnpm"
 if ! command -v node >/dev/null || [[ "$(node -v | cut -d. -f1 | tr -d v)" -lt 22 ]]; then
   curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
   apt-get install -y -q nodejs
@@ -34,11 +34,11 @@ corepack enable
 corepack prepare pnpm@10.33.0 --activate
 npm install -g pm2 >/dev/null
 
-echo "== 3/8 · Cortafuegos (22, 80, 443)"
+echo "== 3/9 · Cortafuegos (22, 80, 443)"
 ufw allow OpenSSH >/dev/null; ufw allow 80/tcp >/dev/null; ufw allow 443/tcp >/dev/null
 ufw --force enable >/dev/null
 
-echo "== 4/8 · Base de datos PostgreSQL (local, solo accesible desde este servidor)"
+echo "== 4/9 · Base de datos PostgreSQL (local, solo accesible desde este servidor)"
 DB_PASS_FILE=/root/.ns-db-password
 if [[ ! -f $DB_PASS_FILE ]]; then openssl rand -hex 24 > $DB_PASS_FILE; chmod 600 $DB_PASS_FILE; fi
 DB_PASS=$(cat $DB_PASS_FILE)
@@ -50,11 +50,11 @@ ALTER ROLE ns PASSWORD '$DB_PASS';
 SQL
 sudo -u postgres psql -tAc "SELECT 1 FROM pg_database WHERE datname='ns'" | grep -q 1 || sudo -u postgres createdb -O ns ns
 
-echo "== 5/8 · Código"
+echo "== 5/9 · Código"
 if [[ -d $DIR/.git ]]; then git -C $DIR pull -q --ff-only; else git clone -q $REPO $DIR; fi
 cd $DIR && pnpm install --frozen-lockfile
 
-echo "== 6/8 · Variables de entorno"
+echo "== 6/9 · Variables de entorno"
 if [[ ! -f $ENV ]]; then
   cat > $ENV <<VARS
 # ---- NS Network · producción (demo privada) ----
@@ -85,7 +85,7 @@ else
   echo "   $ENV ya existía: no se toca."
 fi
 
-echo "== 7/8 · Construir y arrancar"
+echo "== 7/9 · Construir y arrancar"
 cd $APP
 set -a; source $ENV; set +a
 pnpm build
@@ -94,7 +94,7 @@ pm2 start "pnpm start" --name ns-network --cwd $APP
 pm2 save >/dev/null
 pm2 startup systemd -u root --hp /root >/dev/null 2>&1 || true
 
-echo "== 8/8 · nginx, HTTPS y tareas programadas"
+echo "== 8/9 · nginx, HTTPS y tareas programadas"
 cat > /etc/nginx/sites-available/ns-network <<NGX
 server {
     listen 80;
@@ -123,6 +123,9 @@ cat > /etc/cron.d/ns-network <<CRON
 */5 * * * * root  curl -s -H "Authorization: Bearer $CRON_SECRET" http://127.0.0.1:3000/api/jobs  >> /var/log/ns-jobs.log 2>&1
 CRON
 chmod 644 /etc/cron.d/ns-network
+
+echo "== 9/9 · Copias de seguridad (cifradas, probadas, cada noche)"
+bash $DIR/deploy/copias.sh instalar
 
 echo
 echo "=============================================================="

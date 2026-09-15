@@ -41,5 +41,6 @@ Lo que se ha dejado deliberadamente "para más adelante". Claude lo recuerda cua
 
 - Tipografía definitiva (D-023).
 - Política de notificaciones push (D-039).
+- **Copias de seguridad** (D-056): guardar la clave de cifrado (`/root/.ns-copias-clave`) fuera del servidor y configurar el remoto `ns-copias` con rclone para que las copias salgan del servidor (`docs/17` §4c). Hasta entonces, Hoy lo muestra en ámbar a la Directiva. Hacer una restauración completa de prueba una vez.
 - Textos legales y GDPR (`docs/08`, condición 4 de `docs/17`). Hecho el aviso de privacidad de la web pública (D-055); falta el resto de `docs/08` §3 con el abogado.
 - ~~Responsable del tratamiento~~ → Be Trendy, S.L. (D-055, aviso 2026-09-15.3). Buzón de contacto: `hola@networkspain.com` (o `NS_CONTACT_EMAIL` en el servidor); comprobar que recibe correo.

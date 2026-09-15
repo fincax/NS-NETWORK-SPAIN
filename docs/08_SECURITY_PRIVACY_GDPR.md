@@ -34,6 +34,7 @@ La privacidad es arquitectura, no una pantalla legal posterior (constitución §
 - Servidor en la Unión Europea, PostgreSQL solo accesible desde la propia máquina, HTTPS con certificado renovado automáticamente, cortafuegos con solo 22, 80 y 443.
 - Contraseñas con scrypt y sal; sesiones con token aleatorio y solo su hash en base de datos (D-054).
 - Cada acceso, fallo, invitación y cambio de contraseña queda en el registro de auditoría.
+- Copia nocturna de la base de datos cifrada con AES-256, restauración de prueba en cada copia, 30 días de retención y estado visible para la Directiva (D-056). La clave de cifrado no sale del servidor salvo a manos del fundador.
 
 ## 3. Pendiente antes de empresas reales
 
@@ -43,7 +44,7 @@ La privacidad es arquitectura, no una pantalla legal posterior (constitución §
 4. **Registro de actividades de tratamiento** y, si procede, evaluación de impacto por el uso de Agentes sobre datos de terceros.
 5. **Encargados de tratamiento**: proveedor del servidor, proveedor del modelo (Anthropic) y, cuando exista, el envío de correos. Contratos de encargo y transferencias internacionales documentadas.
 6. **Retención y borrado** automatizados por tipo de dato: candidaturas, Indicios, Cesiones, registro de accesos.
-7. **Copias de seguridad** cifradas con restauración probada (docs/17 condición 3).
+7. ~~Copias de seguridad~~ (hecho, D-056: cifradas, probadas en cada copia, 30 días). Falta que el fundador configure el remoto fuera del servidor y custodie la clave.
 8. **Derechos**: procedimiento interno para acceso, rectificación, supresión y portabilidad en el plazo de un mes.
 9. Revisión del conjunto por un abogado especializado (docs/17 estima una semana).
 
