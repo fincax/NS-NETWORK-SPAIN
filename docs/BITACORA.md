@@ -2,6 +2,26 @@
 
 Punto de parada y siguiente paso. Se actualiza al cerrar cada sesión de trabajo.
 
+## 16 de septiembre de 2026 · servidor al día con `main`
+
+**Dónde estamos.**
+
+- `main` contiene las PR #1 a #14. No hay PR abiertas. La #14 (la coma de «Su agente sí, 24/7») se aplicó hoy en el servidor con `actualizar.sh`: el servidor y `main` sirven lo mismo.
+- Las PR #12 (privacidad, D-055) y #13 (copias, D-056) quedaron aplicadas en el servidor el día 15 por la tarde. Primera copia real hecha y restaurada con éxito (37 tablas, 10 empresas, 9 candidaturas). Copias nocturnas a las 03:30 activas.
+- Decisiones registradas hasta **D-056**.
+- Ramas antiguas sin fusionar (`claude/new-session-agaa9j`, `claude/optimistic-tesla-wb8htp`): superadas por trabajo posterior en `main`; no se fusionan.
+
+**Siguiente paso acordado (por este orden).**
+
+1. Guardar la clave de cifrado de las copias (`cat /root/.ns-copias-clave`) en el gestor de contraseñas y configurar el remoto `ns-copias` con rclone (`docs/17` §4c) para que la tarjeta de copias pase a verde.
+2. Pulsar "Preparar NS Cumbre (demo)" en Hoy, si no está hecho, y enseñar la demo a los primeros empresarios de Sevilla.
+3. Al día siguiente, mirar `/var/log/ns-ronda.log` en el servidor: es la primera Ronda con las fuentes públicas reales (D-051).
+4. Opcional: poner `ANTHROPIC_API_KEY` en `.env.production` (docs/17 §4c, paso 6) para que los Agentes razonen con Claude y la Mesa corra en segundo plano (D-053).
+5. Envío de correos para invitaciones y recuperación de contraseña (D-054); después notificaciones push (D-039), que ya tienen dominio publicado.
+6. Después: resto de `docs/08` con el abogado, Protocolo II (Comunicado y Gaceta) y Brújula.
+
+**Para actualizar el servidor** cuando haya código nuevo en `main`: entrar por SSH (`ssh root@200.234.236.135` desde PowerShell) y lanzar `bash /opt/ns-network/deploy/actualizar.sh`. La última línea debe nombrar el commit más reciente de `main`.
+
 ## 15 de septiembre de 2026 · la demo está publicada
 
 **Dónde estamos.**
