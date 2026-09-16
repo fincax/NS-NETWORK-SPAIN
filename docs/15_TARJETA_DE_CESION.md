@@ -15,12 +15,24 @@ Toda tarjeta muestra siempre **WHY · EVIDENCE · CONFIDENCE · UNKNOWN · NEXT 
 | **Objetivo del usuario** | Decidir en 30 segundos si quiere esta Cesión y si la Promesa es realista. |
 | **Trabajo por hacer** | Comprometerse con un Interesado que aún no conoce, con garantías. |
 | **Acción primaria** | Aceptar y confirmar la Promesa (un toque). |
-| **Secundarias** | Ajustar la Promesa (el Agente registra la diferencia); pedir más información (máximo dos rondas, NS-ARP §9.1); declinar con motivo (entrena al Agente, no afecta a la reputación del que declina, el cedente conserva su Mérito de Promesa). |
+| **Secundarias** | Ajustar la Promesa (el Agente registra la diferencia); pedir más información al cedente (máximo dos rondas, NS-ARP §9.1, D-058: la pregunta va al cedente y vuelve con su respuesta destacada en la propia cara A); declinar con motivo (entrena al Agente, no afecta a la reputación del que declina, el cedente conserva su Mérito de Promesa). |
 | **Jerarquía** | Qué es → quién la cede y con qué historial → cuánto promete y por qué → qué falta → decidir. |
 | **Bloque Promesa** | Valor a priori, Encaje, y cinco componentes con semáforo: necesidad real, información, decisor, plazo, presupuesto. |
 | **Qué no aparece** | La identidad del Interesado. Solo tras la Apertura del cedente (capa 2). |
 | **Plazo de respuesta** | Responder al Interesado en **48 h** tras el Puente y emitir Veredicto al cerrar. |
 | **Caducidad** | **7 días** sin respuesta (recordatorio a las 72 h). La Cesión vuelve al cedente, que puede proponerla a otra Sala. El silencio del cesionario cuenta en su Hoja de Méritos. |
+
+## Cara A′ · el cedente responde a una pregunta (D-058)
+
+| | |
+| --- | --- |
+| **Objetivo del usuario** | Contestar en un minuto lo que el cesionario necesita para decidir, sin exponer nada indebido. |
+| **Trabajo por hacer** | Cumplir con el cesionario que se toma en serio el referido. |
+| **Acción primaria** | Enviar la respuesta (el Agente la deja redactada a partir del Indicio; la persona la confirma o corrige). |
+| **Secundarias** | No ceder. |
+| **Jerarquía** | La pregunta, literal → el borrador del Agente → enviar. |
+| **Qué ve el cesionario después** | La respuesta destacada arriba de su cara A y como evidencia en "Lo que averiguaron los Agentes", con las rondas que le quedan. En Hoy, el cedente ve "X te pregunta" con la pregunta literal. |
+| **Plazo** | Cada ida y vuelta reinicia los 7 días de la revisión. Máximo dos rondas por Cesión. |
 
 ## Cara B · el cedente autoriza la Apertura
 
@@ -36,7 +48,7 @@ Toda tarjeta muestra siempre **WHY · EVIDENCE · CONFIDENCE · UNKNOWN · NEXT 
 
 ## Estados
 
-Nueva · En revisión (esperando al otro) · Requiere Directiva (excepción explicada en la propia tarjeta) · Aprobada, Puente listo · En curso (hitos: Puente, reunión, propuesta, cierre; el Agente pregunta cada 14 días) · Embajada (desde otra Sala) · Baja confianza (el Agente pide dos datos) · Declinada con motivo · Caducada.
+Nueva · En revisión (esperando al otro) · Pregunta al cedente (D-058) · Requiere Directiva (excepción explicada en la propia tarjeta) · Aprobada, Puente listo · En curso (hitos: Puente, reunión, propuesta, cierre; el Agente pregunta cada 14 días) · Embajada (desde otra Sala) · Baja confianza (el Agente pide dos datos) · Declinada con motivo · Caducada.
 
 ## Veredicto y Distinción (a posteriori)
 

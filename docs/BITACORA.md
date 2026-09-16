@@ -2,6 +2,23 @@
 
 Punto de parada y siguiente paso. Se actualiza al cerrar cada sesión de trabajo.
 
+## 16 de septiembre de 2026 (tarde) · la Pregunta al cedente
+
+**Dónde estamos.**
+
+- La PR #15 (Latido, D-057) está fusionada en `main`. No hay PR abiertas al empezar la tarde. Decisiones hasta **D-057**.
+- **Fallo detectado en la demo:** Carlos pulsó "Pedir más información" en una Cesión y la tarjeta se quedó sin botones para siempre. Pedir información devolvía la Cesión a "Cualificada" y nadie la recogía (la vuelta de NS-ARP §9.1 no estaba construida); "Siguiente paso" seguía diciendo "Aceptar".
+- **Construido (D-058), en la rama `claude/determined-goodall-zfne4s`:** la pregunta del cesionario va al cedente ("X te pregunta" en Hoy; cara "Una pregunta de X" en la tarjeta, con borrador del Agente) y vuelve al cesionario con la respuesta destacada y como evidencia. Máximo dos rondas; después, aceptar o declinar. "Siguiente paso" por estado. Reparación automática de las Cesiones atascadas al aplicar la actualización (en `/api/jobs`, cada cinco minutos). El cedente ficticio del Latido responde al cabo de una hora. 137 pruebas en verde, tipos y lint limpios, recorrido de navegador comprobado. **Pendiente de fusionar y de `actualizar.sh`.** Decisiones hasta **D-058**.
+
+**Siguiente paso acordado (por este orden).**
+
+1. Fusionar la PR de la Pregunta al cedente y lanzar `bash /opt/ns-network/deploy/actualizar.sh`. En cinco minutos, la Cesión de Correduría Guadalquivir a Híspalis que se atascó pasa a Lucía; el Latido responderá por ella en una hora y Carlos recuperará sus botones.
+2. Guardar la clave de cifrado de las copias y configurar el remoto `ns-copias` (`docs/17` §4c).
+3. Enseñar la demo; al día siguiente, mirar `/var/log/ns-ronda.log`.
+4. Opcional: `ANTHROPIC_API_KEY` en `.env.production` (con ella el Agente del cedente deja borradores de respuesta).
+5. Envío de correos para invitaciones y recuperación de contraseña (D-054); después notificaciones push (D-039).
+6. Después: resto de `docs/08` con el abogado, Protocolo II (Comunicado y Gaceta) y Brújula.
+
 ## 16 de septiembre de 2026 · servidor al día con `main`
 
 **Dónde estamos.**

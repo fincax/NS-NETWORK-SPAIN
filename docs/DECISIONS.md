@@ -1398,3 +1398,30 @@ Servicio a la red        10 %   solo suma: acciones de dirección del mes (3 = 1
 
 **Revisit when.** Entren empresas reales en la Sala (el Latido se apaga solo con `NS_AUTH_MODE=real`; si conviven demo y real en la misma base, separar por Sala) o el modelo real reemplace al determinista en la demo.
 
+---
+
+## D-058 · Pregunta al cedente: pedir información lleva la Cesión al cedente y vuelve con su respuesta; nunca a "Cualificada"
+
+**Status:** CONFIRMED (construido tras detectar una Cesión atascada en la demo)
+**Date:** 2026-09-16
+
+**Context.** En la demo, Carlos Ruiz pulsó "Pedir más información" en una Cesión que esperaba su decisión. NS-ARP §9.1 decía que `REQUEST_INFO` devuelve la Cesión a `QUALIFIED` "con una pregunta concreta para el agente contrario", pero solo estaba construida la ida: la tarjeta pasaba a modo lectura sin botones, ningún Agente ni la Mesa ni el Latido recogían una Cesión en `QUALIFIED`, y "Siguiente paso" seguía diciendo "Aceptar la Cesión" porque se leía del Fundamento original. Un callejón sin salida delante de un empresario.
+
+**Options.** (a) Un estado nuevo `INFO_REQUESTED`: semánticamente limpio pero obliga a tocar Hoy, el Reloj, la Balanza y el Latido para nada. (b) Que responda el Agente del cedente solo: no sabe más de lo que su Timonel apuntó, y el Timonel manda (D-027). (c) Reutilizar los estados de revisión: la pregunta es una decisión humana que espera a otra persona, y NS ya tiene ese concepto.
+
+**Choice.** (c).
+
+- `REQUEST_INFO` solo lo emite el cesionario en `RECEIVER_PENDING`, con pregunta obligatoria. La Cesión pasa a `ORIGINATOR_PENDING`; la pregunta queda como turno de la cualificación de la Pista (`asked_by: RECEIVER`) y el Agente del cedente deja un borrador de respuesta (`draft_answer`) sacado del Indicio y de las notas privadas.
+- El cedente ve en Hoy "X te pregunta" con la pregunta literal y, en la tarjeta, la cara "Una pregunta de X" con el borrador prellenado. Responde con la decisión `ANSWER`: la Cesión vuelve a `RECEIVER_PENDING` y la respuesta queda como evidencia (`answered_by: ORIGINATOR`) en "Lo que averiguaron los Agentes" y destacada en la cara A del cesionario. Con una pregunta abierta, el cedente no puede dar el visto bueno sin responderla.
+- Máximo dos rondas por Cesión (`MAX_INFO_ROUNDS`); agotadas, el botón desaparece y solo quedan aceptar o declinar. Cada ida y vuelta reinicia el plazo de revisión de quien tiene que actuar.
+- "Siguiente paso" se calcula por estado y por quién mira; la sugerencia del Fundamento solo vale en la revisión del cesionario.
+- Una decisión humana solo se registra si es válida: un intento fuera de turno no cuenta como decisión.
+- Reparación: las Cesiones que quedaron en `QUALIFIED` por una petición anterior pasan al cedente con la pregunta registrada (`repairStuckInfoRequests`, en `/api/jobs` y `/api/clock`; idempotente).
+- Latido (D-057): el cedente ficticio responde al vencer su plazo con el borrador o repitiendo lo que consta, sin inventar. La protagonista sigue decidiendo sola.
+
+**Why.** La Cesión en revisión siempre tiene una persona que debe actuar; nunca un limbo. El cedente es quien conoce al Interesado, así que la pregunta es suya; su Agente redacta y él confirma en un toque. Sin estados nuevos, Hoy, el Reloj y la Balanza no se enteran, y la Trazabilidad se lee sola: "esperando al cedente · ¿pregunta?" → "esperando al cesionario · respuesta".
+
+**Consequences.** `core/state-machine.ts` (transición y `MAX_INFO_ROUNDS`), `core/types.ts` (`ANSWER`, campos del turno), `services/referrals.ts` (`decide`, `infoRound`, `infoRoundsFor`, `repairStuckInfoRequests`), tarjeta de Cesión (cara A′, respuestas, rondas, siguiente paso), Hoy, rutas `/api/jobs` y `/api/clock`, `agents/latido.ts`. Pruebas en `core`, `slice` (4) y `latido` (1): 137 en verde; recorrido de navegador Carlos → Lucía → Carlos comprobado. Documentado en `docs/02` §9.1 y §10, `docs/15`, `docs/13`, `docs/07` y `docs/17`.
+
+**Revisit when.** Los Timoneles reales pidan una tercera ronda con frecuencia (subir el tope o abrir un hilo), o el modelo real haga borradores tan buenos que convenga que el Agente responda solo preguntas de hecho ya presentes en el Indicio (seguiría exigiendo el toque del Timonel).
+
