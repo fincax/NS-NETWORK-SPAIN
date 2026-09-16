@@ -22,7 +22,7 @@ Salvoconducto) → tarjeta de Cesión (cara A / cara B) → visto bueno → Aper
 pnpm install
 pnpm db:seed      # crea NS Sevilla · NS Cumbre, 10 titulares con ADN y los escenarios A, C y D
 pnpm dev          # http://localhost:3000 · portada beta; /acceso con demo / nscumbre · Hoy, Mesa, Cesiones, Mi Sala
-pnpm test         # 131 tests: score, puertas, Salvoconducto, máquina de estados, Promesa, Reloj, Rastreo, Encargos, Latido y el slice completo
+pnpm test         # 132 tests: score, puertas, Salvoconducto, máquina de estados, Promesa, Reloj, Rastreo, Encargos, Latido y el slice completo
 ```
 
 Sin configuración usa PGlite (Postgres embebido en `apps/web/.data`) y el proveedor de razonamiento determinista. Con `DATABASE_URL` usa PostgreSQL; con `ANTHROPIC_API_KEY` los Agentes razonan con Claude (`claude-opus-5` por defecto) mediante salidas estructuradas. En la interfaz, el selector "Actúas como" cambia de persona (no hay autenticación en el slice).

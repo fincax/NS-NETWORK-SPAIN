@@ -127,7 +127,7 @@ function hash(s: string): number {
   return Math.abs(h >>> 0);
 }
 
-async function primaryMember(db: Db, companyId: string) {
+async function primaryMember(db: Db, companyId: string): Promise<typeof schema.members.$inferSelect | undefined> {
   return (await db.query.members.findFirst({ where: and(eq(schema.members.companyId, companyId), eq(schema.members.isPrimary, true)) })) ?? (await db.query.members.findFirst({ where: eq(schema.members.companyId, companyId) }));
 }
 
@@ -148,6 +148,15 @@ export async function runLatido(db: Db, opts: { now?: Date; force?: boolean } = 
     const c = byId.get(companyId);
     return Boolean(c && c.status === "ACTIVE" && c.slug !== protagonist);
   };
+
+  // 0 · La semilla puede haberse creado antes de D-057 (el servidor ya tenía la Sala): garantiza las Directivas ficticias
+  //     que la semilla declara, para que una Directiva nunca tenga que revisar su propia excepción.
+  for (const seed of SEED_COMPANIES.filter((c) => c.person.isDirector)) {
+    const company = bySlug.get(seed.slug);
+    if (!company) continue;
+    const member = await primaryMember(db, company.id);
+    if (member && !member.isDirector) await db.update(schema.members).set({ isDirector: true }).where(eq(schema.members.id, member.id));
+  }
 
   // 1 · Un Indicio por franja
   const slot = opts.force ? `manual:${now.toISOString()}` : currentSlot(now);

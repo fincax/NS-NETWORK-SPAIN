@@ -1394,7 +1394,7 @@ Servicio a la red        10 %   solo suma: acciones de dirección del mes (3 = 1
 
 **Why.** Convierte la tesis en algo que el empresario ve a cualquier hora: Indicios de hoy en la Mesa, Cesiones en curso, valor contrastado creciendo en la Balanza y, para la empresa con la que se enseña, decisiones reales que toma la persona delante de él. Sin tocar el protocolo, sin datos reales y sin que nadie tenga que "calentar" la demo a mano.
 
-**Consequences.** `agents/latido.ts`, rutas `/api/jobs` y `/api/clock`, acción `runLatidoAction`, tarjeta en Hoy, segunda Directiva en `seed-data.ts`, pruebas (`tests/latido.test.ts`, 14). Documentado en `docs/07` §6, `docs/13` y `docs/17` §4c. El banco se repite cada ocho días: ampliarlo si la demo se alarga (pendiente).
+**Consequences.** `agents/latido.ts`, rutas `/api/jobs` y `/api/clock`, acción `runLatidoAction`, tarjeta en Hoy, segunda Directiva en `seed-data.ts`, pruebas (`tests/latido.test.ts`, 15). Documentado en `docs/07` §6, `docs/13` y `docs/17` §4c. El banco se repite cada ocho días: ampliarlo si la demo se alarga (pendiente).
 
 **Revisit when.** Entren empresas reales en la Sala (el Latido se apaga solo con `NS_AUTH_MODE=real`; si conviven demo y real en la misma base, separar por Sala) o el modelo real reemplace al determinista en la demo.
 

@@ -120,6 +120,15 @@ describe("Un Indicio por franja", () => {
   });
 });
 
+describe("Directiva ficticia", () => {
+  it("si la Sala se creó antes de D-057, el Latido repone la segunda Directiva de la semilla", async () => {
+    const pedro = companies["valoraciones-ibericas"].memberId;
+    await db.update(schema.members).set({ isDirector: false }).where(eq(schema.members.id, pedro));
+    await runLatido(db, { now: hours(24 * 20) });
+    expect((await db.query.members.findFirst({ where: eq(schema.members.id, pedro) }))!.isDirector).toBe(true);
+  });
+});
+
 describe("Las Cesiones ficticias avanzan con plazos", () => {
   it("nada avanza antes de su plazo; después, un paso por pasada, con eventos humanos de los Timoneles ficticios", async () => {
     const others = await db.query.referrals.findMany({ where: and(eq(schema.referrals.chapterId, chapterId), inArray(schema.referrals.state, ["VALUE_CONFIRMED", "WON", "LOST", "NO_DECISION", "INTRODUCED", "MEETING", "COMMERCIAL_OPPORTUNITY"])) });
