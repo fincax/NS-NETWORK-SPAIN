@@ -10,6 +10,7 @@ import { and, eq } from "drizzle-orm";
 import { schema } from "@/db/client";
 import { requireDemo, requireMember } from "@/lib/session";
 import { runRastreo } from "@/agents/rastreo";
+import { runLatido } from "@/agents/latido";
 
 export async function setPersona(memberId: string) {
   await requireDemo();
@@ -35,6 +36,16 @@ export async function prepareDemo() {
     await runRastreo(db, companies["hispalis"].companyId);
   }
   revalidatePath("/", "layout");
+}
+
+/** Latido a demanda (D-057): un Indicio ficticio más en la Mesa y las Cesiones ficticias vencidas avanzan. Solo demo. */
+export async function runLatidoAction() {
+  await requireMember();
+  const db = await getDb();
+  await runLatido(db, { force: true });
+  revalidatePath("/hoy");
+  revalidatePath("/mesa");
+  revalidatePath("/sala");
 }
 
 /** Rastreo público a demanda (D-031). En producción lo lanza el Reloj de la Sala cada mañana. */

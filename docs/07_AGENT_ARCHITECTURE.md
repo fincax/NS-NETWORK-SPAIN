@@ -83,6 +83,8 @@ Cada paso emite un `AuditEvent{ kind, actor, subject, inputs_used[{type,id,layer
 
 La Mesa corre de dos formas (D-053): **en línea** al publicar (demo y pruebas, proveedor determinista, segundos) o **en cola** (`agent_jobs`) con el modelo real: un trabajo por Indicio, reclamación exclusiva, tres intentos con espera creciente y `NEEDS_HUMAN` con aviso al cedente. La cola se drena tras responder a la publicación (`after()`), en cada Ronda antes del Reloj y por `GET /api/jobs`. El contrato de los agentes no cambia. Además de la Mesa, la Ronda ejecuta el Reloj (plazos y Compromiso), el Rastreo (fuentes públicas reales con `NS_PUBLIC_FEEDS=real`, D-051; empresas en Prueba de Valor incluidas, D-050) y las fuentes propias.
 
+**Latido (solo demo, D-057, `agents/latido.ts`).** Con `NS_AUTH_MODE=demo`, `GET /api/jobs` y `GET /api/clock` llaman antes a `runLatido`: en cada franja (9:00, 13:00, 18:00 hora de Madrid) el Agente de una empresa ficticia publica un Indicio del banco `LATIDO_INDICIOS` por el camino normal (`createSignal` → `publishSignal` con `mesaMode()`), y las Cesiones entre empresas ficticias avanzan un paso cuando vence su plazo (`LATIDO_DELAYS_H`), a través de los mismos servicios que usan las personas. Nunca actúa por la protagonista (`NS_LATIDO_PROTAGONISTA`, por defecto `hispalis`) ni por empresas ajenas a la semilla. `NS_LATIDO=off` lo apaga; `NS_LATIDO=on` lo fuerza. En Hoy, "Latir ahora" ejecuta una pasada forzada.
+
 ## 7. Pendiente
 
 - Adaptadores de Rastreo pendientes: BORME (PDF por provincia), licencias y empleo; Sondeo (grafo de relaciones). PLACE y prensa, hechos (D-051).

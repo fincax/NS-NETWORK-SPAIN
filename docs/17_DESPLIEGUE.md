@@ -23,7 +23,8 @@ Hay dos "servidores" distintos y conviene no confundirlos:
 - **App instalable** (D-039): en el móvil, la demo se instala desde el navegador (Android: "Instalar aplicación"; iPhone: Compartir → "Añadir a pantalla de inicio"). Hoy lo sugiere la primera vez. El icono muestra el número de decisiones pendientes.
 - **Apunte** (D-037): botón flotante "Apuntar" en toda la app. En el móvil, con la demo abierta en el navegador, "Añadir a pantalla de inicio" crea un icono NS cuyo menú ofrece "Apuntar un referido".
 - **Fuentes propias** (D-038): en el Dossier de la propia empresa, "Fuentes de mi Agente". La Ronda las lee cada mañana; en local se prueban con "Leer mis fuentes ahora" (requiere salida a internet).
-- **Antesala** (D-035): la Directiva ve y despacha las candidaturas que llegan desde la portada, con el veredicto de plaza calculado. En la demo, elige a Inés Domínguez (Bufete Alameda · Directiva) en el selector de Timonel.
+- **Antesala** (D-035): la Directiva ve y despacha las candidaturas que llegan desde la portada, con el veredicto de plaza calculado. En la demo, elige a Inés Domínguez (Bufete Alameda · Directiva) o a Pedro Lucena (Valoraciones Ibéricas · Directiva) en el selector de Timonel.
+- **Sala viva** (D-057): en la demo, la Sala late sola. A las 9:00, 13:00 y 18:00 un Agente ficticio lleva un Indicio a la Mesa y las Cesiones entre empresas ficticias avanzan con plazos realistas hasta el valor contrastado. Las decisiones de Reformas Industriales Híspalis (Carlos Ruiz, la persona por defecto) son siempre tuyas: es la empresa con la que se enseña. En Hoy, "Latir ahora" mete un Indicio fresco justo antes de una reunión. Con cuentas reales el Latido se apaga solo.
 
 ## 1. Demo privada: ahora
 
@@ -109,6 +110,8 @@ Tarda de cinco a diez minutos. Instala Node, PostgreSQL, nginx y el certificado;
 
 **Paso 5 · Preparar la Sala.** En el navegador, entra en `https://networkspain.com/acceso` con el usuario y la contraseña del paso 4. En Hoy, pulsa **"Preparar NS Cumbre (demo)"**. Eso crea la Sala, los diez titulares ficticios y los escenarios. Ya puedes enseñarla.
 
+**Cómo enseñarla (D-057).** Entra como **Carlos Ruiz (Reformas Industriales Híspalis)**, la persona por defecto: es la empresa protagonista. Desde que la Sala existe, late sola: cada día a las 9:00, 13:00 y 18:00 un Agente ficticio lleva un Indicio a la Mesa, y las Cesiones entre las demás empresas avanzan con plazos realistas (visto bueno, aceptación, Puente, reunión, cierre, Veredicto, valor contrastado). Lo que llega a Híspalis espera a Carlos: esas decisiones las tomas tú delante del empresario, en la tarjeta de Cesión. Para ceder en directo, usa **Apuntar un referido**. Si la última franja fue hace horas y quieres algo recién llegado, pulsa **Latir ahora** en Hoy. En la Mesa se ve la cronología de hoy; en Mi Sala, la Balanza con valor contrastado. Si das de alta tu propia empresa de prueba desde Mi Sala, nadie decidirá por ella tampoco. Variables opcionales en `.env.production`: `NS_LATIDO=off` apaga el Latido; `NS_LATIDO_PROTAGONISTA=<slug>` cambia la empresa protagonista (por defecto `hispalis`).
+
 **Paso 6 (opcional) · Que los Agentes razonen con Claude.** En el servidor:
 
 ```bash
@@ -166,9 +169,9 @@ tail -n 20 /var/log/ns-ronda.log   # la Ronda de las mañanas
 ```text
 Alojamiento     Vercel (región fra1) o servidor propio con Node 22 y pnpm.
 Base de datos   PostgreSQL 16 gestionado en la UE. Variable DATABASE_URL. Las migraciones se aplican al arrancar.
-Variables       DATABASE_URL · NS_AUTH_MODE · DEMO_USER · DEMO_PASSWORD · DEMO_SESSION_SECRET · NS_SEED_PASSWORD (solo demo) · CRON_SECRET · NS_PUBLIC_URL · ANTHROPIC_API_KEY (opcional) · NS_LLM_MODEL · NS_LLM_PROVIDER
+Variables       DATABASE_URL · NS_AUTH_MODE · DEMO_USER · DEMO_PASSWORD · DEMO_SESSION_SECRET · NS_SEED_PASSWORD (solo demo) · CRON_SECRET · NS_PUBLIC_URL · ANTHROPIC_API_KEY (opcional) · NS_LLM_MODEL · NS_LLM_PROVIDER · NS_LATIDO y NS_LATIDO_PROTAGONISTA (solo demo, D-057)
 Comandos        pnpm install && pnpm build && pnpm start   ·   pnpm db:seed (solo demo)   ·   pnpm clock (Ronda diaria, equivale a GET /api/clock)
-Tareas          La Ronda (Reloj + Rastreo) cada mañana: vercel.json la programa; en otro alojamiento, un cron que llame a /api/clock con el CRON_SECRET.
+Tareas          La Ronda (Reloj + Rastreo) cada mañana: vercel.json la programa; en otro alojamiento, un cron que llame a /api/clock con el CRON_SECRET. La Mesa y el Latido de la demo: /api/jobs cada cinco minutos.
 Copias          deploy/copias.sh: pg_dump cifrado (AES-256, clave en /root/.ns-copias-clave), restauración de prueba en cada copia, 30 días, rclone → remoto "ns-copias", estado en /var/lib/ns-network/copias.json (NS_BACKUP_STATUS_FILE).
 Dominio         Hoy: networkspain.com sirve portada y demo. Con producción: demo.networkspain.com para la demo y networkspain.com para la web y la app reales.
 Marca           Paraguas "NS Network" + país (D-034). Dominios paraguas a reservar y marca europea a registrar antes de salir en prensa con empresas reales.

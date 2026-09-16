@@ -8,7 +8,10 @@ import { REVIEW_STATES } from "@/core/state-machine";
 import { daysAgo, eur, eurRange, firstName, greeting } from "@/lib/format";
 import { Encaje, Empty, StateBadge } from "@/components/ui";
 import { AgentAvatar } from "@/components/brand";
-import { prepareDemo, runRastreoAction } from "../actions";
+import { prepareDemo, runLatidoAction, runRastreoAction } from "../actions";
+import { latidoStatus } from "@/agents/latido";
+import { authMode } from "@/lib/auth";
+import { time } from "@/lib/format";
 import { runClockThrottled } from "@/services/clock";
 import { SOURCE_LABEL } from "@/agents/rastreo";
 import { candidacyCounts } from "@/services/antesala";
@@ -59,6 +62,7 @@ export default async function HoyPage() {
   const copias = member.isDirector && mostrarEstadoCopias() ? valorarCopias(await leerEstadoCopias()) : null;
   const dnaRow = await db.query.businessDna.findFirst({ where: eq(schema.businessDna.companyId, company.id), columns: { validatedAt: true } });
   const interview = dnaRow?.validatedAt ? null : await activeInterview(db, company.id);
+  const latido = authMode() === "demo" ? await latidoStatus(db) : null;
 
   return (
     <div className="stack" style={{ gap: 28 }}>
@@ -98,6 +102,17 @@ export default async function HoyPage() {
         <section className={`card ${copias.tone} row`} style={{ justifyContent: "space-between", gap: 14 }} aria-label="Copias de seguridad">
           <span><strong>{copias.headline}</strong> {copias.detail}</span>
           <span className="mono">Servidor · solo Directiva</span>
+        </section>
+      ) : null}
+
+      {latido?.enabled ? (
+        <section className="card row" style={{ justifyContent: "space-between", gap: 14 }} aria-label="Latido de la Sala de demostración">
+          <span>
+            <strong>Sala viva.</strong> Cada día a las 9:00, 13:00 y 18:00 un Agente lleva un Indicio a la Mesa, y las Cesiones entre empresas ficticias avanzan solas.{" "}
+            {latido.protagonistPerson ? `Las decisiones de ${latido.protagonistName} son siempre de ${latido.protagonistPerson.split(" ")[0]}.` : ""}{" "}
+            <span className="mono">{latido.lastAt ? `Último latido ${time(latido.lastAt)}` : "Sin latidos todavía"} · próximo a las {latido.nextLocalHour}:00</span>
+          </span>
+          <form action={runLatidoAction}><button className="btn small" type="submit">Latir ahora</button></form>
         </section>
       ) : null}
 
