@@ -1074,6 +1074,7 @@ Estos son los documentos vivos del proyecto (D-045). Cada uno tiene una función
 │   ├── 15_TARJETA_DE_CESION.md            La Cesión a dos caras: plazos y estados.
 │   ├── 16_COMPETENCIA.md                  Competencia y qué tomamos o no de cada una.
 │   ├── 17_DESPLIEGUE.md                   Condiciones para producción y fases (hace de roadmap).
+│   ├── 18_GUIA_DEL_TIMONEL.md             Guía de uso para candidatos y nuevos titulares (fuente de la página compartible).
 │   ├── DECISIONS.md                       Registro de decisiones (D-001…).
 │   └── PENDIENTES_DEL_FUNDADOR.md         Todo lo pospuesto, con su decisión de origen.
 ```
