@@ -1372,3 +1372,29 @@ Servicio a la red        10 %   solo suma: acciones de dirección del mes (3 = 1
 
 **Revisit when.** Haya varias Salas o la base supere unos cientos de MB (copias incrementales o `pg_basebackup`), o cuando NS tenga panel de red propio (llevar el estado allí además de a Hoy).
 
+---
+
+## D-057 · Latido: la Sala de demostración vive a cualquier hora, y nadie decide por la empresa con la que se enseña
+
+**Status:** PROPOSED (construido; el fundador lo confirma al enseñar la demo)
+**Date:** 2026-09-16
+
+**Context.** El fundador quiere enseñar NS Cumbre a empresarios de Sevilla para que soliciten plaza. La demo tenía diez empresas con Agente y tres escenarios, pero todo ocurría en segundos al pulsar "Preparar NS Cumbre" y después la Mesa quedaba con fechas viejas: los Agentes solo trabajaban a las 06:00 (Ronda) y cuando alguien publicaba. La tesis "los Agentes se reúnen 24/7" no se veía a las cinco de la tarde.
+
+**Options.** (a) Dar de alta una empresa de prueba más y publicar Indicios a mano antes de cada demo. (b) Un guion de demo que reproduce los escenarios en bucle. (c) Un Latido: en modo demo, la Sala ficticia genera actividad verosímil sola, con plazos realistas, y respeta las puertas humanas de la empresa protagonista.
+
+**Choice.** (c), en `agents/latido.ts`:
+
+- **Un Indicio por franja.** A las 9:00, 13:00 y 18:00 (hora de Madrid) el Agente de una empresa ficticia lleva a la Mesa un Indicio de un banco rotatorio de 24 casos verosímiles: traslados de planta, ransomware, ventas de empresa, exportación a Portugal, rondas, flotas, ENS, sedes de 300 puestos, un referido flojo que la Mesa descarta y uno confidencial (`COMPANY_ONLY`). La Mesa lo cualifica como siempre (NS-ARP S1–S9); el Latido no inventa Cesiones ni Encajes.
+- **Las Cesiones ficticias avanzan solas** con plazos mínimos (visto bueno 1 h, aceptación 2 h, Directiva 3 h, Apertura 1 h, Puente 1 h, reunión 24 h, propuesta 48 h, Veredicto 72 h, valor contrastado 24 h), un paso por pasada y como máximo cuatro pasos por pasada. Algunas se declinan con motivo, algunas se pierden, algunas quedan sin decisión; la mayoría se ganan con un valor dentro de la banda de la Promesa y, de vez en cuando, una Distinción. Todo con los servicios reales (`decide`, `authorizeIntro`, `markIntroduced`, `updateStage`, `submitVerdict`, `confirmValue`), firmado por los Timoneles ficticios.
+- **El Timonel manda (D-027).** El Latido nunca decide por la **protagonista** (`NS_LATIDO_PROTAGONISTA`, por defecto `hispalis`: Reformas Industriales Híspalis, Carlos Ruiz, la persona por defecto del selector) ni publica en su nombre; sus Cesiones esperan su toque y las cede él con un Apunte. Tampoco decide por ninguna empresa ajena a la semilla: si el fundador da de alta su propia empresa de prueba, todas sus decisiones son suyas.
+- **Interruptor.** Encendido en `NS_AUTH_MODE=demo`; apagado con cuentas reales y en las pruebas; `NS_LATIDO=on|off` manda sobre todo. Corre dentro de `GET /api/jobs` (cada cinco minutos en el servidor) y tras la Ronda en `GET /api/clock`; en Hoy, la tarjeta "Sala viva" muestra el último latido y el botón **Latir ahora** para tener un Indicio fresco justo antes de una demo.
+- **Segunda Directiva en la semilla.** Pedro Lucena (Valoraciones Ibéricas) es Directiva junto a Inés Domínguez: cuando una excepción de Salvoconducto afecta a Bufete Alameda, decide una Directiva que no es parte. Una Directiva no revisa su propia excepción.
+- **Idempotente.** Una franja produce un Indicio como máximo (evento `LATIDO` por franja, no significativo: no ensucia la Mesa) y cada Cesión avanza solo cuando vence su plazo.
+
+**Why.** Convierte la tesis en algo que el empresario ve a cualquier hora: Indicios de hoy en la Mesa, Cesiones en curso, valor contrastado creciendo en la Balanza y, para la empresa con la que se enseña, decisiones reales que toma la persona delante de él. Sin tocar el protocolo, sin datos reales y sin que nadie tenga que "calentar" la demo a mano.
+
+**Consequences.** `agents/latido.ts`, rutas `/api/jobs` y `/api/clock`, acción `runLatidoAction`, tarjeta en Hoy, segunda Directiva en `seed-data.ts`, pruebas (`tests/latido.test.ts`, 15). Documentado en `docs/07` §6, `docs/13` y `docs/17` §4c. El banco se repite cada ocho días: ampliarlo si la demo se alarga (pendiente).
+
+**Revisit when.** Entren empresas reales en la Sala (el Latido se apaga solo con `NS_AUTH_MODE=real`; si conviven demo y real en la misma base, separar por Sala) o el modelo real reemplace al determinista en la demo.
+

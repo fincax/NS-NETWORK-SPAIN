@@ -164,7 +164,7 @@ export const SEED_COMPANIES: SeedCompany[] = [
     legalName: "Valoraciones Ibéricas, S.L.",
     website: "https://valoracionesibericas.es",
     specialty: "VALORACION_EMPRESAS",
-    person: { fullName: "Pedro Lucena", role: "Socio", email: "pedro@valoracionesibericas.es" },
+    person: { fullName: "Pedro Lucena", role: "Socio", email: "pedro@valoracionesibericas.es", isDirector: true }, // segunda Directiva (D-057): cuando la excepción afecta a Bufete Alameda, decide una Directiva que no es parte
     dna: base({
       company: { description: "Valoraciones independientes de empresas para operaciones, sucesión y financiación.", locations: ["Sevilla", "Madrid"], website: "https://valoracionesibericas.es", certifications: ["REV"], credibility: ["200 valoraciones"] },
       offering: { services: ["Valoración de empresas", "Fairness opinion", "Valoración de activos intangibles"], products: [], differentiators: ["Informe defendible ante terceros"], exclusions: ["Tasación inmobiliaria"], capacity: "OPEN" },

@@ -2,7 +2,7 @@
 
 Lo que se ha dejado deliberadamente "para más adelante". Claude lo recuerda cuando se le pide y cuando una feature toca uno de estos puntos. Cuando un punto se decide, pasa a `DECISIONS.md` y se tacha aquí con la referencia.
 
-**Última revisión:** 2026-09-15
+**Última revisión:** 2026-09-16
 
 ## Protocolos de Sala (D-018, D-019) · detalles pospuestos el 2026-09-14
 
@@ -41,6 +41,7 @@ Lo que se ha dejado deliberadamente "para más adelante". Claude lo recuerda cua
 
 - Tipografía definitiva (D-023).
 - Política de notificaciones push (D-039).
+- **Latido de la demo** (D-057): el banco tiene 24 Indicios y se repite cada ocho días; ampliarlo si la ronda de demos se alarga. Confirmar la protagonista (hoy Reformas Industriales Híspalis · Carlos Ruiz) o fijar otra con `NS_LATIDO_PROTAGONISTA`. Decidir si la demo pasa al modelo real (`ANTHROPIC_API_KEY`), con el que el Latido encola en la Mesa en vez de cualificar en línea.
 - **Copias de seguridad** (D-056): guardar la clave de cifrado (`/root/.ns-copias-clave`) fuera del servidor y configurar el remoto `ns-copias` con rclone para que las copias salgan del servidor (`docs/17` §4c). Hasta entonces, Hoy lo muestra en ámbar a la Directiva. Hacer una restauración completa de prueba una vez.
 - Textos legales y GDPR (`docs/08`, condición 4 de `docs/17`). Hecho el aviso de privacidad de la web pública (D-055); falta el resto de `docs/08` §3 con el abogado.
 - ~~Responsable del tratamiento~~ → Be Trendy, S.L. (D-055, aviso 2026-09-15.3). Buzón de contacto: `hola@networkspain.com` (o `NS_CONTACT_EMAIL` en el servidor); comprobar que recibe correo.
