@@ -27,7 +27,7 @@ import { audit } from "@/lib/audit";
 import { authMode } from "@/lib/auth";
 import { SEED_COMPANIES } from "@/db/seed-data";
 import { createSignal, publishSignal } from "@/services/signals";
-import { authorizeIntro, confirmValue, decide, markIntroduced, submitVerdict, updateStage } from "@/services/referrals";
+import { authorizeIntro, confirmValue, decide, infoRound, markIntroduced, submitVerdict, updateStage } from "@/services/referrals";
 import { mesaMode } from "@/services/jobs";
 import type { SignalEnvelope, VerdictAxis } from "@/core/types";
 
@@ -127,6 +127,16 @@ function hash(s: string): number {
   return Math.abs(h >>> 0);
 }
 
+/** Respuesta verosímil de un cedente ficticio cuando su Agente no tiene borrador: repite lo que consta, sin inventar nada. */
+async function fictionalAnswer(db: Db, r: { matchId: string }): Promise<string> {
+  const match = await db.query.matchCandidates.findFirst({ where: eq(schema.matchCandidates.id, r.matchId) });
+  const qual = match?.qualificationId ? await db.query.qualifications.findFirst({ where: eq(schema.qualifications.id, match.qualificationId) }) : null;
+  const known = (qual?.turns ?? []).filter((t) => !t.asked_by && !t.insufficient && t.answer).map((t) => t.answer!.replace(/\.$/, ""));
+  return known.length
+    ? `Lo he consultado con mi contacto y me confirma lo que ya te conté: ${known.join("; ")}. Si necesitas algo más concreto, dímelo y se lo pregunto.`
+    : "Lo he consultado con mi contacto: de momento no me ha concretado más. En cuanto tenga el dato te lo paso.";
+}
+
 async function primaryMember(db: Db, companyId: string): Promise<typeof schema.members.$inferSelect | undefined> {
   return (await db.query.members.findFirst({ where: and(eq(schema.members.companyId, companyId), eq(schema.members.isPrimary, true)) })) ?? (await db.query.members.findFirst({ where: eq(schema.members.companyId, companyId) }));
 }
@@ -212,6 +222,14 @@ export async function runLatido(db: Db, opts: { now?: Date; force?: boolean } = 
           break;
         }
         case "ORIGINATOR_PENDING": {
+          // Pregunta del cesionario (D-058): el cedente ficticio responde con el borrador de su Agente o con lo que ya consta.
+          const round = await infoRound(db, r);
+          if (round.pending) {
+            const answer = round.pending.draft_answer ?? (await fictionalAnswer(db, r));
+            await decide(db, { referralId: r.id, memberId: member.id, decision: "ANSWER", notes: answer });
+            result.advanced.push({ referralId: r.id, from: state, to: "RECEIVER_PENDING", by });
+            break;
+          }
           await decide(db, { referralId: r.id, memberId: member.id, decision: "APPROVE" });
           result.advanced.push({ referralId: r.id, from: state, to: "RECEIVER_PENDING", by });
           break;

@@ -5,6 +5,7 @@ import { closeDb, getDb, schema, type Db } from "@/db/client";
 import { seedChapter } from "@/db/seed";
 import { currentSlot, LATIDO_DELAYS_H, LATIDO_INDICIOS, latidoEnabled, latidoStatus, protagonistSlug, runLatido } from "@/agents/latido";
 import { createSignal, publishSignal } from "@/services/signals";
+import { decide, infoRound } from "@/services/referrals";
 import { onboardCompany } from "@/services/onboarding";
 import { acceptAllNormas } from "@/core/normas";
 import { getProvider } from "@/agents/provider";
@@ -117,6 +118,26 @@ describe("Un Indicio por franja", () => {
     expect(mineAfter.every((m) => ["ORIGINATOR_PENDING", "RECEIVER_PENDING"].includes(m.state))).toBe(true);
     const decisions = await db.query.humanDecisions.findMany({ where: inArray(schema.humanDecisions.referralId, mine.map((m) => m.id)) });
     expect(decisions.every((d) => d.memberId !== companies[protagonistSlug()].memberId)).toBe(true);
+  });
+});
+
+describe("Pregunta al cedente (D-058)", () => {
+  it("si la protagonista pregunta, el cedente ficticio responde al cabo de una hora y la Cesión vuelve a su mesa", async () => {
+    const p = companies[protagonistSlug()];
+    const mine = await db.query.referrals.findFirst({ where: and(eq(schema.referrals.receiverCompanyId, p.companyId), eq(schema.referrals.state, "RECEIVER_PENDING")) });
+    expect(mine).toBeTruthy();
+    await decide(db, { referralId: mine!.id, memberId: p.memberId, decision: "REQUEST_INFO", notes: "¿La nave necesita instalaciones especiales?" });
+    const t = new Date();
+    await runLatido(db, { now: t }); // recién preguntada: nadie responde en el minuto
+    expect((await db.query.referrals.findFirst({ where: eq(schema.referrals.id, mine!.id) }))!.state).toBe("ORIGINATOR_PENDING");
+    await runLatido(db, { now: new Date(t.getTime() + 2 * 3_600_000) });
+    const back = (await db.query.referrals.findFirst({ where: eq(schema.referrals.id, mine!.id) }))!;
+    expect(back.state).toBe("RECEIVER_PENDING");
+    const round = await infoRound(db, back);
+    expect(round.pending).toBeNull();
+    expect(round.answered[0].answer).toMatch(/consultado con mi contacto/);
+    const answer = await db.query.humanDecisions.findFirst({ where: and(eq(schema.humanDecisions.referralId, mine!.id), eq(schema.humanDecisions.decision, "ANSWER")) });
+    expect(answer!.memberId).not.toBe(p.memberId);
   });
 });
 

@@ -7,6 +7,7 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/db/client";
 import { runRonda } from "@/services/ronda";
 import { runLatido } from "@/agents/latido";
+import { repairStuckInfoRequests } from "@/services/referrals";
 
 export const dynamic = "force-dynamic";
 
@@ -26,6 +27,7 @@ export async function GET(req: Request) {
   if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
   const db = await getDb();
   const result = await runRonda(db);
+  const repaired = await repairStuckInfoRequests(db);
   const latido = await runLatido(db);
-  return NextResponse.json({ ...result, latido });
+  return NextResponse.json({ ...result, latido, repaired: repaired.length });
 }

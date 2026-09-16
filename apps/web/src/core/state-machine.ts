@@ -13,7 +13,6 @@ const TRANSITIONS: Record<string, { to: ReferralState; actors: Actor[] }[]> = {
     { to: "RECEIVER_PENDING", actors: ["ORIGINATOR"] },
     { to: "REJECTED_BY_MEMBER", actors: ["ORIGINATOR"] },
     { to: "WITHDRAWN_BY_ORIGINATOR", actors: ["ORIGINATOR"] },
-    { to: "QUALIFIED", actors: ["ORIGINATOR"] }, // REQUEST_INFO
     { to: "EXPIRED", actors: ["SYSTEM"] },
   ],
   RECEIVER_PENDING: [
@@ -21,7 +20,7 @@ const TRANSITIONS: Record<string, { to: ReferralState; actors: Actor[] }[]> = {
     { to: "DIRECTOR_PENDING", actors: ["RECEIVER"] },
     { to: "REJECTED_BY_MEMBER", actors: ["RECEIVER"] },
     { to: "WITHDRAWN_BY_ORIGINATOR", actors: ["ORIGINATOR"] },
-    { to: "QUALIFIED", actors: ["RECEIVER"] }, // REQUEST_INFO
+    { to: "ORIGINATOR_PENDING", actors: ["RECEIVER"] }, // REQUEST_INFO (D-058): la pregunta va al cedente y vuelve con la respuesta
     { to: "EXPIRED", actors: ["SYSTEM"] },
   ],
   DIRECTOR_PENDING: [{ to: "APPROVED", actors: ["DIRECTOR"] }, { to: "REJECTED_BY_MEMBER", actors: ["DIRECTOR"] }, { to: "WITHDRAWN_BY_ORIGINATOR", actors: ["ORIGINATOR"] }],
@@ -63,6 +62,9 @@ export const REVIEW_STATES: ReadonlySet<ReferralState> = new Set(["ORIGINATOR_PE
 
 /** Plazos (D-024): recordatorio 72 h, caducidad 7 d, respuesta al Interesado 48 h tras el Puente. */
 export const TIMEOUTS = { reminderHours: 72, expiryDays: 7, responseAfterIntroHours: 48, checkInDays: 14 } as const;
+
+/** Pregunta al cedente (NS-ARP §9.1, D-058): el cesionario puede pedir información como máximo dos veces por Cesión. */
+export const MAX_INFO_ROUNDS = 2;
 
 /** Etiquetas de estado en léxico NS para la tarjeta. */
 export const STATE_LABEL: Record<ReferralState, string> = {

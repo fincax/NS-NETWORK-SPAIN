@@ -222,6 +222,11 @@ export const QualificationTurn = z.object({
   answer: z.string().optional(),
   confidence: z.number().min(0).max(1).optional(),
   insufficient: z.boolean().default(false),
+  /** Pregunta al cedente (D-058): la formula el cesionario en la revisión; la responde el cedente en persona. */
+  asked_by: z.enum(["RECEIVER"]).optional(),
+  answered_by: z.enum(["ORIGINATOR"]).optional(),
+  /** Borrador de respuesta que el Agente del cedente saca del Indicio; el Timonel lo confirma o lo corrige. */
+  draft_answer: z.string().optional(),
 });
 export type QualificationTurn = z.infer<typeof QualificationTurn>;
 
@@ -354,7 +359,7 @@ export const ReferralState = z.enum([
 ]);
 export type ReferralState = z.infer<typeof ReferralState>;
 
-export const HumanDecisionKind = z.enum(["APPROVE", "REQUEST_INFO", "REJECT", "DEFER"]);
+export const HumanDecisionKind = z.enum(["APPROVE", "REQUEST_INFO", "ANSWER", "REJECT", "DEFER"]);
 export type HumanDecisionKind = z.infer<typeof HumanDecisionKind>;
 
 export const RevealScope = z.enum(["COMPANY_ONLY", "COMPANY_AND_CONTACT"]);

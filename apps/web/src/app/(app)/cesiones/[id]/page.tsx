@@ -2,11 +2,12 @@ import { notFound } from "next/navigation";
 import { and, eq } from "drizzle-orm";
 import { getDb, schema } from "@/db/client";
 import { requireMember } from "@/lib/session";
-import { eur, eurRange, dateTime, daysUntil } from "@/lib/format";
+import { eur, eurRange, dateTime, daysUntil, firstName } from "@/lib/format";
 import { Encaje, StateBadge } from "@/components/ui";
 import { PROMISE_LABEL } from "@/core/merit";
-import { STATE_LABEL, TIMEOUTS } from "@/core/state-machine";
-import type { ReferralState, SignalEnvelope } from "@/core/types";
+import { MAX_INFO_ROUNDS, STATE_LABEL, TIMEOUTS } from "@/core/state-machine";
+import type { QualificationTurn, ReferralState, SignalEnvelope } from "@/core/types";
+import { infoRound, type InfoRound } from "@/services/referrals";
 import { aperturaAction, confirmValueAction, decideAction, puenteAction, stageAction, verdictAction } from "./actions";
 
 export default async function CesionPage({ params }: { params: Promise<{ id: string }> }) {
@@ -45,8 +46,13 @@ export default async function CesionPage({ params }: { params: Promise<{ id: str
   const recognitionUsed = recognitionsFrom.some((r) => r.createdAt >= monthStart);
   const merit = originatorTrust.reduce((a, t) => a + t.weight, 0);
 
-  const face: "A" | "B" | "B0" | "SEGUIMIENTO" | "VEREDICTO" | "LECTURA" =
+  const info = await infoRound(db, ref);
+  const receiverFirst = receiverPerson ? firstName(receiverPerson.fullName) : receiver.name;
+  const originatorFirst = originatorPerson ? firstName(originatorPerson.fullName) : originator.name;
+
+  const face: "A" | "B" | "B0" | "PREGUNTA" | "SEGUIMIENTO" | "VEREDICTO" | "LECTURA" =
     iAmReceiver && state === "RECEIVER_PENDING" ? "A"
+    : iAmOriginator && state === "ORIGINATOR_PENDING" && info.pending ? "PREGUNTA"
     : iAmOriginator && state === "ORIGINATOR_PENDING" ? "B0"
     : iAmOriginator && ["APPROVED", "INTRO_AUTHORIZED"].includes(state) ? "B"
     : iAmReceiver && ["INTRODUCED", "MEETING", "COMMERCIAL_OPPORTUNITY"].includes(state) && !verdict ? "SEGUIMIENTO"
@@ -100,7 +106,7 @@ export default async function CesionPage({ params }: { params: Promise<{ id: str
           <ul className="why">{match.explanation.why.map((w, i) => <li key={i}>{w}</li>)}</ul>
           {match.explanation.unknowns.length ? (<><p className="eyebrow" style={{ marginTop: 14 }}>Pendiente</p><ul className="why pending">{match.explanation.unknowns.map((u, i) => <li key={i}>{u}</li>)}</ul></>) : null}
           {match.explanation.negatives.length ? (<><p className="eyebrow" style={{ marginTop: 14 }}>En contra</p><ul className="why neg">{match.explanation.negatives.map((u, i) => <li key={i}>{u}</li>)}</ul></>) : null}
-          <p className="mono" style={{ marginTop: 14 }}>Siguiente paso: {match.explanation.next_action}</p>
+          <p className="mono" style={{ marginTop: 14 }}>Siguiente paso: {nextStep(state, { iAmOriginator, iAmReceiver, info, suggested: match.explanation.next_action, receiverFirst, originatorFirst })}</p>
         </section>
       </div>
 
@@ -141,6 +147,16 @@ export default async function CesionPage({ params }: { params: Promise<{ id: str
       {face === "A" ? (
         <section className="card amber">
           <h2>Tu decisión</h2>
+          {info.answered.length ? (
+            <div className="stack" style={{ gap: 8, marginBottom: 14 }} aria-label="Respuestas del cedente">
+              {info.answered.map((t, i) => (
+                <div key={i} className="notice">
+                  <p className="mono">Preguntaste: {t.question}</p>
+                  <p><strong>{originatorFirst} responde:</strong> {t.answer}</p>
+                </div>
+              ))}
+            </div>
+          ) : null}
           <p className="lead" style={{ fontSize: 14, marginBottom: 12 }}>Al aceptar te comprometes a responder al Interesado en {TIMEOUTS.responseAfterIntroHours} h tras el Puente y a emitir Veredicto al cerrar. Puedes confirmar la Promesa tal cual o ajustarla; tu Agente registrará la diferencia.</p>
           <form action={decideAction} className="stack">
             <input type="hidden" name="referralId" value={ref.id} />
@@ -148,11 +164,32 @@ export default async function CesionPage({ params }: { params: Promise<{ id: str
               <div className="field"><label htmlFor="pmin">Ajustar valor mínimo (opcional)</label><input id="pmin" name="promise_min" type="number" min={0} step={1000} placeholder={String(promise?.estimated_value_min ?? "")} /></div>
               <div className="field"><label htmlFor="pmax">Ajustar valor máximo (opcional)</label><input id="pmax" name="promise_max" type="number" min={0} step={1000} placeholder={String(promise?.estimated_value_max ?? "")} /></div>
             </div>
-            <div className="field"><label htmlFor="notes">Motivo o pregunta (obligatorio al declinar o pedir información)</label><textarea id="notes" name="notes" placeholder="Por ejemplo: sin decisor identificado; o: ¿tiene presupuesto cerrado?" /></div>
+            <div className="field"><label htmlFor="notes">Motivo o pregunta (obligatorio al declinar o pedir información)</label><textarea id="notes" name="notes" placeholder={info.roundsLeft > 0 ? "Por ejemplo: ¿tiene presupuesto cerrado?; o, al declinar: sin decisor identificado." : "Por ejemplo, al declinar: sin decisor identificado."} /></div>
             <div className="actions">
               <button className="btn amber" name="decision" value="APPROVE" type="submit">Aceptar y confirmar la Promesa</button>
-              <button className="btn" name="decision" value="REQUEST_INFO" type="submit">Pedir más información</button>
+              {info.roundsLeft > 0 ? <button className="btn" name="decision" value="REQUEST_INFO" type="submit">Pedir más información a {originatorFirst}</button> : null}
               <button className="btn danger ghost" name="decision" value="REJECT" type="submit">Declinar con motivo</button>
+            </div>
+            <p className="mono">{info.roundsLeft === MAX_INFO_ROUNDS ? `Puedes pedir información hasta ${MAX_INFO_ROUNDS} veces; la pregunta va al cedente y vuelve aquí con su respuesta.` : info.roundsLeft > 0 ? `Te queda ${info.roundsLeft} pregunta al cedente.` : `Ya has pedido información ${MAX_INFO_ROUNDS} veces: acepta o declina.`}</p>
+          </form>
+        </section>
+      ) : null}
+
+      {/* ───────── Cara Pregunta · el cedente responde al cesionario (D-058) ───────── */}
+      {face === "PREGUNTA" && info.pending ? (
+        <section className="card amber">
+          <h2>Una pregunta de {receiverPerson?.fullName ?? receiver.name}</h2>
+          <p className="lead" style={{ fontSize: 14, marginBottom: 12 }}>Antes de aceptar, {receiverFirst} quiere saber algo más del Interesado. Tu respuesta se añade a lo que averiguaron los Agentes y la Cesión vuelve a su mesa. Ronda {info.roundsUsed} de {MAX_INFO_ROUNDS}.</p>
+          <div className="notice" style={{ marginBottom: 12 }}><strong>{receiverFirst} pregunta:</strong> {info.pending.question}</div>
+          <form action={decideAction} className="stack">
+            <input type="hidden" name="referralId" value={ref.id} />
+            <div className="field">
+              <label htmlFor="answer">Tu respuesta{info.pending.draft_answer ? " · tu Agente propone un borrador a partir del Indicio; corrígelo si hace falta" : ""}</label>
+              <textarea id="answer" name="notes" required defaultValue={info.pending.draft_answer ?? ""} placeholder="Solo lo que puedas compartir. La identidad del Interesado sigue reservada hasta la Apertura." />
+            </div>
+            <div className="actions">
+              <button className="btn amber" name="decision" value="ANSWER" type="submit">Enviar la respuesta a {receiver.name}</button>
+              <button className="btn danger ghost" name="decision" value="REJECT" type="submit">No ceder</button>
             </div>
           </form>
         </section>
@@ -269,7 +306,7 @@ export default async function CesionPage({ params }: { params: Promise<{ id: str
         </section>
       ) : null}
       {face === "LECTURA" && !verdict ? (
-        <div className="notice">{waitingText(state, iAmOriginator, iAmReceiver, receiver.name, originator.name)}</div>
+        <div className="notice">{waitingText(state, iAmOriginator, iAmReceiver, receiver.name, originator.name, info)}</div>
       ) : null}
 
       <section className="section">
@@ -305,18 +342,43 @@ async function QualificationList({ qualificationId }: { qualificationId: string 
   const label: Record<string, string> = { BUDGET: "Presupuesto", TIMING: "Plazo", DECISION_MAKER: "Decisor", SCOPE: "Alcance", CONSTRAINT: "Condicionantes", FREE: "Pregunta" };
   return (
     <ul className="plain">
-      {q.turns.map((t, i) => (
+      {q.turns.map((t: QualificationTurn, i: number) => (
         <li key={i}>
-          <span><span className="mono">{label[t.kind]}</span> · {t.insufficient ? <span style={{ color: "var(--amber)" }}>sin información suficiente</span> : t.answer}{t.confidence !== undefined && !t.insufficient ? <span className="mono"> · conf {Math.round(t.confidence * 100)} %</span> : null}</span>
+          {t.asked_by === "RECEIVER" ? (
+            <span><span className="mono">Pregunta del cesionario</span> · {t.question} {t.answered_by ? <>· <strong>respondió el cedente:</strong> {t.answer}</> : <span style={{ color: "var(--amber)" }}>· esperando al cedente</span>}</span>
+          ) : (
+            <span><span className="mono">{label[t.kind]}</span> · {t.insufficient ? <span style={{ color: "var(--amber)" }}>sin información suficiente</span> : t.answer}{t.confidence !== undefined && !t.insufficient ? <span className="mono"> · conf {Math.round(t.confidence * 100)} %</span> : null}</span>
+          )}
         </li>
       ))}
     </ul>
   );
 }
 
-function waitingText(state: ReferralState, iAmOriginator: boolean, iAmReceiver: boolean, receiverName: string, originatorName: string) {
+/** Qué toca ahora, según el estado y quién mira. Solo en la revisión del cesionario vale la sugerencia del Fundamento. */
+function nextStep(state: ReferralState, o: { iAmOriginator: boolean; iAmReceiver: boolean; info: InfoRound; suggested: string; receiverFirst: string; originatorFirst: string }): string {
   switch (state) {
-    case "ORIGINATOR_PENDING": return iAmReceiver ? `En revisión: esperando el visto bueno de ${originatorName}.` : "Esperando tu visto bueno.";
+    case "ORIGINATOR_PENDING":
+      if (o.info.pending) return o.iAmOriginator ? `Responder a la pregunta de ${o.receiverFirst}.` : `${o.originatorFirst} está respondiendo a tu pregunta.`;
+      return o.iAmOriginator ? "Dar el visto bueno para proponer la Cesión." : `Esperar el visto bueno de ${o.originatorFirst}.`;
+    case "RECEIVER_PENDING":
+      if (!o.iAmReceiver) return `Esperar a que ${o.receiverFirst} acepte.`;
+      return o.info.roundsLeft === 0 && /informaci/i.test(o.suggested) ? "Aceptar la Cesión y confirmar la Promesa, o declinar con motivo." : o.suggested;
+    case "DIRECTOR_PENDING": return "Esperar a la Directiva.";
+    case "APPROVED": return o.iAmOriginator ? "Autorizar la Apertura y redactar el Puente." : `${o.originatorFirst} decidirá el alcance de la Apertura.`;
+    case "INTRO_AUTHORIZED": return o.iAmOriginator ? "Enviar el Puente en persona y marcarlo como tendido." : `${o.originatorFirst} enviará el Puente.`;
+    case "INTRODUCED": return o.iAmReceiver ? `Responder al Interesado en ${TIMEOUTS.responseAfterIntroHours} h y anotar el hito.` : `${o.receiverFirst} responderá al Interesado.`;
+    case "MEETING": case "COMMERCIAL_OPPORTUNITY": return o.iAmReceiver ? "Actualizar el hito al cerrar." : `${o.receiverFirst} actualiza los hitos.`;
+    case "WON": case "LOST": case "NO_DECISION": return o.iAmReceiver ? "Emitir el Veredicto." : `Esperar el Veredicto de ${o.receiverFirst}.`;
+    default: return "Nada pendiente.";
+  }
+}
+
+function waitingText(state: ReferralState, iAmOriginator: boolean, iAmReceiver: boolean, receiverName: string, originatorName: string, info: InfoRound) {
+  switch (state) {
+    case "ORIGINATOR_PENDING":
+      if (info.pending) return iAmReceiver ? `Tu pregunta está en manos de ${originatorName}. Cuando responda, la Cesión vuelve aquí.` : `${originatorName} responde a la pregunta de ${receiverName}.`;
+      return iAmReceiver ? `En revisión: esperando el visto bueno de ${originatorName}.` : "Esperando tu visto bueno.";
     case "RECEIVER_PENDING": return iAmOriginator ? `En revisión: esperando a que ${receiverName} acepte.` : "Esperando tu decisión.";
     case "DIRECTOR_PENDING": return "Requiere Directiva: hay una excepción de Compliance que revisar.";
     case "APPROVED": return `Aprobada. ${originatorName} decidirá el alcance de la Apertura.`;
