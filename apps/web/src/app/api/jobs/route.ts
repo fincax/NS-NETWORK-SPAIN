@@ -6,6 +6,7 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/db/client";
 import { runJobs } from "@/services/jobs";
 import { runLatido } from "@/agents/latido";
+import { repairStuckInfoRequests } from "@/services/referrals";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +16,9 @@ export async function GET(req: Request) {
   if (secret && (req.headers.get("authorization") ?? "") !== `Bearer ${secret}`) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   const db = await getDb();
   // Latido de la demo (D-057): un Indicio por franja y las Cesiones ficticias avanzan; apagado con cuentas reales.
+  // Cesiones que quedaron en "Cualificada" con una pregunta sin dueño (antes de D-058): pasan al cedente.
+  const repaired = await repairStuckInfoRequests(db);
   const latido = await runLatido(db);
   const jobs = await runJobs(db, { max: 25 });
-  return NextResponse.json({ ...jobs, latido });
+  return NextResponse.json({ ...jobs, latido, repaired: repaired.length });
 }

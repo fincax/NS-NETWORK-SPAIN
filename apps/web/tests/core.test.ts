@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { buildExplanation, computeNSMatchScore, hardGates, WEIGHTS, PENALTY_WEIGHTS, type CapabilityView } from "@/core/scoring";
 import { runComplianceGate, detectsReferralFee } from "@/core/compliance";
-import { assertTransition, canTransition, TransitionError } from "@/core/state-machine";
+import { assertTransition, canTransition, MAX_INFO_ROUNDS, TransitionError } from "@/core/state-machine";
 import { computePromise, computeVerdictMerit } from "@/core/merit";
 import { SEED_COMPANIES } from "@/db/seed-data";
 import type { ChapterLayer, NeedDraft, QualificationLayer, QualificationTurn, SignalEnvelope } from "@/core/types";
@@ -109,9 +109,13 @@ describe("Máquina de estados de la Cesión (NS-ARP §9)", () => {
     expect(canTransition("RECEIVER_PENDING", "APPROVED", "ORIGINATOR")).toBe(false);
     expect(() => assertTransition("VALUE_CONFIRMED", "DETECTED", "SYSTEM")).toThrow(TransitionError);
   });
-  it("REQUEST_INFO devuelve a QUALIFIED y un agente no puede aprobar por una persona", () => {
-    expect(canTransition("RECEIVER_PENDING", "QUALIFIED", "RECEIVER")).toBe(true);
+  it("REQUEST_INFO lleva la pregunta al cedente (D-058), nunca a Cualificada, y un agente no puede aprobar por una persona", () => {
+    expect(canTransition("RECEIVER_PENDING", "ORIGINATOR_PENDING", "RECEIVER")).toBe(true);
+    expect(canTransition("RECEIVER_PENDING", "QUALIFIED", "RECEIVER")).toBe(false);
+    expect(canTransition("ORIGINATOR_PENDING", "QUALIFIED", "ORIGINATOR")).toBe(false);
+    expect(canTransition("ORIGINATOR_PENDING", "RECEIVER_PENDING", "ORIGINATOR")).toBe(true); // la respuesta vuelve al cesionario
     expect(canTransition("RECEIVER_PENDING", "APPROVED", "MATCHMAKER")).toBe(false);
+    expect(MAX_INFO_ROUNDS).toBe(2);
   });
 });
 

@@ -579,7 +579,7 @@ Estados terminales laterales desde cualquier estado previo a INTRODUCED:
 | INTRODUCED → MEETING → … | Miembro receptor | actualización | check-in del agente cada 14 d |
 | * → VALUE_CONFIRMED | Ambos miembros | ambos confirman | — |
 
-`REQUEST_INFO` en cualquier estado de revisión devuelve el referral a `QUALIFIED` con una pregunta concreta para el agente contrario y un límite de 2 rondas.
+**Pregunta al cedente (D-058).** `REQUEST_INFO` solo lo emite el receptor en `RECEIVER_PENDING` y con una pregunta concreta. La Cesión pasa a `ORIGINATOR_PENDING` con la pregunta registrada como turno de la cualificación (`asked_by: RECEIVER`); el Agente del originador redacta un borrador de respuesta a partir del Indicio y de las notas privadas (`draft_answer`), y la persona lo confirma o lo corrige con `HUMAN_DECISION.ANSWER`, que devuelve la Cesión a `RECEIVER_PENDING` con la respuesta como evidencia (`answered_by: ORIGINATOR`). Máximo **2 rondas** por Cesión; agotadas, solo quedan aceptar o declinar. Cada ida y vuelta reinicia el plazo de revisión (72 h → recordatorio; 7 d → EXPIRED) de quien tiene que actuar. Mientras haya una pregunta sin responder, el originador no puede dar el visto bueno sin responderla. Nunca vuelve a `QUALIFIED`: una Cesión en revisión siempre tiene una persona que debe actuar.
 
 ### 9.2 Reglas de exclusividad de plaza en el ciclo
 
@@ -592,9 +592,10 @@ Si dos claims sobre la misma necesidad provienen de una plaza principal y de una
 | Puerta | Quién decide | Qué decide | Qué ve |
 | --- | --- | --- | --- |
 | Publicación de señal | Originador | publicar / restringir / retirar | previsualización de capa 0 exacta |
-| Revisión del originador | Originador | aprobar revelar / pedir info / rechazar | referral card + capa 0–1 del receptor + explanation |
-| Revisión del receptor | Receptor | aceptar / pedir info / rechazar | referral card + capa 1 de la señal (sin identidad) + explanation |
+| Revisión del originador | Originador | aprobar revelar / rechazar | referral card + capa 0–1 del receptor + explanation |
+| Revisión del receptor | Receptor | aceptar / pedir info (máx. 2) / rechazar | referral card + capa 1 de la señal (sin identidad) + explanation |
 | Revisión de Directiva | Director | aprobar / rechazar / derivar | referral card + excepciones + capa 1; capa 2 solo si la excepción es de datos personales |
+| Respuesta a la pregunta del receptor | Originador | responder / no ceder | la pregunta, el borrador de su Agente y su propio Indicio |
 | Alcance de revelación | Originador | empresa sola / empresa + contacto | capa 2 propia |
 | Envío de introducción | Originador (persona) | enviar / editar / cancelar | `IntroPackage` |
 | Confirmación de resultado | Ambos | valor verificado | outcome propuesto por la otra parte |
