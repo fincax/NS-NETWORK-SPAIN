@@ -149,6 +149,10 @@ Las Salas no son territoriales, así que el encuentro entre Salas no es "la reun
 
 Propuesta Fuera de la Sala (D-015, en el core). Cuando tu Sala no tiene titular para un buen referido, lo propones a un titular de otra Sala y, si resuelve, obtienes una prima de Mérito muy superior. La empresa que acoge la cesión queda acreditada como Embajadora de esa especialidad en tu Sala mientras la plaza siga vacante. Cada Embajada marca además una plaza que la Sala debería cubrir: el hueco se convierte en captación.
 
+### C10 · Invitado avalado: la persona sin empresa que ve negocio (fuera del MVP)
+
+Al valorar el rol "Fuente de Referencias" (D-059) quedó descartado el miembro sin plaza, y el concentrador con empresa entra como Manantial. Queda como idea, no adoptada, la persona física sin empresa que ve negocio (el director de una oficina bancaria, un directivo de una gran empresa que no puede ser miembro). Si algún día se explora, la vía menos arriesgada es un **invitado avalado** por un titular de la Sala: sin plaza, sin voto, sin Agente propio (Apunte manual, coste de tokens nulo), sin poder recibir Cesiones y sin ventaja alguna por ceder (regla 1). Riesgos que lo mantienen fuera: choca con la política de su empleador, la cesión de datos de clientes por un empleado es un riesgo RGPD y reputacional serio, y sin reciprocidad la figura se apaga. Se reabre solo con un caso concreto y un aval.
+
 ## D · Tensiones que hay que resolver (no ignorar)
 
 | Tensión | Riesgo | Respuesta de diseño |

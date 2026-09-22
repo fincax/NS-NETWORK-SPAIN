@@ -6,6 +6,7 @@ import { balance } from "@/services/today";
 import { eur } from "@/lib/format";
 import { openDemands } from "@/services/demands";
 import { compromisoStatus } from "@/services/compromiso";
+import { MANANTIALES } from "@/db/nscat";
 
 export default async function SalaPage() {
   const { chapter, company } = await requireMember();
@@ -34,7 +35,7 @@ export default async function SalaPage() {
             const holder = s.companyId ? byId.get(s.companyId) : undefined;
             return (
               <div key={s.id} className={`seat ${holder ? "" : "vacant"}`}>
-                <span className="mono">{s.specialtyName}</span>
+                <span className="mono">{s.specialtyName}{MANANTIALES.has(s.code) ? <span className="badge blue" title="Especialidad Manantial (D-059): ve necesidades de muchos sectores; misma plaza y mismas reglas que cualquier titular" style={{ marginLeft: 8 }}>Manantial</span> : null}</span>
                 {holder ? <Link className="name" href={`/empresa/${holder.slug}`}>{holder.name}{holder.id === company.id ? " · tú" : ""}</Link> : <span className="name">Plaza vacante · Antesala</span>}
               </div>
             );

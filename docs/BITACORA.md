@@ -2,6 +2,21 @@
 
 Punto de parada y siguiente paso. Se actualiza al cerrar cada sesión de trabajo.
 
+## 22 de septiembre de 2026 · Manantial (D-059)
+
+**Dónde estamos.**
+
+- La PR #16 (Pregunta al cedente, D-058) está fusionada en `main`. Decisiones hasta **D-058** al empezar.
+- El fundador propuso un rol nuevo, "Fuente de Referencias" (persona o empresa que, como los administradores de fincas, es origen de referidos de muchos sectores). Valoración: la figura vale mucho, pero un miembro sin plaza rompe la regla 1 (sin cuota ni plaza el único incentivo sería una contraprestación), la reciprocidad y la Balanza, la exclusividad y la cuota por Tramos. El fundador está de acuerdo y confirma el nombre **Manantial**.
+- **Registrado (D-059), en la rama `claude/confident-goldberg-uu70oo`:** Manantial es una condición de la titularidad, no un rol: mismas Normas, plaza, cuota y Compromiso. NS-CAT marca las especialidades Manantial (`manantial`, `MANANTIALES`) y añade Administración de fincas (68.32) como plaza vacante de NS Cumbre; etiqueta "Manantial" en la vista de plazas de la Sala; constitución, léxico, `docs/12`, `docs/11` (C10: invitado avalado, fuera del MVP), `docs/06` y pendientes actualizados. 138 pruebas en verde, tipos y lint limpios. **Pendiente de fusionar.** La plaza nueva aparece en el servidor cuando vuelva a ejecutarse la semilla (es idempotente); `actualizar.sh` no la lanza.
+
+**Siguiente paso acordado (por este orden).**
+
+1. Fusionar la PR de Manantial.
+2. Confirmar con el fundador la lista de especialidades Manantial de NS-CAT v0.1 y la forma jurídica en el alta (autónomos con NIF como titulares).
+3. Construir el Apunte de Interesado múltiple (una comunidad de propietarios → varias Cesiones de un toque) cuando se aborde la Brújula.
+4. Lo anterior sigue vigente: clave de las copias y remoto `ns-copias`; correos de invitación y recuperación (D-054); Protocolo II y Brújula.
+
 ## 16 de septiembre de 2026 (tarde) · la Pregunta al cedente
 
 **Dónde estamos.**

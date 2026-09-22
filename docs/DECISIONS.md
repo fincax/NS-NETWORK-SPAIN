@@ -1425,3 +1425,33 @@ Servicio a la red        10 %   solo suma: acciones de dirección del mes (3 = 1
 
 **Revisit when.** Los Timoneles reales pidan una tercera ronda con frecuencia (subir el tope o abrir un hilo), o el modelo real haga borradores tan buenos que convenga que el Agente responda solo preguntas de hecho ya presentes en el Indicio (seguiría exigiendo el toque del Timonel).
 
+
+## D-059 · Manantial: la empresa que ve necesidades de muchas especialidades es titular como cualquier otra, con su condición reconocida; no existe un rol de "fuente de referidos" sin plaza
+
+**Status:** CONFIRMED (el fundador propuso un rol "Fuente de Referencias" y confirma el enfoque y el nombre "Manantial" tras la valoración)
+**Date:** 2026-09-22
+
+**Context.** El fundador propone un rol nuevo: **Fuente de Referencias**, una persona física o empresa que, por su actividad (administradores de fincas o similares), es origen de referidos de muchos sectores CNAE. La pregunta es si NS debe incorporarlo como rol propio, con reglas distintas a las del titular.
+
+**Options.**
+
+1. **Rol nuevo sin plaza.** Un miembro que solo cede, sin plaza, sin cuota y sin Compromiso. Máxima facilidad de entrada para el perfil concentrador.
+2. **Titular con condición reconocida.** El concentrador entra como cualquier empresa: plaza, Normas, cuota, Compromiso y Balanza. NS reconoce su condición en la taxonomía, en la captación y en su Hoja de Méritos, y prepara a su Agente para el volumen.
+3. **Invitado avalado (persona sin empresa).** Un primitivo distinto: persona física avalada por un titular, sin Agente propio, con Apunte manual, sin recibir nada.
+
+**Choice.** La opción 2. El concentrador se llama **Manantial**. Es una **condición** de una titularidad, nunca un tipo de miembro.
+
+- **Mismas reglas que todo titular.** Plaza en su especialidad (exclusividad D-001), aceptación expresa de las Normas (D-043), cuota por Tramos (D-025), Compromiso semanal y Escalera (D-042), Balanza pública (D-019), Valoración (D-046). No hay excepción alguna.
+- **Especialidades Manantial en NS-CAT.** La taxonomía marca las especialidades que, por naturaleza, ven necesidades de muchos sectores: administración de fincas, asesoría fiscal, correduría de seguros, arquitectura, y las que la práctica demuestre. Propuesta inicial en `src/db/nscat.ts`; se calibra con datos (prueba del referido, `docs/12` §3.4).
+- **Captación.** La Antesala y la Fundación (D-041) buscan y priorizan las especialidades Manantial al fundar y al completar una Sala. Se añaden a la lista de especialidades fundadoras de D-006 y `docs/12` §2.2.
+- **Agente preparado para el volumen.** El Apunte de un Manantial captura un Interesado (por ejemplo, una comunidad de propietarios, D-017) y despliega varias Cesiones de un toque, una por especialidad, con el decisor identificado (presidente o junta) y el plazo real de la decisión. La Promesa refleja que un decisor colectivo alarga el ciclo. Pendiente de construir.
+- **Reconocimiento por amplitud y calidad, nunca por cantidad.** La Hoja de Méritos puede decir "ha generado negocio contrastado para 9 especialidades de la Sala". No hay multiplicador por número de Cesiones (D-045). `contribution_weeks.distinct_specialties` ya lo cuenta.
+- **Autónomos como titulares.** Muchos administradores de fincas son personas físicas colegiadas. La empresa titular puede ser un autónomo con NIF; es la única forma de "persona física" que NS admite: la persona como empresa, nunca la persona sin empresa. El alta debe recoger la forma jurídica (pendiente).
+- **Transparencia hacia el Interesado.** En el sector de la administración de fincas existen prácticas de comisiones de proveedores. En NS un titular nunca recibe nada del cesionario (regla 1, D-010, expulsión), y toda Cesión de un Manantial exige Interesado avisado (D-029). El Contraste vigila con especial atención los pares Manantial → cesionario repetidos.
+- **Nombre.** "Fuente de Referencias" choca con "Fuente propia" (los RSS del Agente, D-038) y con las "fuentes públicas" del Rastreo (D-031). "Manantial" no colisiona, es castellano y evoca abundancia continua. Uso: "NS Cumbre tiene tres Manantiales", "especialidad Manantial".
+
+**Why.** El perfil concentrador es el que más Cesiones de calidad puede aportar y el que mejor encarna "Para los demás" (D-049): casi todo lo que ve es negocio ajeno. Pero un rol sin plaza rompería cuatro cosas a la vez: la regla 1 (sin plaza ni cuota, el único incentivo posible sería una ventaja por referir, es decir, contraprestación); la reciprocidad y la Balanza (un miembro que solo da y nunca recibe es un invitado, y los invitados se apagan); la exclusividad (otro competidor podría ocupar la plaza en la misma Sala, con obligaciones que el concentrador no tendría); y la sostenibilidad de la cuota (su Agente consume tokens y su Tramo nunca subiría). Reconocer la condición dentro del sistema aporta todo el valor sin tocar ninguna regla inmutable.
+
+**Consequences.** `src/db/nscat.ts`: atributo `manantial` y especialidad `ADMINISTRACION_FINCAS` (68.32) como plaza vacante de NS Cumbre; etiqueta "Manantial" en la vista de plazas de la Sala; constitución (§3 y §8), `docs/12` §2.2, §3.1, §4 y §9, léxico, `docs/11` (C10: invitado avalado, fuera del MVP), pendientes del fundador.
+
+**Revisit when.** La Sala piloto tenga un mes con un Manantial activo: confirmar qué especialidades merecen la marca y si la mención en la Hoja de Méritos basta como reconocimiento. La opción 3 (persona sin empresa) solo se reabre si un titular la pide con un caso concreto y un aval.

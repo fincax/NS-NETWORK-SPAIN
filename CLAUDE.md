@@ -149,6 +149,8 @@ Puede haber varias Salas en una misma ciudad.
 
 **Plaza ocupada, Sala nueva (D-041).** Cuando una empresa pretende entrar y su plaza ya está ocupada por otra del mismo sector, NS la ayuda a promover, promocionar e iniciar una nueva Sala. Si consigue el número mínimo de fundadoras que se exija (a determinar en la práctica), recibe como compensación una gratificación que NS anuncia, por ejemplo unos meses de cuota gratis. Nunca es dinero por referidos.
 
+**Manantial (D-059).** La empresa cuya actividad le hace ver necesidades de muchas especialidades (administración de fincas, asesoría fiscal, correduría de seguros, arquitectura) es un **Manantial**. No es un rol ni un tipo de miembro: es una condición reconocida de una titularidad. El Manantial ocupa su plaza, acepta las Normas, paga su cuota y cumple su Compromiso como cualquier titular. NS marca las especialidades Manantial en NS-CAT, las prioriza al fundar y completar Salas, prepara a su Agente para desplegar varias Cesiones de un solo Interesado y reconoce en la Hoja de Méritos la amplitud de lo cedido, nunca la cantidad. No existe un miembro "fuente de referidos" sin plaza: sin plaza no hay reciprocidad, ni Balanza, ni exclusividad, y el único incentivo posible sería una contraprestación por referir.
+
 **La Sala no es territorial (D-014).** Una Sala se define por sus empresas, no por un mapa. No tiene barrio, distrito ni radio. Su nombre no debe dar ninguna pista territorial: el nombre de la ciudad o municipio está reservado a NS para agrupar las Salas de la zona ("NS Sevilla"), y ninguna Sala puede llevar el nombre de una ciudad, municipio, provincia, comunidad autónoma, país, barrio o distrito. Cada Sala elige un nombre propio, con el prefijo NS, autorizado por NS y único en toda la red: "NS Cumbre", "NS Ágora". Las Salas de una zona se encuentran entre sí (encuentros entre Salas) porque generan negocio, no porque compartan territorio.
 
 Posteriormente existirán:
@@ -319,6 +321,8 @@ Otro CTA poderoso: **Comprobar disponibilidad de mi sector**.
 La exclusividad de categoría es simultáneamente una regla operativa y un elemento comercial.
 
 **Prueba de Valor (D-050).** Antes de la plaza, siete días de Agente: el candidato ve lo que su Agente habría cedido a la Sala y, en agregado y sin identidad, lo que la Sala ya encontró para su especialidad. Las dos caras miran a los demás. Es el argumento de venta de NS.
+
+**Los Manantiales primero (D-059).** Al fundar o completar una Sala, la Antesala busca antes las especialidades Manantial: son las que más Cesiones de calidad traen desde el primer día. Un autónomo con NIF puede ser titular; una persona sin empresa, no.
 
 ## 9. El agente empresarial
 
