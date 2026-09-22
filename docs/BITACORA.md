@@ -2,6 +2,25 @@
 
 Punto de parada y siguiente paso. Se actualiza al cerrar cada sesión de trabajo.
 
+## 22 de septiembre de 2026 (cierre) · correo configurado, a la espera de Clouding
+
+**Punto de parada.** Esperando la respuesta de **soporte de Clouding** a un ticket para desbloquear la salida SMTP (puertos 465 y 587) del servidor. Al retomar, lo primero es preguntar al fundador si Clouding ha respondido.
+
+**Dónde estamos.**
+
+- PR #18 (correo saliente, D-060) fusionada y aplicada en el servidor con `actualizar.sh`.
+- `deploy/correo.sh configurar` ejecutado con los datos de IONOS: `smtp.ionos.es`, puerto 465, usuario `hola@networkspain.com`. Los datos están guardados en `.env.production` y la web se ha reiniciado.
+- **La prueba falla con `Connection timeout`.** Diagnóstico hecho: los puertos 465 y 587 hacia `smtp.ionos.es` están cerrados, mientras que la salida por 443 funciona y `ufw` permite toda la salida (`deny incoming, allow outgoing`). El perfil de firewall de Clouding ("default") solo tiene reglas de entrada. Conclusión: **Clouding bloquea la salida SMTP a nivel de plataforma**. El fundador abre un ticket en portal.clouding.io pidiendo habilitar la salida por 465 y 587.
+- Mientras tanto no se rompe nada: la demo (modo demo) no envía correos, y en modo real un envío fallido muestra el enlace a la Directiva.
+- **Bitwarden:** el fundador perdió la contraseña maestra de la primera cuenta y rehízo la bóveda en una cuenta nueva (servidor europeo). La llave de las copias (`/root/.ns-copias-clave`) y las claves de Backblaze (`rclone config show b2ns`) se volvieron a sacar del servidor y están guardadas y comprobadas.
+
+**Siguiente paso acordado (por este orden).**
+
+1. Cuando Clouding confirme el desbloqueo: `bash /opt/ns-network/deploy/correo.sh probar mmejiasnaranjo@gmail.com` (no hace falta reconfigurar). Si llega a spam, revisar SPF y DKIM de networkspain.com en IONOS.
+2. Si Clouding no desbloquea: plan B, **Brevo** por el puerto 2525 con el remitente `hola@networkspain.com` (solo configuración, con `correo.sh configurar`), más la verificación del dominio en Brevo.
+3. Opcional, sin urgencia: perfil de firewall propio en Clouding con solo 22, 80 y 443 de entrada. El "default" deja entrar 21, 25, 110, 143, 3306 y otros puertos; hoy `ufw` los bloquea.
+4. Lo de siempre: confirmar especialidades Manantial y forma jurídica en el alta; notificaciones push (D-039); Protocolo II (Comunicado y Gaceta) y Brújula; resto de `docs/08` con el abogado.
+
 ## 22 de septiembre de 2026 (noche) · Manantial en el servidor y copias fuera
 
 **Dónde estamos.**
