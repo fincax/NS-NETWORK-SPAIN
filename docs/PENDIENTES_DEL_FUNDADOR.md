@@ -40,7 +40,7 @@ Lo que se ha dejado deliberadamente "para más adelante". Claude lo recuerda cua
 
 ## Producto
 
-- Tipografía definitiva (D-023). El 22-09 se presentaron al fundador la actual (Newsreader + IBM Plex Sans) y tres alternativas: A · Source Serif 4 + Source Sans 3 (institucional), B · Instrument Serif + Inter (editorial contemporánea), C · DM Serif Display + DM Sans (moderna con carácter). Pendiente de elección.
+- ~~Tipografía definitiva (D-023)~~. El 22-09 se presentaron al fundador la actual (Newsreader + IBM Plex Sans) y tres alternativas: A · Source Serif 4 + Source Sans 3 (institucional), B · Instrument Serif + Inter (editorial contemporánea), C · DM Serif Display + DM Sans (moderna con carácter). → Elegida la B (D-064).
 - Política de notificaciones push (D-039).
 - **Latido de la demo** (D-057): el banco tiene 24 Indicios y se repite cada ocho días; ampliarlo si la ronda de demos se alarga. Confirmar la protagonista (hoy Reformas Industriales Híspalis · Carlos Ruiz) o fijar otra con `NS_LATIDO_PROTAGONISTA`. Decidir si la demo pasa al modelo real (`ANTHROPIC_API_KEY`), con el que el Latido encola en la Mesa en vez de cualificar en línea.
 - **Pregunta al cedente** (D-058): el tope de dos rondas y el reinicio del plazo de 7 días en cada ida y vuelta son parámetros iniciales; revisar con Timoneles reales. Sin clave del modelo, el Agente del cedente no deja borrador (el determinista no responde preguntas libres).

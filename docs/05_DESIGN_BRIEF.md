@@ -98,6 +98,7 @@ Reglas:
 - **Mono** solo para identificadores, timestamps del Agent Room y datos técnicos.
 - Escala tipográfica generosa: los titulares de la web pública pueden ser enormes. Las cifras de valor (€42.000 – €67.000) son protagonistas y merecen tratamiento tipográfico propio (tabular figures, peso, tracking).
 - Propón 2–3 combinaciones y elige una con argumentos. Todas con licencia apta para producto y web.
+- **Elegida (D-064):** **Instrument Serif** para titulares y cifras de valor, **Inter** para la interfaz y el texto, **IBM Plex Mono** para identificadores y horas. Instrument Serif solo tiene peso 400: los titulares nunca van en negrita.
 
 ### 4.5 Tendencias que sí y que no
 

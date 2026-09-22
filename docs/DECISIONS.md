@@ -1540,3 +1540,22 @@ Servicio a la red        10 %   solo suma: acciones de dirección del mes (3 = 1
 
 **Revisit when.** Se conozca el coste real del Agente por empresa y antes de cobrar a la primera empresa real.
 
+---
+
+## D-064 · Tipografía: Instrument Serif para títulos, Inter para texto
+
+**Status:** CONFIRMED (el fundador elige la opción B)
+**Date:** 2026-09-22
+
+**Context.** D-023 dejaba la tipografía pendiente; la app usaba una propuesta provisional (Newsreader + IBM Plex Sans). El 22-09 se presentaron al fundador cuatro muestras con el mismo contenido (portada, tarjeta de Cesión y texto de Hoy).
+
+**Options.** Actual: Newsreader + IBM Plex Sans. A · Institucional: Source Serif 4 + Source Sans 3. B · Editorial contemporánea: Instrument Serif + Inter. C · Moderna con carácter: DM Serif Display + DM Sans.
+
+**Choice.** **B.** Títulos y cifras de valor en **Instrument Serif**; interfaz y texto en **Inter**; identificadores, horas y etiquetas en **IBM Plex Mono**, que se mantiene. Todas con licencia libre (SIL OFL) para web y producto.
+
+**Why.** Da el tono premium, europeo y contemporáneo que pide la constitución (§20 y §21) sin parecer una institución bancaria, y los titulares estrechos tienen mucha presencia en la web pública. Inter es de las letras más legibles en pantallas pequeñas, que es donde el Timonel decide.
+
+**Consequences.** `layout.tsx` carga Instrument Serif, Inter e IBM Plex Mono; `globals.css` cambia las variables `--font-display` y `--font-sans`, y los titulares pasan a peso 400 porque Instrument Serif no tiene negrita. `docs/05` §4.4 recoge la elección. Pendiente: aplicarla a los correos y a los PDF exportados cuando se revisen.
+
+**Revisit when.** Algún titular largo se lea mal en móvil, o se registre la marca y se necesite una letra con licencia comercial exclusiva.
+
