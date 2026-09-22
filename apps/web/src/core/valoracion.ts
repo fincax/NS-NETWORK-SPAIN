@@ -2,9 +2,8 @@
  * Valoración mensual del titular (D-046). Funciones puras.
  *
  * Es un porcentaje explicable, nunca un número opaco (constitución §14): cada componente se ve con su peso,
- * su valor y su evidencia. Mide calidad y fiabilidad, nunca cantidad (D-045). Sirve para dos umbrales:
- *   - Embajada: al menos 80 % de Valoración durante un mes completo.
- *   - Candidatura a Director/a de Sala: el mismo umbral.
+ * su valor y su evidencia. Mide calidad y fiabilidad, nunca cantidad (D-045). Sirve para un umbral:
+ *   - Embajada: al menos 80 % de Valoración durante un mes completo. (La candidatura a Director/a de Sala desapareció con D-061.)
  * Los componentes sin datos en el mes no cuentan ni a favor ni en contra: el peso se reparte entre los que sí tienen datos.
  * Sin datos en ningún componente no hay Valoración ("sin datos suficientes"), y no se cumple ningún umbral.
  */
@@ -54,7 +53,6 @@ export interface Valoracion {
   score: number | null; // 0..1; null si no hay datos suficientes
   components: ValoracionComponent[];
   eligibleEmbajada: boolean;
-  eligibleDireccion: boolean;
 }
 
 export function verdictScore(v: { ease: number; business: number; treatment: number; need_was_real: boolean }): number {
@@ -76,7 +74,7 @@ export function computeValoracion(input: ValoracionInput): Valoracion {
   const totalWeight = available.reduce((a, x) => a + x.weight, 0);
   const score = totalWeight > 0 ? available.reduce((a, x) => a + (x.value as number) * x.weight, 0) / totalWeight : null;
   const eligible = score !== null && score >= VALORACION.threshold;
-  return { score, components: c, eligibleEmbajada: eligible, eligibleDireccion: eligible };
+  return { score, components: c, eligibleEmbajada: eligible };
 }
 
 /** Primer día (UTC) del mes al que pertenece la fecha. */

@@ -1487,3 +1487,20 @@ Servicio a la red        10 %   solo suma: acciones de dirección del mes (3 = 1
 
 **Revisit when.** Los correos lleguen a spam con frecuencia, NS envíe más de unos cientos al día (Gaceta, avisos del Compromiso, notificaciones), o haga falta saber si un correo se abrió: entonces, servicio de envío europeo con las mismas plantillas.
 
+---
+
+## D-061 · Se queda "Directiva"; desaparece "Director/a de Sala"
+
+**Status:** CONFIRMED (decisión del fundador)
+**Date:** 2026-09-22
+
+**Context.** D-046 y D-048 introdujeron la figura "Director/a de Sala", con candidatura por un 80 % de Valoración durante un mes, para sustituir a la provisional "Directiva". La app y los documentos seguían usando "Directiva" en casi todas partes, y el léxico tenía las dos palabras.
+
+**Choice.** Se queda **Directiva** para quien dirige una Sala. **"Director/a de Sala" no existirá**: ni como nombre ni como candidatura. Las funciones de D-048 (acciones entre Salas, dudas resueltas entre Timoneles, que suman Valoración) y las de siempre (Antesala, excepciones, propuesta de bajas) son de la Directiva. El 80 % de Valoración sigue siendo el umbral para la Embajada (D-046), y solo para eso.
+
+**Why.** Una sola palabra, la que la app ya usa y los Timoneles ya ven. La candidatura por Valoración no añadía nada que la Directiva no cubra.
+
+**Consequences.** Fuera el distintivo "Candidata a Director/a de Sala" del Dossier y el campo `eligibleDireccion`. Textos y errores dicen "Directiva". Actualizados la constitución (§10 y Embajada), el léxico, `docs/00`, `docs/14` y los pendientes. D-046 y D-048 siguen vigentes en todo lo demás. Pendiente: composición, elección y mandato de la Directiva.
+
+**Revisit when.** Se defina cómo se compone y se elige la Directiva de una Sala.
+

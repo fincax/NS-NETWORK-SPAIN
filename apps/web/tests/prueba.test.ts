@@ -82,10 +82,10 @@ describe("Prueba de Valor (D-050)", () => {
   let trialId: string;
   let trialCompanyId: string;
 
-  it("solo un Director/a la inicia y solo con especialidad clasificada", async () => {
+  it("solo la Directiva la inicia y solo con especialidad clasificada", async () => {
     const cand = (await db.query.betaRequests.findFirst({ where: eq(schema.betaRequests.companyName, "Redes del Sur Telecom") }))!;
     candidacyId = cand.id;
-    await expect(startValueTrial(db, { chapterId, candidacyId, memberId: lucia().memberId })).rejects.toThrow(/Director/);
+    await expect(startValueTrial(db, { chapterId, candidacyId, memberId: lucia().memberId })).rejects.toThrow(/Directiva/);
     const unclassified = (await db.query.betaRequests.findFirst({ where: eq(schema.betaRequests.companyName, "Beltrán Consultores") }))!;
     await expect(startValueTrial(db, { chapterId, candidacyId: unclassified.id, memberId: director().memberId })).rejects.toThrow(/especialidad/);
     const t = await startValueTrial(db, { chapterId, candidacyId, memberId: director().memberId });

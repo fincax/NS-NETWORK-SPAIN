@@ -34,7 +34,7 @@ export async function valoracionActual(db: Db, chapterId: string, companyId: str
   return { decisive, current };
 }
 
-/** D-046: apta para Embajada (y candidata a Director/a de Sala) si el último mes completo alcanzó el 80 %. */
+/** D-046: apta para Embajada si el último mes completo alcanzó el 80 %. */
 export async function eligibleForEmbajada(db: Db, chapterId: string, companyId: string, now = new Date()) {
   const v = await valoracionMensual(db, chapterId, companyId, lastCompletedMonthStart(now));
   return { eligible: v.eligibleEmbajada, score: v.score, month: v.monthLabel };

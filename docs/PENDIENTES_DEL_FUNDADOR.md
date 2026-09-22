@@ -13,7 +13,7 @@ Lo que se ha dejado deliberadamente "para más adelante". Claude lo recuerda cua
 
 ## Estructura y gobierno
 
-- ~~Nombre de la dirección de la Sala~~ → **Director/a de Sala** (D-046). Pendientes: composición (una persona o varias), cómo se elige entre las candidatas con ≥ 80 % de Valoración, duración del mandato.
+- ~~Nombre de la dirección de la Sala~~ → **Directiva** (D-061; "Director/a de Sala" desaparece). Pendientes: composición de la Directiva (una persona o varias), cómo se elige y duración del mandato.
 - **Calibración de la Valoración** (D-046): pesos de los cinco componentes, umbral de tres acciones de dirección, Mérito por acción (D-048), Mérito de Red por Sala adicional (D-047). Tras el primer mes de la Sala piloto.
 - **Cesiones abiertas en el momento de la baja** (D-044).
 - **Panel de NS.** Hoy NS confirma las bajas desde la Antesala de la Sala con el rol `is_network`. Falta un panel propio de la red.
