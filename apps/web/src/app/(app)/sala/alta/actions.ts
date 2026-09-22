@@ -9,7 +9,7 @@ import { activateCandidacy } from "@/services/antesala";
 import { cookies } from "next/headers";
 import { MEMBER_COOKIE } from "@/lib/session";
 import { authMode } from "@/lib/auth";
-import { createInvite } from "@/lib/accounts";
+import { inviteByMail } from "@/services/correo";
 
 const slugify = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
@@ -52,9 +52,11 @@ export async function onboardAction(formData: FormData) {
   if (candidacyId) await activateCandidacy(db, candidacyId, company.id);
   revalidatePath("/", "layout");
   if (authMode() === "real") {
-    // Cuentas personales (D-054): la Directiva recibe el enlace de acceso del nuevo Timonel; él hará la entrevista al entrar.
-    const { token } = await createInvite(db, { memberId: member.id, createdBy: (await requireMember()).member.id });
-    redirect(`/empresa/${company.slug}?invite=${encodeURIComponent(token)}`);
+    // Cuentas personales (D-054): el nuevo Timonel recibe su enlace de acceso por correo (D-060); él hará la entrevista al entrar.
+    // Sin correo configurado, o si el envío falla, la Directiva ve el enlace para hacérselo llegar.
+    const r = await inviteByMail(db, { memberId: member.id, createdBy: (await requireMember()).member.id });
+    if (r.sent) redirect(`/empresa/${company.slug}?enviado=${encodeURIComponent(r.email)}`);
+    redirect(`/empresa/${company.slug}?invite=${encodeURIComponent(r.token)}${r.error ? "&correo=fallo" : ""}`);
   }
   // En la demo, la sesión pasa al nuevo Timonel para que haga la entrevista.
   const jar = await cookies();

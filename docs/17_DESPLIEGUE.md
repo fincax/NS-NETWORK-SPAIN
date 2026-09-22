@@ -47,9 +47,9 @@ Estas son las cinco cosas que faltan hoy y que hacen imprudente abrir la puerta 
 
 | # | Qué falta | Por qué es imprescindible | Esfuerzo estimado |
 | --- | --- | --- | --- |
-| 1 | **Usuarios con contraseña y permisos por Sala** | Hecho (D-054): cuentas personales con `NS_AUTH_MODE=real`, sesiones visibles, enlaces de acceso de un solo uso y registro de accesos. Falta el envío de correos de invitación. | Hecha · correos 1 día |
+| 1 | **Usuarios con contraseña y permisos por Sala** | Hecho (D-054, D-060): cuentas personales con `NS_AUTH_MODE=real`, sesiones visibles, enlaces de acceso de un solo uso, registro de accesos, e invitación y recuperación de contraseña por correo desde `hola@networkspain.com`. Falta configurar el buzón en el servidor (`deploy/correo.sh configurar`). | Hecha |
 | 2 | **Los Agentes en segundo plano con el modelo real** | Hecha en su primera versión (D-053): cola persistente `agent_jobs`, reintentos, `NEEDS_HUMAN`, drenaje tras publicar, en la Ronda y por `/api/jobs`. Falta probarla con la clave del modelo en el servidor y medir tiempos. | Hecha · validar 2 días |
-| 3 | **Copias de seguridad y registro de accesos** | Hecho (D-054, D-056): registro de accesos; copia nocturna cifrada con restauración probada en cada copia, 30 días, estado visible para la Directiva en Hoy (`deploy/copias.sh`). Falta que el fundador configure el remoto para que salgan del servidor y guarde la clave. | Hecha · remoto 1 hora |
+| 3 | **Copias de seguridad y registro de accesos** | Hecho (D-054, D-056): registro de accesos; copia nocturna cifrada con restauración probada en cada copia, 30 días, estado visible para la Directiva en Hoy (`deploy/copias.sh`). El remoto está configurado en Backblaze B2 (UE) desde el 22 de septiembre y la clave está guardada fuera del servidor. | Hecha |
 | 4 | **Textos legales y GDPR** | Hecho el aviso de privacidad de la web pública con consentimiento registrado en la candidatura (D-055, `docs/08` §2). Faltan condiciones de la plaza (con las reglas inmutables y la cuota por Tramos), base jurídica de los datos de terceros, retención y borrado (`docs/08` §3). | 1 semana con un abogado |
 | 5 | **La entrevista del ADN por el Agente** | Hecha en su primera versión (D-040): el alta desemboca en la entrevista, el ADN se construye conversando y se valida al final. Falta afinarla con Timoneles reales y con la clave del modelo en el servidor. | Hecha · afinar 2 días |
 
@@ -146,6 +146,16 @@ bash /opt/ns-network/deploy/copias.sh restaurar /var/backups/ns-network/ns-AAAAM
 
 Para mirar cómo van: `bash /opt/ns-network/deploy/copias.sh listar` y `tail -n 20 /var/log/ns-copias.log`.
 
+**Correo saliente (D-060).** Para que NS envíe las invitaciones y los enlaces de "¿Has olvidado tu contraseña?" desde `hola@networkspain.com`, necesitas los datos SMTP de ese buzón (servidor, puerto, usuario y contraseña; tu proveedor de correo los da en "SMTP" o "correo saliente"). En el servidor:
+
+```bash
+bash /opt/ns-network/deploy/correo.sh configurar     # pregunta los datos, los guarda, reinicia y envía una prueba
+bash /opt/ns-network/deploy/correo.sh probar tu@correo   # otra prueba cuando quieras
+bash /opt/ns-network/deploy/correo.sh quitar         # deja de enviar
+```
+
+Los correos solo se usan con `NS_AUTH_MODE=real`; en la demo no hay invitaciones. Para que no lleguen a spam, el dominio debe tener los registros SPF y DKIM de tu proveedor de correo.
+
 **Para actualizar cuando haya código nuevo en `main`:**
 
 ```bash
@@ -162,14 +172,14 @@ tail -n 20 /var/log/ns-ronda.log   # la Ronda de las mañanas
 
 **Si algo falla:** vuelve a lanzar `bash instalar.sh networkspain.com tucorreo@tuempresa.es`. No borra nada: respeta las contraseñas y la base de datos que ya existan.
 
-**Para pasar a empresas reales** (cuando se cumpla la puerta de Fase 1): en `.env.production` cambia `NS_AUTH_MODE=demo` por `NS_AUTH_MODE=real`, reinicia con `pm2 restart ns-network --update-env`, y la Directiva genera desde el Dossier de cada Timonel su enlace de acceso (D-054).
+**Para pasar a empresas reales** (cuando se cumpla la puerta de Fase 1): en `.env.production` cambia `NS_AUTH_MODE=demo` por `NS_AUTH_MODE=real`, reinicia con `pm2 restart ns-network --update-env`, y la Directiva envía desde el Dossier de cada Timonel su enlace de acceso (D-054); con el correo configurado le llega a su buzón (D-060).
 
 ## 4b. Cómo se despliega, técnicamente (para quien lo haga)
 
 ```text
 Alojamiento     Vercel (región fra1) o servidor propio con Node 22 y pnpm.
 Base de datos   PostgreSQL 16 gestionado en la UE. Variable DATABASE_URL. Las migraciones se aplican al arrancar.
-Variables       DATABASE_URL · NS_AUTH_MODE · DEMO_USER · DEMO_PASSWORD · DEMO_SESSION_SECRET · NS_SEED_PASSWORD (solo demo) · CRON_SECRET · NS_PUBLIC_URL · ANTHROPIC_API_KEY (opcional) · NS_LLM_MODEL · NS_LLM_PROVIDER · NS_LATIDO y NS_LATIDO_PROTAGONISTA (solo demo, D-057)
+Variables       DATABASE_URL · NS_AUTH_MODE · DEMO_USER · DEMO_PASSWORD · DEMO_SESSION_SECRET · NS_SEED_PASSWORD (solo demo) · CRON_SECRET · NS_PUBLIC_URL · ANTHROPIC_API_KEY (opcional) · NS_LLM_MODEL · NS_LLM_PROVIDER · NS_LATIDO y NS_LATIDO_PROTAGONISTA (solo demo, D-057) · NS_SMTP_HOST, NS_SMTP_PORT, NS_SMTP_USER, NS_SMTP_PASSWORD, NS_MAIL_FROM (correo, D-060)
 Comandos        pnpm install && pnpm build && pnpm start   ·   pnpm db:seed (solo demo)   ·   pnpm clock (Ronda diaria, equivale a GET /api/clock)
 Tareas          La Ronda (Reloj + Rastreo) cada mañana: vercel.json la programa; en otro alojamiento, un cron que llame a /api/clock con el CRON_SECRET. La Mesa y el Latido de la demo: /api/jobs cada cinco minutos.
 Copias          deploy/copias.sh: pg_dump cifrado (AES-256, clave en /root/.ns-copias-clave), restauración de prueba en cada copia, 30 días, rclone → remoto "ns-copias", estado en /var/lib/ns-network/copias.json (NS_BACKUP_STATUS_FILE).

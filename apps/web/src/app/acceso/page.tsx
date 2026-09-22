@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Monogram } from "@/components/brand";
 import { accountLoginAction, loginAction } from "./actions";
 import { authMode } from "@/lib/auth";
+import { mailEnabled } from "@/lib/mail";
 
 export const dynamic = "force-dynamic";
 
@@ -28,7 +29,7 @@ export default async function AccesoPage({ searchParams }: { searchParams: Promi
             <div className="field"><label htmlFor="p">Contraseña</label><input id="p" name="password" type="password" autoComplete="current-password" required /></div>
             <button className="btn primary" type="submit">Entrar</button>
           </form>
-          <p className="mono">¿Sin contraseña o la has olvidado? Pide a la Directiva de tu Sala un enlace de acceso. ¿Sin plaza? <Link href="/#plaza">Solicítala</Link>.</p>
+          {mailEnabled() ? <p className="mono"><Link href="/acceso/recuperar">¿Has olvidado tu contraseña?</Link> ¿Sin plaza? <Link href="/#plaza">Solicítala</Link>.</p> : <p className="mono">¿Sin contraseña o la has olvidado? Pide a la Directiva de tu Sala un enlace de acceso. ¿Sin plaza? <Link href="/#plaza">Solicítala</Link>.</p>}
         </div>
       </main>
     );

@@ -12,7 +12,7 @@ Punto de parada y siguiente paso. Se actualiza al cerrar cada sesión de trabajo
 
 **Siguiente paso acordado (por este orden).**
 
-1. Envío de correos para invitaciones y recuperación de contraseña (D-054); después notificaciones push (D-039).
+1. ~~Envío de correos (D-054)~~ → construido la misma noche (D-060), en la rama `claude/upbeat-babbage-797ls6`: invitación y recuperación de contraseña por correo desde `hola@networkspain.com` (SMTP), `deploy/correo.sh configurar` para el servidor. 146 pruebas en verde, tipos y lint limpios, build correcto y recorridos de navegador con y sin correo. **Pendiente de fusionar, de `actualizar.sh` y de los datos SMTP del buzón.** Los correos se usan solo en modo real (`NS_AUTH_MODE=real`). Después: notificaciones push (D-039).
 2. Confirmar con el fundador la lista de especialidades Manantial de NS-CAT v0.1 y la forma jurídica en el alta.
 3. Opcional: probar una restauración completa una vez (`copias.sh restaurar`), acompañado; `ANTHROPIC_API_KEY` en `.env.production`.
 4. Después: resto de `docs/08` con el abogado, Protocolo II (Comunicado y Gaceta) y Brújula, con el Apunte de Interesado múltiple.
