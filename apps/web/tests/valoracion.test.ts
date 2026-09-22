@@ -81,8 +81,8 @@ describe("Valoración · con datos reales de la Sala", () => {
     expect((await eligibleForEmbajada(db, chapterId, lucia().companyId)).eligible).toBe(false);
   });
 
-  it("una acción de dirección suma puntos de Valoración solo a un Director/a", async () => {
-    await expect(logDirectorAction(db, { chapterId, memberId: lucia().memberId, kind: "INTERCHAPTER", text: "Encuentro con NS Ágora para cruzar plazas vacantes" })).rejects.toThrow(/Director/);
+  it("una acción de dirección suma puntos de Valoración solo a la Directiva", async () => {
+    await expect(logDirectorAction(db, { chapterId, memberId: lucia().memberId, kind: "INTERCHAPTER", text: "Encuentro con NS Ágora para cruzar plazas vacantes" })).rejects.toThrow(/Directiva/);
     await expect(logDirectorAction(db, { chapterId, memberId: director().memberId, kind: "QUERY", text: "corto" })).rejects.toThrow(/frase/);
     const r = await logDirectorAction(db, { chapterId, memberId: director().memberId, kind: "INTERCHAPTER", text: "Encuentro con NS Ágora para cruzar plazas vacantes de obra e instalaciones" });
     expect(r.kind).toBe("DIRECTOR_INTERCHAPTER_ACTION");

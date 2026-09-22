@@ -77,7 +77,7 @@ export async function releaseAction(formData: FormData) {
   redirect(`/antesala?vista=${view}`);
 }
 
-/** Acción de dirección (D-048): entre Salas o duda resuelta. Suma Valoración a la empresa del Director/a. */
+/** Acción de dirección (D-048): entre Salas o duda resuelta. Solo la Directiva; suma Valoración a su empresa (D-061). */
 export async function directorActionAction(formData: FormData) {
   const { member, chapter } = await requireMember();
   const db = await getDb();

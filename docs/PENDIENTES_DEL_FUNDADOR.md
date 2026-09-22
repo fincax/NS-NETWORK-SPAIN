@@ -13,7 +13,7 @@ Lo que se ha dejado deliberadamente "para más adelante". Claude lo recuerda cua
 
 ## Estructura y gobierno
 
-- ~~Nombre de la dirección de la Sala~~ → **Director/a de Sala** (D-046). Pendientes: composición (una persona o varias), cómo se elige entre las candidatas con ≥ 80 % de Valoración, duración del mandato.
+- ~~Nombre de la dirección de la Sala~~ → **Directiva** (D-061; "Director/a de Sala" desaparece). Pendientes: composición de la Directiva (una persona o varias), cómo se elige y duración del mandato.
 - **Calibración de la Valoración** (D-046): pesos de los cinco componentes, umbral de tres acciones de dirección, Mérito por acción (D-048), Mérito de Red por Sala adicional (D-047). Tras el primer mes de la Sala piloto.
 - **Cesiones abiertas en el momento de la baja** (D-044).
 - **Panel de NS.** Hoy NS confirma las bajas desde la Antesala de la Sala con el rol `is_network`. Falta un panel propio de la red.
@@ -23,7 +23,7 @@ Lo que se ha dejado deliberadamente "para más adelante". Claude lo recuerda cua
 
 ## Modelo económico (D-025, D-041)
 
-- Importes de la cuota, si existe cuota de incorporación, número de Tramos, umbrales y periodo de revisión.
+- ~~Si existe cuota de incorporación~~ → sí: cuota inicial y cuota mensual, las dos muy bajas (D-063). ~~Periodo de revisión~~ → el Ejercicio es el año natural (D-062). Pendiente: los importes, que anunciará el fundador, el número de Tramos y los umbrales.
 - Mínimo real de fundadoras y gratificación definitiva de la Promotora.
 
 ## Fuentes públicas y Prueba de Valor (D-050, D-051)
@@ -40,11 +40,11 @@ Lo que se ha dejado deliberadamente "para más adelante". Claude lo recuerda cua
 
 ## Producto
 
-- Tipografía definitiva (D-023).
+- ~~Tipografía definitiva (D-023)~~. El 22-09 se presentaron al fundador la actual (Newsreader + IBM Plex Sans) y tres alternativas: A · Source Serif 4 + Source Sans 3 (institucional), B · Instrument Serif + Inter (editorial contemporánea), C · DM Serif Display + DM Sans (moderna con carácter). → Elegida la B (D-064).
 - Política de notificaciones push (D-039).
 - **Latido de la demo** (D-057): el banco tiene 24 Indicios y se repite cada ocho días; ampliarlo si la ronda de demos se alarga. Confirmar la protagonista (hoy Reformas Industriales Híspalis · Carlos Ruiz) o fijar otra con `NS_LATIDO_PROTAGONISTA`. Decidir si la demo pasa al modelo real (`ANTHROPIC_API_KEY`), con el que el Latido encola en la Mesa en vez de cualificar en línea.
 - **Pregunta al cedente** (D-058): el tope de dos rondas y el reinicio del plazo de 7 días en cada ida y vuelta son parámetros iniciales; revisar con Timoneles reales. Sin clave del modelo, el Agente del cedente no deja borrador (el determinista no responde preguntas libres).
 - ~~**Copias de seguridad** (D-056): clave guardada fuera del servidor y remoto `ns-copias` en Backblaze B2 (UE), hecho el 22-09.~~ Queda hacer una restauración completa de prueba una vez.
-- **Correo saliente** (D-060): conseguir los datos SMTP del buzón `hola@networkspain.com` (servidor, puerto, usuario, contraseña) y lanzar `bash /opt/ns-network/deploy/correo.sh configurar`. Comprobar con el proveedor que el dominio tiene SPF y DKIM, para que los correos no lleguen a spam.
+- **Correo saliente** (D-060): configurado en el servidor con IONOS (`smtp.ionos.es`, 465) el 22-09. **Pendiente de que soporte de Clouding desbloquee la salida por los puertos 465 y 587** (ticket abierto por el fundador). Después: `correo.sh probar` y, si los correos llegan a spam, SPF y DKIM del dominio en IONOS. Plan B: Brevo por el puerto 2525.
 - Textos legales y GDPR (`docs/08`, condición 4 de `docs/17`). Hecho el aviso de privacidad de la web pública (D-055); falta el resto de `docs/08` §3 con el abogado.
 - ~~Responsable del tratamiento~~ → Be Trendy, S.L. (D-055, aviso 2026-09-15.3). Buzón de contacto: `hola@networkspain.com` (o `NS_CONTACT_EMAIL` en el servidor); comprobar que recibe correo.

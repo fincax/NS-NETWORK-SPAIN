@@ -122,7 +122,6 @@ export default async function EmpresaPage({ params, searchParams }: { params: Pr
           <div><p className="eyebrow">Valoración · {valoracion.decisive.monthLabel}</p><strong style={{ fontSize: 22 }}>{pct(valoracion.decisive.score)}</strong> <span className="mono">· en curso ({valoracion.current.monthLabel}): {pct(valoracion.current.score)}</span></div>
           <div className="row" style={{ gap: 8 }}>
             <span className={`badge ${valoracion.decisive.eligibleEmbajada ? "green" : ""}`}>{valoracion.decisive.eligibleEmbajada ? "Apta para Embajada" : `Embajada: ≥ ${Math.round(VALORACION.threshold * 100)} % un mes`}</span>
-            <span className={`badge ${valoracion.decisive.eligibleDireccion ? "green" : ""}`}>{valoracion.decisive.eligibleDireccion ? "Candidata a Director/a de Sala" : "Dirección: mismo umbral"}</span>
           </div>
         </div>
         <ul className="plain" style={{ marginTop: 10 }}>

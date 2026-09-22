@@ -16,6 +16,8 @@ pdfmetrics.registerFont(TTFont('SerifI', F+'liberation/LiberationSerif-Italic.tt
 pdfmetrics.registerFont(TTFont('Sans', F+'dejavu/DejaVuSans.ttf'))
 pdfmetrics.registerFont(TTFont('SansB', F+'dejavu/DejaVuSans-Bold.ttf'))
 pdfmetrics.registerFont(TTFont('Mono', F+'dejavu/DejaVuSansMono.ttf'))
+pdfmetrics.registerFontFamily('Sans', normal='Sans', bold='SansB', italic='Sans', boldItalic='SansB')
+pdfmetrics.registerFontFamily('Serif', normal='Serif', bold='SerifB', italic='SerifI', boldItalic='SerifB')
 
 OBSIDIAN=colors.HexColor('#0B0D10'); GRAPHITE=colors.HexColor('#1A1D22')
 PORCELAIN=colors.HexColor('#F4F1EC'); BLUE=colors.HexColor('#0F2A4A')
@@ -42,10 +44,11 @@ sMono=sty('mono', fontName='Mono', fontSize=7.6, leading=10, textColor=GREY)
 sHead=sty('head', fontName='Mono', fontSize=7.2, leading=9, textColor=PORCELAIN)
 sQuote=sty('q', fontName='SerifI', fontSize=12, leading=16, textColor=BLUE, leftIndent=10)
 
-def table(rows, widths, header=('TÉRMINO','QUÉ ES','ID TÉCNICO')):
+def table(rows, widths=None, header=('TÉRMINO','QUÉ ES')):
+    widths=widths or WIDTHS
     data=[[Paragraph(h,sHead) for h in header]]
     for r in rows:
-        data.append([Paragraph(r[0],sTerm), Paragraph(r[1],sCell), Paragraph(r[2],sMono)])
+        data.append([Paragraph(r[0],sTerm), Paragraph(r[1],sCell)])
     t=Table(data, colWidths=widths, repeatRows=1)
     st=[('BACKGROUND',(0,0),(-1,0),BLUE),
         ('VALIGN',(0,0),(-1,-1),'TOP'),
@@ -57,7 +60,7 @@ def table(rows, widths, header=('TÉRMINO','QUÉ ES','ID TÉCNICO')):
     t.setStyle(TableStyle(st)); return t
 
 CW=W-2*M
-WIDTHS=[CW*0.20, CW*0.58, CW*0.22]
+WIDTHS=[CW*0.24, CW*0.76]
 
 def cover(c, doc):
     c.saveState()
@@ -67,186 +70,182 @@ def cover(c, doc):
     c.setFillColor(PORCELAIN); c.setFont('Serif',15); c.drawCentredString(M+8*mm,H-64.5*mm,'NS')
     c.setFillColor(AMBER); c.rect(M,52*mm,28*mm,1.2,fill=1,stroke=0)
     c.setFillColor(colors.HexColor('#8A9098')); c.setFont('Mono',7.5)
-    c.drawString(M,44*mm,'NS NETWORK SPAIN · LÉXICO OFICIAL · v0.4 · 11 SEPTIEMBRE 2026')
-    c.drawString(M,39*mm,'DECISIONES D-013 A D-021 · DOCUMENTO INTERNO DEL EQUIPO FUNDADOR')
+    c.drawString(M,44*mm,'NS NETWORK SPAIN · LÉXICO OFICIAL · v0.5 · 22 SEPTIEMBRE 2026')
+    c.drawString(M,39*mm,'DECISIONES D-013 A D-063 · DOCUMENTO INTERNO DEL EQUIPO FUNDADOR')
     c.restoreState()
 
 def later(c, doc):
     c.saveState()
     c.setFillColor(BLUE); c.rect(0,H-6*mm,W,6*mm,fill=1,stroke=0)
     c.setFont('Mono',7); c.setFillColor(GREY)
-    c.drawString(M,10*mm,'NS Network Spain · Léxico oficial v0.4')
+    c.drawString(M,10*mm,'NS Network Spain · Léxico oficial v0.5')
     c.drawRightString(W-M,10*mm,'%d' % doc.page)
     c.restoreState()
 
-doc=SimpleDocTemplate('NS_Lexico_v0.4.pdf', pagesize=A4, leftMargin=M, rightMargin=M, topMargin=16*mm, bottomMargin=18*mm,
-                      title='NS Network · Léxico oficial', author='NS Network Spain', subject='Naming de estructura, protocolos, reputación y día a día')
+
+doc=SimpleDocTemplate('NS_Lexico_v0.5.pdf', pagesize=A4, leftMargin=M, rightMargin=M, topMargin=16*mm, bottomMargin=18*mm,
+                      title='NS Network · Léxico oficial v0.5', author='NS Network Spain', subject='El lenguaje propio de NS: red, negocio, reputación, Agente, protocolos y reglas')
 S=[]
-# Cover
+# Portada
 S.append(Spacer(1,78*mm))
 S.append(Paragraph('Léxico NS', sTitle))
 S.append(Spacer(1,4*mm))
-S.append(Paragraph('El lenguaje propio de NS Network: estructura, protocolos, flujo de negocio, reputación y día a día.', sSub))
+S.append(Paragraph('El lenguaje propio de NS Network: la red y sus personas, el negocio, la reputación, el Agente, los tres protocolos de Sala y las reglas.', sSub))
 S.append(Spacer(1,3*mm))
 S.append(Paragraph('Human trust. Agentic execution. Business without idle time.', sty('m', fontName='SerifI', fontSize=11, leading=14, textColor=colors.HexColor('#AEB4BC'))))
 S.append(PageBreak())
 
-# Intro
+# Introducción
 S.append(Paragraph('Por qué NS tiene lenguaje propio', sH1))
-S.append(Paragraph('NS crea una categoría nueva de producto y necesita nombrar sus objetos y sus rituales con palabras que nadie más use. El léxico es propiedad intelectual y es producto: la web pública, la app y el microcopy hablan con él. Ningún término copia terminología de otras organizaciones de networking.', sBody))
+S.append(Paragraph('NS crea una categoría nueva y necesita nombrar sus objetos y sus rituales con palabras que nadie más use. El léxico es producto: la web pública, la app y cada mensaje del Agente hablan con él. Ningún término copia terminología de otras organizaciones de networking.', sBody))
 S.append(Spacer(1,3*mm))
-S.append(Paragraph('Criterios de cada nombre: castellano; una palabra siempre que sea posible; institucional y sobrio; con sentido literal reconocible; sin pistas territoriales; traducible sin perder el concepto; registrable con el prefijo NS.', sBody))
+S.append(Paragraph('Criterios de cada nombre: castellano; una palabra siempre que sea posible; institucional y sobrio; con sentido literal reconocible; sin pistas territoriales; traducible sin perder el concepto. <b>La única marca registrada es NS Network Spain</b> (D-028): los términos del léxico son lenguaje de producto, no marcas.', sBody))
 S.append(Spacer(1,4*mm))
-S.append(Paragraph('«Los agentes trabajan. Las personas deciden. La reputación se gana con negocio verificado.»', sQuote))
+S.append(Paragraph('«El Agente rema y vigila el horizonte 24/7. El Timonel decide el rumbo.»', sQuote))
 
-# 1 Marca y jerarquía
-S.append(Paragraph('1 · Marca y jerarquía', sH1))
+# 1 Marca y red
+S.append(Paragraph('1 · La red y sus personas', sH1))
 S.append(table([
- ('NS Network','La red mundial. Marca madre.','Network'),
- ('NS España','País. Agrupa las zonas españolas.','Country'),
- ('NS Sevilla','<b>Zona</b>: ciudad o área metropolitana que agrupa Salas. El nombre de la ciudad pertenece a NS; ninguna Sala puede usarlo.','Zone'),
- ('NS Cumbre','<b>Sala</b>: nombre propio elegido por sus fundadoras y autorizado por NS. Prefijo NS, único en toda la red. Nunca un topónimo (ciudad, municipio, provincia, comunidad, país, barrio, distrito) ni ningún término con pista territorial. Ejemplos de demo: NS Cumbre, NS Ágora, NS Meridiana.','Chapter.name'),
-], WIDTHS))
-S.append(Spacer(1,2*mm))
-S.append(Paragraph('Lectura completa: una empresa es miembro de <b>NS Cumbre</b>, Sala de <b>NS Sevilla</b>, dentro de <b>NS España</b>. La Sala no es territorial (principio 16): se define por sus empresas, no por su mapa.', sSmall))
+ ('NS Network Spain','La marca. Paraguas «NS Network» más el país.'),
+ ('Red NS','La red mundial.'),
+ ('Zona','La ciudad o el área metropolitana que agrupa Salas. Lleva el nombre de la ciudad y ese nombre pertenece a NS: «NS Sevilla».'),
+ ('Sala','La unidad fundamental: empresas seleccionadas, una por especialidad. No es territorial: se define por sus empresas, no por un mapa. Nombre propio con prefijo NS, autorizado y único en la red, nunca un topónimo: «NS Cumbre», «NS Ágora».'),
+ ('Plaza','La posición única de una especialidad dentro de una Sala.'),
+ ('Titular','La empresa que ocupa una plaza.'),
+ ('Titularidad','Cada plaza ocupada por una empresa. Una empresa con varias especialidades puede tener varias titularidades, cada una con su Compromiso; repartirlas por Salas distintas da <b>Mérito de Red</b>.'),
+ ('Timonel','La persona que lleva el rumbo de su empresa en NS: da los vistos buenos, autoriza la Apertura, tiende el Puente y emite el Veredicto. El Agente trabaja 24/7; el Timonel manda. Invariable: el Timonel, la Timonel. Cada titular puede designar un <b>Timonel suplente</b>.'),
+ ('Manantial','Un Timonel, un titular, que por su condición de empresa o de profesión es propicio desde el inicio para facilitar multitud de referidos de sectores distintos. Es una condición de la titularidad, no un rol ni una especialidad concreta: administración de fincas, asesoría fiscal, seguros o arquitectura son solo ejemplos. Mismas reglas que cualquier titular. NS los prioriza al fundar Salas y reconoce la amplitud de lo cedido, nunca la cantidad.'),
+ ('Directiva','Quien dirige la Sala: despacha la Antesala, revisa las excepciones, propone bajas a NS, promueve acciones entre Salas y resuelve dudas entre Timoneles. Dirigir bien suma Valoración.'),
+ ('Consejo de Zona','El gobierno de la zona: apertura, escisión y fusión de Salas, y clasificación de especialidades.'),
+ ('Candidatura','La solicitud de plaza y su proceso de admisión, tras pulsar «Solicitar plaza».'),
+ ('Antesala','La lista de espera de empresas que aguardan plaza o fundan la siguiente Sala.'),
+ ('Fundación','El proceso por el que nace una Sala nueva desde la Antesala. La impulsa una <b>Promotora</b>: la empresa cuya plaza estaba ocupada, que recibe una gratificación de cuota si la Sala se funda. Nunca dinero por referidos.'),
+ ('Prueba de Valor','Siete días de Agente para un candidato antes de tener plaza: ve lo que su Agente habría cedido a la Sala y, en agregado, lo que la Sala ya encontró para su especialidad.'),
+ ('Pleno','La reunión periódica de las personas de una Sala.'),
+ ('Confluencia','El encuentro entre dos o más Salas, convocado cuando los Agentes detectan demanda cruzada.'),
+]))
 
-# 2 Estructura
-S.append(Paragraph('2 · Estructura de la red', sH1))
+# 2 Negocio
+S.append(Paragraph('2 · El negocio · Protocolo I · Generar Negocio (NS-ARP)', sH1))
 S.append(table([
- ('Red NS','La red mundial.','Network'),
- ('Zona','Ciudad o área metropolitana que agrupa Salas. Lleva el nombre de la ciudad y pertenece a NS.','Zone'),
- ('Sala','Unidad fundamental: empresas seleccionadas, una por especialidad. No es territorial. Entre 12 y 15 fundadoras, objetivo 25 a 35, tope 40.','Chapter'),
- ('Plaza','Posición única de una especialidad dentro de una Sala.','CategorySeat'),
- ('Titular','Empresa que ocupa una plaza.','seat.company_id'),
- ('Antesala','Lista de espera de empresas admitidas que aguardan plaza o fundan la siguiente Sala.','Waitlist'),
- ('Candidatura','Solicitud de plaza y proceso de admisión. El paso tras «Solicitar plaza».','Application'),
- ('Directiva','Presidencia y consejo de una Sala.','Director'),
- ('Consejo de Zona','Gobierno de la zona: apertura, escisión y fusión de Salas; Comité de Clasificación.','ZoneDirector'),
- ('Pleno','Reunión periódica de las personas de una Sala.','ChapterSession'),
- ('Confluencia','Encuentro entre dos o más Salas, convocado cuando los agentes detectan demanda cruzada. Agenda generada por los agentes.','CrossChapterMeeting'),
-], WIDTHS))
+ ('Interesado','Quien busca un producto o servicio de confianza: empresa, autónomo, persona, asociación, comunidad de propietarios, administración… Es el objeto de toda Cesión y nunca es miembro por serlo. Sustituye a «lead».'),
+ ('Indicio','La señal estructurada de que un Interesado puede tener una necesidad. La materia prima.'),
+ ('Pista','La hipótesis de encaje entre un Indicio y una plaza, formulada por los Agentes y aún sin cualificar.'),
+ ('Encaje','El grado de ajuste explicable entre necesidad y titular, de 0 a 100 %.'),
+ ('Fundamento','La explicación obligatoria de cada Pista: por qué, evidencia, confianza, lo que falta y el siguiente paso.'),
+ ('Salvoconducto','La autorización de cumplimiento (permisos, privacidad, conflictos) para que una Pista llegue a personas.'),
+ ('Visto bueno','La decisión humana de aprobar.'),
+ ('Apertura','El momento en que el cedente autoriza revelar la identidad del Interesado al cesionario.'),
+ ('Cesión','El referido NS: un Interesado con una necesidad concreta que un miembro, el <b>cedente</b>, entrega al titular de esa especialidad en su Sala, el <b>cesionario</b>. Un Interesado puede originar varias Cesiones. Es la unidad que se cualifica, se contrasta y genera Mérito.'),
+ ('Pregunta al cedente','Lo que el cesionario pide saber antes de aceptar. Va al cedente, que responde con el borrador de su Agente, y vuelve como evidencia. Como mucho dos por Cesión.'),
+ ('Interesado avisado','El hecho que distingue una Cesión de verdad: el Interesado sabe que le van a llamar.'),
+ ('Puente','La presentación cálida que conecta al cesionario con el Interesado: la prepara el Agente y la envía la persona. El Interesado ve una <b>Carta de Presentación</b>.'),
+ ('Oportunidad · Cierre','La negociación abierta tras el Puente, y su resultado: ganado, perdido o sin decisión.'),
+ ('Valor contrastado','El valor económico confirmado por ambas partes y verificable por NS. Se anota en el <b>Libro de Valor</b> y es el único que alimenta la métrica principal.'),
+ ('Embajada','Cuando la plaza está vacante en la Sala del cedente, este cede a un titular de otra Sala de la zona, que queda como <b>Embajadora</b> de esa especialidad mientras siga vacante: sin plaza ni voto. Prima de Mérito para el cedente. Si ninguna Sala de la zona la cubre: <b>Embajada en Red</b>.'),
+]))
 
-# 3 Flujo
-S.append(Paragraph('3 · El flujo de negocio · Protocolo I · Generar Negocio (NS-ARP)', sH1))
+# 3 Reputación
+S.append(Paragraph('3 · Calidad, reputación y compromiso', sH1))
 S.append(table([
- ('Interesado','Quien busca un producto o servicio de confianza: empresa, persona física, autónomo, asociación, fundación, comunidad de propietarios, administración… Es el objeto de toda Cesión. Si es persona física, su identidad solo se revela con base jurídica y consentimiento.','ThirdParty'),
- ('Indicio','Señal estructurada de que un Interesado puede tener una necesidad. La materia prima.','OpportunitySignal'),
- ('Pista','Hipótesis de encaje entre un Indicio y una plaza, formulada por los agentes y aún sin cualificar.','MatchCandidate'),
- ('Encaje','Grado de ajuste explicable entre necesidad y titular, de 0 a 100 %.','NSMatchScore'),
- ('Fundamento','Explicación obligatoria de una Pista: por qué, evidencia, confianza, incógnitas, siguiente paso.','Explanation'),
- ('Salvoconducto','Veredicto de Cumplimiento que autoriza a una Pista a llegar a personas.','ComplianceVerdict'),
- ('Visto bueno','Decisión humana de aprobar (cedente, cesionario o Directiva).','HumanDecision.APPROVE'),
- ('Apertura','Momento en que el cedente autoriza revelar identidad y contexto al cesionario.','INTRO_AUTHORIZED'),
- ('Cesión','El referido NS: un Interesado con una necesidad concreta que un miembro (cedente) entrega al titular de esa especialidad en su Sala (cesionario). Un Interesado puede originar varias Cesiones. Es la unidad que se cualifica, se contrasta y genera Mérito.','Referral'),
- ('Cedente / Cesionario','Quien entrega la Cesión / quien la recibe.','originator / receiver'),
- ('Embajada','Propuesta Fuera de la Sala: cesión extraordinaria que el miembro propone a un titular de otra Sala de la zona cuando la plaza está vacante en la suya. Prima de Mérito para el cedente. «Hacer una Embajada».','Referral{route: ZONE, embassy: true}'),
- ('Embajadora','La empresa de otra Sala que acoge la Embajada. Representa esa especialidad en la Sala del cedente mientras la plaza siga vacante: sin plaza, sin voto, con mención en su Hoja de Méritos. Máximo dos Salas a la vez.','EmbassyRole'),
- ('Embajada en Red','El mismo acto extendido a otra zona cuando ninguna Sala de la zona cubre la necesidad.','Referral{route: NETWORK}'),
- ('Puente','La introducción cálida: el mensaje o reunión que conecta al cesionario con el Interesado, preparado por el Agente y enviado por la persona.','Introduction'),
- ('Oportunidad','Negociación abierta confirmada por el cesionario tras el Puente.','Opportunity'),
- ('Cierre','Resultado: ganado, perdido o sin decisión.','Outcome'),
- ('Valor contrastado','Valor económico confirmado por ambas partes y verificable por NS. El único que alimenta la métrica principal.','VALUE_CONFIRMED'),
- ('Libro de Valor','Registro acumulado de valor contrastado de una empresa, una Sala, una zona.','ValueLedger'),
-], WIDTHS))
+ ('Promesa','Lo que vale una Cesión a priori, fijado al aceptarse con datos estructurados: valor estimado, necesidad real, información completa, decisor, plazo y relación del cedente con el Interesado. Da Mérito al cedente sin esperar al cierre.'),
+ ('Veredicto','Lo que valió a posteriori, en tres toques del cesionario: <b>Facilidad</b> (qué fácil fue prestar el servicio), <b>Negocio</b> (cuánto generó) y <b>Trato</b> (cómo fue el trato de las personas).'),
+ ('Contraste','La auditoría de NS: compara lo declarado con la evidencia de los Agentes.'),
+ ('Mérito','La unidad de reputación verificable. Nace en tres momentos: Promesa, Veredicto y Cierre. Nunca de cantidad; nunca «puntos».'),
+ ('Hoja de Méritos','El panel de comportamientos verificables de cada empresa. Nunca un número opaco.'),
+ ('Distinción','El reconocimiento escaso (una por titular y mes) que el cesionario da al cedente por una Cesión, nombrando el eje que destacó y un motivo. Se publica en la Crónica; de ellas sale la <b>Cesión del mes</b>.'),
+ ('Valoración','El porcentaje mensual y explicable de cada titular: calidad de lo cedido, Compromiso, plazo de respuesta, Comunicado y servicio a la red. Nunca mide cantidad. Con 80 % o más durante un mes, el titular puede acoger una Embajada.'),
+ ('Compromiso','Al menos una Cesión válida a la semana, sin excusas. Con una se cumple; para destacar, varias y a varias especialidades.'),
+ ('Escalera','Semanas seguidas sin Cesión válida: 1.ª constancia, 2.ª <b>Aviso diplomático</b> del Agente, 3.ª <b>Aviso formal</b> de la Directiva, 4.ª <b>Baja</b> de la titularidad. Una Cesión válida pone la cuenta a cero.'),
+ ('Plazo de respuesta','Las 48 horas del cesionario para responder al Interesado tras el Puente.'),
+ ('Niveles','Miembro · Contribuidor · Referente · Consejero · Fundador. Se ganan con Mérito y amplían acceso.'),
+ ('Arbitraje','La resolución de disputas entre cedente y cesionario.'),
+ ('Para los demás','El principio que lo sostiene todo: nadie busca para sí. El negocio propio no entra en NS; solo lo que se cede.'),
+]))
 
-# 4 Reputación
-S.append(Paragraph('4 · Calidad, reputación y compromiso', sH1))
+# 4 Agente
+S.append(Paragraph('4 · El Agente y el día a día', sH1))
 S.append(table([
- ('Promesa','Valor a priori de una Cesión, fijado al aceptarse a partir de datos estructurados del Indicio y del Fundamento: valor estimado, necesidad real, información completa, decisor identificado, plazo, relación del cedente con el Interesado. La calculan los Agentes; el cesionario la confirma o ajusta con un toque. Da Mérito de Promesa al cedente sin esperar al cierre.','ReferralPromise'),
- ('Veredicto','Valor a posteriori: cualificación de la Cesión por el cesionario en tres ejes, en tres toques: Facilidad (qué fácil fue prestar el servicio), Negocio (cuánto negocio generó) y Trato (cómo fue el trato de las personas). El Agente aporta la evidencia de cada eje.','ReferralQualification'),
- ('Contraste','Auditoría de NS: comparación entre el Veredicto declarado y la evidencia recogida por los agentes.','Audit'),
- ('Mérito','Unidad de reputación verificable. Nace en tres momentos: Mérito de Promesa (al aceptarse la Cesión), Mérito de Veredicto (al valorarla el cesionario) y Mérito de Cierre (al contrastarse el valor). Nunca de cantidad. Nunca «puntos».','TrustEvent.weight'),
- ('Hoja de Méritos','Panel de comportamientos verificables de una empresa: cesiones, calidad media, valor contrastado, tiempo de respuesta, fiabilidad como cesionario. Nunca un número opaco.','ReputationProfile'),
- ('Distinción','Reconocimiento que el cesionario otorga al cedente por una Cesión concreta, nombrando el eje que destacó (Facilidad, Negocio o Trato) y una línea de motivo. Escasa: máximo una por titular y mes. Se publica en la Crónica y alimenta el Mérito. De las Distinciones del mes sale la Cesión del mes.','Recognition{axis, reason}'),
- ('Compromiso','Mínimo de Cesiones válidas por Ejercicio que toda empresa debe aportar (regla inmutable).','ContributionQuota'),
- ('Ejercicio','Periodo de cómputo del Compromiso. Por estipular: mes o trimestre.','QuotaPeriod'),
- ('Niveles','Miembro · Contribuidor · Referente · Consejero · Fundador. Se ganan con Mérito; amplían acceso, nunca lo restringen.','MembershipTier'),
- ('Arbitraje','Resolución de disputas entre cedente y cesionario por la Directiva.','Dispute'),
-], WIDTHS))
+ ('Agente NS','El agente empresarial de cada titular: representa, prospecta, cualifica, prepara y hace seguimiento.'),
+ ('ADN de Empresa','El conocimiento estructurado del negocio que entrena al Agente. Se construye en la <b>Entrevista</b> del Agente con su Timonel y se valida al final.'),
+ ('Hoy','La pantalla de inicio: qué ha hecho la red por tu empresa desde la última vez.'),
+ ('Despacho','La sesión breve del Timonel con su Agente: tres cosas preparadas, decisiones de 30 segundos.'),
+ ('Mesa Permanente','La reunión 24/7 de los Agentes de una Sala, vista como una cronología de hechos significativos.'),
+ ('Encargo','Lo que una empresa busca ahora. Los Agentes priorizan las Pistas que responden a un Encargo abierto.'),
+ ('Apunte','Lo que el Timonel anota en treinta segundos, en la calle, sobre un posible referido. Nunca se publica solo.'),
+ ('Rastreo','La búsqueda del Agente en fuentes públicas (licitaciones, registros, prensa…) para encontrar Indicios para otros titulares. El Timonel puede sumar su <b>Fuente propia</b>.'),
+ ('Ronda','La pasada de cada mañana de los Agentes, sin que nadie abra la aplicación.'),
+ ('Reloj de la Sala','El mecanismo que lleva los plazos: recuerda, caduca y avisa. El empujón lo recibe el Timonel, nunca el Interesado.'),
+ ('Sondeo','La pregunta discreta a las relaciones de la Sala. Nadie ve contactos sin el visto bueno de su dueño.'),
+ ('Parte','El informe ejecutivo de la Directiva y del Consejo de Zona.'),
+ ('Crónica','El muro de la Sala con hechos contrastados. Nada se publica sin confirmación de ambas partes.'),
+ ('NS Radar','La visualización icónica de Indicios, Pistas y Cesiones. Nunca sobre un mapa.'),
+ ('Latido','Solo en la Sala de demostración: la mantiene viva a cualquier hora, sin decidir nunca por la empresa protagonista.'),
+]))
 
-# 5 Protocolo II
+# 5 Protocolos II y III
 S.append(Paragraph('5 · Protocolo II · Dar a Conocer (NS-ADP)', sH1))
 S.append(Paragraph('«Nadie puede ceder bien lo que no conoce bien.»', sQuote))
 S.append(Spacer(1,2*mm))
 S.append(table([
- ('Comunicado','Informe semanal estructurado que el Agente de una empresa envía a los Agentes de la Sala: lo estable (qué hace) y el delta (qué ha cambiado esta semana). El gerente lo aprueba en el Despacho con un toque.','Communique'),
- ('Comunicado de continuidad','El que envía el Agente cuando el gerente no aprueba a tiempo: solo lo estable ya validado, sin nuevas afirmaciones.','Communique{approved_by: CONTINUITY}'),
- ('Gaceta','Digesto semanal de la Sala compilado por el Chapter Intelligence Agent a partir de los Comunicados, con vista general y «relevante para ti» por gerente. En el Pleno sustituye la ronda de presentaciones.','ChapterGazette'),
- ('Dossier','Ficha viva de cada miembro: qué hace, a quién sirve, Cesión perfecta, capacidad ahora, Encargos, cómo presentarla, Hoja de Méritos, histórico de Comunicados. Dos toques desde cualquier pantalla.','MemberDossier'),
- ('Conocimiento mutuo','Métrica de salud de la Sala: proporción de gerentes que consultan la Gaceta o un Dossier cada semana.','MutualKnowledgeRate'),
-], WIDTHS))
-
-# 5bis Protocolo III
-S.append(Paragraph('5bis · Protocolo III · Cuentas Claras (NS-ATP)', sH1))
+ ('Comunicado','El informe semanal que el Agente de cada empresa envía a la Sala: qué hace y qué ha cambiado esta semana. El Timonel lo aprueba con un toque. Si no llega a tiempo, sale un <b>Comunicado de continuidad</b> solo con lo ya validado.'),
+ ('Gaceta','El resumen semanal de la Sala hecho con los Comunicados, con una vista «relevante para ti» por Timonel.'),
+ ('Dossier','La ficha viva de cada miembro: qué hace, a quién sirve, su Cesión perfecta, sus Encargos y su Hoja de Méritos. A dos toques desde cualquier pantalla.'),
+ ('Conocimiento mutuo','La salud de la Sala: cuántos Timoneles consultan la Gaceta o un Dossier cada semana.'),
+]))
+S.append(Paragraph('6 · Protocolo III · Cuentas Claras (NS-ATP)', sH1))
 S.append(Paragraph('«Lo que se da y lo que se recibe se ve. Lo que hay que hacer para mejorar, solo lo ve quien tiene que hacerlo.»', sQuote))
 S.append(Spacer(1,2*mm))
 S.append(table([
- ('Balanza','Panel público en la Sala con lo que cada titular ha dado y recibido: Cesiones hechas y recibidas, valor contrastado generado y recibido, del mes y acumulado, y estado frente al Ritmo. Ordenada por plaza, nunca un ranking. Solo lo válido y contrastado.','MemberBalance'),
- ('Balanza de Sala','Agregado de la Sala: Cesiones y valor contrastado del mes y acumulado, Distinciones, mejor semana.','ChapterBalance'),
- ('Ritmo','Objetivo semanal de Cesiones válidas fijado por la Sala o, en su defecto, por NS. Estados: En Ritmo · Por encima · Por debajo. Visible en la Balanza.','WeeklyPace'),
- ('Brújula','Cuadro privado del titular, recalculado cada noche por su Agente: dónde estás, por qué, qué ganas y qué hacer. Solo lo ven el titular y su Agente.','MemberCompass'),
- ('Movimiento','Acción concreta que la Brújula propone para la semana: ceder, ofrecer, proponer, sondear, Embajada. Tres por semana; cinco si el titular va Por debajo. Un toque para ejecutar.','CompassMove'),
-], WIDTHS))
+ ('Balanza','Lo que cada titular ha dado y recibido, visible en su Sala: Cesiones y valor contrastado, del mes y acumulado. Ordenada por plaza, nunca un ranking. Existe también la <b>Balanza de Sala</b>.'),
+ ('Ritmo','El objetivo semanal de Cesiones válidas. Estados: En Ritmo · Por encima · Por debajo.'),
+ ('Brújula','El cuadro privado de cada titular: si consigue sus objetivos, por qué, qué gana, qué puede ofrecer y qué referidos tiene para ceder. Solo lo ven el titular y su Agente.'),
+ ('Movimiento','Una acción concreta que propone la Brújula para la semana. Tres por semana; cinco si se va Por debajo. Un toque para hacerla.'),
+]))
 
-# 6 Agentes y día a día
-S.append(Paragraph('6 · Los agentes y el día a día', sH1))
+# 7 Reglas y dinero
+S.append(Paragraph('7 · Reglas, clasificación y cuota', sH1))
 S.append(table([
- ('Agente NS','El agente empresarial de cada miembro. Representa, prospecta, cualifica, prepara, persigue.','CompanyAgent'),
- ('ADN de Empresa','El conocimiento estructurado que entrena al Agente (Business DNA).','BusinessDNA'),
- ('Mesa Permanente','La reunión 24/7 de los agentes de una Sala. En la app, cronología de eventos significativos.','AgentRoom'),
- ('Despacho','Sesión breve y periódica del miembro con su Agente: tres cosas ya preparadas, decisiones de 30 segundos.','AgentCheckIn'),
- ('Encargo','Lo que una empresa busca ahora (cliente ideal, trigger, importe, plazo). Los agentes prospectan contra los Encargos de la Sala.','DemandPosting'),
- ('Rastreo','Prospección del Agente en fuentes públicas (registros, licitaciones, licencias, empleo, noticias) para generar Indicios para otros.','PublicProspecting'),
- ('Sondeo','Pregunta discreta al grafo de relaciones de la Sala: «¿alguien tiene relación con la dirección financiera de Z?». Nadie ve contactos hasta que su dueño da el visto bueno.','RelationshipProbe'),
- ('Hoy','Pantalla de inicio del miembro: qué ha hecho la red por su empresa desde la última vez.','TodayView'),
- ('Parte','Informe ejecutivo de la Directiva y del Consejo de Zona: indicios, pistas, cesiones, compromiso, antesala, saturación.','ExecutiveBriefing'),
- ('Crónica','Muro de la Sala con hechos contrastados: cierres, distinciones, incorporaciones. Nada se publica sin confirmación de ambas partes.','ChapterFeed'),
- ('Carta de Presentación','Página que ve el Interesado cuando recibe un Puente: quién lo recomienda, por qué, agenda en un clic, opción de valorar.','IntroLandingPage'),
- ('NS Radar','Visualización icónica de Indicios, Pistas y Cesiones de la Sala y de la zona. Nunca sobre un mapa.','Radar'),
-], WIDTHS))
-
-# 7 Protocolos y clasificaciones
-S.append(Paragraph('7 · Protocolos, clasificaciones y reglas', sH1))
-S.append(table([
- ('Protocolo I · Generar Negocio','Deber de ceder referidos de calidad. Unidad: la Cesión. Especificación técnica: NS-ARP.','NS-ARP'),
- ('Protocolo II · Dar a Conocer','Deber de comunicar el trabajo propio a la Sala cada semana. Unidad: el Comunicado. Especificación técnica: NS-ADP.','NS-ADP'),
- ('NS-ARP','NS Agentic Referral Protocol: cómo los agentes descubren, comparten, cualifican, puntúan, autorizan y trazan Cesiones.','protocol_version'),
- ('Protocolo III · Cuentas Claras','Deber de NS de hacer visible en la Sala el valor dado y recibido por cada titular. Unidad: la Balanza. Especificación técnica: NS-ATP.','NS-ATP'),
- ('NS-ADP','NS Agentic Disclosure Protocol: cómo los agentes redactan, filtran, envían, acusan y compilan Comunicados, Gaceta y Dossier.','ADP-0.1'),
- ('NS-ATP','NS Agentic Transparency Protocol: cómo se calculan, contrastan y publican la Balanza y el Ritmo, y cómo el Agente genera la Brújula y sus Movimientos.','ATP-0.1'),
- ('NS-CAT','Clasificación NS de Actividades: base CNAE (sección, división, grupo, clase) más el nivel Especialidad NS, ampliable y versionada. Estados: OFICIAL, NS_EXTENDIDA, PROVISIONAL, RETIRADA.','nscat_version'),
- ('Especialidad','Nivel de NS-CAT que otorga plaza. Definición de conflicto: dos empresas son de la misma especialidad si un mismo referido válido debería enviarse a las dos.','Specialty'),
-], WIDTHS, header=('TÉRMINO','QUÉ ES','ID')))
+ ('Normas NS','El texto único y versionado que toda empresa acepta, norma a norma, al ocupar su plaza. Sin aceptación no hay alta.'),
+ ('NS-CAT','La Clasificación NS de Actividades: base CNAE más la <b>Especialidad</b> NS, que es el nivel que otorga plaza.'),
+ ('Cuota','Lo que paga cada empresa a NS por su plaza y su Agente: una cuota inicial al incorporarse y una cuota mensual, las dos muy bajas; los importes los anuncia NS. Un plano distinto de la regla entre miembros: nunca un porcentaje del negocio ni un cargo por Cesión.'),
+ ('Tramo','El nivel de cuota. Se entra en un Tramo bajo y solo se sube cuando NS te ha generado más negocio contrastado; también se baja. Importes públicos; el Tramo de cada empresa, privado.'),
+ ('Ejercicio','El año natural, de enero a diciembre: NS revisa el Tramo de cuota cada enero con el negocio contrastado del año anterior y cuenta las Embajadas por año. El primero de cada empresa va desde su alta hasta el 31 de diciembre.'),
+]))
 S.append(Spacer(1,3*mm))
-S.append(Paragraph('Reglas inmutables (D-010, D-018 y D-019)', sH2))
-for r in ['<b>Nunca se cobra por una Cesión.</b> Pedir, ofrecer, aceptar o condicionar un referido a dinero, comisión, descuento o favor es motivo de expulsión. NS tampoco cobra por referido.',
-          '<b>Toda empresa cumple su Compromiso:</b> un mínimo de Cesiones válidas por Ejercicio. Pertenecer es contribuir.',
-          '<b>La calidad importa más que la cantidad.</b> Solo cuenta la Cesión que el cesionario cualifica como válida y NS puede contrastar.',
-          '<b>Toda empresa da a conocer su trabajo a la Sala cada semana.</b> El Agente redacta el Comunicado; el gerente lo aprueba.',
-          '<b>Lo que se da y lo que se recibe se ve.</b> La Balanza de cada titular es pública en su Sala, exacta y contrastada. La Brújula, privada.']:
+S.append(Paragraph('Reglas inmutables', sH2))
+for r in ['<b>Nunca se cobra por un referido.</b> Pedir, ofrecer, aceptar o condicionar un referido a dinero, comisión, descuento o favor es motivo de expulsión. NS tampoco cobra por referido.',
+          '<b>Al menos una Cesión válida a la semana, sin excusas.</b> Cuatro semanas seguidas sin ninguna suponen la baja de la titularidad.',
+          '<b>La calidad vale más que la cantidad. Siempre.</b> Solo cuenta la Cesión que el cesionario cualifica como válida y NS puede contrastar.',
+          '<b>Toda empresa da a conocer su trabajo a la Sala cada semana.</b> El Agente redacta el Comunicado; el Timonel lo aprueba.',
+          '<b>Lo que se da y lo que se recibe se ve.</b> La Balanza es pública en la Sala; la Brújula, privada.',
+          '<b>Tu Agente y tú buscáis para los demás.</b> NS es lo que cedes.']:
     S.append(Paragraph('• '+r, sBody))
 
 # 8 flujo narrado
-S.append(Paragraph('8 · El flujo completo dicho en léxico NS', sH1))
+S.append(Paragraph('8 · Una Cesión, contada en léxico NS', sH1))
 flow=['El Agente de Híspalis detecta un <b>Indicio</b> en su <b>Rastreo</b>: un cliente abre sede.',
- 'La <b>Mesa Permanente</b> de NS Cumbre formula tres <b>Pistas</b>; una alcanza 91 % de <b>Encaje</b> con <b>Fundamento</b> claro.',
- 'Cumplimiento emite <b>Salvoconducto</b>. Carlos da el <b>visto bueno</b> en su <b>Despacho</b>; Lucía acepta y confirma la <b>Promesa</b>: Híspalis ya suma Mérito de Promesa.',
- '<b>Apertura</b>: se revela la identidad del <b>Interesado</b>. Carlos tiende el <b>Puente</b>; el Interesado ve la <b>Carta de Presentación</b>.',
- 'La <b>Cesión</b> avanza a <b>Oportunidad</b> y a <b>Cierre</b> ganado. Ambos confirman: 38.000 € de <b>valor contrastado</b> en el <b>Libro de Valor</b>.',
- 'Lucía emite su <b>Veredicto</b> (Facilidad, Negocio, Trato); NS hace <b>Contraste</b>. Híspalis suma <b>Mérito</b> y cumple su <b>Compromiso</b> del <b>Ejercicio</b>.',
- 'Lucía otorga a Híspalis su <b>Distinción</b> del mes, por Trato; la <b>Crónica</b> de NS Cumbre la publica.',
- 'La plaza de Mobiliario estaba vacante en NS Cumbre: Carlos hizo una <b>Embajada</b> a un titular de NS Ágora, que pasó a ser <b>Embajadora</b> de Mobiliario en NS Cumbre; Carlos obtuvo prima de Mérito.',
- 'El domingo, el Agente de Híspalis envía su <b>Comunicado</b>; el lunes, la <b>Gaceta</b> lo resume para toda la Sala y el <b>Dossier</b> de Híspalis queda actualizado.',
- 'La <b>Balanza</b> de NS Cumbre muestra a Híspalis En <b>Ritmo</b>: 2 de 2 esta semana. Su <b>Brújula</b> le propone tres <b>Movimientos</b> para la próxima.',
- 'El <b>Parte</b> del Consejo de Zona anota que Mobiliario debería cubrirse desde la <b>Antesala</b>.']
+ 'La <b>Mesa Permanente</b> de NS Cumbre formula tres <b>Pistas</b>; una alcanza un 91 % de <b>Encaje</b> con <b>Fundamento</b> claro.',
+ 'Llega el <b>Salvoconducto</b>. Carlos, <b>Timonel</b> de Híspalis, da el <b>visto bueno</b> en su <b>Despacho</b>.',
+ 'Lucía, la cesionaria, hace una <b>Pregunta al cedente</b>; Carlos responde y Lucía acepta. Se fija la <b>Promesa</b>: Híspalis ya suma Mérito.',
+ '<b>Apertura</b>: se revela el <b>Interesado</b>, que ya estaba avisado. Carlos tiende el <b>Puente</b>.',
+ 'La <b>Cesión</b> llega a <b>Oportunidad</b> y a <b>Cierre</b> ganado: 38.000 € de <b>valor contrastado</b> en el <b>Libro de Valor</b>.',
+ 'Lucía emite su <b>Veredicto</b> y otorga a Híspalis su <b>Distinción</b> del mes, por Trato. La <b>Crónica</b> lo publica.',
+ 'Híspalis cumple su <b>Compromiso</b> de la semana y su <b>Balanza</b> lo refleja. Su <b>Brújula</b> le propone tres <b>Movimientos</b> para la próxima.',
+ 'La plaza de Mobiliario estaba vacante: Carlos hizo una <b>Embajada</b> a un titular de NS Ágora, que pasó a ser <b>Embajadora</b> de Mobiliario en NS Cumbre.']
 for i,f in enumerate(flow,1):
     S.append(Paragraph('%d. %s' % (i,f), sBody))
 
 # 9 no usar
 S.append(Paragraph('9 · Palabras que NS no usa', sH1))
-S.append(Paragraph('«Lead», «referencia» (en el sentido de referido), «capítulo», «grupo», «círculo», «networking» como sustantivo del producto, «sinergia», «match» en la interfaz, «ranking», «puntos», «compliance» y «ticket» en el copy de la app. Y ninguna expresión, lema o formato protegido de otras organizaciones de networking. Los identificadores técnicos del protocolo se mantienen en inglés y se mapean en este léxico.', sBody))
+S.append(Paragraph('«Lead», «referencia» (en el sentido de referido), «capítulo», «grupo», «networking» como nombre del producto, «sinergia», «match» en pantalla, «ranking», «puntos». Y ninguna expresión, lema o formato protegido de otras organizaciones de networking.', sBody))
+
+# 10 pendiente
+S.append(Paragraph('10 · Pendiente de cerrar', sH2))
+for r in ['<b>Directiva</b>: composición, elección y mandato.']:
+    S.append(Paragraph('• '+r, sBody))
 S.append(Spacer(1,6*mm))
-S.append(Paragraph('Fuentes: docs/13_LEXICO_NS.md · docs/12_SALAS.md · docs/14_PROTOCOLOS_DE_SALA.md · docs/DECISIONS.md (D-013 a D-021). Términos confirmados por el fundador el 11 de septiembre de 2026; «Extramuros» descartado en favor de «Embajada»; el nivel «Embajador» pasa a «Consejero».', sSmall))
+S.append(Paragraph('Fuente: docs/13_LEXICO_NS.md y docs/DECISIONS.md (D-013 a D-063). Versión del 22 de septiembre de 2026. Sustituye a la v0.4 del 11 de septiembre.', sSmall))
 
 doc.build(S, onFirstPage=cover, onLaterPages=later)
 print('ok')

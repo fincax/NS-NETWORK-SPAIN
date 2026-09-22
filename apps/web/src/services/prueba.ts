@@ -19,7 +19,7 @@ const slugify = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowe
 
 export async function startValueTrial(db: Db, input: { chapterId: string; candidacyId: string; memberId: string; websiteText?: string }) {
   const member = await db.query.members.findFirst({ where: eq(schema.members.id, input.memberId) });
-  if (!member || !member.isDirector || member.chapterId !== input.chapterId) throw new PruebaError("Solo un Director/a de la Sala inicia una Prueba de Valor.");
+  if (!member || !member.isDirector || member.chapterId !== input.chapterId) throw new PruebaError("Solo la Directiva de la Sala inicia una Prueba de Valor.");
   const c = await db.query.betaRequests.findFirst({ where: eq(schema.betaRequests.id, input.candidacyId) });
   if (!c) throw new PruebaError("Candidatura no encontrada.");
   if (!c.specialtyCode) throw new PruebaError("Clasifica primero la especialidad de la candidatura.");

@@ -1,6 +1,6 @@
 /**
- * Acciones de dirección (D-048): un Director/a de Sala promueve acciones entre Salas y resuelve dudas entre Timoneles.
- * Cada acción queda en la Mesa (visible para la Sala) y suma puntos de Valoración a la empresa del Director/a.
+ * Acciones de dirección (D-048, D-061): la Directiva promueve acciones entre Salas y resuelve dudas entre Timoneles.
+ * Cada acción queda en la Mesa (visible para la Sala) y suma puntos de Valoración a la empresa de quien la registra.
  * Solo suma: nunca resta, y el Contraste puede revisar acciones vacías.
  */
 import { and, desc, eq, inArray } from "drizzle-orm";
@@ -15,7 +15,7 @@ export class DireccionError extends Error {}
 
 export async function logDirectorAction(db: Db, input: { chapterId: string; memberId: string; kind: DirectorActionKind; text: string }) {
   const member = await db.query.members.findFirst({ where: eq(schema.members.id, input.memberId) });
-  if (!member || !member.isDirector || member.chapterId !== input.chapterId) throw new DireccionError("Solo un Director/a de la Sala registra acciones de dirección.");
+  if (!member || !member.isDirector || member.chapterId !== input.chapterId) throw new DireccionError("Solo la Directiva de la Sala registra acciones de dirección.");
   const text = input.text.trim();
   if (text.length < 12) throw new DireccionError("Describe la acción en una frase: qué se hizo y con quién.");
   const kind = input.kind === "INTERCHAPTER" ? "DIRECTOR_INTERCHAPTER_ACTION" : "DIRECTOR_QUERY_RESOLVED";

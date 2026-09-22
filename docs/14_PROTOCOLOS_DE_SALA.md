@@ -239,7 +239,7 @@ Reglas:
 
 ### 4bis. La Valoración (pública en la Sala)
 
-Porcentaje mensual de cada titular, explicable componente a componente (D-046): calidad de lo cedido 40 %, Compromiso 25 %, plazo de respuesta 15 %, Comunicado 10 %, servicio a la red 10 %. Los componentes sin datos reparten su peso. El mes que decide es el último completo. Con ≥ 80 %: apta para Embajada y candidata a Director/a de Sala. Se ve en el Dossier con su desglose. Nunca mide cantidad.
+Porcentaje mensual de cada titular, explicable componente a componente (D-046): calidad de lo cedido 40 %, Compromiso 25 %, plazo de respuesta 15 %, Comunicado 10 %, servicio a la red 10 %. Los componentes sin datos reparten su peso. El mes que decide es el último completo. Con ≥ 80 %: apta para Embajada. Se ve en el Dossier con su desglose. Nunca mide cantidad.
 
 ### 5. El Ritmo
 

@@ -436,7 +436,7 @@ Durante las últimas 24 horas:
 
 La directiva no debe verse obligada a leer conversaciones completas. Debe recibir inteligencia ejecutiva.
 
-**Director/a de Sala (D-046, D-048).** Quien dirige una Sala se llama Director/a de Sala. Es candidata quien alcanza un 80 % de Valoración durante un mes. Promueve acciones entre Salas y resuelve dudas entre Timoneles, y todo ello suma Valoración: dirigir bien se ve y cuenta.
+**Directiva (D-048, D-061).** Quien dirige una Sala es su **Directiva**. No existe la figura "Director/a de Sala" (D-061). La Directiva despacha la Antesala, propone bajas a NS, promueve acciones entre Salas y resuelve dudas entre Timoneles, y todo ello suma Valoración: dirigir bien se ve y cuenta.
 
 ### Global Routing Agent
 
@@ -613,7 +613,7 @@ La empresa que acoge la cesión se convierte en **Embajadora** de esa especialid
 Reglas del core:
 
 - Solo procede cuando la plaza está vacante en la Sala del cedente. El sistema lo verifica. Con la plaza ocupada, la prioridad es siempre de la propia Sala.
-- **Solo puede ser Embajadora una titular con al menos un 80 % de Valoración durante un mes completo** (D-046). La Valoración es un porcentaje mensual explicable que mide calidad y fiabilidad, nunca cantidad: Veredictos recibidos, Compromiso, plazo de respuesta, Comunicado y servicio a la red. Con ese mismo umbral, la titular es candidata a **Director/a de Sala**.
+- **Solo puede ser Embajadora una titular con al menos un 80 % de Valoración durante un mes completo** (D-046). La Valoración es un porcentaje mensual explicable que mide calidad y fiabilidad, nunca cantidad: Veredictos recibidos, Compromiso, plazo de respuesta, Comunicado y servicio a la red.
 - Si resuelve (veredicto válido de la Embajadora, y más aún si llega a valor contrastado), el cedente recibe una **prima de Mérito muy superior** a la de una cesión ordinaria. La Embajadora recibe Mérito como en cualquier cesión y la mención "Embajadora de [especialidad] en [Sala]" en su Hoja de Méritos. Parámetros propuestos en D-015.
 - La condición de Embajadora es temporal: termina cuando la plaza se cubre o al cierre del Ejercicio siguiente si no hay nuevas Embajadas. Una empresa puede ser Embajadora en un máximo de dos Salas a la vez, para que la figura no se convierta en una membresía múltiple encubierta. La Embajadora no adquiere derecho ni prioridad sobre la plaza.
 - Cada Embajada deja constancia de una plaza que la Sala debería cubrir desde la Antesala. Tres Embajadas de una misma especialidad en un Ejercicio abren candidatura preferente para esa plaza.
@@ -961,8 +961,8 @@ Dos planos que nunca se mezclan:
 ENTRE MIEMBROS        Prohibido dar un referido por una contrapartida económica (D-010, expulsión).
                       Se comparte para que te compartan. Es generación de negocio.
 
-ENTRE MIEMBRO Y NS    Suscribirse y pertenecer a NS tiene un coste inicial (o no, por decidir)
-                      y un coste mensual. Esos son los ingresos de NS. No es una comisión.
+ENTRE MIEMBRO Y NS    Suscribirse y pertenecer a NS tiene una cuota inicial y una cuota mensual,
+                      las dos muy bajas (D-063). Esos son los ingresos de NS. No es una comisión.
 ```
 
 Principio interno de sostenibilidad fijado por el fundador: **la cuota mensual de cada miembro debe cubrir con creces el gasto en tokens de su Agente.** El miembro sabe desde la Candidatura que la cuota no es fija. Empieza en un **Tramo de entrada** bajo y razonable, para que entrar sea fácil, y sube de Tramo **solo cuando NS le ha generado más negocio**.
@@ -976,7 +976,7 @@ Reglas de diseño de la suscripción:
 - Cada Tramo lleva un presupuesto de actividad del Agente. NS mide el coste real de tokens por Agente (dato interno, nunca una factura de consumo para el miembro) y ajusta el presupuesto, no la cuota, si el coste se desvía.
 - El Tramo de cada empresa es privado entre la empresa y NS. La Balanza pública no lo muestra.
 
-Los importes, si existe cuota de incorporación, el número de Tramos, los umbrales y el periodo de revisión quedan pendientes del fundador (ver D-025).
+**Cuota inicial y cuota mensual, las dos muy bajas (D-063).** Hay cuota inicial al incorporarse y cuota mensual; las dos son muy bajas y sus importes los anunciará NS. El **Ejercicio** es el año natural (D-062): el Tramo se revisa cada enero con el valor contrastado recibido el año anterior; el primer Ejercicio de una empresa va desde su alta hasta el 31 de diciembre. Quedan pendientes del fundador los importes, el número de Tramos y los umbrales (ver D-025).
 
 ## 29. MVP
 

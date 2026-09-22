@@ -430,8 +430,8 @@ export const TrustEventKind = z.enum([
   "REFERRAL_FEE_VIOLATION",
   "CONTRIBUTION_QUOTA_MET",
   "CONTRIBUTION_QUOTA_MISSED",
-  "DIRECTOR_INTERCHAPTER_ACTION", // D-048 · acción entre Salas promovida por un Director/a
-  "DIRECTOR_QUERY_RESOLVED", // D-048 · duda entre Timoneles resuelta por un Director/a
+  "DIRECTOR_INTERCHAPTER_ACTION", // D-048 · acción entre Salas promovida por la Directiva
+  "DIRECTOR_QUERY_RESOLVED", // D-048 · duda entre Timoneles resuelta por la Directiva
   "NETWORK_SEAT_BONUS", // D-047 · misma empresa titular en otra Sala de la zona
 ]);
 export type TrustEventKind = z.infer<typeof TrustEventKind>;
