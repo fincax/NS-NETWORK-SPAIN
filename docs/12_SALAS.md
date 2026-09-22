@@ -69,7 +69,7 @@ Una empresa pertenece a **una sola Sala por zona**. Una empresa con unidades loc
 
 La Directiva de Zona abre la Sala N+1 cuando se cumplen las tres condiciones:
 
-1. **Demanda real.** Existe una lista de espera de solicitantes **ya admitidos** (D-004) que no caben en las Salas existentes porque su especialidad está ocupada, y suman al menos 12–15 empresas fundadoras (D-006) que cubren las especialidades más demandadas de la zona (construcción/reforma, legal, fiscal, seguros, IT, marketing, RR.HH., financiación, inmobiliario, consultoría).
+1. **Demanda real.** Existe una lista de espera de solicitantes **ya admitidos** (D-004) que no caben en las Salas existentes porque su especialidad está ocupada, y suman al menos 12–15 empresas fundadoras (D-006) que cubren las especialidades más demandadas de la zona (construcción/reforma, legal, fiscal, seguros, IT, marketing, RR.HH., financiación, inmobiliario, consultoría) y, antes que ninguna, las especialidades **Manantial** (administración de fincas, asesoría fiscal, correduría de seguros, arquitectura), que son las que más Cesiones de calidad traen desde el primer día (D-059).
 2. **Profundidad de mercado.** El censo de empresas objetivo de la zona (DIRCE por CNAE y tamaño, filtrado por los ICP de las especialidades fundadoras) soporta una Sala más sin que el flujo esperado de referidos válidos por miembro caiga por debajo del umbral configurado (propuesta: ≥ 3× el Compromiso semanal de D-042).
 3. **Salud de las Salas existentes.** Las Salas activas están en o por encima del objetivo de 25–35 plazas y su tasa de cumplimiento de cuota es sana. No se abre una Sala nueva para descargar una Sala que no funciona.
 
@@ -115,7 +115,7 @@ Especialidad NS        69.10-NS-03  Derecho laboral
 ```
 
 - La **plaza se otorga a nivel de Especialidad NS**. Nunca a nivel de clase CNAE (demasiado ancho: "Actividades jurídicas" bloquearía a diez despachos que no compiten).
-- Cada Especialidad NS tiene: código, nombre comprensible, descripción en lenguaje de negocio, `overlaps_with[]` (matriz de solapamiento, D-001), ejemplos de referido perfecto y de referido que no le corresponde, y estado.
+- Cada Especialidad NS tiene: código, nombre comprensible, descripción en lenguaje de negocio, `overlaps_with[]` (matriz de solapamiento, D-001), ejemplos de referido perfecto y de referido que no le corresponde, estado y la marca **Manantial** cuando, por naturaleza, ve necesidades de muchos sectores (D-059). La marca no cambia ninguna regla de la plaza: sirve para captar, para preparar al Agente y para reconocer la amplitud de lo cedido.
 - Un solicitante elige su especialidad con ayuda del agente durante la solicitud; el agente propone la especialidad a partir del CNAE declarado, la web y la entrevista, y detecta solapamientos antes de enviar la solicitud.
 
 ### 3.2 Estados de una especialidad
@@ -173,6 +173,8 @@ Reglas (integran D-001 y D-004):
 | Miembro que cambia de especialidad | Nueva solicitud; la plaza anterior se libera con preaviso de un periodo. |
 | Traslado entre Salas de la zona | Permitido una vez por año con vacante en destino y sin cuota pendiente; la reputación viaja con la empresa. |
 | Profesión no contemplada | §3.3: especialidad `PROVISIONAL`. |
+| Concentrador de referidos (cualquier empresa o profesión que ve necesidades de muchos sectores; p. ej., administración de fincas, gestoría, correduría) | Es un **Manantial** (D-059): titular como cualquier otro, en la plaza de su especialidad, con las mismas Normas, cuota y Compromiso. NS lo prioriza en la Antesala y prepara a su Agente para desplegar varias Cesiones de un mismo Interesado. No existe un miembro "fuente de referidos" sin plaza. |
+| Autónomo (persona física con NIF) | Puede ser titular: la persona como empresa. Una persona sin empresa no puede ser miembro (D-059). |
 
 ---
 
@@ -253,7 +255,7 @@ ReferralRoute { referral_id, origin_chapter_id, target_chapter_id, level: CHAPTE
 ## 9. Pendientes del fundador
 
 1. Delimitar la Zona NS Sevilla (solo capital, o capital + área metropolitana).
-2. Confirmar la lista de especialidades fundadoras de la primera Sala de NS Sevilla (30–40) y su primera versión NS-CAT.
+2. Confirmar la lista de especialidades fundadoras de la primera Sala de NS Sevilla (30–40) y su primera versión NS-CAT, incluida la lista de especialidades Manantial (D-059).
 5. Decidir el formato y ritmo de los encuentros entre Salas (§6bis).
 3. Fijar los umbrales de apertura y saturación (propuesta: ≥ 3× el Compromiso semanal de D-042, es decir, 3 Cesiones válidas por titular y semana en el flujo esperado; dos periodos de caída de flujo).
 4. Decidir si el enrutamiento a otras Salas de la zona requiere consentimiento del originador en cada caso o una preferencia general en su Business DNA.

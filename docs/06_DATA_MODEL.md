@@ -29,7 +29,7 @@ RASTREO Y ENCARGOS    public_records (D-031) · demands (D-032)
 | --- | --- | --- |
 | Zona | `zones` | "NS Sevilla". |
 | Sala | `chapters` | Nombre único en la red (D-014). `value_threshold_eur` (umbral de Directiva), `weekly_pace` (Ritmo), `protocol_version`. |
-| Especialidad (NS-CAT) | `specialties` | `nscat_code`, `cnae_class`, `status` OFFICIAL/NS_EXTENDED/PROVISIONAL, `regulated`, `overlaps_with[]`. Catálogo inicial en `src/db/nscat.ts`. |
+| Especialidad (NS-CAT) | `specialties` | `nscat_code`, `cnae_class`, `status` OFFICIAL/NS_EXTENDED/PROVISIONAL, `regulated`, `overlaps_with[]`. Catálogo inicial en `src/db/nscat.ts`. La marca **Manantial** (D-059) vive hoy solo en el catálogo (`manantial`, `MANANTIALES`); pasará a columna cuando la Antesala la use en consultas. |
 | Plaza | `category_seats` | Única por (Sala, especialidad). `status` ACTIVE/VACANT/WAITLISTED/RELEASED. |
 | Titular | `companies` | `status`, `tier` (Niveles), `fee_tier` (Tramo, D-025). |
 | Timonel | `members` | La persona que decide por la empresa (D-027). `is_primary` marca al Timonel; un segundo registro con `is_primary = false` es el Timonel suplente. `is_director` marca a la Directiva. |
