@@ -173,7 +173,7 @@ Reglas (integran D-001 y D-004):
 | Miembro que cambia de especialidad | Nueva solicitud; la plaza anterior se libera con preaviso de un periodo. |
 | Traslado entre Salas de la zona | Permitido una vez por año con vacante en destino y sin cuota pendiente; la reputación viaja con la empresa. |
 | Profesión no contemplada | §3.3: especialidad `PROVISIONAL`. |
-| Concentrador de referidos (administrador de fincas, gestoría, correduría) | Es un **Manantial** (D-059): titular como cualquier otro, en la plaza de su especialidad, con las mismas Normas, cuota y Compromiso. NS lo prioriza en la Antesala y prepara a su Agente para desplegar varias Cesiones de un mismo Interesado. No existe un miembro "fuente de referidos" sin plaza. |
+| Concentrador de referidos (cualquier empresa o profesión que ve necesidades de muchos sectores; p. ej., administración de fincas, gestoría, correduría) | Es un **Manantial** (D-059): titular como cualquier otro, en la plaza de su especialidad, con las mismas Normas, cuota y Compromiso. NS lo prioriza en la Antesala y prepara a su Agente para desplegar varias Cesiones de un mismo Interesado. No existe un miembro "fuente de referidos" sin plaza. |
 | Autónomo (persona física con NIF) | Puede ser titular: la persona como empresa. Una persona sin empresa no puede ser miembro (D-059). |
 
 ---

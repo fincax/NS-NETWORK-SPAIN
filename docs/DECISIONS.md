@@ -1441,6 +1441,8 @@ Servicio a la red        10 %   solo suma: acciones de dirección del mes (3 = 1
 
 **Choice.** La opción 2. El concentrador se llama **Manantial**. Es una **condición** de una titularidad, nunca un tipo de miembro.
 
+- **Qué es un Manantial (precisión del fundador, 22-09).** Un Timonel, un titular, que por su condición de empresa o de profesión es propicio desde el inicio para facilitar multitud de referidos de sectores distintos. No se define por una especialidad: el administrador de fincas es solo el ejemplo que abrió la conversación. La marca de NS-CAT señala las especialidades donde esa condición es habitual, para captar; no agota quién puede ser Manantial.
+
 - **Mismas reglas que todo titular.** Plaza en su especialidad (exclusividad D-001), aceptación expresa de las Normas (D-043), cuota por Tramos (D-025), Compromiso semanal y Escalera (D-042), Balanza pública (D-019), Valoración (D-046). No hay excepción alguna.
 - **Especialidades Manantial en NS-CAT.** La taxonomía marca las especialidades que, por naturaleza, ven necesidades de muchos sectores: administración de fincas, asesoría fiscal, correduría de seguros, arquitectura, y las que la práctica demuestre. Propuesta inicial en `src/db/nscat.ts`; se calibra con datos (prueba del referido, `docs/12` §3.4).
 - **Captación.** La Antesala y la Fundación (D-041) buscan y priorizan las especialidades Manantial al fundar y al completar una Sala. Se añaden a la lista de especialidades fundadoras de D-006 y `docs/12` §2.2.

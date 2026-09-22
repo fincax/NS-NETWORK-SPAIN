@@ -8,6 +8,7 @@ import { acceptAllNormas } from "@/core/normas";
 import { onboardCompany } from "@/services/onboarding";
 import { activateCandidacy, candidacyCounts, CandidacyTransitionError, listCandidacies, triageCandidacy, updateCandidacy } from "@/services/antesala";
 import { MANANTIALES, NSCAT } from "@/db/nscat";
+import { syncNscatSeats } from "@/db/seed";
 
 process.env.PGLITE_DATA_DIR = "memory";
 process.env.NS_LLM_PROVIDER = "deterministic";
@@ -51,6 +52,13 @@ describe("Veredicto de plaza", () => {
     const t = await triageCandidacy(db, chapterId, { ...(await byCompany("Mantenimiento Integral Guadaíra")), specialtyCode: "ADMINISTRACION_FINCAS" });
     expect(t.seat).toBe("VACANT");
     expect(t.canApprove).toBe(true);
+  });
+  it("una especialidad nueva de NS-CAT llega a una Sala ya sembrada sin resembrar, y solo una vez", async () => {
+    const spec = await db.query.specialties.findFirst({ where: eq(schema.specialties.nscatCode, "ADMINISTRACION_FINCAS") });
+    await db.delete(schema.categorySeats).where(eq(schema.categorySeats.specialtyId, spec!.id));
+    await db.delete(schema.specialties).where(eq(schema.specialties.id, spec!.id));
+    expect(await syncNscatSeats(db, chapterId)).toEqual(["ADMINISTRACION_FINCAS"]);
+    expect(await syncNscatSeats(db, chapterId)).toEqual([]);
   });
   it("plaza ocupada: nombra al titular y no se puede aprobar", async () => {
     const t = await triageCandidacy(db, chapterId, await byCompany("Correduría Giralda"));

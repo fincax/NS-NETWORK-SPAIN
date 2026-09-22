@@ -8,20 +8,34 @@ import { acceptAllNormas } from "@/core/normas";
 import { onboardCompany } from "@/services/onboarding";
 import { hasPassword, setPassword } from "@/lib/accounts";
 
-export async function seedChapter(db: Db) {
-  let zone = await db.query.zones.findFirst({ where: eq(schema.zones.slug, "ns-sevilla") });
-  if (!zone) [zone] = await db.insert(schema.zones).values({ country: "ES", name: "NS Sevilla", slug: "ns-sevilla" }).returning();
-  let chapter = await db.query.chapters.findFirst({ where: eq(schema.chapters.slug, "ns-cumbre") });
-  if (!chapter) [chapter] = await db.insert(schema.chapters).values({ zoneId: zone.id, name: "NS Cumbre", slug: "ns-cumbre" }).returning();
-
+/**
+ * Especialidades de NS-CAT que aún no existen en la base de datos → especialidad nueva y plaza vacante en la Sala.
+ * Idempotente. Lo llaman la semilla y /api/jobs, para que una especialidad añadida a NS-CAT (p. ej. Administración de
+ * fincas, D-059) llegue al servidor con `actualizar.sh`, sin volver a ejecutar la semilla. Devuelve los códigos añadidos.
+ */
+export async function syncNscatSeats(db: Db, chapterId: string): Promise<string[]> {
+  const added: string[] = [];
   for (const s of NSCAT) {
     const existing = await db.query.specialties.findFirst({ where: eq(schema.specialties.nscatCode, s.code) });
     const [row] = existing
       ? [existing]
       : await db.insert(schema.specialties).values({ nscatCode: s.code, cnaeClass: s.cnae, name: s.name, description: s.description, status: s.status, regulated: s.regulated ?? false, overlapsWith: s.overlapsWith ?? [] }).returning();
     const seat = await db.query.categorySeats.findFirst({ where: eq(schema.categorySeats.specialtyId, row.id) });
-    if (!seat) await db.insert(schema.categorySeats).values({ chapterId: chapter.id, specialtyId: row.id, status: "VACANT" });
+    if (!seat) {
+      await db.insert(schema.categorySeats).values({ chapterId, specialtyId: row.id, status: "VACANT" });
+      added.push(s.code);
+    }
   }
+  return added;
+}
+
+export async function seedChapter(db: Db) {
+  let zone = await db.query.zones.findFirst({ where: eq(schema.zones.slug, "ns-sevilla") });
+  if (!zone) [zone] = await db.insert(schema.zones).values({ country: "ES", name: "NS Sevilla", slug: "ns-sevilla" }).returning();
+  let chapter = await db.query.chapters.findFirst({ where: eq(schema.chapters.slug, "ns-cumbre") });
+  if (!chapter) [chapter] = await db.insert(schema.chapters).values({ zoneId: zone.id, name: "NS Cumbre", slug: "ns-cumbre" }).returning();
+
+  await syncNscatSeats(db, chapter.id);
 
   for (const kind of ["MATCHMAKER", "COMPLIANCE", "CHAPTER_INTELLIGENCE", "BRIEFING"]) {
     const existing = await db.query.agents.findFirst({ where: eq(schema.agents.kind, kind) });
