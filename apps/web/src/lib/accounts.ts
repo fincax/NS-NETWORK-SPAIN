@@ -4,7 +4,7 @@
  * - Contraseñas con scrypt (Node crypto) y sal por cuenta. Nunca se guarda la contraseña.
  * - Sesiones: token aleatorio en la cookie, en base de datos solo su hash. Caducan a los 30 días y se pueden cerrar una a una.
  * - Invitaciones: enlace de un solo uso, 7 días, para fijar la primera contraseña o recuperarla. Lo genera la Directiva
- *   (o NS); el envío por correo llega después. Mientras tanto, el enlace se muestra a quien lo genera.
+ *   (o NS), o la propia persona desde "¿Has olvidado tu contraseña?". Con correo configurado se envía (D-060, services/correo.ts); si no, se muestra a quien lo genera.
  * Cada acceso, fallo, cierre e invitación queda en el audit log: es el registro de accesos.
  */
 import { createHash, randomBytes, scrypt as scryptCb, timingSafeEqual } from "node:crypto";
@@ -122,14 +122,16 @@ export async function changePassword(db: Db, memberId: string, current: string, 
 }
 
 /** Invitación para fijar (o recuperar) la contraseña. Solo la Directiva, NS o la propia persona la generan. */
-export async function createInvite(db: Db, opts: { memberId: string; createdBy: string }) {
+export async function createInvite(db: Db, opts: { memberId: string; createdBy: string; ttlHours?: number }) {
   const member = await db.query.members.findFirst({ where: eq(schema.members.id, opts.memberId) });
   if (!member) throw new AccountError("Persona no encontrada.");
   const by = await db.query.members.findFirst({ where: eq(schema.members.id, opts.createdBy) });
   if (!by || (by.id !== member.id && !by.isDirector)) throw new AccountError("Solo la Directiva genera enlaces de acceso para otros.");
   const token = newToken();
-  const [row] = await db.insert(schema.invites).values({ memberId: member.id, tokenHash: sha256(token), expiresAt: days(INVITE_TTL_DAYS), createdByMemberId: by.id }).returning();
-  await audit(db, { chapterId: member.chapterId, kind: "INVITE_CREATED", actor: { type: "USER", id: by.id }, subject: { type: "Member", id: member.id }, result: `${by.fullName} generó un enlace de acceso para ${member.fullName} (válido ${INVITE_TTL_DAYS} días).`, significant: false, companyIds: [member.companyId] });
+  const hours = opts.ttlHours ?? INVITE_TTL_DAYS * 24;
+  const validity = hours % 24 === 0 ? `${hours / 24} días` : `${hours} horas`;
+  const [row] = await db.insert(schema.invites).values({ memberId: member.id, tokenHash: sha256(token), expiresAt: new Date(Date.now() + hours * 3_600_000), createdByMemberId: by.id }).returning();
+  await audit(db, { chapterId: member.chapterId, kind: "INVITE_CREATED", actor: { type: "USER", id: by.id }, subject: { type: "Member", id: member.id }, result: `${by.fullName} generó un enlace de acceso para ${member.fullName} (válido ${validity}).`, significant: false, companyIds: [member.companyId] });
   return { token, invite: row, member };
 }
 

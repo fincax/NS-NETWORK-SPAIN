@@ -1457,3 +1457,33 @@ Servicio a la red        10 %   solo suma: acciones de dirección del mes (3 = 1
 **Consequences.** `src/db/nscat.ts`: atributo `manantial` y especialidad `ADMINISTRACION_FINCAS` (68.32) como plaza vacante de NS Cumbre; etiqueta "Manantial" en la vista de plazas de la Sala; constitución (§3 y §8), `docs/12` §2.2, §3.1, §4 y §9, léxico, `docs/11` (C10: invitado avalado, fuera del MVP), pendientes del fundador.
 
 **Revisit when.** La Sala piloto tenga un mes con un Manantial activo: confirmar qué especialidades merecen la marca y si la mención en la Hoja de Méritos basta como reconocimiento. La opción 3 (persona sin empresa) solo se reabre si un titular la pide con un caso concreto y un aval.
+
+---
+
+## D-060 · Correo saliente desde el buzón de NS: invitaciones y recuperación de contraseña por correo
+
+**Status:** CONFIRMED (el fundador elige el buzón hola@networkspain.com frente a un servicio de envío)
+**Date:** 2026-09-22
+
+**Context.** D-054 dejó las cuentas personales listas, pero el enlace de acceso se mostraba a la Directiva, que debía hacérselo llegar al Timonel por su cuenta, y quien olvidaba la contraseña dependía de la Directiva. Era lo que faltaba de la condición 1 de `docs/17` para abrir la puerta a empresas reales.
+
+**Options.**
+
+1. **Servicio de envío transaccional** (Brevo u otro europeo): mejor entregabilidad y métricas, un encargado de tratamiento más y una cuenta más que mantener.
+2. **SMTP del buzón de NS** (`hola@networkspain.com`): sin terceros nuevos más allá del proveedor del buzón, el remitente es la dirección que el Timonel ya conoce; entregabilidad dependiente de la configuración del dominio (SPF, DKIM, DMARC).
+
+**Choice.** La opción 2, elegida por el fundador. El código habla SMTP estándar, así que pasar a un servicio de envío más adelante es cambiar cuatro variables.
+
+- **Configuración.** `NS_SMTP_HOST`, `NS_SMTP_PORT` (465 TLS directo, 587 STARTTLS), `NS_SMTP_USER`, `NS_SMTP_PASSWORD` y `NS_MAIL_FROM`. `deploy/correo.sh configurar` las pregunta, las guarda en `.env.production`, reinicia la web y envía un correo de prueba; `probar` y `quitar` completan el ciclo. `pnpm correo:prueba destino` hace la prueba a mano.
+- **Invitación.** La Directiva pulsa "Enviar enlace de acceso al Timonel" en su Dossier, o da de alta una empresa en modo real: el Timonel recibe el enlace en su correo y la Directiva ya no lo ve. Si el envío falla, la Directiva ve el enlace como hasta ahora y un aviso; el fallo queda registrado.
+- **Recuperación.** "¿Has olvidado tu contraseña?" en `/acceso` lleva a `/acceso/recuperar`. La respuesta es siempre la misma, exista o no el correo. El enlace dura **24 horas** (la invitación, siete días), como mucho **tres por persona y hora**, y nunca a una empresa de baja o suspendida. Al usarlo se cierran las demás sesiones (D-054).
+- **Sin correo configurado nada cambia**: se muestran los enlaces como en D-054 y la recuperación remite a la Directiva.
+- **Registro.** `MAIL_SENT`, `MAIL_FAILED` y `RECOVERY_THROTTLED` en el audit log, con destinatario y motivo; nunca el enlace.
+- **Solo en modo real.** Con `NS_AUTH_MODE=demo` (la demo publicada) no hay invitaciones ni recuperación: los correos se estrenan al pasar a cuentas personales.
+
+**Why.** El Timonel debe poder entrar y recuperar su acceso sin depender de nadie: es la diferencia entre una red de confianza y un piloto tutelado. El buzón propio es la vía más simple y la que el fundador ya tiene.
+
+**Consequences.** `lib/mail.ts` (nodemailer 10), `services/correo.ts` (plantillas y reglas), `/acceso/recuperar`, avisos en el Dossier, `createInvite` con caducidad en horas, `deploy/correo.sh`, `scripts/correo-prueba.ts`, `tests/correo.test.ts`. `docs/17` condición 1 cerrada; `docs/08` suma el proveedor del buzón como encargado de tratamiento. Para que los correos no acaben en spam, el dominio necesita SPF y DKIM del proveedor del buzón (lo configura el propio proveedor o su panel DNS).
+
+**Revisit when.** Los correos lleguen a spam con frecuencia, NS envíe más de unos cientos al día (Gaceta, avisos del Compromiso, notificaciones), o haga falta saber si un correo se abrió: entonces, servicio de envío europeo con las mismas plantillas.
+

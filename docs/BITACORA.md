@@ -2,6 +2,21 @@
 
 Punto de parada y siguiente paso. Se actualiza al cerrar cada sesión de trabajo.
 
+## 22 de septiembre de 2026 (noche) · Manantial en el servidor y copias fuera
+
+**Dónde estamos.**
+
+- PR #17 (Manantial, D-059) fusionada y aplicada en el servidor con `actualizar.sh` (`7e1aad6`). Con ella llegaron también el Latido (#15) y la Pregunta al cedente (#16). Comprobado en la web: Administración de fincas aparece como plaza vacante con la etiqueta Manantial, y Hoy muestra "Sala viva".
+- **Copias fuera del servidor.** Cuenta de Backblaze B2 en región EU Central, cubo privado `ns-network-copias-spain-3717` que conserva solo la última versión de cada archivo, y clave de aplicación limitada a ese cubo, con lectura y escritura. En el servidor, remoto de rclone `b2ns` (B2) y alias `ns-copias` → `b2ns:ns-network-copias-spain-3717`. Primera copia probada: restauración correcta (37 tablas, 10 empresas, 58 Cesiones) y `offsite: ok`. Las cinco copias existentes ya están en Backblaze. La tarjeta de copias de Hoy pasa a verde.
+- La llave de cifrado de las copias y las claves de Backblaze están guardadas en el gestor de contraseñas del fundador (Bitwarden, servidor europeo). El documento provisional se borró.
+
+**Siguiente paso acordado (por este orden).**
+
+1. ~~Envío de correos (D-054)~~ → construido la misma noche (D-060), en la rama `claude/upbeat-babbage-797ls6`: invitación y recuperación de contraseña por correo desde `hola@networkspain.com` (SMTP), `deploy/correo.sh configurar` para el servidor. 146 pruebas en verde, tipos y lint limpios, build correcto y recorridos de navegador con y sin correo. **Pendiente de fusionar, de `actualizar.sh` y de los datos SMTP del buzón.** Los correos se usan solo en modo real (`NS_AUTH_MODE=real`). Después: notificaciones push (D-039).
+2. Confirmar con el fundador la lista de especialidades Manantial de NS-CAT v0.1 y la forma jurídica en el alta.
+3. Opcional: probar una restauración completa una vez (`copias.sh restaurar`), acompañado; `ANTHROPIC_API_KEY` en `.env.production`.
+4. Después: resto de `docs/08` con el abogado, Protocolo II (Comunicado y Gaceta) y Brújula, con el Apunte de Interesado múltiple.
+
 ## 22 de septiembre de 2026 · Manantial (D-059)
 
 **Dónde estamos.**

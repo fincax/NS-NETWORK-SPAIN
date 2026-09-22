@@ -13,10 +13,11 @@ import { valoracionActual } from "@/services/valoracion";
 import { VALORACION } from "@/core/valoracion";
 import { listSources, MAX_SOURCES_PER_AGENT } from "@/services/sources";
 import { dateTime } from "@/lib/format";
+import { mailEnabled } from "@/lib/mail";
 
-export default async function EmpresaPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ fuente?: string; adn?: string; error?: string; invite?: string }> }) {
+export default async function EmpresaPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ fuente?: string; adn?: string; error?: string; invite?: string; enviado?: string; correo?: string }> }) {
   const { slug } = await params;
-  const { fuente: sourceError, adn, error, invite } = await searchParams;
+  const { fuente: sourceError, adn, error, invite, enviado, correo } = await searchParams;
   const { company: me, chapter, member: viewer } = await requireMember();
   const publicUrl = process.env.NS_PUBLIC_URL ?? "http://localhost:3000";
   const db = await getDb();
@@ -50,8 +51,10 @@ export default async function EmpresaPage({ params, searchParams }: { params: Pr
       </div>
       {own && !dnaRow?.validatedAt ? <div className="notice amber row" style={{ justifyContent: "space-between" }}><span><strong>Tu ADN está sin validar.</strong> Hasta que termines la entrevista con tu Agente, trabajará con lo poco que sabe.</span><Link href="/entrevista" className="btn small primary">Hacer la entrevista</Link></div> : null}
       {error ? <div className="notice error">{error}</div> : null}
+      {enviado ? <div className="notice" role="status" style={{ borderColor: "var(--green)" }}><strong>Enlace de acceso enviado a {enviado}.</strong> {person?.fullName} lo recibirá desde el buzón de NS; es de un solo uso y caduca en siete días. Si no le llega, puede mirar en su carpeta de correo no deseado o puedes generar otro.</div> : null}
+      {invite && correo === "fallo" ? <div className="notice amber" role="alert">El correo no se pudo enviar. Hazle llegar este enlace por otro canal; el fallo queda registrado para revisar la configuración del buzón.</div> : null}
       {invite ? <div className="notice" style={{ borderColor: "var(--green)", display: "grid", gap: 6 }}><strong>Enlace de acceso para {person?.fullName} (un solo uso, siete días).</strong><span>Envíaselo por el canal que prefieras; al abrirlo elige su contraseña y entra. Este enlace no vuelve a mostrarse.</span><code className="invite-link" style={{ userSelect: "all", wordBreak: "break-all" }}>{`${publicUrl}/invitacion/${invite}`}</code></div> : null}
-      {viewer.isDirector && !own && authMode() === "real" ? <form action={inviteMemberAction}><input type="hidden" name="slug" value={company.slug} /><button className="btn small" type="submit">Enlace de acceso para el Timonel</button></form> : null}
+      {viewer.isDirector && !own && authMode() === "real" ? <form action={inviteMemberAction}><input type="hidden" name="slug" value={company.slug} /><button className="btn small" type="submit">{mailEnabled() ? "Enviar enlace de acceso al Timonel" : "Enlace de acceso para el Timonel"}</button></form> : null}
       {own && adn === "validado" ? <div className="notice" style={{ borderColor: "var(--green)" }}>ADN validado. Tu Agente trabaja ya con la versión {dnaRow?.version} en la Mesa.</div> : null}
       <div className="grid grid-3">
         <div className="card kpi"><span className="value">{bal.given}</span><span className="label">Cesiones hechas</span></div>

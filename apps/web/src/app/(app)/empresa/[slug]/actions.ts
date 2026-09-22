@@ -6,7 +6,8 @@ import { closeDemand, createDemand } from "@/services/demands";
 import { addSource, removeSource, runOwnSources, SourceError } from "@/services/sources";
 import { addSeat } from "@/services/onboarding";
 import { redirect } from "next/navigation";
-import { AccountError, createInvite } from "@/lib/accounts";
+import { AccountError } from "@/lib/accounts";
+import { inviteByMail } from "@/services/correo";
 import { and, eq } from "drizzle-orm";
 import { schema } from "@/db/client";
 import type { BusinessTrigger } from "@/core/types";
@@ -76,7 +77,7 @@ export async function addSeatAction(formData: FormData) {
   redirect(`/empresa/${slug}`);
 }
 
-/** Enlace de acceso para el Timonel de una empresa (D-054). Solo la Directiva. */
+/** Enlace de acceso para el Timonel de una empresa (D-054). Solo la Directiva. Con correo configurado, se le envía (D-060). */
 export async function inviteMemberAction(formData: FormData) {
   const { member } = await requireMember();
   const db = await getDb();
@@ -84,11 +85,13 @@ export async function inviteMemberAction(formData: FormData) {
   const company = await db.query.companies.findFirst({ where: eq(schema.companies.slug, slug) });
   const target = company ? await db.query.members.findFirst({ where: and(eq(schema.members.companyId, company.id), eq(schema.members.isPrimary, true)) }) : undefined;
   if (!target) redirect(`/empresa/${slug}?fuente=${encodeURIComponent("No hay Timonel que invitar.")}`);
+  let r: Awaited<ReturnType<typeof inviteByMail>>;
   try {
-    const { token } = await createInvite(db, { memberId: target.id, createdBy: member.id });
-    redirect(`/empresa/${slug}?invite=${encodeURIComponent(token)}`);
+    r = await inviteByMail(db, { memberId: target.id, createdBy: member.id });
   } catch (e) {
     if (e instanceof AccountError) redirect(`/empresa/${slug}?fuente=${encodeURIComponent(e.message)}`);
     throw e;
   }
+  if (r.sent) redirect(`/empresa/${slug}?enviado=${encodeURIComponent(r.email)}`);
+  redirect(`/empresa/${slug}?invite=${encodeURIComponent(r.token)}${r.error ? "&correo=fallo" : ""}`);
 }

@@ -3,6 +3,7 @@ import { getDb } from "@/db/client";
 import { Monogram } from "@/components/brand";
 import { inviteFromToken, MIN_PASSWORD_LENGTH } from "@/lib/accounts";
 import { redeemInviteAction } from "./actions";
+import { mailEnabled } from "@/lib/mail";
 
 export const dynamic = "force-dynamic";
 
@@ -22,7 +23,7 @@ export default async function InvitacionPage({ params, searchParams }: { params:
         {!found ? (
           <div className="stack">
             <h1 style={{ fontSize: 24 }}>Este enlace ya no sirve.</h1>
-            <p className="lead" style={{ fontSize: 14 }}>Los enlaces de acceso son de un solo uso y caducan a los siete días. Pide otro a la Directiva de tu Sala.</p>
+            <p className="lead" style={{ fontSize: 14 }}>Los enlaces de acceso son de un solo uso y caducan a los siete días. {mailEnabled() ? <>Pide uno nuevo en <Link href="/acceso/recuperar">¿Has olvidado tu contraseña?</Link> o a la Directiva de tu Sala.</> : "Pide otro a la Directiva de tu Sala."}</p>
             <Link href="/acceso" className="btn">Ir al acceso</Link>
           </div>
         ) : (
