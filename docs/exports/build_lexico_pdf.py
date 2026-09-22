@@ -71,7 +71,7 @@ def cover(c, doc):
     c.setFillColor(AMBER); c.rect(M,52*mm,28*mm,1.2,fill=1,stroke=0)
     c.setFillColor(colors.HexColor('#8A9098')); c.setFont('Mono',7.5)
     c.drawString(M,44*mm,'NS NETWORK SPAIN · LÉXICO OFICIAL · v0.5 · 22 SEPTIEMBRE 2026')
-    c.drawString(M,39*mm,'DECISIONES D-013 A D-061 · DOCUMENTO INTERNO DEL EQUIPO FUNDADOR')
+    c.drawString(M,39*mm,'DECISIONES D-013 A D-063 · DOCUMENTO INTERNO DEL EQUIPO FUNDADOR')
     c.restoreState()
 
 def later(c, doc):
@@ -208,9 +208,9 @@ S.append(Paragraph('7 · Reglas, clasificación y cuota', sH1))
 S.append(table([
  ('Normas NS','El texto único y versionado que toda empresa acepta, norma a norma, al ocupar su plaza. Sin aceptación no hay alta.'),
  ('NS-CAT','La Clasificación NS de Actividades: base CNAE más la <b>Especialidad</b> NS, que es el nivel que otorga plaza.'),
- ('Cuota','Lo que paga cada empresa a NS por su plaza y su Agente. Un plano distinto de la regla entre miembros: nunca un porcentaje del negocio ni un cargo por Cesión.'),
+ ('Cuota','Lo que paga cada empresa a NS por su plaza y su Agente: una cuota inicial al incorporarse y una cuota mensual, las dos muy bajas; los importes los anuncia NS. Un plano distinto de la regla entre miembros: nunca un porcentaje del negocio ni un cargo por Cesión.'),
  ('Tramo','El nivel de cuota. Se entra en un Tramo bajo y solo se sube cuando NS te ha generado más negocio contrastado; también se baja. Importes públicos; el Tramo de cada empresa, privado.'),
- ('Ejercicio','El periodo que usa NS para revisar el Tramo de cuota y contar las Embajadas. Por decidir su duración.'),
+ ('Ejercicio','El año natural, de enero a diciembre: NS revisa el Tramo de cuota cada enero con el negocio contrastado del año anterior y cuenta las Embajadas por año. El primero de cada empresa va desde su alta hasta el 31 de diciembre.'),
 ]))
 S.append(Spacer(1,3*mm))
 S.append(Paragraph('Reglas inmutables', sH2))
@@ -242,11 +242,10 @@ S.append(Paragraph('«Lead», «referencia» (en el sentido de referido), «cap�
 
 # 10 pendiente
 S.append(Paragraph('10 · Pendiente de cerrar', sH2))
-for r in ['<b>Ejercicio</b>: el periodo que usa NS para revisar el Tramo de cuota y contar las Embajadas. Por decidir su duración.',
-          '<b>Directiva</b>: composición, elección y mandato.']:
+for r in ['<b>Directiva</b>: composición, elección y mandato.']:
     S.append(Paragraph('• '+r, sBody))
 S.append(Spacer(1,6*mm))
-S.append(Paragraph('Fuente: docs/13_LEXICO_NS.md y docs/DECISIONS.md (D-013 a D-061). Versión del 22 de septiembre de 2026. Sustituye a la v0.4 del 11 de septiembre.', sSmall))
+S.append(Paragraph('Fuente: docs/13_LEXICO_NS.md y docs/DECISIONS.md (D-013 a D-063). Versión del 22 de septiembre de 2026. Sustituye a la v0.4 del 11 de septiembre.', sSmall))
 
 doc.build(S, onFirstPage=cover, onLaterPages=later)
 print('ok')

@@ -1504,3 +1504,39 @@ Servicio a la red        10 %   solo suma: acciones de dirección del mes (3 = 1
 
 **Revisit when.** Se defina cómo se compone y se elige la Directiva de una Sala.
 
+---
+
+## D-062 · El Ejercicio es el año natural
+
+**Status:** CONFIRMED (el fundador sigue la recomendación)
+**Date:** 2026-09-22
+
+**Context.** El léxico dejaba el Ejercicio "por estipular: mes o trimestre". Es el periodo en que NS revisa el Tramo de cuota (D-025) y cuenta las Embajadas (D-015).
+
+**Options.** Mes; trimestre; año natural.
+
+**Choice.** **Año natural, de enero a diciembre.** El Tramo se revisa una vez al año, en enero, con el valor contrastado recibido el año anterior y con aviso previo del Agente en la Brújula. El primer Ejercicio de cada empresa va desde su alta hasta el 31 de diciembre. Las Embajadas se cuentan por año natural: tres de una misma especialidad en el año abren candidatura preferente para esa plaza, y la condición de Embajadora termina, como tarde, al cierre del año siguiente. El Compromiso sigue midiéndose por semana y la Valoración por mes.
+
+**Why.** Es el periodo que cualquier empresario entiende (su ejercicio fiscal) y evita que la cuota cambie cada poco tiempo. Un mes o un trimestre harían que un buen o un mal periodo aislado moviese el precio.
+
+**Consequences.** Léxico, constitución §28 y pendientes. No cambia código: las Normas ya hablan del Ejercicio sin fijar su duración.
+
+**Revisit when.** El primer cierre de año muestre que un Ejercicio parcial de pocas semanas distorsiona el Tramo de una empresa recién llegada.
+
+---
+
+## D-063 · Cuota inicial y cuota mensual, las dos muy bajas; los importes los anunciará NS
+
+**Status:** CONFIRMED (decisión del fundador)
+**Date:** 2026-09-22
+
+**Context.** D-025 dejó por decidir si había cuota de incorporación, además de los importes.
+
+**Choice.** Hay **cuota inicial** al incorporarse y **cuota mensual**. **Las dos son muy bajas.** NS anunciará los importes. El resto de D-025 sigue igual: se entra en el Tramo de entrada, solo se sube cuando NS ha generado más negocio contrastado (revisión anual, D-062), también se baja, y la cuota nunca es un porcentaje del negocio ni un cargo por Cesión.
+
+**Why.** Entrar debe ser fácil. Una cuota inicial pequeña marca compromiso sin ser una barrera.
+
+**Consequences.** Constitución §28, léxico (Cuota) y pendientes. Siguen pendientes los importes, el número de Tramos y los umbrales. La condición técnica se mantiene: la cuota mensual debe cubrir con creces el coste del Agente, que se medirá con la clave del modelo en el servidor.
+
+**Revisit when.** Se conozca el coste real del Agente por empresa y antes de cobrar a la primera empresa real.
+

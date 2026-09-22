@@ -961,8 +961,8 @@ Dos planos que nunca se mezclan:
 ENTRE MIEMBROS        Prohibido dar un referido por una contrapartida económica (D-010, expulsión).
                       Se comparte para que te compartan. Es generación de negocio.
 
-ENTRE MIEMBRO Y NS    Suscribirse y pertenecer a NS tiene un coste inicial (o no, por decidir)
-                      y un coste mensual. Esos son los ingresos de NS. No es una comisión.
+ENTRE MIEMBRO Y NS    Suscribirse y pertenecer a NS tiene una cuota inicial y una cuota mensual,
+                      las dos muy bajas (D-063). Esos son los ingresos de NS. No es una comisión.
 ```
 
 Principio interno de sostenibilidad fijado por el fundador: **la cuota mensual de cada miembro debe cubrir con creces el gasto en tokens de su Agente.** El miembro sabe desde la Candidatura que la cuota no es fija. Empieza en un **Tramo de entrada** bajo y razonable, para que entrar sea fácil, y sube de Tramo **solo cuando NS le ha generado más negocio**.
@@ -976,7 +976,7 @@ Reglas de diseño de la suscripción:
 - Cada Tramo lleva un presupuesto de actividad del Agente. NS mide el coste real de tokens por Agente (dato interno, nunca una factura de consumo para el miembro) y ajusta el presupuesto, no la cuota, si el coste se desvía.
 - El Tramo de cada empresa es privado entre la empresa y NS. La Balanza pública no lo muestra.
 
-Los importes, si existe cuota de incorporación, el número de Tramos, los umbrales y el periodo de revisión quedan pendientes del fundador (ver D-025).
+**Cuota inicial y cuota mensual, las dos muy bajas (D-063).** Hay cuota inicial al incorporarse y cuota mensual; las dos son muy bajas y sus importes los anunciará NS. El **Ejercicio** es el año natural (D-062): el Tramo se revisa cada enero con el valor contrastado recibido el año anterior; el primer Ejercicio de una empresa va desde su alta hasta el 31 de diciembre. Quedan pendientes del fundador los importes, el número de Tramos y los umbrales (ver D-025).
 
 ## 29. MVP
 
