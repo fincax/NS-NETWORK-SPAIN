@@ -2,6 +2,37 @@
 
 Punto de parada y siguiente paso. Se actualiza al cerrar cada sesión de trabajo.
 
+## 1 de octubre de 2026 (tarde) · Pregunta exprés (D-065)
+
+**Dónde estamos.**
+
+- El fundador fija el principio: nada debe frenar el dinamismo entre titulares; contactar al Interesado cuanto antes es seña de identidad de NS. Si alguien no contesta, se continúa siempre sin respuesta; si la respuesta llega después, se incorpora.
+- **Construido (D-065), en la rama `claude/optimistic-hawking-rnkanv`:** la Pregunta exprés sustituye a la Pregunta al cedente (D-058). La pregunta nunca mueve la Cesión; "Aceptar y preguntar" en un acto; el cedente responde en 24 h (recordatorio a las 4 h) desde cualquier cara y con la Apertura en el mismo toque; vencido el plazo, la Cesión sigue y el retraso cuenta en el plazo de respuesta del cedente (−5); una respuesta tardía se incorpora marcada. Seis preguntas tipo. Recordatorio de revisión a 24 h (antes 72 h). El Reloj corre en cada drenaje de `/api/jobs`. Reparación de las Cesiones que D-058 dejó esperando al cedente. Latido adaptado. 147 pruebas en verde, tipos y lint limpios. **Pendiente de PR, fusionar y `actualizar.sh`.**
+- Arreglada de paso la prueba del Latido, que dependía de una fecha fija (15-09) y había dejado de pasar con el calendario; ahora se ancla al día siguiente al de ejecución.
+- **Recordatorio del fundador:** la pregunta es solo para casos de duda; el camino es aceptar y contactar. El botón principal es siempre Aceptar.
+- **Dinamismo como Core (D-066):** el fundador lo eleva a principio para todo. Registrado como principio no negociable 18 (constitución y North Star) y principio 11 de NS-ARP: toda espera entre titulares tiene plazo en horas, recordatorio y continuación automática. Propuestas para aplicarlo a lo existente en `docs/11` (sección Dinamismo).
+
+**Siguiente paso acordado (por este orden).**
+
+1. Abrir la PR de la rama, fusionar y lanzar `bash /opt/ns-network/deploy/actualizar.sh`. Comprobar en la demo, como Carlos: "Aceptar y preguntar" en una Cesión y, una hora después, la respuesta destacada.
+2. Protocolo II (Comunicado y Gaceta); después, Brújula.
+3. Lo de siempre: especialidades Manantial y forma jurídica en el alta; notificaciones push (D-039); resto de `docs/08` con el abogado.
+
+## 1 de octubre de 2026 · el servidor ya envía correo
+
+**Dónde estamos.**
+
+- Soporte de Clouding activó la salida SMTP del servidor 200.234.236.135. Se puede activar o desactivar desde el panel de cliente, pestaña "Red" del servidor.
+- `correo.sh probar mmejiasnaranjo@gmail.com` envía correctamente desde `NS Network <hola@networkspain.com>` por IONOS (`smtp.ionos.es`, 465). El correo de prueba llegó a **Recibidos** de Gmail (no a spam). **El correo saliente (D-060) queda funcionando.**
+- La PR #19 está en `main`: Directiva (D-061), Ejercicio en año natural (D-062), cuota inicial y mensual muy bajas (D-063) y tipografía (D-064). Aplicada en el servidor: `/opt/ns-network` está en `699513c`.
+
+**Siguiente paso acordado (por este orden).**
+
+1. Hecho: Gmail muestra "enviado por" y "firmado por" networkspain.com (SPF y DKIM correctos) y cifrado TLS. Opcional: registro DMARC en IONOS si algún proveedor manda los correos a spam.
+2. ~~Aplicar `main` en el servidor~~: hecho, el servidor está en `699513c`.
+3. Protocolo II (Comunicado y Gaceta), antes de las primeras empresas reales; después, Brújula.
+4. Lo de siempre: especialidades Manantial y forma jurídica en el alta; notificaciones push (D-039); resto de `docs/08` con el abogado.
+
 ## 22 de septiembre de 2026 (cierre) · correo configurado, a la espera de Clouding
 
 **Punto de parada.** Esperando la respuesta de **soporte de Clouding** a un ticket para desbloquear la salida SMTP (puertos 465 y 587) del servidor. Al retomar, lo primero es preguntar al fundador si Clouding ha respondido.

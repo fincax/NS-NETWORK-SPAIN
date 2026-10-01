@@ -74,6 +74,8 @@ Business DNA acumulado
 14. El producto debe generar negocio medible.
 15. Cada mejora debe fortalecer el Network Effect.
 16. La Sala no es territorial: se define por sus empresas, no por su mapa.
+17. Nadie busca para sí (D-049).
+18. **Dinamismo: nada espera a nadie** (D-066). El valor de un referido cae con las horas. Todo paso entre titulares tiene un plazo en horas, un recordatorio del Agente y una continuación automática si vence: el flujo sigue siempre, con lo que consta, y lo que llegue después se incorpora. Preguntar es la excepción para casos de duda; el camino es aceptar y contactar. Ninguna feature puede añadir una espera entre dos titulares sin un reloj que la resuelva.
 
 ## Reglas inmutables (D-010)
 

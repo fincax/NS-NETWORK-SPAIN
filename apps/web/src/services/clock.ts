@@ -1,6 +1,7 @@
 /**
  * Reloj de la Sala (D-030): ejecuta los plazos de NS-ARP §9.1 y D-024.
- *  - Revisión: recordatorio a las 72 h; caducidad a los 7 días (vuelve al cedente; el silencio cuenta).
+ *  - Revisión: recordatorio a las 24 h; caducidad a los 7 días (vuelve al cedente; el silencio cuenta).
+ *  - Pregunta exprés (D-065): recordatorio al cedente a las 4 h; a las 24 h la pregunta queda sin respuesta y la Cesión sigue.
  *  - Puente: respuesta al Interesado en 48 h; si no hay hito, RESPONSE_LATE para el cesionario.
  *  - Seguimiento: el Agente pregunta cada 14 días.
  *  - Compromiso (D-042): cada semana completa, cuenta de Cesiones válidas por titular y escalera de avisos hasta la baja.
@@ -10,14 +11,17 @@ import { and, eq, inArray, lt, isNull, or } from "drizzle-orm";
 import type { Db } from "@/db/client";
 import { schema } from "@/db/client";
 import { audit } from "@/lib/audit";
-import { TIMEOUTS } from "@/core/state-machine";
+import { QUESTION_STATES, TIMEOUTS } from "@/core/state-machine";
 import { evaluateCompromiso, type CompromisoResult } from "@/services/compromiso";
+import { infoRoundsFor, patchPendingQuestion } from "@/services/referrals";
 
 export interface ClockResult {
   reminders: number;
   expired: number;
   late: number;
   nudges: number;
+  questionReminders: number;
+  questionsUnanswered: number;
   compromiso: CompromisoResult;
 }
 
@@ -25,18 +29,39 @@ const H = 3_600_000;
 const D = 86_400_000;
 
 export async function runClock(db: Db, now = new Date(), chapterId?: string): Promise<ClockResult> {
-  const res: ClockResult = { reminders: 0, expired: 0, late: 0, nudges: 0, compromiso: { evaluated: 0, met: 0, notices: 0, releases: 0 } };
+  const res: ClockResult = { reminders: 0, expired: 0, late: 0, nudges: 0, questionReminders: 0, questionsUnanswered: 0, compromiso: { evaluated: 0, met: 0, notices: 0, releases: 0 } };
   const scope = chapterId ? eq(schema.referrals.chapterId, chapterId) : undefined;
 
-  // 1 · Recordatorio a las 72 h en revisión
+  // 1 · Recordatorio a las 24 h en revisión
   const toRemind = await db.query.referrals.findMany({
     where: and(scope, inArray(schema.referrals.state, ["ORIGINATOR_PENDING", "RECEIVER_PENDING"]), isNull(schema.referrals.reminderSentAt), lt(schema.referrals.reviewRequestedAt, new Date(now.getTime() - TIMEOUTS.reminderHours * H))),
   });
   for (const r of toRemind) {
     const waitingOn = r.state === "ORIGINATOR_PENDING" ? r.originatorCompanyId : r.receiverCompanyId;
     await db.update(schema.referrals).set({ reminderSentAt: now }).where(eq(schema.referrals.id, r.id));
-    await audit(db, { chapterId: r.chapterId, kind: "REMINDER", actor: { type: "AGENT", id: "clock" }, subject: { type: "Referral", id: r.id }, policyApplied: "timeouts.reminder_72h", result: `Tu Agente te recuerda una Cesión que espera tu decisión desde hace 3 días. Caduca en ${Math.max(0, Math.ceil(((r.expiresAt?.getTime() ?? now.getTime()) - now.getTime()) / D))} días.`, significant: true, companyIds: [waitingOn] });
+    await audit(db, { chapterId: r.chapterId, kind: "REMINDER", actor: { type: "AGENT", id: "clock" }, subject: { type: "Referral", id: r.id }, policyApplied: "timeouts.reminder_24h", result: `Tu Agente te recuerda una Cesión que espera tu decisión desde ayer. Caduca en ${Math.max(0, Math.ceil(((r.expiresAt?.getTime() ?? now.getTime()) - now.getTime()) / D))} días.`, significant: true, companyIds: [waitingOn] });
     res.reminders++;
+  }
+
+  // 1b · Pregunta exprés (D-065): el cedente tiene 24 h; a las 4 h se le recuerda; vencido el plazo, la pregunta queda sin respuesta y la Cesión sigue.
+  const withQuestions = await db.query.referrals.findMany({ where: and(scope, inArray(schema.referrals.state, [...QUESTION_STATES])) });
+  const rounds = await infoRoundsFor(db, withQuestions);
+  for (const r of withQuestions) {
+    const q = rounds.get(r.id)?.pending;
+    if (!q?.asked_at) continue;
+    const askedAt = new Date(q.asked_at).getTime();
+    const dueAt = q.due_at ? new Date(q.due_at).getTime() : askedAt + TIMEOUTS.questionAnswerHours * H;
+    if (!q.unanswered_at && now.getTime() >= dueAt) {
+      await patchPendingQuestion(db, r, { unanswered_at: now.toISOString() });
+      await db.insert(schema.trustEvents).values({ chapterId: r.chapterId, companyId: r.originatorCompanyId, kind: "RESPONSE_LATE", weight: -5, evidenceRef: `referral:${r.id}` });
+      await audit(db, { chapterId: r.chapterId, kind: "QUESTION_UNANSWERED", actor: { type: "AGENT", id: "clock" }, subject: { type: "Referral", id: r.id }, policyApplied: "question.unanswered_24h", result: `El cedente no respondió en ${TIMEOUTS.questionAnswerHours} h. La Cesión sigue con lo que consta; si responde después, el cesionario verá la respuesta destacada. El retraso cuenta en el plazo de respuesta del cedente.`, significant: true, companyIds: [r.originatorCompanyId, r.receiverCompanyId] });
+      res.questionsUnanswered++;
+    } else if (!q.unanswered_at && !q.reminded_at && now.getTime() >= askedAt + TIMEOUTS.questionReminderHours * H) {
+      await patchPendingQuestion(db, r, { reminded_at: now.toISOString() });
+      const left = Math.max(1, Math.round((dueAt - now.getTime()) / H));
+      await audit(db, { chapterId: r.chapterId, kind: "REMINDER", actor: { type: "AGENT", id: "clock" }, subject: { type: "Referral", id: r.id }, policyApplied: "question.reminder_4h", result: `El cesionario te hizo una pregunta hace ${TIMEOUTS.questionReminderHours} h. Te quedan ${left} h; tu Agente te ha dejado un borrador. La Cesión no espera: si no respondes, sigue sin tu respuesta.`, significant: true, companyIds: [r.originatorCompanyId] });
+      res.questionReminders++;
+    }
   }
 
   // 2 · Caducidad a los 7 días

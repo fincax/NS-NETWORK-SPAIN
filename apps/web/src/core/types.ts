@@ -222,11 +222,19 @@ export const QualificationTurn = z.object({
   answer: z.string().optional(),
   confidence: z.number().min(0).max(1).optional(),
   insufficient: z.boolean().default(false),
-  /** Pregunta al cedente (D-058): la formula el cesionario en la revisión; la responde el cedente en persona. */
+  /** Pregunta exprés (D-065): la formula el cesionario; la responde el cedente en persona. Nunca detiene la Cesión. */
   asked_by: z.enum(["RECEIVER"]).optional(),
   answered_by: z.enum(["ORIGINATOR"]).optional(),
   /** Borrador de respuesta que el Agente del cedente saca del Indicio; el Timonel lo confirma o lo corrige. */
   draft_answer: z.string().optional(),
+  /** Plazos de la pregunta (ISO). El cedente tiene 24 h; a las 4 h su Agente le recuerda; vencido el plazo, la pregunta queda "sin respuesta" y la Cesión sigue. */
+  asked_at: z.string().optional(),
+  due_at: z.string().optional(),
+  reminded_at: z.string().optional(),
+  unanswered_at: z.string().optional(),
+  answered_at: z.string().optional(),
+  /** La respuesta llegó después del plazo: se incorpora igualmente y el cesionario la ve destacada. */
+  answered_late: z.boolean().optional(),
 });
 export type QualificationTurn = z.infer<typeof QualificationTurn>;
 

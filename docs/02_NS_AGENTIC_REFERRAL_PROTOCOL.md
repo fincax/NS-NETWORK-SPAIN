@@ -35,6 +35,7 @@ NS-ARP es propiedad intelectual de NS Network. Debe evolucionar con versiones ex
 8. **Fail safe.** Ante duda de permiso, visibilidad o conflicto, el protocolo degrada a la acción más conservadora: no compartir, no revelar, no contactar, escalar.
 9. **Todo se audita.** Cada transición produce un `AuditEvent`. No se registran razonamientos internos; se registran decisiones, evidencia y políticas aplicadas.
 10. **Local first, global by architecture.** Todo objeto lleva `chapter_id`; el enrutamiento fuera de la Sala es una extensión explícita (§13), no un caso implícito.
+11. **Dinamismo: nada espera a nadie (D-066).** Toda espera entre titulares lleva tres cosas: un plazo en horas (`TIMEOUTS`), un recordatorio del Agente antes de vencer y una continuación automática al vencer (la Cesión sigue con lo que consta; lo que llegue después se incorpora). Un estado donde una persona bloquea a otra sin reloj es un defecto del protocolo. Presupuesto de tiempo del camino normal: Apunte → Mesa en minutos; visto bueno, aceptación y Apertura en el mismo día (recordatorio a las 24 h, caducidad a los 7 días); Puente → contacto en 48 h; pregunta en 24 h sin detener nada. Preguntar es la excepción (casos de duda); el camino es aceptar y contactar.
 
 ---
 
@@ -571,15 +572,15 @@ Estados terminales laterales desde cualquier estado previo a INTRODUCED:
 | AGENT_MATCHED → QUALIFIED | Company Agents | outcome QUALIFIED | 48 h → INSUFFICIENT_INFORMATION → EXPIRED |
 | QUALIFIED → COMPLIANCE_CHECK | Matchmaker | `score.total ≥ 0.55` | — |
 | COMPLIANCE_CHECK → MEMBER_REVIEW | Compliance | verdict ≠ BLOCK | — |
-| ORIGINATOR_PENDING → RECEIVER_PENDING | Miembro originador | `HUMAN_DECISION.APPROVE` | 72 h → recordatorio; 7 d → EXPIRED |
-| RECEIVER_PENDING → APPROVED / DIRECTOR_PENDING | Miembro receptor | `APPROVE` | 72 h → recordatorio; 7 d → EXPIRED |
+| ORIGINATOR_PENDING → RECEIVER_PENDING | Miembro originador | `HUMAN_DECISION.APPROVE` | 24 h → recordatorio; 7 d → EXPIRED |
+| RECEIVER_PENDING → APPROVED / DIRECTOR_PENDING | Miembro receptor | `APPROVE` (con o sin pregunta) | 24 h → recordatorio; 7 d → EXPIRED |
 | DIRECTOR_PENDING → APPROVED | Director | `APPROVE` | 5 d → escalado a Presidencia de la Sala |
 | APPROVED → INTRO_AUTHORIZED | Miembro originador | `reveal_scope` definido | — |
 | INTRO_AUTHORIZED → INTRODUCED | Miembro (persona) | introducción enviada | 14 d → recordatorio |
 | INTRODUCED → MEETING → … | Miembro receptor | actualización | check-in del agente cada 14 d |
 | * → VALUE_CONFIRMED | Ambos miembros | ambos confirman | — |
 
-**Pregunta al cedente (D-058).** `REQUEST_INFO` solo lo emite el receptor en `RECEIVER_PENDING` y con una pregunta concreta. La Cesión pasa a `ORIGINATOR_PENDING` con la pregunta registrada como turno de la cualificación (`asked_by: RECEIVER`); el Agente del originador redacta un borrador de respuesta a partir del Indicio y de las notas privadas (`draft_answer`), y la persona lo confirma o lo corrige con `HUMAN_DECISION.ANSWER`, que devuelve la Cesión a `RECEIVER_PENDING` con la respuesta como evidencia (`answered_by: ORIGINATOR`). Máximo **2 rondas** por Cesión; agotadas, solo quedan aceptar o declinar. Cada ida y vuelta reinicia el plazo de revisión (72 h → recordatorio; 7 d → EXPIRED) de quien tiene que actuar. Mientras haya una pregunta sin responder, el originador no puede dar el visto bueno sin responderla. Nunca vuelve a `QUALIFIED`: una Cesión en revisión siempre tiene una persona que debe actuar.
+**Pregunta exprés (D-065; sustituye a D-058).** Una pregunta del receptor **nunca mueve la Cesión ni la detiene**. El receptor la formula en `RECEIVER_PENDING`, sola (`REQUEST_INFO`) o al aceptar (`APPROVE` con `question`: "aceptar y preguntar"), eligiendo una pregunta tipo o una línea libre. Queda como turno de la cualificación (`asked_by: RECEIVER`, `asked_at`, `due_at` = +24 h) con el borrador del Agente del originador (`draft_answer`). El originador responde en persona con `HUMAN_DECISION.ANSWER` (sí, no, "no lo sé" o una línea), desde cualquier estado entre `RECEIVER_PENDING` y `WON`, y en la Apertura en el mismo acto que la autoriza. A las 4 h su Agente le recuerda; a las **24 h** el Reloj deja la pregunta `unanswered_at`, avisa al receptor para que decida con lo que consta y anota `RESPONSE_LATE` al originador. Una respuesta posterior se incorpora igualmente como evidencia (`answered_late: true`) y el receptor la ve destacada. Máximo **2 preguntas** por Cesión, nunca dos abiertas a la vez; preguntar no alarga el plazo de revisión de quien pregunta. Nunca vuelve a `QUALIFIED` ni a `ORIGINATOR_PENDING`: la Cesión siempre está en la mesa de quien decide.
 
 ### 9.2 Reglas de exclusividad de plaza en el ciclo
 
@@ -593,9 +594,9 @@ Si dos claims sobre la misma necesidad provienen de una plaza principal y de una
 | --- | --- | --- | --- |
 | Publicación de señal | Originador | publicar / restringir / retirar | previsualización de capa 0 exacta |
 | Revisión del originador | Originador | aprobar revelar / rechazar | referral card + capa 0–1 del receptor + explanation |
-| Revisión del receptor | Receptor | aceptar / pedir info (máx. 2) / rechazar | referral card + capa 1 de la señal (sin identidad) + explanation |
+| Revisión del receptor | Receptor | aceptar / aceptar y preguntar / solo preguntar (máx. 2, sin detener nada) / rechazar | referral card + capa 1 de la señal (sin identidad) + explanation |
 | Revisión de Directiva | Director | aprobar / rechazar / derivar | referral card + excepciones + capa 1; capa 2 solo si la excepción es de datos personales |
-| Respuesta a la pregunta del receptor | Originador | responder / no ceder | la pregunta, el borrador de su Agente y su propio Indicio |
+| Respuesta a la pregunta del receptor | Originador | responder en 24 h (desde cualquier cara; con la Apertura en el mismo acto) / callar (la Cesión sigue; cuenta en su plazo de respuesta) | la pregunta, el borrador de su Agente y su propio Indicio |
 | Alcance de revelación | Originador | empresa sola / empresa + contacto | capa 2 propia |
 | Envío de introducción | Originador (persona) | enviar / editar / cancelar | `IntroPackage` |
 | Confirmación de resultado | Ambos | valor verificado | outcome propuesto por la otra parte |

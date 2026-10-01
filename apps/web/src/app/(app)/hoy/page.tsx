@@ -5,7 +5,7 @@ import { currentMember, requireDemo } from "@/lib/session";
 import { todaySummary, balance } from "@/services/today";
 import { compromisoStatus } from "@/services/compromiso";
 import { infoRoundsFor } from "@/services/referrals";
-import { REVIEW_STATES } from "@/core/state-machine";
+import { REVIEW_STATES, TIMEOUTS } from "@/core/state-machine";
 import { daysAgo, eur, eurRange, firstName, greeting } from "@/lib/format";
 import { Encaje, Empty, StateBadge } from "@/components/ui";
 import { AgentAvatar } from "@/components/brand";
@@ -46,9 +46,11 @@ export default async function HoyPage() {
     where: and(eq(schema.referrals.chapterId, chapter.id), inArray(schema.referrals.state, [...REVIEW_STATES, "APPROVED", "INTRO_AUTHORIZED"]), or(eq(schema.referrals.receiverCompanyId, company.id), eq(schema.referrals.originatorCompanyId, company.id))),
     orderBy: [desc(schema.referrals.updatedAt)],
   });
-  const forMe = pending.filter((r) => (r.state === "ORIGINATOR_PENDING" && r.originatorCompanyId === company.id) || (r.state === "RECEIVER_PENDING" && r.receiverCompanyId === company.id) || (r.state === "DIRECTOR_PENDING" && member.isDirector) || (["APPROVED", "INTRO_AUTHORIZED"].includes(r.state) && r.originatorCompanyId === company.id));
+  const rounds = await infoRoundsFor(db, pending);
+  // Pregunta exprés (D-065): una pregunta pendiente del cesionario pone la Cesión en la mesa del cedente sin moverla de estado.
+  const askedToMe = (r: { id: string; originatorCompanyId: string }) => r.originatorCompanyId === company.id && Boolean(rounds.get(r.id)?.pending) && !rounds.get(r.id)?.overdue;
+  const forMe = pending.filter((r) => (r.state === "ORIGINATOR_PENDING" && r.originatorCompanyId === company.id) || (r.state === "RECEIVER_PENDING" && r.receiverCompanyId === company.id) || (r.state === "DIRECTOR_PENDING" && member.isDirector) || (["APPROVED", "INTRO_AUTHORIZED"].includes(r.state) && r.originatorCompanyId === company.id) || askedToMe(r));
   const waiting = pending.filter((r) => !forMe.includes(r));
-  const rounds = await infoRoundsFor(db, forMe);
   const matches = new Map((await db.query.matchCandidates.findMany({ where: inArray(schema.matchCandidates.id, pending.map((r) => r.matchId).concat("00000000-0000-0000-0000-000000000000")) })).map((m) => [m.id, m]));
   const inCourse = await db.query.referrals.findMany({ where: and(eq(schema.referrals.chapterId, chapter.id), inArray(schema.referrals.state, ["INTRODUCED", "MEETING", "COMMERCIAL_OPPORTUNITY", "WON"]), or(eq(schema.referrals.receiverCompanyId, company.id), eq(schema.referrals.originatorCompanyId, company.id))) });
 
@@ -140,9 +142,9 @@ export default async function HoyPage() {
                   <div className="row"><StateBadge state={r.state} /><span className="spacer" /><span className="mono">{iAmReceiver ? "recibes" : "cedes"}</span></div>
                   <div className="title" style={{ display: "flex", gap: 14, alignItems: "baseline", flexWrap: "wrap" }}>
                     {m ? <Encaje total={m.score.total} band={m.score.band} /> : null}
-                    <strong>{rounds.get(r.id)?.pending && !iAmReceiver ? `${other?.name} te pregunta` : iAmReceiver ? `Cesión de ${other?.name}` : `Cesión a ${other?.name}`}</strong>
+                    <strong>{askedToMe(r) ? `${other?.name} te pregunta · responde en ${TIMEOUTS.questionAnswerHours} h` : iAmReceiver && rounds.get(r.id)?.overdue ? `Cesión de ${other?.name} · sin respuesta: decide con lo que consta` : iAmReceiver ? `Cesión de ${other?.name}` : `Cesión a ${other?.name}`}</strong>
                   </div>
-                  <p className="lead" style={{ fontSize: 14 }}>{rounds.get(r.id)?.pending && !iAmReceiver ? rounds.get(r.id)!.pending!.question : m?.explanation.why[0]}</p>
+                  <p className="lead" style={{ fontSize: 14 }}>{askedToMe(r) ? rounds.get(r.id)!.pending!.question : m?.explanation.why[0]}</p>
                   <p className="money" style={{ fontSize: 18 }}>{eurRange(r.valuePotentialMin, r.valuePotentialMax)}</p>
                 </Link>
               );

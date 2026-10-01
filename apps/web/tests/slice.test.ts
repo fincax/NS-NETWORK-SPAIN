@@ -162,12 +162,13 @@ describe("Scenario D · confidencialidad", () => {
   });
 });
 
-describe("D-058 · Pregunta al cedente", () => {
+describe("D-065 · Pregunta exprés: nada frena la Cesión", () => {
   let referralId: string;
   const lucia = () => companies.guadalquivir;
   const carlos = () => companies.hispalis;
+  const H = 3_600_000;
 
-  it("la pregunta del cesionario va al cedente con el plazo reiniciado; su Agente no decide por él", async () => {
+  it("solo preguntar: la pregunta va al cedente con 24 h de plazo y la Cesión sigue en la mesa del cesionario", async () => {
     const created = await createSignal(db, { companyId: lucia().companyId, memberId: lucia().memberId, rawContent: "Mi cliente Envases del Aljarafe, empresa industrial de 120 empleados, abre una nueva nave industrial en Dos Hermanas en Q2 con 70 empleados nuevos. Presupuesto de obra aprobado de 600.000 €. Decide el Director General, con el que tengo trato directo." });
     await publishSignal(db, created.opportunitySignal.id, lucia().memberId);
     const ref = (await db.query.referrals.findFirst({ where: and(eq(schema.referrals.opportunitySignalId, created.opportunitySignal.id), eq(schema.referrals.receiverCompanyId, carlos().companyId)) }))!;
@@ -175,71 +176,106 @@ describe("D-058 · Pregunta al cedente", () => {
     await decide(db, { referralId, memberId: lucia().memberId, decision: "APPROVE" });
     await expect(decide(db, { referralId, memberId: carlos().memberId, decision: "REQUEST_INFO" })).rejects.toThrow(/pregunta concreta/);
     const before = (await db.query.referrals.findFirst({ where: eq(schema.referrals.id, referralId) }))!;
-    await decide(db, { referralId, memberId: carlos().memberId, decision: "REQUEST_INFO", notes: "¿La obra incluye instalaciones o solo la nave?" });
+    await decide(db, { referralId, memberId: carlos().memberId, decision: "REQUEST_INFO", question: "¿La obra incluye instalaciones o solo la nave?" });
     const after = (await db.query.referrals.findFirst({ where: eq(schema.referrals.id, referralId) }))!;
-    expect(after.state).toBe("ORIGINATOR_PENDING");
-    expect(after.reviewRequestedAt!.getTime()).toBeGreaterThan(before.reviewRequestedAt!.getTime());
+    expect(after.state).toBe("RECEIVER_PENDING"); // no se mueve
+    expect(after.reviewRequestedAt!.getTime()).toBe(before.reviewRequestedAt!.getTime()); // preguntar no alarga el propio plazo
     const round = await infoRound(db, after);
     expect(round.pending?.question).toMatch(/instalaciones/);
+    expect(round.pending?.asked_at).toBeTruthy();
+    expect(round.dueAt!.getTime() - new Date(round.pending!.asked_at!).getTime()).toBe(24 * H);
     expect(round.roundsUsed).toBe(1);
     expect(round.roundsLeft).toBe(1);
-    // Con la pregunta abierta, el cedente no puede "dar el visto bueno" sin responder, y el cesionario no puede aceptar todavía.
-    await expect(decide(db, { referralId, memberId: lucia().memberId, decision: "APPROVE" })).rejects.toThrow(/pregunta/);
-    await expect(decide(db, { referralId, memberId: carlos().memberId, decision: "APPROVE" })).rejects.toThrow();
+    expect(round.overdue).toBe(false);
+    await expect(decide(db, { referralId, memberId: carlos().memberId, decision: "REQUEST_INFO", question: "¿Y el plazo?" })).rejects.toThrow(/Ya hay una pregunta/);
+    await expect(decide(db, { referralId, memberId: carlos().memberId, decision: "ANSWER", notes: "Yo no soy el cedente" })).rejects.toThrow(/Solo el cedente/);
   });
 
-  it("la respuesta del cedente vuelve al cesionario y queda en lo que averiguaron los Agentes", async () => {
-    await expect(decide(db, { referralId, memberId: carlos().memberId, decision: "ANSWER", notes: "Yo no soy el cedente" })).rejects.toThrow(/Solo el cedente/);
+  it("el Reloj recuerda al cedente a las 4 h y a las 24 h deja la pregunta sin respuesta; la Cesión sigue y el cesionario puede decidir", async () => {
+    const ref = (await db.query.referrals.findFirst({ where: eq(schema.referrals.id, referralId) }))!;
+    const asked = new Date((await infoRound(db, ref)).pending!.asked_at!);
+    const r4 = await runClock(db, new Date(asked.getTime() + 5 * H), chapterId);
+    expect(r4.questionReminders).toBe(1);
+    expect((await runClock(db, new Date(asked.getTime() + 6 * H), chapterId)).questionReminders).toBe(0); // idempotente
+    const r24 = await runClock(db, new Date(asked.getTime() + 25 * H), chapterId);
+    expect(r24.questionsUnanswered).toBe(1);
+    const round = await infoRound(db, ref);
+    expect(round.overdue).toBe(true);
+    expect(round.pending).not.toBeNull(); // sigue abierta: se puede responder tarde
+    expect((await db.query.referrals.findFirst({ where: eq(schema.referrals.id, referralId) }))!.state).toBe("RECEIVER_PENDING");
+    const late = await db.query.trustEvents.findFirst({ where: and(eq(schema.trustEvents.companyId, lucia().companyId), eq(schema.trustEvents.kind, "RESPONSE_LATE"), eq(schema.trustEvents.evidenceRef, `referral:${referralId}`)) });
+    expect(late?.weight).toBe(-5);
+  });
+
+  it("una respuesta tardía se incorpora como evidencia y queda marcada", async () => {
     await decide(db, { referralId, memberId: lucia().memberId, decision: "ANSWER", notes: "Solo la nave; las instalaciones las contrata aparte." });
     const ref = (await db.query.referrals.findFirst({ where: eq(schema.referrals.id, referralId) }))!;
     expect(ref.state).toBe("RECEIVER_PENDING");
     const round = await infoRound(db, ref);
     expect(round.pending).toBeNull();
-    expect(round.answered).toHaveLength(1);
     expect(round.answered[0].answer).toMatch(/Solo la nave/);
     expect(round.answered[0].answered_by).toBe("ORIGINATOR");
+    expect(round.answered[0].answered_late).toBe(true);
     const decisions = await db.query.humanDecisions.findMany({ where: eq(schema.humanDecisions.referralId, referralId) });
     expect(decisions.map((d) => d.decision)).toEqual(["APPROVE", "REQUEST_INFO", "ANSWER"]);
   });
 
-  it("como máximo dos rondas: a la tercera solo queda aceptar o declinar", async () => {
-    await decide(db, { referralId, memberId: carlos().memberId, decision: "REQUEST_INFO", notes: "¿Hay fecha de licencia?" });
-    await decide(db, { referralId, memberId: lucia().memberId, decision: "ANSWER", notes: "Licencia solicitada en julio; esperan respuesta en octubre." });
-    await expect(decide(db, { referralId, memberId: carlos().memberId, decision: "REQUEST_INFO", notes: "¿Y el presupuesto?" })).rejects.toThrow(/acepta o declina/);
-    expect((await infoRound(db, { matchId: (await db.query.referrals.findFirst({ where: eq(schema.referrals.id, referralId) }))!.matchId })).roundsLeft).toBe(0);
-    await decide(db, { referralId, memberId: carlos().memberId, decision: "APPROVE" });
-    expect(["APPROVED", "DIRECTOR_PENDING"]).toContain((await db.query.referrals.findFirst({ where: eq(schema.referrals.id, referralId) }))!.state); // Directiva si el valor supera el umbral de la Sala
+  it("aceptar y preguntar: la Cesión avanza y el cedente responde con la Apertura en el mismo acto", async () => {
+    await decide(db, { referralId, memberId: carlos().memberId, decision: "APPROVE", question: "¿Sabe el Interesado que le vamos a contactar?" });
+    const ref = (await db.query.referrals.findFirst({ where: eq(schema.referrals.id, referralId) }))!;
+    expect(["APPROVED", "DIRECTOR_PENDING"]).toContain(ref.state); // Directiva si el valor supera el umbral de la Sala
+    const round = await infoRound(db, ref);
+    expect(round.pending?.question).toMatch(/contactar/);
+    expect(round.roundsLeft).toBe(0);
+    if (ref.state === "DIRECTOR_PENDING") {
+      const director = (await db.query.members.findMany({ where: eq(schema.members.chapterId, chapterId) })).find((m) => m.isDirector && m.companyId !== lucia().companyId && m.companyId !== carlos().companyId)!;
+      await decide(db, { referralId, memberId: director.id, decision: "APPROVE" });
+    }
+    await authorizeIntro(db, referralId, lucia().memberId, "COMPANY_ONLY", { answer: "Sí, le he dicho que le llamaréis esta semana." });
+    const after = (await db.query.referrals.findFirst({ where: eq(schema.referrals.id, referralId) }))!;
+    expect(after.state).toBe("INTRO_AUTHORIZED");
+    const done = await infoRound(db, after);
+    expect(done.pending).toBeNull();
+    expect(done.answered).toHaveLength(2);
+    expect(done.answered[1].answered_late).toBe(false);
+    await expect(decide(db, { referralId, memberId: lucia().memberId, decision: "ANSWER", notes: "otra" })).rejects.toThrow(/ninguna pregunta pendiente/);
   });
 
-  it("reparación: una Cesión que quedó en Cualificada por una petición antigua pasa al cedente con la pregunta", async () => {
+  it("reparación: las Cesiones que una versión anterior dejó esperando al cedente por una pregunta vuelven a la mesa del cesionario", async () => {
     const created = await createSignal(db, { companyId: lucia().companyId, memberId: lucia().memberId, rawContent: "Mi cliente Cerámicas Bajo Guadalquivir, empresa industrial de 90 empleados, abre una nueva nave industrial en Alcalá de Guadaíra en Q1 con 40 empleados nuevos. Presupuesto de obra aprobado de 500.000 €. Decide el gerente, con el que tengo trato directo." });
     await publishSignal(db, created.opportunitySignal.id, lucia().memberId);
     const ref = (await db.query.referrals.findFirst({ where: and(eq(schema.referrals.opportunitySignalId, created.opportunitySignal.id), eq(schema.referrals.receiverCompanyId, carlos().companyId)) }))!;
     await decide(db, { referralId: ref.id, memberId: lucia().memberId, decision: "APPROVE" });
-    // Reproduce el comportamiento anterior a D-058: la petición devolvía la Cesión a QUALIFIED.
+    // Reproduce D-058: la pregunta movía la Cesión al cedente, sin plazo.
     await db.insert(schema.humanDecisions).values({ referralId: ref.id, memberId: carlos().memberId, role: "RECEIVER", decision: "REQUEST_INFO", notes: "¿Tiene presupuesto cerrado?", seenLayers: [0, 1] });
-    await db.insert(schema.referralTransitions).values({ referralId: ref.id, fromState: "RECEIVER_PENDING", toState: "QUALIFIED", actorType: "USER", actorId: carlos().memberId });
-    await db.update(schema.referrals).set({ state: "QUALIFIED" }).where(eq(schema.referrals.id, ref.id));
+    await db.insert(schema.referralTransitions).values({ referralId: ref.id, fromState: "RECEIVER_PENDING", toState: "ORIGINATOR_PENDING", actorType: "USER", actorId: carlos().memberId });
+    await db.update(schema.referrals).set({ state: "ORIGINATOR_PENDING" }).where(eq(schema.referrals.id, ref.id));
+    const match = (await db.query.matchCandidates.findFirst({ where: eq(schema.matchCandidates.id, ref.matchId) }))!;
+    const qual = (await db.query.qualifications.findFirst({ where: eq(schema.qualifications.id, match.qualificationId!) }))!;
+    await db.update(schema.qualifications).set({ turns: [...qual.turns, { kind: "FREE", question: "¿Tiene presupuesto cerrado?", insufficient: true, asked_by: "RECEIVER" }] }).where(eq(schema.qualifications.id, qual.id));
     const repaired = await repairStuckInfoRequests(db);
     expect(repaired).toContain(ref.id);
     const fixed = (await db.query.referrals.findFirst({ where: eq(schema.referrals.id, ref.id) }))!;
-    expect(fixed.state).toBe("ORIGINATOR_PENDING");
-    expect((await infoRound(db, fixed)).pending?.question).toMatch(/presupuesto cerrado/);
+    expect(fixed.state).toBe("RECEIVER_PENDING");
+    const round = await infoRound(db, fixed);
+    expect(round.pending?.question).toMatch(/presupuesto cerrado/);
+    expect(round.dueAt).not.toBeNull();
     expect(await repairStuckInfoRequests(db)).toEqual([]); // idempotente
     await decide(db, { referralId: ref.id, memberId: lucia().memberId, decision: "ANSWER", notes: "Cerrado en 400.000 €." });
     expect((await db.query.referrals.findFirst({ where: eq(schema.referrals.id, ref.id) }))!.state).toBe("RECEIVER_PENDING");
+    expect((await infoRound(db, fixed)).answered[0].answered_late).toBe(false);
   });
 });
 
 describe("D-030 · Reloj de la Sala", () => {
-  it("recuerda a las 72 h y caduca a los 7 días con RESPONSE_LATE para quien calló", async () => {
+  it("recuerda a las 24 h y caduca a los 7 días con RESPONSE_LATE para quien calló", async () => {
     const c = companies.guadalquivir;
     const created = await createSignal(db, { companyId: c.companyId, memberId: c.memberId, rawContent: "Mi cliente Bodegas Alcor abre nueva sede en Utrera en Q1 con 30 empleados nuevos. Presupuesto aprobado. Decide el gerente." });
     const res = await publishSignal(db, created.opportunitySignal.id, c.memberId);
     expect(res.referralIds.length).toBeGreaterThan(0);
     const id = res.referralIds[0];
     const ref0 = (await db.query.referrals.findFirst({ where: eq(schema.referrals.id, id) }))!;
-    const t72 = new Date(ref0.reviewRequestedAt!.getTime() + 73 * 3_600_000);
+    const t72 = new Date(ref0.reviewRequestedAt!.getTime() + 25 * 3_600_000);
     const r1 = await runClock(db, t72, chapterId);
     expect(r1.reminders).toBeGreaterThanOrEqual(1);
     const r1b = await runClock(db, t72, chapterId);

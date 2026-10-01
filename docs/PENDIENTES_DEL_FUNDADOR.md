@@ -2,7 +2,7 @@
 
 Lo que se ha dejado deliberadamente "para más adelante". Claude lo recuerda cuando se le pide y cuando una feature toca uno de estos puntos. Cuando un punto se decide, pasa a `DECISIONS.md` y se tacha aquí con la referencia.
 
-**Última revisión:** 2026-09-22
+**Última revisión:** 2026-10-01
 
 ## Protocolos de Sala (D-018, D-019) · detalles pospuestos el 2026-09-14
 
@@ -43,8 +43,8 @@ Lo que se ha dejado deliberadamente "para más adelante". Claude lo recuerda cua
 - ~~Tipografía definitiva (D-023)~~. El 22-09 se presentaron al fundador la actual (Newsreader + IBM Plex Sans) y tres alternativas: A · Source Serif 4 + Source Sans 3 (institucional), B · Instrument Serif + Inter (editorial contemporánea), C · DM Serif Display + DM Sans (moderna con carácter). → Elegida la B (D-064).
 - Política de notificaciones push (D-039).
 - **Latido de la demo** (D-057): el banco tiene 24 Indicios y se repite cada ocho días; ampliarlo si la ronda de demos se alarga. Confirmar la protagonista (hoy Reformas Industriales Híspalis · Carlos Ruiz) o fijar otra con `NS_LATIDO_PROTAGONISTA`. Decidir si la demo pasa al modelo real (`ANTHROPIC_API_KEY`), con el que el Latido encola en la Mesa en vez de cualificar en línea.
-- **Pregunta al cedente** (D-058): el tope de dos rondas y el reinicio del plazo de 7 días en cada ida y vuelta son parámetros iniciales; revisar con Timoneles reales. Sin clave del modelo, el Agente del cedente no deja borrador (el determinista no responde preguntas libres).
+- **Pregunta exprés** (D-065; sustituye a D-058): el plazo de 24 h, el recordatorio a las 4 h, el −5 por no responder y el tope de dos preguntas son parámetros iniciales; revisar con 50 Cesiones reales. Sin clave del modelo, el Agente del cedente no deja borrador (el determinista no responde preguntas libres).
 - ~~**Copias de seguridad** (D-056): clave guardada fuera del servidor y remoto `ns-copias` en Backblaze B2 (UE), hecho el 22-09.~~ Queda hacer una restauración completa de prueba una vez.
-- **Correo saliente** (D-060): configurado en el servidor con IONOS (`smtp.ionos.es`, 465) el 22-09. **Pendiente de que soporte de Clouding desbloquee la salida por los puertos 465 y 587** (ticket abierto por el fundador). Después: `correo.sh probar` y, si los correos llegan a spam, SPF y DKIM del dominio en IONOS. Plan B: Brevo por el puerto 2525.
+- ~~**Correo saliente** (D-060)~~: funcionando desde el 01-10. Clouding activó la salida SMTP (se gestiona en su panel, pestaña "Red"); IONOS `smtp.ionos.es`, 465; la prueba llegó a Recibidos de Gmail. Gmail muestra "enviado por" y "firmado por" networkspain.com (SPF y DKIM correctos) y cifrado TLS. Opcional: registro DMARC del dominio en IONOS.
 - Textos legales y GDPR (`docs/08`, condición 4 de `docs/17`). Hecho el aviso de privacidad de la web pública (D-055); falta el resto de `docs/08` §3 con el abogado.
 - ~~Responsable del tratamiento~~ → Be Trendy, S.L. (D-055, aviso 2026-09-15.3). Buzón de contacto: `hola@networkspain.com` (o `NS_CONTACT_EMAIL` en el servidor); comprobar que recibe correo.

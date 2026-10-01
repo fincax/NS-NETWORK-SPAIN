@@ -288,6 +288,8 @@ NS debe maximizar automatización sin eliminar responsabilidad humana.
 
 El objetivo no es reducir la autonomía. El objetivo es situar la aprobación humana exactamente donde genera valor.
 
+**Dinamismo como Core (D-066).** Del Apunte a la llamada al Interesado en un día. Cuatro toques humanos (anotar, visto bueno, aceptar, abrir); todo lo demás lo hacen los Agentes. Cada espera entre titulares tiene reloj, recordatorio y continuación automática. La Pregunta exprés (D-065) es la excepción para casos de duda, nunca el camino.
+
 **El Timonel manda (D-027).** La persona que representa a cada empresa en NS se llama **Timonel**. El Agente rema y vigila el horizonte 24/7; el Timonel decide el rumbo: da los vistos buenos, autoriza la Apertura, tiende el Puente y emite el Veredicto. Principio fijado por el fundador: la persona debe sentir siempre que es quien dirige. No es una cortesía de interfaz: es la descripción exacta de las puertas humanas de NS-ARP, y todo diseño que convierta al Timonel en un espectador de su Agente es un error de producto.
 
 ## 8. NS debe ser una red de confianza, no una red abierta
@@ -1376,6 +1378,7 @@ Y posteriormente:
 15. Cada mejora debe fortalecer el Network Effect.
 16. La Sala no es territorial: se define por sus empresas, no por su mapa.
 17. **Nadie busca para sí** (D-049). Los titulares y sus Agentes buscan negocio para los demás titulares de su Sala. El negocio para la propia empresa no entra en NS: solo entra lo que se cede a uno o varios cesionarios. Lo que recibes lo han buscado los demás para ti.
+18. **Dinamismo: nada espera a nadie** (D-066). El valor de un referido cae con las horas. Todo paso entre titulares tiene un plazo en horas, un recordatorio del Agente y una continuación automática si vence: el flujo sigue siempre, con lo que consta, y lo que llegue después se incorpora. Preguntar es la excepción para casos de duda; el camino es aceptar y contactar. Ninguna feature puede añadir una espera entre dos titulares sin un reloj que la resuelva.
 
 ## Reglas inmutables (D-010)
 
