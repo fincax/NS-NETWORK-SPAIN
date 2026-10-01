@@ -2,6 +2,38 @@
 
 Punto de parada y siguiente paso. Se actualiza al cerrar cada sesión de trabajo.
 
+## 1 de octubre de 2026 (cierre) · siete decisiones en un día; todo en la PR #21
+
+**Punto de parada.** Sesión pausada por el fundador ("memoriza todo que luego seguimos"). **Todo el trabajo del día está en la rama `claude/optimistic-hawking-rnkanv` y en la PR #21, sin fusionar.** Al retomar, lo primero: fusionar la PR #21 y lanzar `bash /opt/ns-network/deploy/actualizar.sh` en el servidor (aplica las migraciones `0015` a `0018`). Después, entrar en la demo como Carlos y ver en Hoy la Brújula, el Comunicado y las Cesiones.
+
+**Filosofía fijada hoy por el fundador (recordar siempre).**
+
+1. **Dinamismo como Core (D-066, principio 18).** Nada espera a nadie. Toda espera entre titulares tiene plazo en horas, recordatorio y continuación automática; si alguien no contesta, el flujo sigue y lo que llegue después se incorpora. Contactar al Interesado cuanto antes es seña de identidad de NS.
+2. **Preguntar es la excepción.** Solo para casos de duda. El camino es aceptar y contactar; el botón principal es siempre Aceptar.
+3. **Sencillez absoluta para el usuario; herramienta interna y agentic top del mercado.** El Timonel ve tres líneas y pulsa un botón; el Agente hace todo lo demás. Cada feature nueva se mide con esa vara.
+
+**Dónde estamos (todo en `main` salvo lo marcado).**
+
+- En `main`: D-065 (Pregunta exprés) y D-066 (Dinamismo como Core), fusionadas en la PR #20. Correo saliente funcionando (Clouding desbloqueó SMTP; SPF y DKIM correctos). Servidor en `699513c` + lo que aplique `actualizar.sh`.
+- **En la PR #21 (pendiente):**
+  - D-067 · Avisos con acción en un toque desde el correo (`/accion/[token]`) y Apertura en el visto bueno.
+  - D-068 · Cada espera dura 72 h con reloj propio por mesa (avisos a 24 y 48 h, relevo al caducar); Directiva en 24 h (criterio sigue sola, riesgo escala a NS).
+  - D-069 · «He contactado al Interesado» en un toque (aviso a 24 h); Veredicto provisional del Agente a los 7 días; valor contrastado por silencio a los 7 días.
+  - D-070 · Protocolo II: Comunicado redactado por el Agente el lunes, un toque del Timonel (Hoy o correo), cierre viernes 14:00 con continuidad, Gaceta con "relevante para ti" (`/gaceta`), histórico en el Dossier.
+  - D-071 · La Brújula en Hoy: dónde estás, por qué (evidencia real), qué ganas y tres Movimientos de un toque (cinco tras una semana sin ceder), con descarte con motivo.
+  - 171 pruebas en verde, tipos, lint y build limpios; recorridos de navegador de cada pieza.
+- Decisiones hasta **D-071**. Del banco `docs/11` §F quedan: F3 (ceder directo desde el Apunte) y F4 (Puente desde NS), que tocan puertas humanas y se deciden con el fundador; F9 (tiempo hasta el contacto como métrica visible, cuando haya datos); F10 (medir Apunte → Cesión).
+
+**Siguiente paso acordado (por este orden).**
+
+1. Fusionar la PR #21 y lanzar `actualizar.sh`. Comprobar en la demo: Brújula y Comunicado en Hoy; «Aceptar y preguntar» en una Cesión; Gaceta el viernes a las 14:00.
+2. Notificaciones push (D-039) reutilizando los enlaces de acción de D-067: el mismo botón de un toque, en el móvil.
+3. F9: "del Apunte a la llamada: N h de media" en Hoy, Balanza y web pública.
+4. Decidir con el fundador F3 y F4 (puertas humanas) y el bloque "Cuota" de la Brújula (importes y Tramos, D-025).
+5. Lo de siempre: especialidades Manantial y forma jurídica en el alta; resto de `docs/08` con el abogado; redacción del Comunicado y del "por qué" de la Brújula con el modelo cuando haya historial.
+
+**Para el fundador.** Para que los avisos por correo se vean en acción hace falta modo real (`NS_AUTH_MODE=real`) con una cuenta tuya; en la demo no se escribe a correos ficticios. Cuando quieras, preparo la guía para darte de alta como Timonel real y recibir el primer «Aceptar la Cesión» en tu buzón.
+
 ## 1 de octubre de 2026 (tarde) · Pregunta exprés (D-065)
 
 **Dónde estamos.**

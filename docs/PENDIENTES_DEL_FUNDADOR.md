@@ -2,7 +2,7 @@
 
 Lo que se ha dejado deliberadamente "para más adelante". Claude lo recuerda cuando se le pide y cuando una feature toca uno de estos puntos. Cuando un punto se decide, pasa a `DECISIONS.md` y se tacha aquí con la referencia.
 
-**Última revisión:** 2026-10-01
+**Última revisión:** 2026-10-01 (cierre)
 
 ## Protocolos de Sala (D-018, D-019) · detalles pospuestos el 2026-09-14
 
