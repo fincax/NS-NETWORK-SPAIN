@@ -199,6 +199,8 @@ Reglas:
 
 ### 4. La Brújula (privada)
 
+**Construida (D-071)** en Hoy: el Agente la recalcula cada vez que el Timonel abre la aplicación. Tres bloques de una línea (dónde estás, por qué, qué ganas) y tres Movimientos (cinco tras una semana sin ceder), cada uno con un botón que lo ejecuta y otro que lo descarta. Los Movimientos salen de datos reales: Apuntes y borradores propios, Indicios del Rastreo, Cesiones que esperan una decisión, el Comunicado de la semana y Encargos de otros titulares sobre la clientela del Timonel. Sin confianza suficiente, la Brújula lo dice y pide datos. Pendiente: bloque "Cuota" con importes (D-025) y Sondeos.
+
 El Agente del titular la recalcula cada noche y la presenta en el Despacho y en Hoy. Es el lugar donde el Agente "estudia constantemente cómo mejorar sus estadísticas". Cuatro bloques:
 
 ```text

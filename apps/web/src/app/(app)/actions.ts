@@ -12,6 +12,49 @@ import { requireDemo, requireMember } from "@/lib/session";
 import { runRastreo } from "@/agents/rastreo";
 import { runLatido } from "@/agents/latido";
 import { approveComunicado } from "@/services/comunicados";
+import { acceptedMove, dismissMove, type MoveAction } from "@/services/brujula";
+import { mesaMode, runJobs } from "@/services/jobs";
+import { after } from "next/server";
+import { redirect } from "next/navigation";
+
+/** Brújula (D-071): un Movimiento se ejecuta o se descarta con un toque. */
+export async function moveAction(formData: FormData) {
+  const { member, company, chapter } = await requireMember();
+  const db = await getDb();
+  const key = String(formData.get("key") ?? "");
+  const action = JSON.parse(String(formData.get("action") ?? "{}")) as MoveAction;
+  if (String(formData.get("do")) === "dismiss") {
+    await dismissMove(db, { chapterId: chapter.id, companyId: company.id, memberId: member.id, key, reason: "No procede" });
+    revalidatePath("/hoy");
+    return;
+  }
+  let next = "/hoy";
+  switch (action.type) {
+    case "PUBLISH_SIGNAL": {
+      const res = await publishSignal(db, action.signalId, member.id, { mode: mesaMode() });
+      if ("queued" in res) after(() => runJobs(db, { chapterId: chapter.id, max: 3 }));
+      next = "/mesa";
+      break;
+    }
+    case "ACCEPT_REFERRAL":
+      await decide(db, { referralId: action.referralId, memberId: member.id, decision: "APPROVE" });
+      next = `/cesiones/${action.referralId}`;
+      break;
+    case "PROPOSE_REFERRAL":
+      await decide(db, { referralId: action.referralId, memberId: member.id, decision: "APPROVE", revealScope: "COMPANY_ONLY" });
+      next = `/cesiones/${action.referralId}`;
+      break;
+    case "APPROVE_COMUNICADO":
+      await approveComunicado(db, { comunicadoId: action.comunicadoId, memberId: member.id });
+      break;
+    case "LINK":
+      next = action.href;
+      break;
+  }
+  await acceptedMove(db, { chapterId: chapter.id, companyId: company.id, key });
+  revalidatePath("/", "layout");
+  redirect(next);
+}
 
 /** Protocolo II (D-070): el Timonel aprueba su Comunicado con un toque, con una línea opcional. */
 export async function approveComunicadoAction(formData: FormData) {

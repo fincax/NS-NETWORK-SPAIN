@@ -7,7 +7,7 @@ Lo que se ha dejado deliberadamente "para más adelante". Claude lo recuerda cua
 ## Protocolos de Sala (D-018, D-019) · detalles pospuestos el 2026-09-14
 
 - ~~**Protocolo II · Dar a Conocer.**~~ Construido (D-070): borrador del Agente el lunes, un toque del Timonel, cierre el viernes a las 14:00 con continuidad, Gaceta con "relevante para ti", histórico en el Dossier. Pendiente: si la Gaceta se comparte entre Salas; redacción con el modelo y Gaceta por correo (`docs/14` §9).
-- **Brújula completa.** Cuatro bloques (dónde estás, por qué, qué ganas, Movimientos) y tres o cinco Movimientos accionables. Hoy es una tarjeta con el estado del Compromiso.
+- ~~**Brújula completa.**~~ Construida (D-071) en Hoy con Movimientos de un toque. Pendiente: bloque "Cuota" con importes y Tramos (D-025), Movimientos de Sondeo y Embajada cuando existan esos flujos.
 - **Ritmo por Sala.** La Sala puede fijar un Ritmo mayor que 1, pero no hay pantalla para hacerlo.
 - **Calibración del Mérito frente a la Escalera.** Una Promesa vale hasta 100 y una semana sin ceder resta 5. Revisar tras cuatro semanas de la Sala piloto (D-042).
 

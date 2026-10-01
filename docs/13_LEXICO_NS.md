@@ -116,8 +116,8 @@ Criterios de cada nombre: castellano; una palabra siempre que sea posible; insti
 | **Balanza** | Panel público en la Sala con lo que cada titular ha dado y recibido: Cesiones hechas y recibidas, valor contrastado generado y recibido, del mes y acumulado, y estado frente al Ritmo. Ordenada por plaza, nunca un ranking. | `MemberBalance` |
 | **Balanza de Sala** | Agregado de la Sala: Cesiones y valor contrastado del mes y acumulado, Distinciones, mejor semana. | `ChapterBalance` |
 | **Ritmo** | Objetivo semanal de Cesiones válidas fijado por la Sala o, en su defecto, por NS. Estados: En Ritmo · Por encima · Por debajo. | `WeeklyPace` |
-| **Brújula** | Cuadro privado del titular: si consigue sus objetivos, por qué, qué gana, qué ofrecer, qué proponer y qué referidos posibles tiene para ceder. Solo lo ven el titular y su Agente. | `MemberCompass` |
-| **Movimiento** | Acción concreta que la Brújula propone para la semana (ceder, ofrecer, proponer, sondear, Embajada). Tres por semana; cinco si el titular va Por debajo. Un toque para ejecutar. | `CompassMove` |
+| **Brújula** | Cuadro privado del titular en Hoy: dónde está, por qué (evidencia real), qué gana (consecuencias concretas) y sus Movimientos. Solo lo ven el titular y su Agente (D-071). | `Brujula` · `services/brujula.ts` |
+| **Movimiento** | Acción concreta que la Brújula propone para la semana (ceder, decidir, responder, dar a conocer, cerrar, proponer). Tres por semana; cinco tras una semana sin ceder. Un toque para ejecutar, otro para descartar con motivo (`MOVE_ACCEPTED` / `MOVE_DISMISSED`). | `Move` · `MoveAction` |
 
 Alternativas consideradas para Tramo: "Escalón" y "Nivel de cuota" (descartado "Nivel" por colisión con los Niveles de membresía). Alternativas consideradas: para el protocolo, "Rendir Cuentas" y "Transparencia"; para Balanza, "Tablón" y "Cuadro"; para Brújula, "Bitácora" y "Plan". Se recomienda Cuentas Claras · Balanza · Brújula · Ritmo · Movimiento por sobriedad, literalidad y contraste entre lo público (pesar) y lo privado (orientar).
 

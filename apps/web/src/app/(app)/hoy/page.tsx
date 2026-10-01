@@ -3,13 +3,13 @@ import { and, desc, eq, inArray, or } from "drizzle-orm";
 import { getDb, schema } from "@/db/client";
 import { currentMember, requireDemo } from "@/lib/session";
 import { todaySummary, balance } from "@/services/today";
-import { compromisoStatus } from "@/services/compromiso";
 import { infoRoundsFor } from "@/services/referrals";
 import { REVIEW_STATES, TIMEOUTS } from "@/core/state-machine";
 import { daysAgo, eur, eurRange, firstName, greeting } from "@/lib/format";
 import { Encaje, Empty, StateBadge } from "@/components/ui";
 import { AgentAvatar } from "@/components/brand";
-import { approveComunicadoAction, prepareDemo, runLatidoAction, runRastreoAction } from "../actions";
+import { approveComunicadoAction, moveAction, prepareDemo, runLatidoAction, runRastreoAction } from "../actions";
+import { brujula } from "@/services/brujula";
 import { comunicadoStatus, gaceta } from "@/services/comunicados";
 import { latidoStatus } from "@/agents/latido";
 import { authMode } from "@/lib/auth";
@@ -39,10 +39,9 @@ export default async function HoyPage() {
   await runClockThrottled(db, chapter.id);
   const summary = await todaySummary(db, chapter.id, company.id, daysAgo(7));
   const bal = await balance(db, chapter.id, company.id);
-  const compromiso = await compromisoStatus(db, chapter.id, company.id);
   const comunicado = await comunicadoStatus(db, company.id);
+  const bru = await brujula(db, chapter.id, company.id, member);
   const gazette = await gaceta(db, chapter.id, company.id);
-  const compromisoTone = compromiso.lastAction === "RELEASE_NOTICE" || compromiso.missedStreak >= 2 ? "red" : compromiso.thisWeek.validCount >= compromiso.minimum ? "green" : "amber";
   const companies = new Map((await db.query.companies.findMany()).map((c) => [c.id, c]));
 
   const pending = await db.query.referrals.findMany({
@@ -93,9 +92,41 @@ export default async function HoyPage() {
 
       <InstallHint />
 
-      <section className={`card ${compromisoTone} row`} style={{ justifyContent: "space-between", gap: 14 }} aria-label="Compromiso de la semana">
-        <span><strong>Compromiso · {compromiso.label}.</strong> Esta semana {compromiso.thisWeek.validCount} de {compromiso.minimum} Cesión válida{compromiso.thisWeek.distinctSpecialties > 1 ? ` a ${compromiso.thisWeek.distinctSpecialties} especialidades` : ""}. {compromiso.nextStep}</span>
-        <span className="mono">Brújula · solo tú lo ves</span>
+      {/* Brújula (Protocolo III, D-071): privada; el Agente la recalcula cada vez que abres Hoy */}
+      <section className={`card ${bru.donde.tone}`} aria-label="Tu Brújula">
+        <div className="row" style={{ justifyContent: "space-between" }}><h2 style={{ margin: 0 }}>Tu Brújula · semana {bru.week}</h2><span className="mono">solo tú la ves</span></div>
+        <div className="grid grid-2" style={{ marginTop: 10, gap: 14 }}>
+          <div>
+            <p className="eyebrow">Dónde estás</p>
+            <p><strong>{bru.donde.compromiso}.</strong> {bru.donde.comunicado}.</p>
+            <p className="mono" style={{ marginTop: 4 }}>{bru.donde.recibes} · {bru.donde.das} · {bru.donde.valoracion}</p>
+            {bru.escalera ? <p style={{ marginTop: 6, color: "var(--amber)" }}>{bru.escalera}</p> : null}
+          </div>
+          <div>
+            <p className="eyebrow">Por qué</p>
+            <ul className="plain">{bru.porque.map((l, i) => <li key={i}>{l}</li>)}</ul>
+            <p className="eyebrow" style={{ marginTop: 8 }}>Qué ganas</p>
+            <ul className="plain">{bru.ganas.slice(0, 3).map((l, i) => <li key={i}>{l}</li>)}</ul>
+          </div>
+        </div>
+        <p className="eyebrow" style={{ marginTop: 12 }}>{bru.target} Movimientos para esta semana</p>
+        {bru.movimientos.length === 0 ? (
+          <p className="lead" style={{ fontSize: 14 }}>Tu Agente no tiene todavía un Movimiento con confianza suficiente. Apunta un referido o dile dos cosas en la entrevista: cuanto más sabe, mejor propone.</p>
+        ) : (
+          <ol className="plain" style={{ display: "grid", gap: 8, marginTop: 6 }}>
+            {bru.movimientos.map((m, i) => (
+              <li key={m.key} className="row" style={{ justifyContent: "space-between", gap: 12, alignItems: "flex-start", padding: "8px 0", borderTop: "1px solid var(--line)" }}>
+                <span><span className="mono">{i + 1} · {m.kind.toLowerCase().replaceAll("_", " ")}{m.countsForCompromiso ? " · cuenta para el Compromiso" : ""}</span><br /><strong>{m.title}</strong><br /><span style={{ fontSize: 14 }}>{m.why}</span></span>
+                <form action={moveAction} className="row" style={{ gap: 6, flexShrink: 0 }}>
+                  <input type="hidden" name="key" value={m.key} />
+                  <input type="hidden" name="action" value={JSON.stringify(m.action)} />
+                  {m.action.type === "LINK" ? <Link href={m.action.href} className="btn amber small">{m.button}</Link> : <button className="btn amber small" name="do" value="run" type="submit">{m.button}</button>}
+                  <button className="btn ghost small" name="do" value="dismiss" type="submit" title="No procede: tu Agente aprende y no lo volverá a proponer en 7 días">Descartar</button>
+                </form>
+              </li>
+            ))}
+          </ol>
+        )}
       </section>
 
       {/* Protocolo II (D-070): tu Comunicado de la semana, un toque */}

@@ -1704,3 +1704,26 @@ Servicio a la red        10 %   solo suma: acciones de dirección del mes (3 = 1
 **Consequences.** Migración `0018_protocolo_ii`; `core/comunicado.ts`, `services/comunicados.ts`, `services/clock.ts` (paso 5), `services/avisos.ts` (`notifyComunicado`), `services/accion.ts` (`APPROVE_COMUNICADO`), Hoy, `/gaceta`, Dossier, navegación. 9 pruebas. Documentado en `docs/14` §3 y §9, `docs/13`, `docs/06`, pendientes.
 
 **Revisit when.** Haya cuatro Gacetas reales: medir cuántos Comunicados se aprueban (meta: más del 80 %) y si "relevante para ti" cambia lo que se cede. Después: redacción con el modelo (una línea de novedad por sector a partir del Rastreo) y Gaceta por correo.
+
+---
+
+## D-071 · La Brújula construida: tres líneas y tres Movimientos de un toque, recalculados por el Agente cada vez que el Timonel abre Hoy
+
+**Status:** CONFIRMED (el fundador: "vamos por la Brújula; simpleza absoluta para el usuario, herramienta interna y agentic top")
+**Date:** 2026-10-01
+
+**Context.** El Protocolo III (D-019) tenía la Balanza pública construida y la Brújula privada reducida a una tarjeta con el estado del Compromiso. `docs/14` §4 la especifica con cuatro bloques; el fundador pide que la persona vea lo mínimo y que el Agente haga el trabajo.
+
+**Choice.** La Brújula es una sola tarjeta en Hoy, privada (`COMPANY_ONLY`), que sustituye a la del Compromiso:
+
+- **Dónde estás** (una línea + una de datos): Compromiso de la semana en léxico de la Escalera, estado del Comunicado, valor contrastado recibido en el mes y generado para otros, Valoración y distancia a la Embajada. Tono verde/ámbar/rojo según la Escalera (D-042).
+- **Por qué** (hasta cuatro líneas de evidencia real, nunca consejos genéricos): tasa de aceptación de tus Cesiones, el motivo literal de la última declinada ("tu Agente pedirá ese dato antes de proponer"), medias de tus Veredictos con el eje más débil, y las señales que mejor conviertes (triggers de las Cesiones ganadas). Sin datos, lo dice.
+- **Qué ganas** (consecuencias concretas): Mérito actual y lo que vale aceptar y cerrar; qué falta para la Embajada (80 %); plazas vacantes de la Sala y su prima; Tramo de cuota y valor recibido en el Ejercicio (D-025; importes pendientes).
+- **Movimientos** (tres; cinco tras una semana sin ceder): salen de datos reales y cada uno lleva fuente y confianza. Ceder un Apunte o un Indicio en borrador (`PUBLISH_SIGNAL`), proponer una Cesión preparada (`PROPOSE_REFERRAL`, con Apertura anticipada), aceptar una Cesión que espera (`ACCEPT_REFERRAL`), responder una pregunta, autorizar la Apertura, enviar el Puente, "He contactado", emitir el Veredicto, aprobar el Comunicado (`APPROVE_COMUNICADO`), y Encargos de otros titulares sobre tu clientela ("Apuntar un referido"). Con el Compromiso sin cumplir, primero lo que cuenta para él. Un botón ejecuta (`MOVE_ACCEPTED`); otro descarta con motivo y no se vuelve a proponer en siete días (`MOVE_DISMISSED`). Sin Movimiento con confianza suficiente, la Brújula lo dice y pide datos.
+- La Escalera habla en la propia Brújula: tras una semana sin ceder, cinco Movimientos; tras dos, el aviso diplomático con lo que pasa la tercera y la cuarta; tras tres, el aviso formal.
+
+**Why.** La persona necesita saber tres cosas en diez segundos (cómo voy, por qué, qué gano) y tener algo que hacer con un toque; todo lo demás es ruido. El Agente, en cambio, debe mirarlo todo: Apuntes, Rastreo, Cesiones abiertas, Veredictos, Encargos de la Sala. La Brújula es exactamente esa división: cuadro mínimo, motor máximo. Y nunca es un ranking: compara a la empresa consigo misma.
+
+**Consequences.** `services/brujula.ts` (`brujula`, `dismissMove`, `acceptedMove`), `app/(app)/actions.ts` (`moveAction`), Hoy. Sin migración: los descartes viven en `audit_events`. 5 pruebas. Documentado en `docs/14` §4, `docs/13`, pendientes.
+
+**Revisit when.** Haya cuatro semanas de Brújula real: medir la tasa de aceptación de Movimientos y su conversión en Cesiones válidas (docs/14 §7). Después: Movimientos de Sondeo y de Embajada, bloque "Cuota" con importes, y redacción del "por qué" con el modelo cuando haya historial de 12 semanas.
