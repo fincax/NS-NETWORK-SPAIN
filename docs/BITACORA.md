@@ -12,7 +12,7 @@ Punto de parada y siguiente paso. Se actualiza al cerrar cada sesión de trabajo
 
 **Siguiente paso acordado (por este orden).**
 
-1. Opcional: mirar en Gmail "Mostrar original" que SPF, DKIM y DMARC digan PASS; si algún proveedor manda los correos a spam, revisarlos en IONOS.
+1. Hecho: Gmail muestra "enviado por" y "firmado por" networkspain.com (SPF y DKIM correctos) y cifrado TLS. Opcional: registro DMARC en IONOS si algún proveedor manda los correos a spam.
 2. Aplicar `main` en el servidor con `actualizar.sh` si falta (último commit `699513c`).
 3. Protocolo II (Comunicado y Gaceta), antes de las primeras empresas reales; después, Brújula.
 4. Lo de siempre: especialidades Manantial y forma jurídica en el alta; notificaciones push (D-039); resto de `docs/08` con el abogado.
