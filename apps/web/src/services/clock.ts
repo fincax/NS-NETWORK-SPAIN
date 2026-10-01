@@ -14,7 +14,7 @@ import { schema } from "@/db/client";
 import { audit } from "@/lib/audit";
 import { AUTO_APPROVABLE_EXCEPTIONS, QUESTION_STATES, TIMEOUTS } from "@/core/state-machine";
 import { evaluateCompromiso, type CompromisoResult } from "@/services/compromiso";
-import { approveByClock, infoRoundsFor, patchPendingQuestion } from "@/services/referrals";
+import { approveByClock, confirmValueByClock, infoRoundsFor, patchPendingQuestion, provisionalVerdict } from "@/services/referrals";
 
 export interface ClockResult {
   reminders: number;
@@ -27,6 +27,9 @@ export interface ClockResult {
   directorReminders: number;
   directorApproved: number;
   escalated: number;
+  contactReminders: number;
+  provisionalVerdicts: number;
+  valuesConfirmed: number;
   compromiso: CompromisoResult;
 }
 
@@ -35,7 +38,7 @@ const D = 86_400_000;
 const hoursLeft = (until: Date | null | undefined, now: Date) => Math.max(0, Math.ceil(((until?.getTime() ?? now.getTime()) - now.getTime()) / H));
 
 export async function runClock(db: Db, now = new Date(), chapterId?: string): Promise<ClockResult> {
-  const res: ClockResult = { reminders: 0, expired: 0, late: 0, nudges: 0, questionReminders: 0, questionsUnanswered: 0, secondReminders: 0, directorReminders: 0, directorApproved: 0, escalated: 0, compromiso: { evaluated: 0, met: 0, notices: 0, releases: 0 } };
+  const res: ClockResult = { reminders: 0, expired: 0, late: 0, nudges: 0, questionReminders: 0, questionsUnanswered: 0, secondReminders: 0, directorReminders: 0, directorApproved: 0, escalated: 0, contactReminders: 0, provisionalVerdicts: 0, valuesConfirmed: 0, compromiso: { evaluated: 0, met: 0, notices: 0, releases: 0 } };
   const scope = chapterId ? eq(schema.referrals.chapterId, chapterId) : undefined;
 
   // 1 · Recordatorio a las 24 h en revisión
@@ -127,9 +130,19 @@ export async function runClock(db: Db, now = new Date(), chapterId?: string): Pr
     res.expired++;
   }
 
-  // 3 · Respuesta al Interesado en 48 h tras el Puente
+  // 3a · Primer contacto (D-069): aviso a las 24 h del Puente si el cesionario aún no ha marcado "He contactado"
+  const toRemindContact = await db.query.referrals.findMany({
+    where: and(scope, eq(schema.referrals.state, "INTRODUCED"), isNull(schema.referrals.contactedAt), isNull(schema.referrals.contactReminderSentAt), lt(schema.referrals.introducedAt, new Date(now.getTime() - TIMEOUTS.contactReminderHours * H))),
+  });
+  for (const r of toRemindContact) {
+    await db.update(schema.referrals).set({ contactReminderSentAt: now }).where(eq(schema.referrals.id, r.id));
+    await audit(db, { chapterId: r.chapterId, kind: "CONTACT_REMINDER", actor: { type: "AGENT", id: "clock" }, subject: { type: "Referral", id: r.id }, policyApplied: "contact.reminder_24h", result: `Hace ${TIMEOUTS.contactReminderHours} h que el Puente está tendido y el Interesado espera. Te quedan ${hoursLeft(r.responseDueAt, now)} h del compromiso de ${TIMEOUTS.responseAfterIntroHours} h: llámale y pulsa "He contactado".`, significant: true, companyIds: [r.receiverCompanyId] });
+    res.contactReminders++;
+  }
+
+  // 3 · Respuesta al Interesado en 48 h tras el Puente (si no se marcó el contacto ni hubo hito)
   const toFlag = await db.query.referrals.findMany({
-    where: and(scope, eq(schema.referrals.state, "INTRODUCED"), isNull(schema.referrals.lateFlaggedAt), lt(schema.referrals.responseDueAt, now)),
+    where: and(scope, eq(schema.referrals.state, "INTRODUCED"), isNull(schema.referrals.contactedAt), isNull(schema.referrals.lateFlaggedAt), lt(schema.referrals.responseDueAt, now)),
   });
   for (const r of toFlag) {
     await db.update(schema.referrals).set({ lateFlaggedAt: now }).where(eq(schema.referrals.id, r.id));
@@ -147,6 +160,22 @@ export async function runClock(db: Db, now = new Date(), chapterId?: string): Pr
     await db.update(schema.referrals).set({ lastNudgeAt: now }).where(eq(schema.referrals.id, r.id));
     await audit(db, { chapterId: r.chapterId, kind: "CHECK_IN", actor: { type: "AGENT", id: "clock" }, subject: { type: "Referral", id: r.id }, policyApplied: "timeouts.checkin_14d", result: "Tu Agente pregunta: ¿cómo va esta Cesión? Actualiza el hito o cierra con el Veredicto. Al cedente también le gustará saberlo.", significant: true, companyIds: [r.receiverCompanyId] });
     res.nudges++;
+  }
+
+  // 4a · Veredicto exprés (D-069): a los 7 días del cierre sin Veredicto, el Agente emite uno provisional
+  const closed = await db.query.referrals.findMany({ where: and(scope, inArray(schema.referrals.state, ["WON", "LOST", "NO_DECISION"]), lt(schema.referrals.closedAt, new Date(now.getTime() - TIMEOUTS.verdictDays * D))) });
+  for (const r of closed) {
+    if (await provisionalVerdict(db, r.id)) res.provisionalVerdicts++;
+  }
+
+  // 4b · Valor contrastado por silencio (D-069): ganada con valor y Veredicto desde hace 7 días sin que el cedente lo cuestione
+  const won = await db.query.referrals.findMany({ where: and(scope, eq(schema.referrals.state, "WON")) });
+  for (const r of won) {
+    if (!r.valueVerified) continue;
+    const v = await db.query.verdicts.findFirst({ where: eq(schema.verdicts.referralId, r.id) });
+    if (!v || v.provisional || now.getTime() - v.createdAt.getTime() < TIMEOUTS.valueConfirmDays * D) continue;
+    await confirmValueByClock(db, r.id);
+    res.valuesConfirmed++;
   }
 
   // 5 · Compromiso semanal (D-042): última semana completa, una vez por titular

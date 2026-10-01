@@ -1658,3 +1658,25 @@ Servicio a la red        10 %   solo suma: acciones de dirección del mes (3 = 1
 **Consequences.** Migración `0016_dinamismo_plazos`; `core/state-machine.ts` (`TIMEOUTS`, `AUTO_APPROVABLE_EXCEPTIONS`, `SYSTEM` en `DIRECTOR_PENDING → APPROVED`), `services/referrals.ts` (reinicio del reloj en `transition`, `approveByClock`, `afterApproved`), `services/clock.ts` (pasos 1a, 1c y 2), `agents/mesa.ts`, tarjeta. Pruebas: Reloj (3 nuevas), core. Documentado en `docs/02` §4 y §9.1, `docs/15`, `docs/13`, `docs/06`, `docs/11` (F5, F6 hechas). Latido: la Distinción ficticia se otorga en el primer cierre ganado del mes (estabiliza la prueba).
 
 **Revisit when.** Haya 50 Cesiones reales: medir cuántas caducan y cuántas aprueba el Reloj por silencio de la Directiva. Si las caducidades superan el 10 %, el problema es el aviso, no el plazo.
+
+---
+
+## D-069 · Primer contacto en un toque y Veredicto exprés: el cierre del bucle tampoco espera (F7 y F8)
+
+**Status:** CONFIRMED (el fundador: "sigue con F7 y F8")
+**Date:** 2026-10-01
+
+**Context.** Tras el Puente, el único hito del cesionario era el comercial (reunión, propuesta), así que "ya he llamado" no se podía decir con un toque, y el aviso llegaba a las 48 h, cuando el compromiso ya había vencido. Al cerrar, el Mérito de Veredicto y de Cierre del cedente dependía de que el cesionario emitiera el Veredicto, y el valor contrastado de que el cedente lo confirmara: dos esperas sin reloj.
+
+**Choice.**
+
+- **"He contactado al Interesado"** (`referrals.contacted_at`): botón único y grande en la cara de seguimiento y en el aviso "Puente tendido" (enlace de acción `CONTACTED`). No cambia el hito comercial. A tiempo (≤ 48 h) anota `RESPONSE_ON_TIME`; tarde, `RESPONSE_LATE` (−10). El Agente avisa a las **24 h** del Puente (`contact_reminder_sent_at`) si no se ha pulsado; la marca de las 48 h solo salta si no hubo contacto ni hito.
+- **Veredicto exprés** (`verdicts.provisional`): a los 7 días del cierre (`closed_at`) sin Veredicto, el Agente emite uno provisional a partir de la evidencia (Facilidad según los componentes en verde de la Promesa; Negocio según el resultado; Trato 4 por defecto; `need_was_real` true; **sin valor contrastado**, que solo lo da una persona). El cedente recibe su Mérito de Veredicto y de Cierre; el cesionario no recibe Mérito de cesionario hasta que emita el suyo. La cara Veredicto pasa a "Matiza el Veredicto de tu Agente": al matizar, el provisional y su Mérito se retiran y entra el real.
+- **Valor contrastado por silencio**: ganada, con valor y Veredicto real desde hace 7 días sin que el cedente lo cuestione → `VALUE_CONFIRMED` por `SYSTEM` con motivo explícito, Contraste `OK`, valor al Libro de Valor.
+- Latido: los cesionarios ficticios pulsan "He contactado" antes de la reunión.
+
+**Why.** El Interesado no debe esperar dos días a que alguien se acuerde; un toque a las 24 h y un aviso a mitad del compromiso lo evitan. Dar un buen referido se reconoce al aceptarse (Promesa) y al cerrarse; que el cierre dependa de la diligencia del otro rompía la reciprocidad. El Agente no inventa valor: solo da forma a lo que ya consta, y la persona siempre puede corregirlo.
+
+**Consequences.** Migración `0017_dinamismo_cierre`; `services/referrals.ts` (`markContacted`, `recordVerdict`, `provisionalVerdict`, `confirmValueByClock`, `submitVerdict` sustituye un provisional), `services/clock.ts` (pasos 3a, 4a, 4b), `services/avisos.ts` y `services/accion.ts` (`CONTACTED`), `core/state-machine.ts` (`SYSTEM` en `WON → VALUE_CONFIRMED`, `TIMEOUTS`), tarjeta (seguimiento y Veredicto), `agents/latido.ts`. Pruebas: 2 en el slice, core. Documentado en `docs/02` §9.1, `docs/15`, `docs/13`, `docs/06`, `docs/11` (F7, F8 hechas).
+
+**Revisit when.** Haya 50 Veredictos reales: medir cuántos son provisionales y cuántos se matizan. Si más del 30 % quedan provisionales, el problema es el aviso de cierre, no el plazo.

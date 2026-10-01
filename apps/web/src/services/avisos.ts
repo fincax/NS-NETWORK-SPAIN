@@ -18,7 +18,7 @@ import { publicUrl } from "@/services/correo";
 import { TIMEOUTS } from "@/core/state-machine";
 import { eurRange } from "@/lib/format";
 
-export type LinkAction = "PROPOSE" | "ACCEPT" | "OPEN" | "ANSWER" | "VIEW";
+export type LinkAction = "PROPOSE" | "ACCEPT" | "OPEN" | "ANSWER" | "CONTACTED" | "VIEW";
 export const ACTION_LINK_TTL_HOURS = 72;
 
 const sha256 = (s: string) => createHash("sha256").update(s).digest("hex");
@@ -110,10 +110,10 @@ const SPECS: Record<AvisoEvent, AvisoSpec> = {
   },
   INTRODUCED: {
     to: "RECEIVER",
-    action: "VIEW",
+    action: "CONTACTED",
     subject: () => `Puente tendido: contacta en ${TIMEOUTS.responseAfterIntroHours} h · NS Network`,
-    lines: (c) => [`Hola, ${c.first}:`, `${c.otherPerson} (${c.other}) ha tendido el Puente: el Interesado de "${c.need}" ya sabe que le vas a llamar.`, `Tu compromiso es responderle en ${TIMEOUTS.responseAfterIntroHours} h y anotar el hito en la Cesión.`],
-    button: () => "Ver la Cesión y el contacto",
+    lines: (c) => [`Hola, ${c.first}:`, `${c.otherPerson} (${c.other}) ha tendido el Puente: el Interesado de "${c.need}" ya sabe que le vas a llamar.`, `Tu compromiso es responderle en ${TIMEOUTS.responseAfterIntroHours} h. Cuando lo hayas hecho, pulsa el botón: un toque y queda anotado.`],
+    button: () => "He contactado",
   },
   QUESTION: {
     to: "ORIGINATOR",

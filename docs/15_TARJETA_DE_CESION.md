@@ -68,6 +68,12 @@ Nueva · En revisión (esperando al otro) · Pregunta en curso (D-065: nunca det
 
 Al Cierre, el cesionario valora en tres ejes y tres toques (Facilidad, Negocio, Trato) con la evidencia ya rellenada por el Agente. Puede otorgar una Distinción (una por mes) nombrando el eje y una línea que va a la Crónica. Al confirmar: Mérito de Veredicto y de Cierre para el cedente; Mérito de cesionario para quien cierra el bucle; valor contrastado al Libro de Valor y a la Balanza; Contraste de NS.
 
+**Veredicto exprés (D-069).** Si a los 7 días del cierre no hay Veredicto, el Agente emite uno provisional a partir de la Promesa y del resultado (sin valor contrastado: ese dato solo lo da una persona) y el cedente recibe su Mérito. La cara Veredicto pasa a "Matiza el Veredicto de tu Agente": si el cesionario lo matiza, el Mérito se recalcula. El valor de un cierre ganado queda contrastado si el cedente no lo cuestiona en 7 días.
+
+## Seguimiento · primer contacto en un toque (D-069)
+
+Tras el Puente, la cara de seguimiento del cesionario abre con un solo botón grande: **"He contactado al Interesado"**, con las horas que quedan del compromiso de 48 h. Llega también en el aviso "Puente tendido". A las 24 h sin pulsarlo, el Agente avisa; a las 48 h sin contacto ni hito, cuenta en el plazo de respuesta. Pulsarlo no cambia el hito comercial: solo deja constancia de que el Interesado ya no espera.
+
 ## Móvil
 
 La cara A en una pantalla: Promesa, tres razones, Salvoconducto y la decisión con el pulgar. La cara B prioriza escritorio, pero es operable en móvil con el mismo orden.

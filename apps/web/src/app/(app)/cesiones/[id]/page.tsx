@@ -8,7 +8,7 @@ import { PROMISE_LABEL } from "@/core/merit";
 import { MAX_INFO_ROUNDS, QUESTION_STATES, QUICK_QUESTIONS, STATE_LABEL, TIMEOUTS } from "@/core/state-machine";
 import type { QualificationTurn, ReferralState, SignalEnvelope } from "@/core/types";
 import { infoRound, type InfoRound } from "@/services/referrals";
-import { aperturaAction, confirmValueAction, decideAction, puenteAction, stageAction, verdictAction } from "./actions";
+import { aperturaAction, confirmValueAction, contactedAction, decideAction, puenteAction, stageAction, verdictAction } from "./actions";
 
 export default async function CesionPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -55,7 +55,7 @@ export default async function CesionPage({ params }: { params: Promise<{ id: str
     : iAmOriginator && state === "ORIGINATOR_PENDING" ? "B0"
     : iAmOriginator && ["APPROVED", "INTRO_AUTHORIZED"].includes(state) ? "B"
     : iAmReceiver && ["INTRODUCED", "MEETING", "COMMERCIAL_OPPORTUNITY"].includes(state) && !verdict ? "SEGUIMIENTO"
-    : iAmReceiver && ["WON", "LOST", "NO_DECISION"].includes(state) && !verdict ? "VEREDICTO"
+    : iAmReceiver && ["WON", "LOST", "NO_DECISION"].includes(state) && (!verdict || verdict.provisional) ? "VEREDICTO"
     : "LECTURA";
 
   const expires = hoursUntil(ref.expiresAt);
@@ -108,7 +108,7 @@ export default async function CesionPage({ params }: { params: Promise<{ id: str
           <ul className="why">{match.explanation.why.map((w, i) => <li key={i}>{w}</li>)}</ul>
           {match.explanation.unknowns.length ? (<><p className="eyebrow" style={{ marginTop: 14 }}>Pendiente</p><ul className="why pending">{match.explanation.unknowns.map((u, i) => <li key={i}>{u}</li>)}</ul></>) : null}
           {match.explanation.negatives.length ? (<><p className="eyebrow" style={{ marginTop: 14 }}>En contra</p><ul className="why neg">{match.explanation.negatives.map((u, i) => <li key={i}>{u}</li>)}</ul></>) : null}
-          <p className="mono" style={{ marginTop: 14 }}>Siguiente paso: {nextStep(state, { iAmOriginator, iAmReceiver, info, suggested: match.explanation.next_action, receiverFirst, originatorFirst })}</p>
+          <p className="mono" style={{ marginTop: 14 }}>Siguiente paso: {nextStep(state, { iAmOriginator, iAmReceiver, info, suggested: match.explanation.next_action, receiverFirst, originatorFirst, contacted: Boolean(ref.contactedAt) })}</p>
         </section>
       </div>
 
@@ -290,6 +290,15 @@ export default async function CesionPage({ params }: { params: Promise<{ id: str
       {face === "SEGUIMIENTO" ? (
         <section className="card">
           <h2>Seguimiento</h2>
+          {!ref.contactedAt ? (
+            <form action={contactedAction} className="stack" style={{ marginBottom: 14 }}>
+              <input type="hidden" name="referralId" value={ref.id} />
+              <p className="lead" style={{ fontSize: 14 }}>El Interesado espera tu llamada. Compromiso: {TIMEOUTS.responseAfterIntroHours} h desde el Puente{ref.responseDueAt ? ` (quedan ${hoursUntil(ref.responseDueAt)} h)` : ""}. Cuando lo hayas hecho, un toque:</p>
+              <div className="actions"><button className="btn amber" type="submit" style={{ fontSize: 16, padding: "14px 22px" }}>He contactado al Interesado</button></div>
+            </form>
+          ) : (
+            <p className="mono" style={{ marginBottom: 12 }}>Contactaste al Interesado el {dateTime(ref.contactedAt)}.</p>
+          )}
           <p className="lead" style={{ fontSize: 14, marginBottom: 12 }}>Tu Agente te preguntará cada {TIMEOUTS.checkInDays} días. Actualiza el hito o cierra la Cesión para emitir el Veredicto.</p>
           <form action={stageAction} className="stack">
             <input type="hidden" name="referralId" value={ref.id} />
@@ -307,7 +316,8 @@ export default async function CesionPage({ params }: { params: Promise<{ id: str
       {/* ───────── Veredicto (D-020) y Distinción ───────── */}
       {face === "VEREDICTO" ? (
         <section className="card amber">
-          <h2>Veredicto</h2>
+          <h2>{verdict?.provisional ? "Matiza el Veredicto de tu Agente" : "Veredicto"}</h2>
+          {verdict?.provisional ? <div className="notice" style={{ marginBottom: 12 }}>Tu Agente emitió un Veredicto provisional el {dateTime(verdict.createdAt)} (Facilidad {verdict.verdict.ease} · Negocio {verdict.verdict.business} · Trato {verdict.verdict.treatment}) para que {originator.name} no esperase su Mérito. Si lo matizas, el Mérito se recalcula.</div> : null}
           <p className="lead" style={{ fontSize: 14, marginBottom: 12 }}>Tres ejes, tres toques. Tu Agente ya ha rellenado la evidencia. Al confirmar, {originator.name} recibe Mérito de Veredicto y de Cierre.</p>
           <form action={verdictAction} className="stack">
             <input type="hidden" name="referralId" value={ref.id} />
@@ -337,9 +347,9 @@ export default async function CesionPage({ params }: { params: Promise<{ id: str
       ) : null}
 
       {/* ───────── Lectura: qué pasó y qué toca ───────── */}
-      {verdict ? (
+      {verdict && !(face === "VEREDICTO") ? (
         <section className="card green">
-          <h2>Veredicto emitido</h2>
+          <h2>{verdict.provisional ? "Veredicto provisional del Agente" : "Veredicto emitido"}</h2>
           <p>Facilidad {verdict.verdict.ease}/5 · Negocio {verdict.verdict.business}/5 · Trato {verdict.verdict.treatment}/5 · {STATE_LABEL[verdict.verdict.result as ReferralState]}{verdict.verdict.value_verified ? ` · ${eur(verdict.verdict.value_verified)}` : ""}</p>
           <p className="mono" style={{ marginTop: 6 }}>Mérito para el cedente {verdict.meritOriginator} · para el cesionario {verdict.meritReceiver} · Contraste {verdict.contrastStatus}</p>
           {iAmOriginator && state === "WON" ? (
@@ -398,7 +408,7 @@ async function QualificationList({ qualificationId }: { qualificationId: string 
 }
 
 /** Qué toca ahora, según el estado y quién mira. Solo en la revisión del cesionario vale la sugerencia del Fundamento. */
-function nextStep(state: ReferralState, o: { iAmOriginator: boolean; iAmReceiver: boolean; info: InfoRound; suggested: string; receiverFirst: string; originatorFirst: string }): string {
+function nextStep(state: ReferralState, o: { iAmOriginator: boolean; iAmReceiver: boolean; info: InfoRound; suggested: string; receiverFirst: string; originatorFirst: string; contacted?: boolean }): string {
   switch (state) {
     case "ORIGINATOR_PENDING":
       return o.iAmOriginator ? "Dar el visto bueno para proponer la Cesión." : `Esperar el visto bueno de ${o.originatorFirst}.`;
@@ -410,7 +420,7 @@ function nextStep(state: ReferralState, o: { iAmOriginator: boolean; iAmReceiver
     case "DIRECTOR_PENDING": return `Esperar a la Directiva (${TIMEOUTS.directorHours} h; si la excepción es solo de valor, la Cesión sigue sola).`;
     case "APPROVED": return o.iAmOriginator ? (o.info.pending ? `Responder a ${o.receiverFirst} y autorizar la Apertura en el mismo acto.` : "Autorizar la Apertura y redactar el Puente.") : `${o.originatorFirst} decidirá el alcance de la Apertura.`;
     case "INTRO_AUTHORIZED": return o.iAmOriginator ? "Enviar el Puente en persona y marcarlo como tendido." : `${o.originatorFirst} enviará el Puente.`;
-    case "INTRODUCED": return o.iAmReceiver ? `Responder al Interesado en ${TIMEOUTS.responseAfterIntroHours} h y anotar el hito.` : `${o.receiverFirst} responderá al Interesado.`;
+    case "INTRODUCED": return o.iAmReceiver ? (o.contacted ? "Anotar el hito cuando avance." : `Contactar al Interesado en ${TIMEOUTS.responseAfterIntroHours} h y pulsar "He contactado".`) : `${o.receiverFirst} contactará al Interesado.`;
     case "MEETING": case "COMMERCIAL_OPPORTUNITY": return o.iAmReceiver ? "Actualizar el hito al cerrar." : `${o.receiverFirst} actualiza los hitos.`;
     case "WON": case "LOST": case "NO_DECISION": return o.iAmReceiver ? "Emitir el Veredicto." : `Esperar el Veredicto de ${o.receiverFirst}.`;
     default: return "Nada pendiente.";

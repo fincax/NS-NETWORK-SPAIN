@@ -28,7 +28,7 @@ const TRANSITIONS: Record<string, { to: ReferralState; actors: Actor[] }[]> = {
   INTRODUCED: [{ to: "MEETING", actors: ["RECEIVER"] }, { to: "COMMERCIAL_OPPORTUNITY", actors: ["RECEIVER"] }, { to: "LOST", actors: ["RECEIVER"] }, { to: "NO_DECISION", actors: ["RECEIVER"] }],
   MEETING: [{ to: "COMMERCIAL_OPPORTUNITY", actors: ["RECEIVER"] }, { to: "LOST", actors: ["RECEIVER"] }, { to: "NO_DECISION", actors: ["RECEIVER"] }, { to: "WON", actors: ["RECEIVER"] }],
   COMMERCIAL_OPPORTUNITY: [{ to: "WON", actors: ["RECEIVER"] }, { to: "LOST", actors: ["RECEIVER"] }, { to: "NO_DECISION", actors: ["RECEIVER"] }],
-  WON: [{ to: "VALUE_CONFIRMED", actors: ["ORIGINATOR", "RECEIVER"] }],
+  WON: [{ to: "VALUE_CONFIRMED", actors: ["ORIGINATOR", "RECEIVER", "SYSTEM"] }], // SYSTEM solo por el Reloj: valor no cuestionado en 7 días (D-069)
   LOST: [],
   NO_DECISION: [],
   VALUE_CONFIRMED: [],
@@ -64,7 +64,7 @@ export const REVIEW_STATES: ReadonlySet<ReferralState> = new Set(["ORIGINATOR_PE
  * 24 y 48 h); respuesta al Interesado 48 h tras el Puente. Pregunta exprés: 24 h (recordatorio a las 4 h), sin detener nada.
  * Directiva: 24 h (recordatorio a las 4 h); si la excepción es solo de valor, la Cesión sigue sola; si no, escala a NS.
  */
-export const TIMEOUTS = { reminderHours: 24, secondReminderHours: 48, expiryHours: 72, responseAfterIntroHours: 48, checkInDays: 14, questionReminderHours: 4, questionAnswerHours: 24, directorReminderHours: 4, directorHours: 24 } as const;
+export const TIMEOUTS = { reminderHours: 24, secondReminderHours: 48, expiryHours: 72, responseAfterIntroHours: 48, contactReminderHours: 24, checkInDays: 14, questionReminderHours: 4, questionAnswerHours: 24, directorReminderHours: 4, directorHours: 24, verdictDays: 7, valueConfirmDays: 7 } as const;
 
 /** Excepciones de Compliance que el Reloj puede dar por aprobadas si la Directiva no decide en 24 h (D-068): son de criterio, no de riesgo. */
 export const AUTO_APPROVABLE_EXCEPTIONS: ReadonlySet<string> = new Set(["VALUE_THRESHOLD", "TRIAL_PERIOD"]);

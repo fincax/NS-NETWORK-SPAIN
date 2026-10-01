@@ -355,6 +355,22 @@ export async function markIntroduced(db: Db, referralId: string, memberId: strin
   await audit(db, { chapterId: ref.chapterId, kind: "INTRODUCED", actor: { type: "USER", id: memberId }, subject: { type: "Referral", id: referralId }, result: "El cedente tendió el Puente. El cesionario se compromete a responder al Interesado en 48 h.", significant: true, companyIds: [ref.originatorCompanyId, ref.receiverCompanyId] });
 }
 
+/** Primer contacto en un toque (D-069): el cesionario marca que ya ha contactado al Interesado. Cumple el compromiso de 48 h sin cambiar el hito comercial. */
+export async function markContacted(db: Db, referralId: string, memberId: string) {
+  const role = await roleOf(db, referralId, memberId);
+  if (role !== "RECEIVER") throw new Error("Solo el cesionario marca el primer contacto");
+  const ref = await db.query.referrals.findFirst({ where: eq(schema.referrals.id, referralId) });
+  if (!ref) throw new Error("Cesión no encontrada");
+  if (!["INTRODUCED", "MEETING", "COMMERCIAL_OPPORTUNITY"].includes(ref.state)) throw new Error("El primer contacto se marca tras el Puente.");
+  if (ref.contactedAt) return ref;
+  const now = new Date();
+  const onTime = !ref.responseDueAt || now <= ref.responseDueAt;
+  await db.update(schema.referrals).set({ contactedAt: now, updatedAt: now }).where(eq(schema.referrals.id, referralId));
+  await db.insert(schema.trustEvents).values({ chapterId: ref.chapterId, companyId: ref.receiverCompanyId, kind: onTime ? "RESPONSE_ON_TIME" : "RESPONSE_LATE", weight: onTime ? 0 : -10, evidenceRef: `referral:${referralId}` });
+  await audit(db, { chapterId: ref.chapterId, kind: "CONTACTED", actor: { type: "USER", id: memberId }, subject: { type: "Referral", id: referralId }, policyApplied: onTime ? "contact.on_time" : "contact.late", result: onTime ? "El cesionario ya ha contactado al Interesado, dentro de las 48 h del Puente." : "El cesionario ha contactado al Interesado, fuera de las 48 h del Puente.", significant: true, companyIds: [ref.originatorCompanyId, ref.receiverCompanyId] });
+  return { ...ref, contactedAt: now };
+}
+
 /** Seguimiento por hitos (el Agente pregunta cada 14 días). */
 export async function updateStage(db: Db, referralId: string, memberId: string, stage: "MEETING" | "COMMERCIAL_OPPORTUNITY" | "WON" | "LOST" | "NO_DECISION", notes?: string) {
   const role = await roleOf(db, referralId, memberId);
@@ -381,20 +397,17 @@ export async function submitVerdict(db: Db, input: VerdictInput) {
   if (v.notes && detectsReferralFee(v.notes)) throw new Error("Las notas contienen una contraprestación. Regla inmutable D-010.");
   const state = ref.state as ReferralState;
   if (!["INTRODUCED", "MEETING", "COMMERCIAL_OPPORTUNITY", "WON", "LOST", "NO_DECISION"].includes(state)) throw new Error("El Veredicto se emite tras el Puente.");
+  // Veredicto exprés (D-069): si el Agente emitió uno provisional, el del cesionario lo sustituye y el Mérito se recalcula.
+  const existing = await db.query.verdicts.findFirst({ where: eq(schema.verdicts.referralId, ref.id) });
+  if (existing && !existing.provisional) throw new Error("Esta Cesión ya tiene Veredicto.");
+  if (existing) {
+    await db.delete(schema.trustEvents).where(eq(schema.trustEvents.evidenceRef, `verdict:${existing.id}`));
+    await db.delete(schema.verdicts).where(eq(schema.verdicts.id, existing.id));
+  }
   if (!["WON", "LOST", "NO_DECISION"].includes(state)) await transition(db, ref.id, v.result, "RECEIVER", input.memberId);
 
-  const merit = computeVerdictMerit(v, ref.promise, { embassy: ref.embassy });
-  const [row] = await db.insert(schema.verdicts).values({ referralId: ref.id, receiverMemberId: input.memberId, verdict: v, meritOriginator: merit.originator.verdict + merit.originator.close, meritReceiver: merit.receiver.closedLoop, contrastStatus: "PENDING" }).returning();
+  const { row, merit } = await recordVerdict(db, { ...ref, promise: ref.promise }, v, input.memberId, false);
   const ev = (companyId: string, kind: string, weight: number) => db.insert(schema.trustEvents).values({ chapterId: ref.chapterId, companyId, kind, weight, evidenceRef: `verdict:${row.id}` });
-  if (merit.originator.promiseRevoked) await ev(ref.originatorCompanyId, "PROMISE_REVOKED", -ref.promise.merit_promise);
-  if (merit.originator.verdict) await ev(ref.originatorCompanyId, "VERDICT_MERIT", merit.originator.verdict);
-  if (merit.originator.close) await ev(ref.originatorCompanyId, "CLOSE_MERIT", merit.originator.close);
-  await ev(ref.receiverCompanyId, "RECEIVER_MERIT", merit.receiver.closedLoop);
-  await ev(ref.receiverCompanyId, "OUTCOME_REPORTED", 0);
-  if (v.result === "WON" && v.value_verified) {
-    // El cedente confirma después; en el MVP el valor pasa a "pendiente de contraste" y el estado a VALUE_CONFIRMED cuando ambos confirman.
-    await db.update(schema.referrals).set({ valueVerified: v.value_verified }).where(eq(schema.referrals.id, ref.id));
-  }
 
   let recognition: typeof schema.recognitions.$inferSelect | undefined;
   if (input.recognition) {
@@ -410,8 +423,56 @@ export async function submitVerdict(db: Db, input: VerdictInput) {
     await audit(db, { chapterId: ref.chapterId, kind: "RECOGNITION", actor: { type: "USER", id: input.memberId }, subject: { type: "Recognition", id: recognition.id }, result: `${receiver!.name} distingue a ${originator!.name} por ${input.recognition.axis.toLowerCase()}: "${input.recognition.reason}".`, significant: true });
   }
   const resultLabel = { WON: "ganada", LOST: "perdida", NO_DECISION: "sin decisión" }[v.result];
-  await audit(db, { chapterId: ref.chapterId, kind: "VERDICT", actor: { type: "USER", id: input.memberId }, subject: { type: "Verdict", id: row.id }, policyApplied: merit.originator.promiseRevoked ? "promise.revoked" : "merit.three_moments", result: `Veredicto emitido (Facilidad ${v.ease}/5 · Negocio ${v.business}/5 · Trato ${v.treatment}/5): Cesión ${resultLabel}${v.value_verified ? `, ${v.value_verified.toLocaleString("es-ES")} € pendientes de contraste` : ""}.`, significant: true, companyIds: [ref.originatorCompanyId, ref.receiverCompanyId] });
+  await audit(db, { chapterId: ref.chapterId, kind: "VERDICT", actor: { type: "USER", id: input.memberId }, subject: { type: "Verdict", id: row.id }, policyApplied: merit.originator.promiseRevoked ? "promise.revoked" : "merit.three_moments", result: `Veredicto ${existing ? "matizado por el cesionario" : "emitido"} (Facilidad ${v.ease}/5 · Negocio ${v.business}/5 · Trato ${v.treatment}/5): Cesión ${resultLabel}${v.value_verified ? `, ${v.value_verified.toLocaleString("es-ES")} € pendientes de contraste` : ""}.`, significant: true, companyIds: [ref.originatorCompanyId, ref.receiverCompanyId] });
   return { verdict: row, merit, recognition };
+}
+
+type Ref = typeof schema.referrals.$inferSelect;
+
+/** Registra el Veredicto y su Mérito (D-020). Compartido por el Veredicto del cesionario y el provisional del Agente. */
+async function recordVerdict(db: Db, ref: Ref & { promise: ReferralPromise }, v: ReferralVerdict, memberId: string, provisional: boolean) {
+  const merit = computeVerdictMerit(v, ref.promise, { embassy: ref.embassy });
+  const [row] = await db.insert(schema.verdicts).values({ referralId: ref.id, receiverMemberId: memberId, verdict: v, meritOriginator: merit.originator.verdict + merit.originator.close, meritReceiver: merit.receiver.closedLoop, contrastStatus: "PENDING", provisional }).returning();
+  const ev = (companyId: string, kind: string, weight: number) => db.insert(schema.trustEvents).values({ chapterId: ref.chapterId, companyId, kind, weight, evidenceRef: `verdict:${row.id}` });
+  if (merit.originator.promiseRevoked) await ev(ref.originatorCompanyId, "PROMISE_REVOKED", -ref.promise.merit_promise);
+  if (merit.originator.verdict) await ev(ref.originatorCompanyId, "VERDICT_MERIT", merit.originator.verdict);
+  if (merit.originator.close) await ev(ref.originatorCompanyId, "CLOSE_MERIT", merit.originator.close);
+  if (!provisional) {
+    await ev(ref.receiverCompanyId, "RECEIVER_MERIT", merit.receiver.closedLoop);
+    await ev(ref.receiverCompanyId, "OUTCOME_REPORTED", 0);
+  }
+  if (v.result === "WON" && v.value_verified) {
+    // El cedente confirma después; el valor pasa a "pendiente de contraste" y el estado a VALUE_CONFIRMED cuando ambos confirman (o el Reloj, D-069).
+    await db.update(schema.referrals).set({ valueVerified: v.value_verified }).where(eq(schema.referrals.id, ref.id));
+  }
+  return { row, merit };
+}
+
+/**
+ * Veredicto exprés (D-069): a los 7 días del cierre sin Veredicto del cesionario, el Agente emite uno provisional a partir de la
+ * evidencia (Promesa y resultado), para que el Mérito del cedente no dependa de la diligencia del otro. Sin valor contrastado:
+ * ese dato solo lo da una persona. El cesionario puede matizarlo después y el Mérito se recalcula.
+ */
+export async function provisionalVerdict(db: Db, referralId: string) {
+  const ref = await db.query.referrals.findFirst({ where: eq(schema.referrals.id, referralId) });
+  if (!ref?.promise || !["WON", "LOST", "NO_DECISION"].includes(ref.state)) return null;
+  if (await db.query.verdicts.findFirst({ where: eq(schema.verdicts.referralId, ref.id) })) return null;
+  const member = (await db.query.members.findFirst({ where: and(eq(schema.members.companyId, ref.receiverCompanyId), eq(schema.members.isPrimary, true)) })) ?? (await db.query.members.findFirst({ where: eq(schema.members.companyId, ref.receiverCompanyId) }));
+  if (!member) return null;
+  const green = ref.promise.components.filter((c) => c.status === "GREEN").length;
+  const result = ref.state as "WON" | "LOST" | "NO_DECISION";
+  const v: ReferralVerdict = { ease: green >= 4 ? 4 : green >= 2 ? 3 : 2, business: result === "WON" ? 4 : result === "NO_DECISION" ? 2 : 1, treatment: 4, result, need_was_real: true, notes: `Veredicto provisional del Agente a los ${TIMEOUTS.verdictDays} días del cierre sin Veredicto del cesionario (D-069). Facilidad según la Promesa (${green}/${ref.promise.components.length} componentes en verde); Negocio según el resultado; Trato por defecto.` };
+  const { row, merit } = await recordVerdict(db, ref as Ref & { promise: ReferralPromise }, v, member.id, true);
+  await audit(db, { chapterId: ref.chapterId, kind: "VERDICT_PROVISIONAL", actor: { type: "AGENT", id: "clock" }, subject: { type: "Verdict", id: row.id }, policyApplied: "verdict.provisional_7d", result: `Sin Veredicto del cesionario en ${TIMEOUTS.verdictDays} días: el Agente emite uno provisional (Facilidad ${v.ease}/5 · Negocio ${v.business}/5 · Trato ${v.treatment}/5) y el cedente recibe su Mérito. El cesionario puede matizarlo cuando quiera.`, significant: true, companyIds: [ref.originatorCompanyId, ref.receiverCompanyId] });
+  return { row, merit };
+}
+
+/** Valor contrastado por silencio (D-069): si el cedente no cuestiona el valor en 7 días, el Reloj lo confirma. */
+export async function confirmValueByClock(db: Db, referralId: string) {
+  const ref = await transition(db, referralId, "VALUE_CONFIRMED", "SYSTEM", "reloj", `Valor no cuestionado por el cedente en ${TIMEOUTS.valueConfirmDays} días (D-069)`);
+  await db.update(schema.verdicts).set({ contrastStatus: "OK" }).where(eq(schema.verdicts.referralId, referralId));
+  await db.insert(schema.trustEvents).values({ chapterId: ref.chapterId, companyId: ref.originatorCompanyId, kind: "VALUE_VERIFIED", weight: 0, evidenceRef: `referral:${referralId}` });
+  await audit(db, { chapterId: ref.chapterId, kind: "VALUE_CONFIRMED", actor: { type: "SYSTEM", id: "clock" }, subject: { type: "Referral", id: referralId }, policyApplied: "contrast.silence_7d", result: `Valor contrastado por silencio: el cedente no lo cuestionó en ${TIMEOUTS.valueConfirmDays} días. ${ref.valueVerified?.toLocaleString("es-ES")} € al Libro de Valor.`, significant: true });
 }
 
 /** El cedente confirma el valor: VALUE_CONFIRMED → Libro de Valor y Balanza. */

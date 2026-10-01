@@ -183,9 +183,9 @@ Principio: toda espera entre titulares tiene plazo en horas, recordatorio y cont
 
 **F6 · Caducidad de revisión a 72 h, con relevo.** → Hecho (D-068); la Embajada automática queda para cuando exista la Embajada como flujo. 7 días de silencio es demasiado para un referido caliente. Propuesta: recordatorio a las 24 h (hecho), segundo aviso a las 48 h y caducidad a las 72 h. Al caducar, el Agente del cedente propone en el acto el relevo: Embajada (D-015) a un titular de otra Sala con la plaza vacante o, si la plaza está ocupada, la Cesión vuelve con el motivo visible en la Balanza del que calló.
 
-**F7 · Primer contacto en un toque.** Tras el Puente, el hito "He contactado" como botón único en el móvil y en la notificación (F1), con recordatorio del Agente a las 24 h, no a las 48 h. Las 48 h siguen siendo el compromiso; el aviso llega a mitad de camino.
+**F7 · Primer contacto en un toque.** → Hecho (D-069). Tras el Puente, el hito "He contactado" como botón único en el móvil y en la notificación (F1), con recordatorio del Agente a las 24 h, no a las 48 h. Las 48 h siguen siendo el compromiso; el aviso llega a mitad de camino.
 
-**F8 · Veredicto exprés.** Al cerrar, tres toques con los ejes prellenados por el Agente (hecho en diseño). Propuesta: si el cesionario marca el cierre y no emite Veredicto en 7 días, el Agente emite un Veredicto provisional a partir de la evidencia; el cedente recibe su Mérito de Veredicto y el cesionario puede matizarlo después. Lo mismo para el valor contrastado: si el cedente no lo cuestiona en 7 días, se confirma.
+**F8 · Veredicto exprés.** → Hecho (D-069). Al cerrar, tres toques con los ejes prellenados por el Agente (hecho en diseño). Propuesta: si el cesionario marca el cierre y no emite Veredicto en 7 días, el Agente emite un Veredicto provisional a partir de la evidencia; el cedente recibe su Mérito de Veredicto y el cesionario puede matizarlo después. Lo mismo para el valor contrastado: si el cedente no lo cuestiona en 7 días, se confirma.
 
 **F9 · Tiempo hasta el contacto como métrica visible.** El dinamismo se ve: en Hoy y en la Balanza de la Sala, "del Apunte a la llamada: 19 h de media este mes". En la web pública, el mismo dato de la red. Es la prueba del principio y un argumento de venta; nunca un ranking de personas.
 

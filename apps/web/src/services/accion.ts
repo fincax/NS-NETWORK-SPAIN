@@ -6,7 +6,7 @@ import { and, eq } from "drizzle-orm";
 import type { Db } from "@/db/client";
 import { schema } from "@/db/client";
 import { actionLinkFromToken, markActionLinkUsed, type LinkAction } from "@/services/avisos";
-import { authorizeIntro, decide, infoRound } from "@/services/referrals";
+import { authorizeIntro, decide, infoRound, markContacted } from "@/services/referrals";
 import type { ReferralState, RevealScope } from "@/core/types";
 
 const EXPECTED: Record<LinkAction, ReferralState[] | null> = {
@@ -14,6 +14,7 @@ const EXPECTED: Record<LinkAction, ReferralState[] | null> = {
   ACCEPT: ["RECEIVER_PENDING"],
   OPEN: ["APPROVED"],
   ANSWER: null, // mientras haya una pregunta pendiente
+  CONTACTED: ["INTRODUCED", "MEETING", "COMMERCIAL_OPPORTUNITY"],
   VIEW: null,
 };
 
@@ -22,6 +23,7 @@ export const ACTION_LABEL: Record<LinkAction, string> = {
   ACCEPT: "Aceptar y confirmar la Promesa",
   OPEN: "Autorizar la Apertura",
   ANSWER: "Enviar la respuesta",
+  CONTACTED: "He contactado al Interesado",
   VIEW: "Ver la Cesión",
 };
 
@@ -56,6 +58,7 @@ export async function actionContext(db: Db, token: string): Promise<ActionContex
   const blockedContact = match?.compliance?.blocked_fields.includes("identity_layer.contact_person") ?? false;
   const action = link.action as LinkAction;
   let applies = EXPECTED[action] ? EXPECTED[action]!.includes(referral.state as ReferralState) : action === "VIEW";
+  if (action === "CONTACTED" && referral.contactedAt) applies = false;
   let draftAnswer: string | undefined;
   let question: string | undefined;
   if (action === "ANSWER") {
@@ -88,6 +91,9 @@ export async function executeAction(db: Db, token: string, input: { answer?: str
     case "ANSWER":
       if (!input.answer?.trim()) throw new Error("Escribe la respuesta.");
       await decide(db, { referralId: ctx.referral.id, memberId: ctx.member.id, decision: "ANSWER", notes: input.answer.trim() });
+      break;
+    case "CONTACTED":
+      await markContacted(db, ctx.referral.id, ctx.member.id);
       break;
     case "VIEW":
       break;

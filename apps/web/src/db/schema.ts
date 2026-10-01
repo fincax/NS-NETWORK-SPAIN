@@ -292,6 +292,9 @@ export const referrals = pgTable(
     // Dinamismo (D-068): segundo aviso a las 48 h; escalado a NS de una excepción que la Directiva no resolvió en 24 h.
     secondReminderSentAt: timestamp("second_reminder_sent_at", { withTimezone: true }),
     escalatedAt: timestamp("escalated_at", { withTimezone: true }),
+    // Primer contacto en un toque (D-069): el cesionario marca que ya ha contactado al Interesado; aviso del Agente a las 24 h del Puente.
+    contactedAt: timestamp("contacted_at", { withTimezone: true }),
+    contactReminderSentAt: timestamp("contact_reminder_sent_at", { withTimezone: true }),
     lateFlaggedAt: timestamp("late_flagged_at", { withTimezone: true }),
     lastNudgeAt: timestamp("last_nudge_at", { withTimezone: true }),
     protocolVersion: text("protocol_version").notNull().default("0.2"),
@@ -405,6 +408,8 @@ export const verdicts = pgTable("verdicts", {
   meritOriginator: integer("merit_originator").notNull().default(0),
   meritReceiver: integer("merit_receiver").notNull().default(0),
   contrastStatus: text("contrast_status").notNull().default("PENDING"), // PENDING | OK | FLAGGED
+  // Veredicto exprés (D-069): lo emitió el Agente a los 7 días sin Veredicto del cesionario; este puede matizarlo después.
+  provisional: boolean("provisional").notNull().default(false),
   createdAt: createdAt(),
 });
 

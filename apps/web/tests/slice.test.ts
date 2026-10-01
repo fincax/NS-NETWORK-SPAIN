@@ -4,7 +4,7 @@ import { and, eq } from "drizzle-orm";
 import { closeDb, getDb, schema, type Db } from "@/db/client";
 import { seedChapter, SCENARIOS } from "@/db/seed";
 import { createSignal, publishSignal } from "@/services/signals";
-import { authorizeIntro, confirmValue, decide, infoRound, markIntroduced, repairStuckInfoRequests, submitVerdict, updateStage } from "@/services/referrals";
+import { authorizeIntro, confirmValue, decide, infoRound, markContacted, markIntroduced, repairStuckInfoRequests, submitVerdict, updateStage } from "@/services/referrals";
 import { acceptAllNormas } from "@/core/normas";
 import { onboardCompany, RulesNotAcceptedError, SeatTakenError } from "@/services/onboarding";
 import { NORMAS_NS, NORMAS_VERSION } from "@/core/normas";
@@ -373,6 +373,88 @@ describe("D-030 · Reloj de la Sala (plazos D-068)", () => {
     expect((await db.query.referrals.findFirst({ where: eq(schema.referrals.id, ref.id) }))!.state).toBe("DIRECTOR_PENDING");
     const esc = await db.query.auditEvents.findFirst({ where: and(eq(schema.auditEvents.kind, "ESCALATED_TO_NS"), eq(schema.auditEvents.subjectId, ref.id)) });
     expect(esc?.result).toMatch(/REGULATED_SPECIALTY/);
+  });
+});
+
+describe("D-069 · Primer contacto en un toque y Veredicto exprés", () => {
+  const H = 3_600_000;
+  const D = 86_400_000;
+  const lucia = () => companies.guadalquivir;
+  const carlos = () => companies.hispalis;
+
+  async function introduced(rawContent: string) {
+    const created = await createSignal(db, { companyId: lucia().companyId, memberId: lucia().memberId, rawContent });
+    await publishSignal(db, created.opportunitySignal.id, lucia().memberId);
+    const ref = (await db.query.referrals.findFirst({ where: and(eq(schema.referrals.opportunitySignalId, created.opportunitySignal.id), eq(schema.referrals.receiverCompanyId, carlos().companyId)) }))!;
+    await decide(db, { referralId: ref.id, memberId: lucia().memberId, decision: "APPROVE", revealScope: "COMPANY_ONLY" });
+    await decide(db, { referralId: ref.id, memberId: carlos().memberId, decision: "APPROVE" });
+    let cur = (await db.query.referrals.findFirst({ where: eq(schema.referrals.id, ref.id) }))!;
+    if (cur.state === "DIRECTOR_PENDING") {
+      const director = (await db.query.members.findMany({ where: eq(schema.members.chapterId, chapterId) })).find((m) => m.isDirector && m.companyId !== lucia().companyId && m.companyId !== carlos().companyId)!;
+      await decide(db, { referralId: ref.id, memberId: director.id, decision: "APPROVE" });
+    }
+    await markIntroduced(db, ref.id, lucia().memberId, "Os presento.");
+    cur = (await db.query.referrals.findFirst({ where: eq(schema.referrals.id, ref.id) }))!;
+    expect(cur.state).toBe("INTRODUCED");
+    return cur;
+  }
+
+  it("el Agente avisa a las 24 h del Puente; «He contactado» cumple el compromiso y evita la marca de las 48 h", async () => {
+    const ref = await introduced("Mi cliente Vidrios Aljarafe, empresa industrial de 70 empleados, abre una nueva nave industrial en Dos Hermanas en Q1 con 20 empleados nuevos. Presupuesto de obra aprobado de 300.000 €. Decide el gerente, con el que tengo trato directo.");
+    const t0 = ref.introducedAt!.getTime();
+    const r24 = await runClock(db, new Date(t0 + 25 * H), chapterId);
+    expect(r24.contactReminders).toBe(1);
+    expect((await runClock(db, new Date(t0 + 26 * H), chapterId)).contactReminders).toBe(0); // idempotente
+    await expect(markContacted(db, ref.id, lucia().memberId)).rejects.toThrow(/Solo el cesionario/);
+    await markContacted(db, ref.id, carlos().memberId);
+    const after = (await db.query.referrals.findFirst({ where: eq(schema.referrals.id, ref.id) }))!;
+    expect(after.contactedAt).not.toBeNull();
+    expect(after.state).toBe("INTRODUCED"); // el hito comercial no cambia
+    const onTime = await db.query.trustEvents.findFirst({ where: and(eq(schema.trustEvents.companyId, carlos().companyId), eq(schema.trustEvents.kind, "RESPONSE_ON_TIME"), eq(schema.trustEvents.evidenceRef, `referral:${ref.id}`)) });
+    expect(onTime).toBeTruthy();
+    const r48 = await runClock(db, new Date(t0 + 49 * H), chapterId);
+    expect((await db.query.referrals.findFirst({ where: eq(schema.referrals.id, ref.id) }))!.lateFlaggedAt).toBeNull(); // contactó a tiempo
+    expect(r48.late).toBe(0);
+  });
+
+  it("Veredicto exprés: a los 7 días del cierre sin Veredicto, el Agente emite uno provisional y el cedente cobra; el cesionario lo matiza después y el Mérito se recalcula", async () => {
+    const ref = await introduced("Mi cliente Hierros Bética, empresa industrial de 95 empleados, abre una nueva nave industrial en Alcalá de Guadaíra en Q2 con 35 empleados nuevos. Presupuesto de obra aprobado de 350.000 €. Decide el Director General, con el que tengo trato directo.");
+    await markContacted(db, ref.id, carlos().memberId);
+    await updateStage(db, ref.id, carlos().memberId, "MEETING");
+    await updateStage(db, ref.id, carlos().memberId, "WON");
+    const closed = (await db.query.referrals.findFirst({ where: eq(schema.referrals.id, ref.id) }))!;
+    const t0 = closed.closedAt!.getTime();
+    expect((await runClock(db, new Date(t0 + 6 * D), chapterId)).provisionalVerdicts).toBe(0);
+    const r7 = await runClock(db, new Date(t0 + 8 * D), chapterId);
+    expect(r7.provisionalVerdicts).toBe(1);
+    const prov = (await db.query.verdicts.findFirst({ where: eq(schema.verdicts.referralId, ref.id) }))!;
+    expect(prov.provisional).toBe(true);
+    expect(prov.verdict.result).toBe("WON");
+    expect(prov.verdict.value_verified).toBeUndefined(); // el valor solo lo da una persona
+    expect(prov.meritOriginator).toBeGreaterThan(0);
+    const meritBefore = (await db.query.trustEvents.findMany({ where: eq(schema.trustEvents.evidenceRef, `verdict:${prov.id}`) })).reduce((a, t) => a + t.weight, 0);
+    expect(meritBefore).toBeGreaterThan(0);
+    expect((await runClock(db, new Date(t0 + 9 * D), chapterId)).provisionalVerdicts).toBe(0); // idempotente
+    // Sin valor contrastado, el silencio del cedente no confirma nada
+    expect((await runClock(db, new Date(t0 + 20 * D), chapterId)).valuesConfirmed).toBe(0);
+    // El cesionario matiza: el provisional desaparece con su Mérito y entra el suyo, con valor
+    await submitVerdict(db, { referralId: ref.id, memberId: carlos().memberId, verdict: { ease: 5, business: 5, treatment: 5, result: "WON", value_verified: 120_000, need_was_real: true } });
+    const real = (await db.query.verdicts.findFirst({ where: eq(schema.verdicts.referralId, ref.id) }))!;
+    expect(real.provisional).toBe(false);
+    expect(real.id).not.toBe(prov.id);
+    expect(await db.query.trustEvents.findMany({ where: eq(schema.trustEvents.evidenceRef, `verdict:${prov.id}`) })).toEqual([]);
+    expect((await db.query.referrals.findFirst({ where: eq(schema.referrals.id, ref.id) }))!.valueVerified).toBe(120_000);
+    await expect(submitVerdict(db, { referralId: ref.id, memberId: carlos().memberId, verdict: { ease: 1, business: 1, treatment: 1, result: "WON", need_was_real: true } })).rejects.toThrow(/ya tiene Veredicto/);
+    // Valor contrastado por silencio: 7 días después del Veredicto real sin que el cedente lo cuestione
+    const t1 = real.createdAt.getTime();
+    expect((await runClock(db, new Date(t1 + 6 * D), chapterId)).valuesConfirmed).toBe(0);
+    const rv = await runClock(db, new Date(t1 + 8 * D), chapterId);
+    expect(rv.valuesConfirmed).toBe(1);
+    const done = (await db.query.referrals.findFirst({ where: eq(schema.referrals.id, ref.id) }))!;
+    expect(done.state).toBe("VALUE_CONFIRMED");
+    expect((await db.query.verdicts.findFirst({ where: eq(schema.verdicts.referralId, ref.id) }))!.contrastStatus).toBe("OK");
+    const t = await db.query.referralTransitions.findFirst({ where: and(eq(schema.referralTransitions.referralId, ref.id), eq(schema.referralTransitions.toState, "VALUE_CONFIRMED")) });
+    expect(t?.actorType).toBe("SYSTEM");
   });
 });
 
