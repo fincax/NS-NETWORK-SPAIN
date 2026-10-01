@@ -1685,3 +1685,25 @@ Servicio a la red        10 %   solo suma: acciones de dirección del mes (3 = 1
 **Consequences.** Migración `0017_comunicado`; `core/comunicado.ts` (tipos zod, estable, delta, calendario, relevancia), `services/comunicado.ts`, `services/clock.ts` (paso 6 y `ClockResult.comunicado`), `services/ronda.ts`, `services/valoracion.ts`, `agents/latido.ts`, páginas `/comunicado` y `/gaceta`, tarjeta y "Relevante para ti" en Hoy, sección y columna en Mi Sala, histórico en el Dossier, etiquetas en la Mesa, "Gaceta" en la navegación. Pruebas `comunicado.test.ts` (14) y Latido (2 afirmaciones). Documentado en `docs/14`, `docs/06`, `docs/07`, `docs/13`, `docs/17`.
 
 **Revisit when.** Tras cuatro semanas de Comunicados en la Sala piloto: cuántos se aprueban antes del domingo, cuántos de continuidad, si el conocimiento mutuo sube y si las Pistas ganan precisión. Pendientes del fundador: día y hora del cierre (hoy domingo 20:00), tope de continuidad (hoy dos), si la Gaceta se comparte entre Salas (hoy no) y el aviso por correo del domingo con acción en un toque (F1 aplicado al Comunicado).
+
+---
+
+## D-070 · Hoy es una pila de toques: el tiempo del Timonel es oro
+
+**Status:** CONFIRMED (el fundador: "simplicidad y belleza para el usuario, y solución inmediata de contratiempos")
+**Date:** 2026-10-01
+
+**Context.** Hoy había crecido tarjeta a tarjeta (indicadores, Compromiso, Comunicado, entrevista, copias, Sala viva, Antesala, Relevante, Para tu decisión, Apuntes, Rastreo, Solo para ti, En marcha). Cada una se justificaba sola; juntas obligaban a leer antes de decidir, contra el dinamismo (D-066) y contra "el Timonel manda" (D-027): la persona debe sentir que dirige, no que repasa un panel.
+
+**Choice.**
+
+- **Arriba, solo toques.** `services/hoy.ts` compone una lista única de lo que espera la decisión del Timonel, ordenada por urgencia, con el botón de la decisión evidente dentro de la fila y "Ver" al lado para quien quiera leer más: responder una Pregunta exprés (con el borrador de su Agente en un toque), aceptar una Cesión, proponerla (Apertura autorizada: solo la empresa), autorizar la Apertura, enviar el Puente, revisar una excepción (Directiva), publicar un Apunte o una propuesta del Rastreo, aprobar el Comunicado, hacer la entrevista del ADN, despachar la Antesala. Cada toque pasa por el mismo servicio que la tarjeta: ninguna puerta humana se salta.
+- **Debajo, contratiempos con solución.** Lo que se torció y tiene salida en un toque: una pregunta vencida que aún sirve, un Interesado sin respuesta tras el Puente, un referido caducado por silencio ajeno (volver a cederlo), un Indicio que la Mesa no pudo cualificar, semanas sin ceder (apuntar un referido), una excepción escalada a NS. Nunca un aviso sin acción.
+- **Todo lo demás, una línea.** Valor potencial abierto y contrastado recibido en una línea de estado con el Compromiso, el Comunicado aprobado, la Sala viva (demo) y el Rastreo. "Relevante para ti" en tres líneas, debajo de las decisiones. "En marcha" plegado. Los seis indicadores y las tarjetas informativas desaparecen de Hoy.
+- **Móvil primero.** Cada fila cabe en 390 px con el botón a todo el ancho.
+
+**Why.** Cuatro toques humanos (D-066) exigen que Hoy sea cuatro filas, no un panel. La estructura (protocolos, relojes, auditoría) sigue trabajando por debajo; la persona ve solo lo que depende de ella y lo resuelve sin salir de Hoy.
+
+**Consequences.** `services/hoy.ts` (`hoyBoard`), `app/(app)/hoy/actions.ts` (`toqueAction`), `app/(app)/hoy/page.tsx`, CSS `.toques`, `.toque`, `.estado`, `.plegable`. Pruebas `hoy.test.ts` (5). Ningún protocolo, tabla ni servicio de fondo cambia.
+
+**Revisit when.** Con Timoneles reales: medir toques por sesión y tiempo hasta la primera decisión. Si una fila necesita más contexto del que cabe en dos líneas, el problema es la Explanation de la Pista, no Hoy.
