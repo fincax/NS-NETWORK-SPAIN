@@ -14,6 +14,8 @@ export interface MailMessage {
   subject: string;
   text: string;
   html: string;
+  cc?: string[];
+  replyTo?: string;
 }
 
 export type MailResult = { ok: true } | { ok: false; error: string };
@@ -22,6 +24,11 @@ export type MailResult = { ok: true } | { ok: false; error: string };
 export const outbox: MailMessage[] = [];
 
 const memory = () => process.env.NS_MAIL_TRANSPORT === "memory";
+
+/** Transporte en memoria (pruebas y demo sin SMTP): los mensajes van a `outbox`. */
+export function mailMemory(): boolean {
+  return memory();
+}
 
 export function mailEnabled(): boolean {
   return memory() || Boolean(process.env.NS_SMTP_HOST && process.env.NS_SMTP_USER && process.env.NS_SMTP_PASSWORD);
@@ -49,7 +56,7 @@ export async function sendMail(msg: MailMessage): Promise<MailResult> {
     socketTimeout: 20_000,
   });
   try {
-    await transport.sendMail({ from: mailFrom(), to: msg.to, subject: msg.subject, text: msg.text, html: msg.html });
+    await transport.sendMail({ from: mailFrom(), to: msg.to, cc: msg.cc, replyTo: msg.replyTo, subject: msg.subject, text: msg.text, html: msg.html });
     return { ok: true };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message.slice(0, 300) : "Error desconocido al enviar." };

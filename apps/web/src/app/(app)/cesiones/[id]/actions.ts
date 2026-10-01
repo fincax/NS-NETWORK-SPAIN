@@ -2,7 +2,7 @@
 import { revalidatePath } from "next/cache";
 import { getDb } from "@/db/client";
 import { requireMember } from "@/lib/session";
-import { authorizeIntro, confirmValue, decide, markContacted, markIntroduced, submitVerdict, updateStage } from "@/services/referrals";
+import { authorizeIntro, confirmValue, decide, markContacted, markIntroduced, sendIntroFromNS, submitVerdict, updateStage } from "@/services/referrals";
 import { QUICK_QUESTIONS } from "@/core/state-machine";
 import type { HumanDecisionKind, RevealScope, VerdictAxis } from "@/core/types";
 
@@ -50,7 +50,11 @@ export async function puenteAction(formData: FormData) {
   const { member } = await requireMember();
   const db = await getDb();
   const id = String(formData.get("referralId"));
-  await markIntroduced(db, id, member.id, String(formData.get("message")), (String(formData.get("channel") ?? "EMAIL_BY_MEMBER") as "EMAIL_BY_MEMBER"));
+  const channel = String(formData.get("channel") ?? "EMAIL_BY_MEMBER") as "EMAIL_BY_MEMBER" | "NS_MESSAGE" | "MEETING" | "PHONE_BY_MEMBER";
+  const message = String(formData.get("message"));
+  // Puente desde NS (D-074, F4): lo envía NS en nombre del cedente; si no sale, la persona lo ve y lo envía desde su correo.
+  if (channel === "NS_MESSAGE") await sendIntroFromNS(db, id, member.id, message);
+  else await markIntroduced(db, id, member.id, message, channel);
   done(id);
 }
 

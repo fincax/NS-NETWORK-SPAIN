@@ -21,6 +21,8 @@ export async function apunteAction(formData: FormData) {
       need: String(formData.get("need") ?? ""),
       contactName: String(formData.get("contactName") ?? ""),
       contactRole: String(formData.get("contactRole") ?? ""),
+      contactEmail: String(formData.get("contactEmail") ?? ""),
+      contactConsent: formData.get("contactConsent") === "1",
       notes: String(formData.get("notes") ?? ""),
       relation: RELATIONS.includes(relation as ApunteRelation) ? (relation as ApunteRelation) : "KNOWN",
       expectsContact: formData.get("expectsContact") === "1",

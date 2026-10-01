@@ -9,6 +9,8 @@ import { computeVerdictMerit } from "@/core/merit";
 import { detectsReferralFee } from "@/core/compliance";
 import { ReferralVerdict, type HumanDecisionKind, type QualificationTurn, type ReferralPromise, type ReferralState, type RevealScope, type SignalEnvelope, type VerdictAxis } from "@/core/types";
 import { notifyReferral } from "@/services/avisos";
+import { mailEnabled, mailMemory, sendMail } from "@/lib/mail";
+import { authMode } from "@/lib/auth";
 
 async function transition(db: Db, referralId: string, to: ReferralState, actor: Actor, actorId: string, reason?: string) {
   const ref = await db.query.referrals.findFirst({ where: eq(schema.referrals.id, referralId) });
@@ -355,6 +357,56 @@ export async function markIntroduced(db: Db, referralId: string, memberId: strin
   await audit(db, { chapterId: ref.chapterId, kind: "INTRODUCED", actor: { type: "USER", id: memberId }, subject: { type: "Referral", id: referralId }, result: "El cedente tendió el Puente. El cesionario se compromete a responder al Interesado en 48 h.", significant: true, companyIds: [ref.originatorCompanyId, ref.receiverCompanyId] });
 }
 
+/** Puente desde NS (D-074, F4): puede enviarse si el Interesado está avisado, hay base jurídica y correo del contacto, y el correo de NS funciona. */
+export function canSendIntroFromNS(env: SignalEnvelope): { ok: boolean; reason: string } {
+  const c = env.identity_layer?.contact_person;
+  if (!c?.email) return { ok: false, reason: "sin correo del contacto en el Indicio" };
+  if (c.legal_basis === "NONE") return { ok: false, reason: "sin base jurídica para contactar a la persona" };
+  if (!env.chapter_layer.third_party_expects_contact) return { ok: false, reason: "el Interesado no ha sido avisado" };
+  if (!mailEnabled()) return { ok: false, reason: "el correo de NS no está configurado" };
+  if (authMode() !== "real" && !mailMemory()) return { ok: false, reason: "solo con cuentas reales" };
+  return { ok: true, reason: "" };
+}
+
+/**
+ * Envía el Puente desde hola@networkspain.com en nombre del cedente, con copia a los dos Timoneles y respuesta al cedente.
+ * Lo pulsa la persona (puerta humana intacta); desaparece el copiar y pegar. Si el correo no sale, nada cambia.
+ */
+export async function sendIntroFromNS(db: Db, referralId: string, memberId: string, message: string) {
+  const role = await roleOf(db, referralId, memberId);
+  if (role !== "ORIGINATOR") throw new Error("Solo el cedente tiende el Puente");
+  const ref = await db.query.referrals.findFirst({ where: eq(schema.referrals.id, referralId) });
+  if (!ref || ref.state !== "INTRO_AUTHORIZED") throw new Error("El Puente se envía con la Apertura autorizada");
+  if (detectsReferralFee(message)) throw new Error("El mensaje contiene una contraprestación. Regla inmutable D-010.");
+  const os = await db.query.opportunitySignals.findFirst({ where: eq(schema.opportunitySignals.id, ref.opportunitySignalId) });
+  const env = os?.envelope as SignalEnvelope | undefined;
+  if (!env) throw new Error("Indicio no encontrado");
+  const can = canSendIntroFromNS(env);
+  if (!can.ok) throw new Error(`No se puede enviar desde NS: ${can.reason}.`);
+  const intro = await db.query.introductions.findFirst({ where: eq(schema.introductions.referralId, referralId) });
+  const originatorMember = await db.query.members.findFirst({ where: eq(schema.members.id, memberId) });
+  const receiverMember = (await db.query.members.findFirst({ where: and(eq(schema.members.companyId, ref.receiverCompanyId), eq(schema.members.isPrimary, true)) })) ?? (await db.query.members.findFirst({ where: eq(schema.members.companyId, ref.receiverCompanyId) }));
+  const originator = await db.query.companies.findFirst({ where: eq(schema.companies.id, ref.originatorCompanyId) });
+  const contact = env.identity_layer!.contact_person!;
+  const subject = intro?.preparedByAgent.subject ?? `Presentación de ${originatorMember?.fullName ?? originator?.name ?? "un socio"}`;
+  const text = `${message.trim()}
+
+—
+${originatorMember?.fullName ?? ""}${originator ? ` · ${originator.name}` : ""}
+Enviado desde NS Network en nombre de ${originatorMember?.fullName ?? originator?.name ?? "el remitente"}. Responde a este correo para contestarle directamente.`;
+  const escape = (t: string) => t.replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch]!);
+  const html = `<!doctype html><html lang="es"><body style="margin:0;background:#f6f4ef;font-family:Georgia,'Times New Roman',serif;color:#16181d"><div style="max-width:560px;margin:0 auto;padding:32px 24px;font-size:16px;line-height:1.55">${message.trim().split(/\n{2,}/).map((para) => `<p style="margin:0 0 16px">${escape(para).replace(/\n/g, "<br>")}</p>`).join("")}<p style="margin:24px 0 0;font-family:Arial,sans-serif;font-size:12px;color:#5b6070">${escape(originatorMember?.fullName ?? "")}${originator ? ` · ${escape(originator.name)}` : ""}<br>Enviado desde NS Network en nombre de ${escape(originatorMember?.fullName ?? originator?.name ?? "el remitente")}. Responde a este correo para contestarle directamente.</p></div></body></html>`;
+  const cc = [originatorMember?.email, receiverMember?.email].filter((x): x is string => Boolean(x));
+  const r = await sendMail({ to: contact.email!, cc, replyTo: originatorMember?.email, subject, text, html });
+  if (!r.ok) {
+    await audit(db, { chapterId: ref.chapterId, kind: "MAIL_FAILED", actor: { type: "USER", id: memberId }, subject: { type: "Referral", id: referralId }, policyApplied: "intro.from_ns", result: `El Puente no salió desde NS: ${r.error}. Envíalo desde tu correo.`, significant: false, companyIds: [ref.originatorCompanyId] });
+    throw new Error(`El correo no salió (${r.error}). Envíalo desde tu correo y márcalo como tendido.`);
+  }
+  await markIntroduced(db, referralId, memberId, message, "NS_MESSAGE");
+  await audit(db, { chapterId: ref.chapterId, kind: "INTRO_SENT_BY_NS", actor: { type: "USER", id: memberId }, subject: { type: "Referral", id: referralId }, policyApplied: "intro.from_ns", result: `Puente enviado desde NS a ${contact.name} en nombre de ${originatorMember?.fullName ?? originator?.name ?? "el cedente"}, con copia a los dos Timoneles.`, significant: true, companyIds: [ref.originatorCompanyId, ref.receiverCompanyId] });
+  return { to: contact.email!, cc };
+}
+
 /** Primer contacto en un toque (D-073, F7): el cesionario marca que ya ha contactado al Interesado. A tiempo (48 h) suma; el hito queda en la Cesión y mide el dinamismo. */
 export async function markContacted(db: Db, referralId: string, memberId: string) {
   const role = await roleOf(db, referralId, memberId);
@@ -388,6 +440,15 @@ export interface VerdictInput {
   recognition?: { axis: VerdictAxis; reason: string };
 }
 
+/** Un Veredicto provisional del Agente (D-074, F8) se sustituye cuando el cesionario emite el suyo: fuera su Mérito, fuera la fila. */
+async function dropProvisionalVerdict(db: Db, referralId: string) {
+  const existing = await db.query.verdicts.findFirst({ where: eq(schema.verdicts.referralId, referralId) });
+  if (!existing) return;
+  if (!existing.verdict.provisional) throw new Error("Esta Cesión ya tiene Veredicto.");
+  await db.delete(schema.trustEvents).where(eq(schema.trustEvents.evidenceRef, `verdict:${existing.id}`));
+  await db.delete(schema.verdicts).where(eq(schema.verdicts.id, existing.id));
+}
+
 /** Veredicto (D-020) en tres ejes + Distinción opcional (máx. una por titular y mes). Emite Mérito y valor contrastado. */
 export async function submitVerdict(db: Db, input: VerdictInput) {
   const v = ReferralVerdict.parse(input.verdict);
@@ -398,6 +459,7 @@ export async function submitVerdict(db: Db, input: VerdictInput) {
   if (v.notes && detectsReferralFee(v.notes)) throw new Error("Las notas contienen una contraprestación. Regla inmutable D-010.");
   const state = ref.state as ReferralState;
   if (!["INTRODUCED", "MEETING", "COMMERCIAL_OPPORTUNITY", "WON", "LOST", "NO_DECISION"].includes(state)) throw new Error("El Veredicto se emite tras el Puente.");
+  await dropProvisionalVerdict(db, ref.id);
   if (!["WON", "LOST", "NO_DECISION"].includes(state)) await transition(db, ref.id, v.result, "RECEIVER", input.memberId);
 
   const merit = computeVerdictMerit(v, ref.promise, { embassy: ref.embassy });
@@ -429,6 +491,39 @@ export async function submitVerdict(db: Db, input: VerdictInput) {
   const resultLabel = { WON: "ganada", LOST: "perdida", NO_DECISION: "sin decisión" }[v.result];
   await audit(db, { chapterId: ref.chapterId, kind: "VERDICT", actor: { type: "USER", id: input.memberId }, subject: { type: "Verdict", id: row.id }, policyApplied: merit.originator.promiseRevoked ? "promise.revoked" : "merit.three_moments", result: `Veredicto emitido (Facilidad ${v.ease}/5 · Negocio ${v.business}/5 · Trato ${v.treatment}/5): Cesión ${resultLabel}${v.value_verified ? `, ${v.value_verified.toLocaleString("es-ES")} € pendientes de contraste` : ""}.`, significant: true, companyIds: [ref.originatorCompanyId, ref.receiverCompanyId] });
   return { verdict: row, merit, recognition };
+}
+
+/**
+ * Veredicto exprés (D-074, F8): el cesionario cerró (ganada, perdida o sin decisión) y no emitió Veredicto en 7 días. El Agente
+ * emite uno provisional a partir de la evidencia: Facilidad desde la Promesa, Negocio desde el resultado, Trato neutro. El
+ * cedente recibe su Mérito de Veredicto sin esperar; el cesionario puede matizarlo después y su Veredicto sustituye a este.
+ */
+export async function provisionalVerdict(db: Db, referralId: string) {
+  const ref = await db.query.referrals.findFirst({ where: eq(schema.referrals.id, referralId) });
+  if (!ref || !ref.promise || !["WON", "LOST", "NO_DECISION"].includes(ref.state)) throw new Error("Solo tras un cierre sin Veredicto");
+  const existing = await db.query.verdicts.findFirst({ where: eq(schema.verdicts.referralId, referralId) });
+  if (existing) return existing;
+  const greens = ref.promise.components.filter((c) => c.status === "GREEN").length;
+  const ease = Math.max(1, Math.min(5, Math.round(1 + (greens / Math.max(1, ref.promise.components.length)) * 4)));
+  const business = ref.state === "WON" ? 4 : 2;
+  const v: ReferralVerdict = { ease, business, treatment: 3, result: ref.state as "WON" | "LOST" | "NO_DECISION", value_verified: ref.state === "WON" ? (ref.valueVerified ?? undefined) : undefined, need_was_real: true, provisional: true, notes: `Veredicto provisional del Agente: el cesionario no lo emitió en ${TIMEOUTS.verdictDays} días. Puede matizarlo.` };
+  const merit = computeVerdictMerit(v, ref.promise, { embassy: ref.embassy });
+  const receiverMember = (await db.query.members.findFirst({ where: and(eq(schema.members.companyId, ref.receiverCompanyId), eq(schema.members.isPrimary, true)) })) ?? (await db.query.members.findFirst({ where: eq(schema.members.companyId, ref.receiverCompanyId) }));
+  if (!receiverMember) throw new Error("Sin Timonel cesionario");
+  const [row] = await db.insert(schema.verdicts).values({ referralId: ref.id, receiverMemberId: receiverMember.id, verdict: v, meritOriginator: merit.originator.verdict + merit.originator.close, meritReceiver: 0, contrastStatus: "PENDING" }).returning();
+  const ev = (companyId: string, kind: string, weight: number) => db.insert(schema.trustEvents).values({ chapterId: ref.chapterId, companyId, kind, weight, evidenceRef: `verdict:${row.id}` });
+  if (merit.originator.verdict) await ev(ref.originatorCompanyId, "VERDICT_MERIT", merit.originator.verdict);
+  if (merit.originator.close) await ev(ref.originatorCompanyId, "CLOSE_MERIT", merit.originator.close);
+  await audit(db, { chapterId: ref.chapterId, kind: "VERDICT_PROVISIONAL", actor: { type: "AGENT", id: "clock" }, subject: { type: "Verdict", id: row.id }, policyApplied: "verdict.express_7d", result: `Veredicto provisional del Agente (Facilidad ${ease}/5 · Negocio ${business}/5 · Trato 3/5): el cesionario no lo emitió en ${TIMEOUTS.verdictDays} días. El cedente ya tiene su Mérito de Veredicto; el cesionario puede matizarlo cuando quiera.`, significant: true, companyIds: [ref.originatorCompanyId, ref.receiverCompanyId] });
+  return row;
+}
+
+/** Contraste por silencio (D-074, F8): el cesionario declaró el valor del cierre y el cedente no lo cuestionó en 7 días. */
+export async function confirmValueBySilence(db: Db, referralId: string) {
+  const ref = await transition(db, referralId, "VALUE_CONFIRMED", "SYSTEM", "clock", `El cedente no cuestionó el valor en ${TIMEOUTS.contrastDays} días (D-074)`);
+  await db.update(schema.verdicts).set({ contrastStatus: "OK" }).where(eq(schema.verdicts.referralId, referralId));
+  await db.insert(schema.trustEvents).values({ chapterId: ref.chapterId, companyId: ref.originatorCompanyId, kind: "VALUE_VERIFIED", weight: 0, evidenceRef: `referral:${referralId}` });
+  await audit(db, { chapterId: ref.chapterId, kind: "VALUE_CONFIRMED", actor: { type: "SYSTEM", id: "clock" }, subject: { type: "Referral", id: referralId }, policyApplied: "contrast.silence_7d", result: `Valor contrastado por silencio: el cedente no cuestionó ${ref.valueVerified?.toLocaleString("es-ES")} € en ${TIMEOUTS.contrastDays} días. Al Libro de Valor.`, significant: true });
 }
 
 /** El cedente confirma el valor: VALUE_CONFIRMED → Libro de Valor y Balanza. */

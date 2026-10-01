@@ -17,6 +17,7 @@ export interface CreateSignalInput {
   legalBasisForContact?: "CONSENT" | "LEGITIMATE_INTEREST" | "CONTRACT" | "NONE";
   contactName?: string;
   contactRole?: string;
+  contactEmail?: string; // capa 2: solo para el Puente desde NS (D-074, F4)
   thirdPartyExpectsContact?: boolean; // D-029
 }
 
@@ -49,9 +50,9 @@ export async function createSignal(db: Db, input: CreateSignalInput) {
     chapter_layer: extraction.chapter_layer,
     qualification_layer: extraction.qualification_layer,
     identity_layer: extraction.identity_layer
-      ? { ...extraction.identity_layer, contact_person: input.contactName ? { name: input.contactName, role: input.contactRole, legal_basis: input.legalBasisForContact ?? "NONE" } : undefined }
+      ? { ...extraction.identity_layer, contact_person: input.contactName ? { name: input.contactName, role: input.contactRole, email: input.contactEmail, legal_basis: input.legalBasisForContact ?? "NONE" } : undefined }
       : input.contactName
-        ? { third_party_company: { name: "Sin nombre" }, contact_person: { name: input.contactName, role: input.contactRole, legal_basis: input.legalBasisForContact ?? "NONE" } }
+        ? { third_party_company: { name: "Sin nombre" }, contact_person: { name: input.contactName, role: input.contactRole, email: input.contactEmail, legal_basis: input.legalBasisForContact ?? "NONE" } }
         : undefined,
     private_layer: { source_material_refs: [bs.id], internal_notes: input.rawContent },
   };

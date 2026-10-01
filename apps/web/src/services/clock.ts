@@ -18,13 +18,15 @@ import { AUTO_APPROVABLE_EXCEPTIONS, QUESTION_STATES, TIMEOUTS } from "@/core/st
 import { evaluateCompromiso, type CompromisoResult } from "@/services/compromiso";
 import { evaluateComunicados, type CloseResult } from "@/services/comunicado";
 import { protectedCompanyId } from "@/agents/latido";
-import { approveByClock, infoRoundsFor, patchPendingQuestion } from "@/services/referrals";
+import { approveByClock, confirmValueBySilence, infoRoundsFor, patchPendingQuestion, provisionalVerdict } from "@/services/referrals";
 
 export interface ClockResult {
   reminders: number;
   expired: number;
   late: number;
   contactReminders: number;
+  provisionalVerdicts: number;
+  valuesBySilence: number;
   nudges: number;
   questionReminders: number;
   questionsUnanswered: number;
@@ -41,7 +43,7 @@ const D = 86_400_000;
 const hoursLeft = (until: Date | null | undefined, now: Date) => Math.max(0, Math.ceil(((until?.getTime() ?? now.getTime()) - now.getTime()) / H));
 
 export async function runClock(db: Db, now = new Date(), chapterId?: string): Promise<ClockResult> {
-  const res: ClockResult = { reminders: 0, expired: 0, late: 0, contactReminders: 0, nudges: 0, questionReminders: 0, questionsUnanswered: 0, secondReminders: 0, directorReminders: 0, directorApproved: 0, escalated: 0, compromiso: { evaluated: 0, met: 0, notices: 0, releases: 0 }, comunicado: { weeks: 0, continuity: 0, notices: 0, gazettes: 0, drafted: 0 } };
+  const res: ClockResult = { reminders: 0, expired: 0, late: 0, contactReminders: 0, provisionalVerdicts: 0, valuesBySilence: 0, nudges: 0, questionReminders: 0, questionsUnanswered: 0, secondReminders: 0, directorReminders: 0, directorApproved: 0, escalated: 0, compromiso: { evaluated: 0, met: 0, notices: 0, releases: 0 }, comunicado: { weeks: 0, continuity: 0, notices: 0, gazettes: 0, drafted: 0 } };
   const scope = chapterId ? eq(schema.referrals.chapterId, chapterId) : undefined;
   // Demo (D-071): nadie decide por la protagonista entre demo y demo; el Reloj no la penaliza.
   const shielded = await protectedCompanyId(db);
@@ -174,6 +176,25 @@ export async function runClock(db: Db, now = new Date(), chapterId?: string): Pr
     await db.update(schema.referrals).set({ lastNudgeAt: now }).where(eq(schema.referrals.id, r.id));
     await audit(db, { chapterId: r.chapterId, kind: "CHECK_IN", actor: { type: "AGENT", id: "clock" }, subject: { type: "Referral", id: r.id }, policyApplied: "timeouts.checkin_14d", result: "Tu Agente pregunta: ¿cómo va esta Cesión? Actualiza el hito o cierra con el Veredicto. Al cedente también le gustará saberlo.", significant: true, companyIds: [r.receiverCompanyId] });
     res.nudges++;
+  }
+
+  // 4b · Veredicto exprés (D-074, F8): cierre sin Veredicto en 7 días → provisional del Agente; valor sin cuestionar en 7 días → contrastado
+  const closedNoVerdict = await db.query.referrals.findMany({ where: and(scope, inArray(schema.referrals.state, ["WON", "LOST", "NO_DECISION"]), lt(schema.referrals.closedAt, new Date(now.getTime() - TIMEOUTS.verdictDays * D))) });
+  for (const r of closedNoVerdict) {
+    const v = await db.query.verdicts.findFirst({ where: eq(schema.verdicts.referralId, r.id) });
+    if (v) {
+      if (r.state === "WON" && r.valueVerified && v.createdAt < new Date(now.getTime() - TIMEOUTS.contrastDays * D)) {
+        await confirmValueBySilence(db, r.id);
+        res.valuesBySilence++;
+      }
+      continue;
+    }
+    try {
+      await provisionalVerdict(db, r.id);
+      res.provisionalVerdicts++;
+    } catch {
+      // sin Promesa o sin Timonel: nada que emitir
+    }
   }
 
   // 5 · Compromiso semanal (D-042): última semana completa, una vez por titular

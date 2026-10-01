@@ -1772,3 +1772,24 @@ Servicio a la red        10 %   solo suma: acciones de dirección del mes (3 = 1
 **Consequences.** Migración `0018_contacto`; `services/referrals.ts` (`markContacted`), `services/clock.ts` (3a y 3), `services/dinamismo.ts`, `services/hoy.ts`, tarjeta, Hoy, Mi Sala, portada, `agents/latido.ts`. Pruebas `dinamismo.test.ts` (3). `docs/11` §F: F7, F9 y F10 hechas.
 
 **Revisit when.** Con 50 Cesiones reales: si la media del Apunte a la llamada supera 48 h, el problema está en el Puente (F4), no en el recordatorio.
+
+---
+
+## D-074 · Ceder directo desde el Apunte, Puente desde NS y Veredicto exprés (F3, F4 y F8)
+
+**Status:** CONFIRMED (el fundador: "paso a paso para ser wow", propuestas F3, F4 y F8 de D-066)
+**Date:** 2026-10-01
+
+**Context.** Tres esperas que seguían en el camino: el visto bueno del cedente sobre un referido que él mismo apuntó con el Interesado avisado; el copiar y pegar del Puente al correo propio; y el Veredicto que el cesionario no emite, con el Mérito del cedente parado.
+
+**Choice.**
+
+- **F3 · Ceder directo desde el Apunte.** En la Mesa, si el Indicio es un Apunte (`business_signals.source = APUNTE`) con Interesado avisado (`third_party_expects_contact`), decisor identificado (turno `DECISION_MAKER` con confianza ≥ 0,6), Salvoconducto sin bloqueo (las excepciones siguen yendo a la Directiva cuando el cesionario acepta) y Encaje `HIGH` o `GOOD`, el visto bueno queda implícito: transición `ORIGINATOR_PENDING → RECEIVER_PENDING` firmada por el Timonel que apuntó, `human_decisions` APPROVE con nota, Apertura autorizada (solo la empresa), aviso al cesionario. El cedente lo ve en Hoy "En marcha" y puede retirarla hasta la Apertura. Camino: anotar, aceptar, abrir. Si falta cualquiera de las condiciones, camino normal. El Apunte añade "Me ha autorizado a dar su contacto" (base jurídica `CONSENT`); sin ese toque, la persona de contacto no se revela y el Puente desde NS no está disponible.
+- **F4 · Puente desde NS.** En la cara B, "Desde NS, en mi nombre": `sendIntroFromNS` envía el mensaje redactado desde `hola@networkspain.com` al correo del contacto (nuevo campo opcional en el Apunte y en Ceder un Indicio, capa 2), con copia a los dos Timoneles y respuesta al cedente, firmado "Enviado desde NS Network en nombre de X". Solo con correo del contacto, base jurídica distinta de NONE, Interesado avisado, correo de NS configurado y cuentas reales (o transporte en memoria). Si no se puede, la opción lo dice y queda deshabilitada; si el correo no sale, nada cambia y la persona lo envía desde su correo. Lo pulsa la persona: la puerta humana sigue intacta.
+- **F8 · Veredicto exprés.** Un cierre (ganada, perdida, sin decisión) sin Veredicto en 7 días (`TIMEOUTS.verdictDays`) recibe un **Veredicto provisional** del Agente a partir de la evidencia: Facilidad desde la Promesa, Negocio desde el resultado, Trato neutro, `provisional: true`. El cedente cobra su Mérito de Veredicto (y de Cierre si ganada con valor) sin esperar; el cesionario puede matizarlo y su Veredicto sustituye al provisional (fuera su Mérito, fuera la fila). Un valor declarado que el cedente no cuestiona en 7 días (`contrastDays`) queda contrastado por silencio (`WON → VALUE_CONFIRMED` por `SYSTEM`, `contrast.silence_7d`).
+
+**Why.** Quien apunta un referido avisado ya decidió ceder; pedirle que lo confirme es una espera sin valor. El Puente desde NS quita el último copiar y pegar sin que ningún Agente contacte a nadie. Y el Mérito del cedente no puede depender de que el cesionario encuentre un rato para tres toques.
+
+**Consequences.** `agents/mesa.ts` (S9), `services/referrals.ts` (`canSendIntroFromNS`, `sendIntroFromNS`, `provisionalVerdict`, `confirmValueBySilence`, `dropProvisionalVerdict`), `services/clock.ts` (paso 4b), `core/types.ts` (`provisional`), `core/state-machine.ts` (`SYSTEM` en `WON → VALUE_CONFIRMED`, `verdictDays`, `contrastDays`), `lib/mail.ts` (`cc`, `replyTo`, `mailMemory`), `services/signals.ts` y `services/apunte.ts` (`contactEmail`), formularios, tarjeta. Pruebas en `dinamismo.test.ts` (4 nuevas). `docs/11` §F: las diez propuestas de D-066 están hechas.
+
+**Revisit when.** Con 50 Cesiones reales: cuántas nacen directas desde el Apunte y cuántas se retiran; cuántos Puentes salen desde NS; cuántos Veredictos quedan provisionales sin matizar (si son muchos, el problema es el formulario del Veredicto, no el plazo).

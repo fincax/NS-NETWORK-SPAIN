@@ -208,6 +208,22 @@ export async function runMesa(db: Db, opportunitySignalId: string): Promise<Mesa
       await db.update(schema.referrals).set({ state: finalState, promise, reviewRequestedAt: now, expiresAt: new Date(now.getTime() + TIMEOUTS.expiryHours * 3_600_000), updatedAt: now }).where(eq(schema.referrals.id, ref.id));
       if (finalState === "ORIGINATOR_PENDING") {
         result.referralIds.push(ref.id);
+        // F3 (D-074): ceder directo desde el Apunte. Si el Timonel apuntó un referido con el Interesado avisado y el decisor
+        // identificado, ya decidió ceder: el visto bueno queda implícito y la Cesión nace en la mesa del cesionario, con la
+        // Apertura autorizada (solo la empresa). Puede retirarla hasta la Apertura. Solo sin bloqueo de Compliance y con buen Encaje.
+        const dm = turns.find((t) => t.kind === "DECISION_MAKER");
+        const direct = bs.source === "APUNTE" && Boolean(bs.createdByMemberId) && envelope.chapter_layer.third_party_expects_contact && Boolean(dm && !dm.insufficient && (dm.confidence ?? 0) >= 0.6) && verdict.verdict !== "BLOCK" && (score.band === "HIGH" || score.band === "GOOD"); // las excepciones del Salvoconducto siguen yendo a la Directiva al aceptar
+        if (direct) {
+          assertTransition("ORIGINATOR_PENDING", "RECEIVER_PENDING", "ORIGINATOR");
+          const memberId = bs.createdByMemberId as string;
+          await db.insert(schema.referralTransitions).values({ referralId: ref.id, fromState: "ORIGINATOR_PENDING", toState: "RECEIVER_PENDING", actorType: "USER", actorId: memberId, reason: "Visto bueno implícito desde el Apunte (D-074, F3): Interesado avisado y decisor identificado" });
+          await db.insert(schema.humanDecisions).values({ referralId: ref.id, memberId, role: "ORIGINATOR", decision: "APPROVE", revealScope: "COMPANY_ONLY", notes: "Visto bueno implícito desde el Apunte (D-074, F3).", seenLayers: [0, 1, 2] });
+          await db.update(schema.referrals).set({ state: "RECEIVER_PENDING", preauthorizedScope: "COMPANY_ONLY", preauthorizedByMemberId: memberId, reviewRequestedAt: now, expiresAt: new Date(now.getTime() + TIMEOUTS.expiryHours * 3_600_000), updatedAt: now }).where(eq(schema.referrals.id, ref.id));
+          await audit(db, { chapterId, kind: "DIRECT_FROM_APUNTE", actor: { type: "USER", id: memberId }, subject: { type: "Referral", id: ref.id }, policyApplied: "apunte.direct_f3", result: `Cesión directa desde el Apunte de ${originator.name}: el Interesado está avisado y el decisor identificado, así que ya está en la mesa de ${company.name} con la Apertura autorizada (solo la empresa). ${originator.name} puede retirarla hasta la Apertura.`, significant: true, companyIds: [originator.id, company.id] });
+          const full = await db.query.referrals.findFirst({ where: eq(schema.referrals.id, ref.id) });
+          if (full) await notifyReferral(db, full, "REVIEW_RECEIVER");
+          continue;
+        }
         await audit(db, { chapterId, kind: "REVIEW_REQUEST", actor: { type: "AGENT", id: matchmaker.id }, subject: { type: "Referral", id: ref.id }, result: `Cesión preparada para el visto bueno de ${originator.name} (cesionario propuesto: ${company.name}).`, significant: true });
         const full = await db.query.referrals.findFirst({ where: eq(schema.referrals.id, ref.id) });
         if (full) await notifyReferral(db, full, "REVIEW_ORIGINATOR");

@@ -37,6 +37,7 @@ export default async function NuevoIndicioPage() {
           <div className="form-grid">
             <div className="field"><label htmlFor="cn">Nombre</label><input id="cn" name="contactName" /></div>
             <div className="field"><label htmlFor="cr">Cargo</label><input id="cr" name="contactRole" /></div>
+            <div className="field"><label htmlFor="ce">Correo (opcional, para el Puente desde NS)</label><input id="ce" name="contactEmail" type="email" /></div>
             <div className="field"><label htmlFor="lb">Base jurídica para revelarla</label>
               <select id="lb" name="legalBasisForContact" defaultValue="NONE">
                 <option value="NONE">Ninguna (solo se revelará la empresa)</option>
