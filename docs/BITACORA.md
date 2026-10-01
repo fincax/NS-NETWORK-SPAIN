@@ -8,12 +8,12 @@ Punto de parada y siguiente paso. Se actualiza al cerrar cada sesión de trabajo
 
 - Soporte de Clouding activó la salida SMTP del servidor 200.234.236.135. Se puede activar o desactivar desde el panel de cliente, pestaña "Red" del servidor.
 - `correo.sh probar mmejiasnaranjo@gmail.com` envía correctamente desde `NS Network <hola@networkspain.com>` por IONOS (`smtp.ionos.es`, 465). El correo de prueba llegó a **Recibidos** de Gmail (no a spam). **El correo saliente (D-060) queda funcionando.**
-- La PR #19 está en `main`: Directiva (D-061), Ejercicio en año natural (D-062), cuota inicial y mensual muy bajas (D-063) y tipografía (D-064). No consta si se aplicó en el servidor con `actualizar.sh`.
+- La PR #19 está en `main`: Directiva (D-061), Ejercicio en año natural (D-062), cuota inicial y mensual muy bajas (D-063) y tipografía (D-064). Aplicada en el servidor: `/opt/ns-network` está en `699513c`.
 
 **Siguiente paso acordado (por este orden).**
 
 1. Hecho: Gmail muestra "enviado por" y "firmado por" networkspain.com (SPF y DKIM correctos) y cifrado TLS. Opcional: registro DMARC en IONOS si algún proveedor manda los correos a spam.
-2. Aplicar `main` en el servidor con `actualizar.sh` si falta (último commit `699513c`).
+2. ~~Aplicar `main` en el servidor~~: hecho, el servidor está en `699513c`.
 3. Protocolo II (Comunicado y Gaceta), antes de las primeras empresas reales; después, Brújula.
 4. Lo de siempre: especialidades Manantial y forma jurídica en el alta; notificaciones push (D-039); resto de `docs/08` con el abogado.
 
