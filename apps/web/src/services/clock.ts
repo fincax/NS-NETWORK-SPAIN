@@ -15,6 +15,7 @@ import { audit } from "@/lib/audit";
 import { AUTO_APPROVABLE_EXCEPTIONS, QUESTION_STATES, TIMEOUTS } from "@/core/state-machine";
 import { evaluateCompromiso, type CompromisoResult } from "@/services/compromiso";
 import { approveByClock, confirmValueByClock, infoRoundsFor, patchPendingQuestion, provisionalVerdict } from "@/services/referrals";
+import { runProtocoloII } from "@/services/comunicados";
 
 export interface ClockResult {
   reminders: number;
@@ -30,6 +31,7 @@ export interface ClockResult {
   contactReminders: number;
   provisionalVerdicts: number;
   valuesConfirmed: number;
+  comunicados: { drafted: number; continuity: number; gazettes: number };
   compromiso: CompromisoResult;
 }
 
@@ -38,7 +40,7 @@ const D = 86_400_000;
 const hoursLeft = (until: Date | null | undefined, now: Date) => Math.max(0, Math.ceil(((until?.getTime() ?? now.getTime()) - now.getTime()) / H));
 
 export async function runClock(db: Db, now = new Date(), chapterId?: string): Promise<ClockResult> {
-  const res: ClockResult = { reminders: 0, expired: 0, late: 0, nudges: 0, questionReminders: 0, questionsUnanswered: 0, secondReminders: 0, directorReminders: 0, directorApproved: 0, escalated: 0, contactReminders: 0, provisionalVerdicts: 0, valuesConfirmed: 0, compromiso: { evaluated: 0, met: 0, notices: 0, releases: 0 } };
+  const res: ClockResult = { reminders: 0, expired: 0, late: 0, nudges: 0, questionReminders: 0, questionsUnanswered: 0, secondReminders: 0, directorReminders: 0, directorApproved: 0, escalated: 0, contactReminders: 0, provisionalVerdicts: 0, valuesConfirmed: 0, comunicados: { drafted: 0, continuity: 0, gazettes: 0 }, compromiso: { evaluated: 0, met: 0, notices: 0, releases: 0 } };
   const scope = chapterId ? eq(schema.referrals.chapterId, chapterId) : undefined;
 
   // 1 · Recordatorio a las 24 h en revisión
@@ -178,15 +180,13 @@ export async function runClock(db: Db, now = new Date(), chapterId?: string): Pr
     res.valuesConfirmed++;
   }
 
-  // 5 · Compromiso semanal (D-042): última semana completa, una vez por titular
-  if (chapterId) {
-    res.compromiso = await evaluateCompromiso(db, now, chapterId);
-  } else {
-    const chapters = await db.query.chapters.findMany({ columns: { id: true } });
-    for (const c of chapters) {
-      const r = await evaluateCompromiso(db, now, c.id);
-      res.compromiso = { evaluated: res.compromiso.evaluated + r.evaluated, met: res.compromiso.met + r.met, notices: res.compromiso.notices + r.notices, releases: res.compromiso.releases + r.releases };
-    }
+  // 5 · Compromiso semanal (D-042) y Protocolo II (D-070): una vez por Sala
+  const chapterIds = chapterId ? [chapterId] : (await db.query.chapters.findMany({ columns: { id: true } })).map((c) => c.id);
+  for (const id of chapterIds) {
+    const r = await evaluateCompromiso(db, now, id);
+    res.compromiso = { evaluated: res.compromiso.evaluated + r.evaluated, met: res.compromiso.met + r.met, notices: res.compromiso.notices + r.notices, releases: res.compromiso.releases + r.releases };
+    const p = await runProtocoloII(db, id, now);
+    res.comunicados = { drafted: res.comunicados.drafted + p.drafted, continuity: res.comunicados.continuity + p.continuity, gazettes: res.comunicados.gazettes + (p.gazette ? 1 : 0) };
   }
   return res;
 }

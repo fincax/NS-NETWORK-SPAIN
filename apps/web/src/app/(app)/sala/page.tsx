@@ -25,7 +25,7 @@ export default async function SalaPage() {
           <h1>{chapter.name}</h1>
           <p className="lead">{occupied} plazas ocupadas · {seats.length - occupied} vacantes · Ritmo {Math.max(1, chapter.weeklyPace)} Cesión válida por semana y titular, sin excusas; a la cuarta semana sin ceder, la plaza vuelve a la Antesala (D-042).</p>
         </div>
-        <Link href="/sala/alta" className="btn">Solicitar plaza para una empresa</Link>
+        <div className="row" style={{ gap: 10 }}><Link href="/gaceta" className="btn">Gaceta de la semana</Link><Link href="/sala/alta" className="btn">Solicitar plaza para una empresa</Link></div>
       </div>
 
       <section>

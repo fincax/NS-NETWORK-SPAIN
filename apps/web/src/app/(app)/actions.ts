@@ -11,6 +11,16 @@ import { schema } from "@/db/client";
 import { requireDemo, requireMember } from "@/lib/session";
 import { runRastreo } from "@/agents/rastreo";
 import { runLatido } from "@/agents/latido";
+import { approveComunicado } from "@/services/comunicados";
+
+/** Protocolo II (D-070): el Timonel aprueba su Comunicado con un toque, con una línea opcional. */
+export async function approveComunicadoAction(formData: FormData) {
+  const { member } = await requireMember();
+  const db = await getDb();
+  await approveComunicado(db, { comunicadoId: String(formData.get("comunicadoId")), memberId: member.id, note: String(formData.get("note") ?? "").trim() || undefined });
+  revalidatePath("/hoy");
+  revalidatePath("/gaceta");
+}
 
 export async function setPersona(memberId: string) {
   await requireDemo();

@@ -1680,3 +1680,27 @@ Servicio a la red        10 %   solo suma: acciones de dirección del mes (3 = 1
 **Consequences.** Migración `0017_dinamismo_cierre`; `services/referrals.ts` (`markContacted`, `recordVerdict`, `provisionalVerdict`, `confirmValueByClock`, `submitVerdict` sustituye un provisional), `services/clock.ts` (pasos 3a, 4a, 4b), `services/avisos.ts` y `services/accion.ts` (`CONTACTED`), `core/state-machine.ts` (`SYSTEM` en `WON → VALUE_CONFIRMED`, `TIMEOUTS`), tarjeta (seguimiento y Veredicto), `agents/latido.ts`. Pruebas: 2 en el slice, core. Documentado en `docs/02` §9.1, `docs/15`, `docs/13`, `docs/06`, `docs/11` (F7, F8 hechas).
 
 **Revisit when.** Haya 50 Veredictos reales: medir cuántos son provisionales y cuántos se matizan. Si más del 30 % quedan provisionales, el problema es el aviso de cierre, no el plazo.
+
+---
+
+## D-070 · Protocolo II construido con un toque: el Agente redacta, el Timonel aprueba, el viernes sale la Gaceta y nada espera a nadie
+
+**Status:** CONFIRMED (el fundador: "sigue por ahí… agiliza y simplifica el protocolo lo máximo; nivel usuario con sencillez como core y herramienta top detrás")
+**Date:** 2026-10-01
+
+**Context.** El Protocolo II (D-018) estaba decidido y especificado en `docs/14`, pero sin construir, y el titular ya lo firma como Norma NS. El fundador pide la versión más simple para la persona con la herramienta haciendo todo lo demás.
+
+**Choice.** Para el Timonel, el Protocolo II es **un toque a la semana**; todo lo demás lo hace el Agente.
+
+- **Lunes: borrador automático.** Para cada empresa activa con ADN, el Agente redacta el Comunicado (`comunicados`): la parte estable sale del ADN (capas PUBLIC/CHAPTER: especialidad, qué hace y qué no, para quién, Cesión perfecta, capacidad), el delta de los hechos verificables de la semana anterior (referidos cedidos, cierres contrastados con la Sala) y de los cambios del ADN (capacidad, oferta nueva, marcados `INFERRED_FROM_DNA`), y los Encargos abiertos. Nunca inventa. Texto de cinco líneas, concreto, sin adjetivos (`renderComunicado`).
+- **Un toque.** El Timonel lo aprueba en Hoy o desde el correo ("Aprobar el Comunicado", enlace de acción D-067) y puede añadir una línea, que entra como `DECLARED_BY_MEMBER`.
+- **Viernes 14:00 (Madrid): cierre.** Lo no aprobado se publica como **continuidad** (solo lo estable y lo `VERIFIED`) y el Chapter Intelligence compila la **Gaceta** (`GAZETTE_PUBLISHED`, una por Sala y semana): "relevante para ti" por Timonel (novedades, clientela compartida, capacidad, Encargos; nunca la propia empresa), "en la Sala esta semana" y totales. Página `/gaceta` y tarjeta en Hoy.
+- **Continuidad cumple**, pero dos seguidas avisan al Timonel y tres a la Directiva (`COMMUNIQUE_CONTINUITY`). Sin baja por este motivo en el MVP. `COMMUNIQUE_MET` cuando se aprueba.
+- **Dossier:** la página de cada empresa muestra el histórico de Comunicados publicados.
+- El Reloj ejecuta el Protocolo II en cada pasada (`runProtocoloII`, idempotente): borradores el lunes, cierre el viernes.
+
+**Why.** Nadie cede bien lo que no conoce bien, pero nadie quiere escribir un boletín semanal. Si el Agente redacta a partir de datos y la persona solo confirma, el conocimiento mutuo de la Sala crece sin esfuerzo; y si la persona calla, la Sala sigue conociendo lo estable (D-066). La Gaceta no es un boletín: es lo que cambia la precisión de las Cesiones de la semana siguiente.
+
+**Consequences.** Migración `0018_protocolo_ii`; `core/comunicado.ts`, `services/comunicados.ts`, `services/clock.ts` (paso 5), `services/avisos.ts` (`notifyComunicado`), `services/accion.ts` (`APPROVE_COMUNICADO`), Hoy, `/gaceta`, Dossier, navegación. 9 pruebas. Documentado en `docs/14` §3 y §9, `docs/13`, `docs/06`, pendientes.
+
+**Revisit when.** Haya cuatro Gacetas reales: medir cuántos Comunicados se aprueban (meta: más del 80 %) y si "relevante para ti" cambia lo que se cede. Después: redacción con el modelo (una línea de novedad por sector a partir del Rastreo) y Gaceta por correo.

@@ -7,6 +7,8 @@ import type {
   AuditEventInput,
   BusinessDNA,
   ComplianceVerdict,
+  ComunicadoDelta,
+  ComunicadoStable,
   Explanation,
   IntroPackage,
   NSMatchScore,
@@ -137,14 +139,36 @@ export const actionLinks = pgTable(
   {
     id: id(),
     memberId: uuid("member_id").notNull().references(() => members.id),
-    referralId: uuid("referral_id").notNull(),
-    action: text("action").notNull(), // PROPOSE | ACCEPT | OPEN | ANSWER | VIEW
+    referralId: uuid("referral_id"),
+    comunicadoId: uuid("comunicado_id"), // Protocolo II (D-070): "Aprobar el Comunicado" desde el correo
+    action: text("action").notNull(), // PROPOSE | ACCEPT | OPEN | ANSWER | CONTACTED | VIEW | APPROVE_COMUNICADO
     tokenHash: text("token_hash").notNull().unique(),
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
     usedAt: timestamp("used_at", { withTimezone: true }),
     createdAt: createdAt(),
   },
   (t) => [index("action_links_referral_idx").on(t.referralId)],
+);
+
+/** Comunicado semanal (Protocolo II, D-018, D-070): lo redacta el Agente a partir del ADN y de la semana; el Timonel lo aprueba con un toque. */
+export const comunicados = pgTable(
+  "comunicados",
+  {
+    id: id(),
+    chapterId: uuid("chapter_id").notNull().references(() => chapters.id),
+    companyId: uuid("company_id").notNull().references(() => companies.id),
+    weekStart: timestamp("week_start", { withTimezone: true }).notNull(), // lunes 00:00 UTC
+    stable: jsonb("stable").$type<ComunicadoStable>().notNull(),
+    delta: jsonb("delta").$type<ComunicadoDelta[]>().notNull().default([]),
+    encargos: jsonb("encargos").$type<string[]>().notNull().default([]),
+    note: text("note"), // la línea que añade el Timonel al aprobar (DECLARED_BY_MEMBER)
+    status: text("status").notNull().default("DRAFT"), // DRAFT | APPROVED | CONTINUITY
+    approvedByMemberId: uuid("approved_by_member_id"),
+    approvedAt: timestamp("approved_at", { withTimezone: true }),
+    publishedAt: timestamp("published_at", { withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  (t) => [uniqueIndex("comunicado_unique").on(t.companyId, t.weekStart)],
 );
 
 export const businessDna = pgTable("business_dna", {

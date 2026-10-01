@@ -5,7 +5,7 @@ import { Encaje, StateBadge } from "@/components/ui";
 import { eurRange } from "@/lib/format";
 import { TIMEOUTS } from "@/core/state-machine";
 import { PROMISE_LABEL } from "@/core/merit";
-import { actionContext, ACTION_LABEL } from "@/services/accion";
+import { actionContext, ACTION_LABEL, comunicadoActionContext } from "@/services/accion";
 import type { LinkAction } from "@/services/avisos";
 import { executeActionLink } from "./actions";
 
@@ -19,6 +19,27 @@ export default async function AccionPage({ params, searchParams }: { params: Pro
   const { token } = await params;
   const { error } = await searchParams;
   const db = await getDb();
+  const cc = await comunicadoActionContext(db, token);
+  if (cc) {
+    return (
+      <main className="public-shell" style={{ minHeight: "100vh", display: "grid", placeItems: "center", padding: "48px 16px" }}>
+        <div className="card" style={{ width: "100%", maxWidth: 560, display: "grid", gap: 18 }}>
+          <Link href="/" className="brand" aria-label="NS Network Spain"><Monogram size={34} /><span><span className="wordmark">NS Network</span><br /><span className="lockup">Un toque desde tu correo</span></span></Link>
+          <div>
+            <h1 style={{ fontSize: 24 }}>Hola, {cc.member.fullName.split(" ")[0]}.</h1>
+            <p className="lead" style={{ fontSize: 15, marginTop: 6 }}>{cc.applies ? `Tu Agente ha redactado el Comunicado de ${cc.companyName} para esta semana. Apruébalo con un toque; si hay algo nuevo, añade una línea.` : "Este Comunicado ya está publicado."}</p>
+          </div>
+          <pre style={{ whiteSpace: "pre-wrap", font: "inherit", fontSize: 14, margin: 0, padding: 12, background: "var(--panel)", borderRadius: 8 }}>{cc.text}</pre>
+          {error ? <div className="notice error">{error}</div> : null}
+          <form action={executeActionLink} className="stack">
+            <input type="hidden" name="token" value={token} />
+            {cc.applies ? <div className="field"><label htmlFor="note">Una línea nueva (opcional)</label><input id="note" name="note" maxLength={200} placeholder="Por ejemplo: capacidad alta en noviembre." /></div> : null}
+            <div className="actions"><button className="btn amber" type="submit" style={{ fontSize: 16, padding: "14px 22px" }}>{cc.applies ? "Aprobar el Comunicado" : "Entrar en NS Network"}</button></div>
+          </form>
+        </div>
+      </main>
+    );
+  }
   const ctx = await actionContext(db, token);
   const action = ctx?.link.action as LinkAction | undefined;
   const first = ctx?.member.fullName.split(" ")[0];

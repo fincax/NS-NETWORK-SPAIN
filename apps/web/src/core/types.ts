@@ -471,3 +471,23 @@ export interface AuditEventInput {
   significant?: boolean; // aparece en la Mesa Permanente
   companyIds?: string[]; // empresas que pueden ver el evento (vacío = toda la Sala)
 }
+
+// ───────────────────────── Protocolo II · Comunicado (D-018, D-070) ─────────────────────────
+/** Lo que la empresa es: se repite cada semana, se edita poco. Solo capas PUBLIC y CHAPTER del ADN. */
+export const ComunicadoStable = z.object({
+  specialty: z.string(),
+  offering: z.array(z.string()),
+  not_offering: z.array(z.string()),
+  ideal_customer: z.string(),
+  perfect_referral: z.string(),
+  capacity_now: z.enum(["ALTA", "MEDIA", "BAJA"]),
+});
+export type ComunicadoStable = z.infer<typeof ComunicadoStable>;
+
+/** Lo que ha cambiado esta semana, con su origen. Nada inferido se publica como hecho sin visto bueno. */
+export const ComunicadoDelta = z.object({
+  kind: z.enum(["NEW_SERVICE", "CASE_WON", "CAPACITY", "TEAM", "CERTIFICATION", "GIVEN", "NOTE"]),
+  text: z.string(),
+  source: z.enum(["DECLARED_BY_MEMBER", "INFERRED_FROM_DNA", "VERIFIED"]),
+});
+export type ComunicadoDelta = z.infer<typeof ComunicadoDelta>;

@@ -40,7 +40,7 @@ La calidad de las Cesiones depende de cuánto sabe cada Agente (y cada Timonel) 
 
 | Campo | Especificación |
 | --- | --- |
-| **Trigger** | Cierre semanal de la Sala (día y hora configurables por Sala; propuesta: domingo 20:00, para que la Gaceta esté lista el lunes a primera hora). También bajo demanda cuando el ADN de Empresa cambia de forma relevante. |
+| **Trigger** | Cada lunes el Agente redacta el borrador (`draftComunicados`); el cierre semanal es el **viernes a las 14:00 de Madrid** (D-070, `PROTOCOLO_II.closeWeekday/closeHour`), y entonces sale la Gaceta. También bajo demanda cuando el ADN de Empresa cambia de forma relevante. |
 | **Inputs** | ADN de Empresa (capas `PUBLIC` y `CHAPTER`); Encargos vigentes; cambios de la semana (servicios, productos, capacidad, equipo, certificaciones, sedes, casos ganados anonimizables); Cesiones cerradas contrastadas; lo que el Timonel añada en el Despacho. |
 | **Agente** | Company Agent redacta; Chapter Intelligence Agent compila la Gaceta; Trust & Compliance filtra visibilidad. |
 | **Tools** | Lectura del ADN; diff de la semana; generador de Comunicado; índice de capabilities de la Sala; personalizador de relevancia. |
@@ -48,7 +48,7 @@ La calidad de las Cesiones depende de cuánto sabe cada Agente (y cada Timonel) 
 | **Objetivo de razonamiento** | Que cada Agente de la Sala actualice su modelo de la empresa: qué ofrece, qué no, a quién, con qué capacidad ahora, y qué señales debe buscar para ella. Que el Timonel lea en 90 segundos lo que le importa. |
 | **Salida estructurada** | Ver §4. |
 | **Confianza** | Cada afirmación del delta lleva origen: `DECLARED_BY_MEMBER` (lo dijo el Timonel), `INFERRED_FROM_DNA` (cambio en el ADN), `VERIFIED` (Cesión contrastada, certificación comprobada). Nada inferido se publica como hecho sin visto bueno. |
-| **Puerta humana** | El Timonel revisa y aprueba el Comunicado en su Despacho (un toque). Si en 48 h no lo aprueba, el Agente envía un **Comunicado de continuidad**: solo la parte estable ya validada, sin nuevas afirmaciones, y lo marca como no revisado. |
+| **Puerta humana** | El Timonel aprueba el Comunicado con un toque, en Hoy o desde el correo ("Aprobar el Comunicado", enlace de acción D-067), y puede añadir una línea (`DECLARED_BY_MEMBER`). Si al cierre del viernes no lo ha aprobado, se publica como **Comunicado de continuidad**: solo la parte estable y los hechos `VERIFIED`, sin afirmaciones inferidas, marcado como no revisado. Nada espera a nadie (D-066). |
 | **Efecto** | Los Agentes receptores actualizan su índice de capabilities y sus criterios de Rastreo; el Dossier se actualiza; la Gaceta se publica; cada Timonel recibe su vista "relevante para ti". |
 | **Evento de auditoría** | `COMMUNIQUE_SENT`, `COMMUNIQUE_CONTINUITY`, `COMMUNIQUE_ACKED` (por cada Agente receptor), `GAZETTE_PUBLISHED`, `DOSSIER_VIEWED`. |
 | **Fallo** | Si el Agente no puede generar el Comunicado (ADN incompleto, error), avisa al Timonel y a la Directiva; la ausencia cuenta como incumplimiento solo si el Timonel no responde al aviso en el plazo. |
@@ -143,11 +143,12 @@ Accesos: desde Mi Sala (lista de miembros), desde cualquier Cesión o Pista ("ve
 - **Pleno**: la Gaceta en pantalla; solo novedades.
 - **Parte** (Directiva): cumplimiento de Comunicados, conocimiento mutuo, miembros con ADN incompleto.
 
-### 9. Pendientes del fundador
+### 9. Decidido y pendiente
 
-1. Día y hora del cierre semanal.
-2. Si el Comunicado de continuidad cumple indefinidamente o tiene tope (propuesta: dos seguidos).
-3. Si la Gaceta se comparte también entre Salas de la zona (propuesta: solo en Confluencias).
+1. ~~Día y hora del cierre semanal~~ → viernes 14:00 de Madrid (D-070), configurable por Sala más adelante.
+2. ~~Tope de continuidad~~ → la continuidad cumple; dos seguidas, aviso del Agente; tres, aviso a la Directiva (D-070). Sin baja por este motivo en el MVP.
+3. Si la Gaceta se comparte también entre Salas de la zona (propuesta: solo en Confluencias). Pendiente.
+4. Redacción del Comunicado con el modelo (hoy es determinista a partir del ADN y de los hechos de la semana) y envío de la Gaceta por correo.
 
 ---
 

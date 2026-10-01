@@ -43,7 +43,8 @@ RASTREO Y ENCARGOS    public_records (D-031) · demands (D-032)
 | Cualificación | `qualifications` | `turns[]` tipados, `outcome`. |
 | Pista | `match_candidates` | `score` (NSMatchScore), `explanation`, `compliance` (Salvoconducto). |
 | Cesión | `referrals` | `state` (máquina §9), `route` CHAPTER/ZONE/NETWORK, `embassy`, `promise` (D-021), `reveal_scope`, `preauthorized_scope` y `preauthorized_by_member_id` (Apertura en el visto bueno, D-067), `value_potential_*`, `value_verified`, plazos (`expires_at`, `response_due_at`). |
-| Aviso con acción | `action_links` | Enlace de un toque desde el correo (D-067): `member_id`, `referral_id`, `action` (PROPOSE/ACCEPT/OPEN/ANSWER/VIEW), `token_hash`, `expires_at` (72 h), `used_at`. |
+| Aviso con acción | `action_links` | Enlace de un toque desde el correo (D-067, D-070): `member_id`, `referral_id` o `comunicado_id`, `action` (PROPOSE/ACCEPT/OPEN/ANSWER/CONTACTED/VIEW/APPROVE_COMUNICADO), `token_hash`, `expires_at` (72 h), `used_at`. |
+| Comunicado | `comunicados` | Protocolo II (D-070): una fila por empresa y semana (`week_start`), `stable` (del ADN), `delta` (hechos con origen), `encargos`, `note`, `status` DRAFT/APPROVED/CONTINUITY, `approved_by_member_id`, `published_at`. La Gaceta no se guarda: se compila de los Comunicados de la semana (evento `GAZETTE_PUBLISHED`). |
 | Transición | `referral_transitions` | Toda transición con actor y motivo. |
 | Visto bueno | `human_decisions` | Rol, decisión, `reveal_scope`, `seen_layers[]` (qué vio la persona al decidir). |
 | Puente | `introductions` | Borrador del Agente, mensaje final, canal, quién lo envió. |

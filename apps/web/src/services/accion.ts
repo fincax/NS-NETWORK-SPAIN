@@ -7,6 +7,8 @@ import type { Db } from "@/db/client";
 import { schema } from "@/db/client";
 import { actionLinkFromToken, markActionLinkUsed, type LinkAction } from "@/services/avisos";
 import { authorizeIntro, decide, infoRound, markContacted } from "@/services/referrals";
+import { approveComunicado } from "@/services/comunicados";
+import { renderComunicado } from "@/core/comunicado";
 import type { ReferralState, RevealScope } from "@/core/types";
 
 const EXPECTED: Record<LinkAction, ReferralState[] | null> = {
@@ -16,6 +18,7 @@ const EXPECTED: Record<LinkAction, ReferralState[] | null> = {
   ANSWER: null, // mientras haya una pregunta pendiente
   CONTACTED: ["INTRODUCED", "MEETING", "COMMERCIAL_OPPORTUNITY"],
   VIEW: null,
+  APPROVE_COMUNICADO: null,
 };
 
 export const ACTION_LABEL: Record<LinkAction, string> = {
@@ -25,7 +28,37 @@ export const ACTION_LABEL: Record<LinkAction, string> = {
   ANSWER: "Enviar la respuesta",
   CONTACTED: "He contactado al Interesado",
   VIEW: "Ver la Cesión",
+  APPROVE_COMUNICADO: "Aprobar el Comunicado",
 };
+
+/** Enlace "Aprobar el Comunicado" (D-070): qué muestra y si todavía procede. */
+export interface ComunicadoActionContext {
+  link: typeof schema.actionLinks.$inferSelect;
+  member: typeof schema.members.$inferSelect;
+  comunicado: typeof schema.comunicados.$inferSelect;
+  companyName: string;
+  text: string;
+  applies: boolean;
+}
+
+export async function comunicadoActionContext(db: Db, token: string): Promise<ComunicadoActionContext | null> {
+  const link = await actionLinkFromToken(db, token);
+  if (!link?.comunicadoId) return null;
+  const member = await db.query.members.findFirst({ where: eq(schema.members.id, link.memberId) });
+  const comunicado = await db.query.comunicados.findFirst({ where: eq(schema.comunicados.id, link.comunicadoId) });
+  if (!member || !comunicado) return null;
+  const company = await db.query.companies.findFirst({ where: eq(schema.companies.id, comunicado.companyId) });
+  return { link, member, comunicado, companyName: company?.name ?? "", text: renderComunicado(comunicado, company?.name ?? ""), applies: comunicado.status === "DRAFT" };
+}
+
+export async function executeComunicadoAction(db: Db, token: string, input: { note?: string } = {}): Promise<{ memberId: string; done: boolean }> {
+  const ctx = await comunicadoActionContext(db, token);
+  if (!ctx) throw new Error("Este enlace ya no sirve.");
+  await markActionLinkUsed(db, ctx.link.id);
+  if (!ctx.applies) return { memberId: ctx.member.id, done: false };
+  await approveComunicado(db, { comunicadoId: ctx.comunicado.id, memberId: ctx.member.id, note: input.note });
+  return { memberId: ctx.member.id, done: true };
+}
 
 export interface ActionContext {
   link: typeof schema.actionLinks.$inferSelect;
@@ -44,7 +77,7 @@ export interface ActionContext {
 
 export async function actionContext(db: Db, token: string): Promise<ActionContext | null> {
   const link = await actionLinkFromToken(db, token);
-  if (!link) return null;
+  if (!link?.referralId) return null;
   const member = await db.query.members.findFirst({ where: eq(schema.members.id, link.memberId) });
   const referral = await db.query.referrals.findFirst({ where: eq(schema.referrals.id, link.referralId) });
   if (!member || !referral) return null;
@@ -96,6 +129,7 @@ export async function executeAction(db: Db, token: string, input: { answer?: str
       await markContacted(db, ctx.referral.id, ctx.member.id);
       break;
     case "VIEW":
+    case "APPROVE_COMUNICADO":
       break;
   }
   return { referralId: ctx.referral.id, memberId: ctx.member.id, done: action !== "VIEW" };

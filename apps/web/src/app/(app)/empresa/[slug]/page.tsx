@@ -10,6 +10,7 @@ import { openDemands } from "@/services/demands";
 import { createDemandAction, closeDemandAction, addSourceAction, removeSourceAction, runOwnSourcesAction, addSeatAction, inviteMemberAction } from "./actions";
 import { authMode } from "@/lib/auth";
 import { valoracionActual } from "@/services/valoracion";
+import { comunicadoHistory } from "@/services/comunicados";
 import { VALORACION } from "@/core/valoracion";
 import { listSources, MAX_SOURCES_PER_AGENT } from "@/services/sources";
 import { dateTime } from "@/lib/format";
@@ -28,6 +29,7 @@ export default async function EmpresaPage({ params, searchParams }: { params: Pr
   const acceptance = await db.query.rulesAcceptances.findFirst({ where: eq(schema.rulesAcceptances.companyId, company.id), orderBy: [desc(schema.rulesAcceptances.acceptedAt)] });
   const acceptor = acceptance ? await db.query.members.findFirst({ where: eq(schema.members.id, acceptance.memberId) }) : undefined;
   const valoracion = await valoracionActual(db, company.chapterId, company.id);
+  const history = await comunicadoHistory(db, company.id);
   const mySeats = await db.select({ name: schema.specialties.name }).from(schema.categorySeats).innerJoin(schema.specialties, eq(schema.specialties.id, schema.categorySeats.specialtyId)).where(and(eq(schema.categorySeats.companyId, company.id), eq(schema.categorySeats.status, "ACTIVE")));
   const vacantSeats = company.id === me.id ? await db.select({ code: schema.specialties.nscatCode, name: schema.specialties.name }).from(schema.categorySeats).innerJoin(schema.specialties, eq(schema.specialties.id, schema.categorySeats.specialtyId)).where(and(eq(schema.categorySeats.chapterId, company.chapterId), eq(schema.categorySeats.status, "VACANT"))) : [];
   const pct = (x: number | null) => (x === null ? "—" : `${Math.round(x * 100)} %`);
@@ -128,6 +130,13 @@ export default async function EmpresaPage({ params, searchParams }: { params: Pr
           {valoracion.decisive.components.map((c) => <li key={c.key} className="row"><span style={{ minWidth: 170 }}>{c.label}</span><span className="mono">peso {Math.round(c.weight * 100)} %</span><span className="mono">{pct(c.value)}</span><span className="mono">{c.detail}</span></li>)}
         </ul>
         <p className="mono" style={{ marginTop: 8 }}>Mide calidad y fiabilidad, nunca cantidad (D-045). Los componentes sin datos no cuentan ni a favor ni en contra. Titularidades en esta Sala: {mySeats.map((s) => s.name).join(" · ") || "—"}.</p>
+      </section>
+
+      <section className="card" aria-label="Comunicados">
+        <p className="eyebrow">Comunicados · Dar a Conocer (Protocolo II)</p>
+        {history.length === 0 ? <p className="lead" style={{ fontSize: 14 }}>Todavía sin Comunicados publicados. El primero sale esta semana.</p> : (
+          <ul className="plain">{history.map((c) => <li key={c.id}><span className="mono">semana {c.week} · {c.status === "APPROVED" ? "aprobado" : "continuidad"}</span><br /><span style={{ whiteSpace: "pre-wrap" }}>{c.text}</span></li>)}</ul>
+        )}
       </section>
 
       {own ? (

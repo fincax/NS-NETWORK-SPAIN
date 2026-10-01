@@ -103,7 +103,7 @@ Criterios de cada nombre: castellano; una palabra siempre que sea posible; insti
 
 | Término NS | Qué es | Identificador técnico |
 | --- | --- | --- |
-| **Comunicado** | Informe semanal estructurado que el Agente de una empresa envía a los Agentes de la Sala: lo estable (qué hace) y el delta (qué ha cambiado esta semana). El Timonel lo aprueba en el Despacho. | `Communique` |
+| **Comunicado** | (Construido, D-070: el Agente lo redacta el lunes, el Timonel lo aprueba con un toque, el viernes a las 14:00 sale la Gaceta.) Informe semanal estructurado que el Agente de una empresa envía a los Agentes de la Sala: lo estable (qué hace) y el delta (qué ha cambiado esta semana). El Timonel lo aprueba en el Despacho. | `Communique` |
 | **Comunicado de continuidad** | El que envía el Agente cuando el Timonel no aprueba a tiempo: solo lo estable ya validado, sin nuevas afirmaciones. | `Communique{ approved_by: CONTINUITY }` |
 | **Gaceta** | Digesto semanal de la Sala compilado por el Chapter Intelligence Agent a partir de los Comunicados, con vista general y "relevante para ti" por Timonel. En el Pleno sustituye la ronda de presentaciones. | `ChapterGazette` |
 | **Dossier** | Ficha viva de cada miembro: qué hace, a quién sirve, Cesión perfecta, capacidad ahora, Encargos, cómo presentarla, Hoja de Méritos, histórico de Comunicados. Dos toques desde cualquier pantalla. | `MemberDossier` |

@@ -12,13 +12,14 @@ Punto de parada y siguiente paso. Se actualiza al cerrar cada sesión de trabajo
 - **Recordatorio del fundador:** la pregunta es solo para casos de duda; el camino es aceptar y contactar. El botón principal es siempre Aceptar.
 - **F1 y F2 construidos (D-067), en la misma rama:** Avisos con acción en un toque desde el correo (`/accion/[token]`, un solo uso, 72 h, solo en modo real) y Apertura en el visto bueno (el cedente la deja autorizada al proponer; se ejecuta sola al aceptar el cesionario; el Puente queda redactado). Migración `0015_dinamismo`. Pruebas en verde. **Pendiente de PR, fusionar y `actualizar.sh`.**
 - **F5 y F6 construidos (D-068), misma rama:** cada espera de revisión dura 72 h desde que llega a esa mesa (avisos a las 24 y 48 h) y al caducar el Agente del cedente propone el relevo; la Directiva decide en 24 h (aviso a las 4 h) y, si no, una excepción solo de valor sigue sola y una de riesgo escala a NS sin caducar. Migración `0016_dinamismo_plazos`. 155 pruebas en verde.
+- **Protocolo II construido (D-070), misma rama:** el Agente redacta el Comunicado el lunes (ADN + hechos de la semana), el Timonel lo aprueba con un toque (Hoy o correo), el viernes a las 14:00 lo no aprobado sale como continuidad y se publica la Gaceta con "relevante para ti"; histórico en el Dossier. Migración `0018_protocolo_ii`. 9 pruebas.
 - **F7 y F8 construidos (D-069), misma rama:** "He contactado al Interesado" en un toque (tarjeta y correo) con aviso a las 24 h del Puente; Veredicto provisional del Agente a los 7 días del cierre (el cedente cobra; el cesionario matiza después) y valor contrastado por silencio a los 7 días. Migración `0017_dinamismo_cierre`. Con esto, las diez propuestas F quedan: F1, F2, F5, F6, F7 y F8 hechas; F3, F4 (puertas humanas, decidir con el fundador), F9 (métrica, con datos reales) y F10 pendientes.
 - **Dinamismo como Core (D-066):** el fundador lo eleva a principio para todo. Registrado como principio no negociable 18 (constitución y North Star) y principio 11 de NS-ARP: toda espera entre titulares tiene plazo en horas, recordatorio y continuación automática. Propuestas para aplicarlo a lo existente en `docs/11` (sección Dinamismo).
 
 **Siguiente paso acordado (por este orden).**
 
 1. Abrir la PR de la rama, fusionar y lanzar `bash /opt/ns-network/deploy/actualizar.sh`. Comprobar en la demo, como Carlos: "Aceptar y preguntar" en una Cesión y, una hora después, la respuesta destacada.
-2. Protocolo II (Comunicado y Gaceta); después, Brújula.
+2. ~~Protocolo II~~ hecho (D-070). Después, Brújula completa.
 3. Lo de siempre: especialidades Manantial y forma jurídica en el alta; notificaciones push (D-039); resto de `docs/08` con el abogado.
 
 ## 1 de octubre de 2026 · el servidor ya envía correo

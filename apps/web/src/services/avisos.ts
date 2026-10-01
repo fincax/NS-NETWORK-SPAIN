@@ -18,7 +18,7 @@ import { publicUrl } from "@/services/correo";
 import { TIMEOUTS } from "@/core/state-machine";
 import { eurRange } from "@/lib/format";
 
-export type LinkAction = "PROPOSE" | "ACCEPT" | "OPEN" | "ANSWER" | "CONTACTED" | "VIEW";
+export type LinkAction = "PROPOSE" | "ACCEPT" | "OPEN" | "ANSWER" | "CONTACTED" | "VIEW" | "APPROVE_COMUNICADO";
 export const ACTION_LINK_TTL_HOURS = 72;
 
 const sha256 = (s: string) => createHash("sha256").update(s).digest("hex");
@@ -29,10 +29,28 @@ export function avisosEnabled(): boolean {
 }
 
 /** Crea un enlace de acción para una persona, una Cesión y una acción. Devuelve la URL completa. */
-export async function createActionLink(db: Db, opts: { memberId: string; referralId: string; action: LinkAction }): Promise<string> {
+export async function createActionLink(db: Db, opts: { memberId: string; referralId?: string; comunicadoId?: string; action: LinkAction }): Promise<string> {
   const token = randomBytes(32).toString("base64url");
-  await db.insert(schema.actionLinks).values({ memberId: opts.memberId, referralId: opts.referralId, action: opts.action, tokenHash: sha256(token), expiresAt: new Date(Date.now() + ACTION_LINK_TTL_HOURS * 3_600_000) });
+  await db.insert(schema.actionLinks).values({ memberId: opts.memberId, referralId: opts.referralId ?? null, comunicadoId: opts.comunicadoId ?? null, action: opts.action, tokenHash: sha256(token), expiresAt: new Date(Date.now() + ACTION_LINK_TTL_HOURS * 3_600_000) });
   return `${publicUrl()}/accion/${token}`;
+}
+
+/** Protocolo II (D-070): "Tu Comunicado está listo", con el botón "Aprobar" dentro. Nunca lanza. */
+export async function notifyComunicado(db: Db, c: typeof schema.comunicados.$inferSelect, companyName: string): Promise<boolean> {
+  if (!avisosEnabled()) return false;
+  try {
+    const member = (await db.query.members.findFirst({ where: and(eq(schema.members.companyId, c.companyId), eq(schema.members.isPrimary, true)) })) ?? (await db.query.members.findFirst({ where: eq(schema.members.companyId, c.companyId) }));
+    if (!member?.email) return false;
+    const link = await createActionLink(db, { memberId: member.id, comunicadoId: c.id, action: "APPROVE_COMUNICADO" });
+    const first = member.fullName.split(" ")[0];
+    const lines = [`Hola, ${first}:`, `Tu Agente ha redactado el Comunicado de ${companyName} para esta semana: lo que haces, para quién, tu capacidad y lo que ha pasado estos días. Es lo que los Agentes de la Sala usarán para cederte bien.`, `Apruébalo con un toque; si quieres, añade una línea con una novedad. Si no lo apruebas antes del viernes a las 14:00, se publicará solo la parte estable.`];
+    const footer = `El enlace es personal, de un solo uso y caduca en ${ACTION_LINK_TTL_HOURS} h. También puedes aprobarlo desde Hoy.`;
+    const r = await sendMail({ to: member.email, subject: `Tu Comunicado de la semana · un toque · NS Network`, text: `${lines.join("\n\n")}\n\n${link}\n\n${footer}\n\nNS Network`, html: layout(lines, link, "Aprobar el Comunicado", footer) });
+    await audit(db, { chapterId: c.chapterId, kind: r.ok ? "MAIL_SENT" : "MAIL_FAILED", actor: { type: "AGENT", id: "avisos" }, subject: { type: "Comunicado", id: c.id }, policyApplied: "aviso.comunicado", result: r.ok ? `Aviso "Aprobar el Comunicado" enviado a ${member.email}.` : `Aviso a ${member.email} no enviado: ${r.error}`, significant: false, companyIds: [c.companyId] });
+    return r.ok;
+  } catch {
+    return false;
+  }
 }
 
 /** Enlace vigente (sin usar, sin caducar) o null. */

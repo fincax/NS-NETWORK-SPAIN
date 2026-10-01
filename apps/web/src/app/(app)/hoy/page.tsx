@@ -9,7 +9,8 @@ import { REVIEW_STATES, TIMEOUTS } from "@/core/state-machine";
 import { daysAgo, eur, eurRange, firstName, greeting } from "@/lib/format";
 import { Encaje, Empty, StateBadge } from "@/components/ui";
 import { AgentAvatar } from "@/components/brand";
-import { prepareDemo, runLatidoAction, runRastreoAction } from "../actions";
+import { approveComunicadoAction, prepareDemo, runLatidoAction, runRastreoAction } from "../actions";
+import { comunicadoStatus, gaceta } from "@/services/comunicados";
 import { latidoStatus } from "@/agents/latido";
 import { authMode } from "@/lib/auth";
 import { time } from "@/lib/format";
@@ -39,6 +40,8 @@ export default async function HoyPage() {
   const summary = await todaySummary(db, chapter.id, company.id, daysAgo(7));
   const bal = await balance(db, chapter.id, company.id);
   const compromiso = await compromisoStatus(db, chapter.id, company.id);
+  const comunicado = await comunicadoStatus(db, company.id);
+  const gazette = await gaceta(db, chapter.id, company.id);
   const compromisoTone = compromiso.lastAction === "RELEASE_NOTICE" || compromiso.missedStreak >= 2 ? "red" : compromiso.thisWeek.validCount >= compromiso.minimum ? "green" : "amber";
   const companies = new Map((await db.query.companies.findMany()).map((c) => [c.id, c]));
 
@@ -94,6 +97,38 @@ export default async function HoyPage() {
         <span><strong>Compromiso · {compromiso.label}.</strong> Esta semana {compromiso.thisWeek.validCount} de {compromiso.minimum} Cesión válida{compromiso.thisWeek.distinctSpecialties > 1 ? ` a ${compromiso.thisWeek.distinctSpecialties} especialidades` : ""}. {compromiso.nextStep}</span>
         <span className="mono">Brújula · solo tú lo ves</span>
       </section>
+
+      {/* Protocolo II (D-070): tu Comunicado de la semana, un toque */}
+      {comunicado.comunicado ? (
+        comunicado.comunicado.status === "DRAFT" ? (
+          <section className="card amber" aria-label="Tu Comunicado de la semana">
+            <div className="row" style={{ justifyContent: "space-between" }}><h2 style={{ margin: 0 }}>Tu Comunicado · semana {comunicado.week}</h2><span className="mono">Dar a Conocer · un toque</span></div>
+            <p className="lead" style={{ fontSize: 14, margin: "8px 0 10px" }}>Tu Agente lo ha redactado con tu ADN y lo que ha pasado esta semana. Es lo que los demás Agentes usarán para cederte bien. Apruébalo; si hay algo nuevo, añade una línea.</p>
+            <pre style={{ whiteSpace: "pre-wrap", font: "inherit", fontSize: 14, margin: 0, padding: 12, background: "var(--panel)", borderRadius: 8 }}>{comunicado.text}</pre>
+            <form action={approveComunicadoAction} className="stack" style={{ marginTop: 12 }}>
+              <input type="hidden" name="comunicadoId" value={comunicado.comunicado.id} />
+              <div className="field"><label htmlFor="cnote">Una línea nueva (opcional): servicio, capacidad, equipo, certificación…</label><input id="cnote" name="note" maxLength={200} placeholder="Por ejemplo: desde octubre también hacemos licencias de actividad." /></div>
+              <div className="actions"><button className="btn amber" type="submit">Aprobar el Comunicado</button><span className="mono">Si no lo apruebas antes del viernes a las 14:00, sale solo lo estable.</span></div>
+            </form>
+          </section>
+        ) : (
+          <section className="card green row" style={{ justifyContent: "space-between", gap: 14 }} aria-label="Tu Comunicado de la semana">
+            <span><strong>Comunicado de la semana {comunicado.week} {comunicado.comunicado.status === "APPROVED" ? "aprobado" : "publicado sin revisar (solo lo estable)"}.</strong> {comunicado.closed ? "La Gaceta ya está publicada." : "La Gaceta sale el viernes a las 14:00."}</span>
+            <Link href="/gaceta" className="mono">Gaceta →</Link>
+          </section>
+        )
+      ) : null}
+
+      {gazette.published ? (
+        <section className="card" aria-label="Gaceta · relevante para ti">
+          <div className="row" style={{ justifyContent: "space-between" }}><h2 style={{ margin: 0 }}>Gaceta · semana {gazette.week}</h2><Link href="/gaceta" className="mono">Leer la Gaceta →</Link></div>
+          {gazette.relevant.length ? (
+            <ul className="plain" style={{ marginTop: 10 }}>{gazette.relevant.slice(0, 3).map((e) => <li key={e.comunicado.id}><Link href={`/empresa/${e.companySlug}`}><strong>{e.companyName}</strong></Link> · {e.why}</li>)}</ul>
+          ) : (
+            <p className="lead" style={{ fontSize: 14, marginTop: 8 }}>Sin novedades relevantes para ti esta semana. {gazette.totals.comunicados} Comunicados en la Sala.</p>
+          )}
+        </section>
+      ) : null}
 
       {dnaRow && !dnaRow.validatedAt ? (
         <Link href="/entrevista" className="card amber row" style={{ justifyContent: "space-between", textDecoration: "none" }}>
