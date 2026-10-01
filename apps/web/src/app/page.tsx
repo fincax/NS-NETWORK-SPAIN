@@ -2,11 +2,23 @@ import Link from "next/link";
 import { asc, eq } from "drizzle-orm";
 import { getDb, schema } from "@/db/client";
 import { NSCAT } from "@/db/nscat";
+import { monthAgo, tiemposDinamismo } from "@/services/dinamismo";
 import { Monogram } from "@/components/brand";
 import { betaRequestAction } from "./beta-actions";
 import { CONSENTIMIENTO_CANDIDATURA, PRIVACIDAD_VERSION } from "@/core/privacidad";
 
 export const dynamic = "force-dynamic";
+
+/** Dinamismo de la red (D-073, F9): del Apunte a la llamada al Interesado, en horas de media. Sin datos, no se muestra. */
+async function networkPace(): Promise<{ hours: number; n: number } | null> {
+  try {
+    const db = await getDb();
+    const t = await tiemposDinamismo(db, { since: monthAgo() });
+    return t.contact && t.contact.n >= 3 ? t.contact : null;
+  } catch {
+    return null;
+  }
+}
 
 async function seatAvailability() {
   try {
@@ -24,6 +36,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
   const { ok, error } = await searchParams;
   const seats = await seatAvailability();
   const vacant = seats.filter((s) => !s.taken);
+  const pace = await networkPace();
   return (
     <div className="public-shell">
       <header className="public-top">
@@ -46,7 +59,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
           <a href="#plaza" className="btn primary">Solicitar plaza en la beta</a>
           <a href="#disponibilidad" className="btn">Comprobar disponibilidad de mi sector</a>
         </div>
-        <p className="mono" style={{ marginTop: 10 }}>Beta privada en NS Sevilla · {vacant.length} plazas vacantes de {seats.length} en NS Cumbre</p>
+        <p className="mono" style={{ marginTop: 10 }}>Beta privada en NS Sevilla · {vacant.length} plazas vacantes de {seats.length} en NS Cumbre{pace ? ` · de un Apunte a la llamada al Interesado: ${pace.hours} h de media este mes` : ""}</p>
       </section>
 
       <section id="como" className="narrative">

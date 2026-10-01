@@ -34,7 +34,7 @@ import { audit } from "@/lib/audit";
 import { authMode } from "@/lib/auth";
 import { SEED_COMPANIES } from "@/db/seed-data";
 import { createSignal, publishSignal } from "@/services/signals";
-import { authorizeIntro, confirmValue, decide, infoRoundsFor, markIntroduced, submitVerdict, updateStage } from "@/services/referrals";
+import { authorizeIntro, confirmValue, decide, infoRoundsFor, markContacted, markIntroduced, submitVerdict, updateStage } from "@/services/referrals";
 import { QUESTION_STATES, QUICK_QUESTIONS } from "@/core/state-machine";
 import { mesaMode } from "@/services/jobs";
 import { approveCommunique, ensureDrafts } from "@/services/comunicado";
@@ -300,6 +300,7 @@ export async function runLatido(db: Db, opts: { now?: Date; force?: boolean } = 
           break;
         }
         case "INTRODUCED": {
+          await markContacted(db, r.id, member.id); // primer contacto en un toque (D-073): el cesionario ficticio lo marca antes de la reunión
           await updateStage(db, r.id, member.id, "MEETING");
           result.advanced.push({ referralId: r.id, from: state, to: "MEETING", by });
           break;

@@ -2,7 +2,7 @@
 import { revalidatePath } from "next/cache";
 import { getDb } from "@/db/client";
 import { requireMember } from "@/lib/session";
-import { authorizeIntro, confirmValue, decide, markIntroduced, submitVerdict, updateStage } from "@/services/referrals";
+import { authorizeIntro, confirmValue, decide, markContacted, markIntroduced, submitVerdict, updateStage } from "@/services/referrals";
 import { QUICK_QUESTIONS } from "@/core/state-machine";
 import type { HumanDecisionKind, RevealScope, VerdictAxis } from "@/core/types";
 
@@ -90,5 +90,14 @@ export async function confirmValueAction(formData: FormData) {
   const db = await getDb();
   const id = String(formData.get("referralId"));
   await confirmValue(db, id, member.id);
+  done(id);
+}
+
+/** Primer contacto en un toque (D-073, F7). */
+export async function contactedAction(formData: FormData) {
+  const { member } = await requireMember();
+  const db = await getDb();
+  const id = String(formData.get("referralId"));
+  await markContacted(db, id, member.id);
   done(id);
 }

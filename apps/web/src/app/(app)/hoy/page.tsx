@@ -4,6 +4,7 @@ import { currentMember, requireDemo } from "@/lib/session";
 import { todaySummary, balance } from "@/services/today";
 import { hoyBoard } from "@/services/hoy";
 import { brujula } from "@/services/brujula";
+import { monthAgo, tiemposDinamismo } from "@/services/dinamismo";
 import { latestGazette, relevantForMe } from "@/services/comunicado";
 import { daysAgo, eur, eurRange, firstName, greeting } from "@/lib/format";
 import { StateBadge } from "@/components/ui";
@@ -46,6 +47,7 @@ export default async function HoyPage({ searchParams }: { searchParams: Promise<
   const relevant = gazette ? (await relevantForMe(db, chapter.id, company.id, gazette.weekStart)).slice(0, 3) : [];
   const companies = new Map((await db.query.companies.findMany({ columns: { id: true, slug: true } })).map((c) => [c.id, c.slug]));
   const copias = member.isDirector && mostrarEstadoCopias() ? valorarCopias(await leerEstadoCopias()) : null;
+  const tiempos = await tiemposDinamismo(db, { chapterId: chapter.id, since: monthAgo() });
   const agentState = board.toques.length ? "esperando" : summary.matches ? "encontrado" : "analizando";
   const { compromiso, comunicado } = board;
   const compromisoTone = compromiso.lastAction === "RELEASE_NOTICE" || compromiso.missedStreak >= 2 ? "red" : compromiso.thisWeek.validCount >= compromiso.minimum ? "green" : "amber";
@@ -146,6 +148,8 @@ export default async function HoyPage({ searchParams }: { searchParams: Promise<
         <span><span className="money" style={{ fontSize: 20, color: "var(--amber)" }}>{eurRange(summary.potential.min, summary.potential.max)}</span> en Cesiones abiertas</span>
         <span>·</span>
         <span><span className="money" style={{ fontSize: 20, color: "var(--green)" }}>{eur(bal.valueReceived)}</span> contrastado recibido · Mérito {bal.merit}</span>
+        {tiempos.contact ? <><span>·</span><span title={`${tiempos.contact.n} contacto(s) en 30 días`}>del Apunte a la llamada <strong>{tiempos.contact.hours} h</strong></span></> : null}
+        {tiempos.mesa ? <><span>·</span><span title={`${tiempos.mesa.n} Indicio(s) en 30 días`}>del Apunte a la Mesa <strong>{tiempos.mesa.minutes < 1 ? "menos de 1 min" : `${Math.round(tiempos.mesa.minutes)} min`}</strong></span></> : null}
         <span className="spacer" />
         <Link href="/brujula" className={`badge ${compromisoTone}`} title={compromiso.nextStep}>Compromiso · {compromiso.label.replace(/^Pendiente esta semana$/, `${compromiso.thisWeek.validCount} de ${compromiso.minimum} esta semana`)}</Link>
         {comunicado.row?.status === "APPROVED" ? <Link href="/comunicado" className="badge green">Comunicado aprobado</Link> : null}

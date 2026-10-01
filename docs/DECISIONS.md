@@ -1751,3 +1751,24 @@ Servicio a la red        10 %   solo suma: acciones de dirección del mes (3 = 1
 **Consequences.** `services/brujula.ts`, `app/(app)/brujula/`, Hoy, `nav-links.tsx`. Pruebas `brujula.test.ts` (5). Sin tablas nuevas: el descarte vive en `audit_events`.
 
 **Revisit when.** Haya 50 Cesiones reales: medir qué Movimientos se ejecutan y cuáles se descartan y con qué motivo; afinar rangos y confianza. Los Movimientos "Ofrecer" y "Conocer" dependen de la calidad del ADN: si se descartan por "no encaja", el problema está en la entrevista.
+
+---
+
+## D-073 · El dinamismo se ve: primer contacto en un toque y tiempos del Apunte a la llamada y a la Mesa (F7, F9 y F10)
+
+**Status:** CONFIRMED (el fundador: "paso a paso para ser wow", propuestas F7, F9 y F10 de D-066)
+**Date:** 2026-10-01
+
+**Context.** El compromiso de responder al Interesado en 48 h se medía por ausencia: si no había hito, RESPONSE_LATE. Nadie podía decir "ya le he llamado", el aviso llegaba cuando el plazo ya había vencido, y el principio "nada espera a nadie" no se veía en ninguna cifra.
+
+**Choice.**
+
+- **F7 · Primer contacto en un toque.** `referrals.contacted_at`: el cesionario marca "He contactado" desde Hoy (toque `CONTACTAR`, con las horas que quedan) o desde la tarjeta. A tiempo suma `RESPONSE_ON_TIME` (+5); el cedente lo ve (`CONTACTED`). El Reloj recuerda a las 24 h (`contact_reminder_sent_at`, `TIMEOUTS.contactReminderHours`) y solo resta a las 48 h si no consta el contacto. Pasado el plazo sin contacto, el toque pasa a contratiempo con el mismo botón. Los cesionarios ficticios lo marcan antes de la reunión.
+- **F9 · Del Apunte a la llamada.** `services/dinamismo.ts`: horas medias desde que se anotó el Indicio hasta el contacto, en 30 días. En la línea de estado de Hoy, en la cabecera de la Balanza de Mi Sala y, con al menos tres contactos, en la portada pública ("de un Apunte a la llamada al Interesado: N h de media este mes"). Nunca por persona: es la prueba del principio, no un ranking.
+- **F10 · Del Apunte a la Mesa.** Minutos desde el Indicio hasta la primera Cesión en la mesa de un cesionario; objetivo interno `MESA_TARGET_MINUTES` = 10. En Hoy y en Mi Sala.
+
+**Why.** Un compromiso se cumple mejor cuando se puede declarar con un toque y se recuerda a mitad de camino. Y el dinamismo es un argumento de venta solo si se mide con hechos.
+
+**Consequences.** Migración `0018_contacto`; `services/referrals.ts` (`markContacted`), `services/clock.ts` (3a y 3), `services/dinamismo.ts`, `services/hoy.ts`, tarjeta, Hoy, Mi Sala, portada, `agents/latido.ts`. Pruebas `dinamismo.test.ts` (3). `docs/11` §F: F7, F9 y F10 hechas.
+
+**Revisit when.** Con 50 Cesiones reales: si la media del Apunte a la llamada supera 48 h, el problema está en el Puente (F4), no en el recordatorio.

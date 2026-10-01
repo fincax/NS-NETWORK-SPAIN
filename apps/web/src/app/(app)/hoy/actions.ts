@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getDb } from "@/db/client";
 import { requireMember } from "@/lib/session";
-import { authorizeIntro, decide, infoRound } from "@/services/referrals";
+import { authorizeIntro, decide, infoRound, markContacted } from "@/services/referrals";
 import { approveCommunique, ComunicadoError } from "@/services/comunicado";
 import { publishSignal } from "@/services/signals";
 import { mesaMode, runJobs } from "@/services/jobs";
@@ -50,6 +50,9 @@ export async function toqueAction(formData: FormData) {
         if ("queued" in res) after(() => runJobs(db, { chapterId: chapter.id, max: 3 }));
         break;
       }
+      case "CONTACTED":
+        await markContacted(db, referralId, member.id);
+        break;
       case "APPROVE_COMMUNIQUE":
         await approveCommunique(db, { chapterId: chapter.id, companyId: company.id, memberId: member.id });
         break;

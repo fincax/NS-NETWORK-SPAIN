@@ -64,7 +64,7 @@ export const REVIEW_STATES: ReadonlySet<ReferralState> = new Set(["ORIGINATOR_PE
  * 24 y 48 h); respuesta al Interesado 48 h tras el Puente. Pregunta exprés: 24 h (recordatorio a las 4 h), sin detener nada.
  * Directiva: 24 h (recordatorio a las 4 h); si la excepción es solo de valor, la Cesión sigue sola; si no, escala a NS.
  */
-export const TIMEOUTS = { reminderHours: 24, secondReminderHours: 48, expiryHours: 72, responseAfterIntroHours: 48, checkInDays: 14, questionReminderHours: 4, questionAnswerHours: 24, directorReminderHours: 4, directorHours: 24 } as const;
+export const TIMEOUTS = { reminderHours: 24, secondReminderHours: 48, expiryHours: 72, responseAfterIntroHours: 48, contactReminderHours: 24, checkInDays: 14, questionReminderHours: 4, questionAnswerHours: 24, directorReminderHours: 4, directorHours: 24 } as const;
 
 /** Excepciones de Compliance que el Reloj puede dar por aprobadas si la Directiva no decide en 24 h (D-068): son de criterio, no de riesgo. */
 export const AUTO_APPROVABLE_EXCEPTIONS: ReadonlySet<string> = new Set(["VALUE_THRESHOLD", "TRIAL_PERIOD"]);

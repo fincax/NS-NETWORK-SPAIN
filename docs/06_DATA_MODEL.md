@@ -57,7 +57,7 @@ PROTOCOLO II          communiques (Comunicado semanal) · gazettes (Gaceta de la
 | Encargo | `demands` | Lo que busca un titular ahora: texto, señal, industria, vigencia, estado. |
 | Comunicado | `communiques` | Una fila por titular y semana (D-069): `stable` (del ADN, capas PUBLIC y CHAPTER), `delta` (inferido y verificado, recalculado por el Agente mientras es borrador), `declared` (líneas del Timonel), `encargos`, `asks`, `status` DRAFT/APPROVED/CONTINUITY, `continuity_streak`, `dna_version`, `approved_by_member_id/at`, `closed_at`. Única por (empresa, semana). |
 | Gaceta | `gazettes` | Una por Sala y semana: JSON `ChapterGazette` (Comunicados, servicios nuevos, cierres contrastados, Encargos, necesidades sin titular, conocimiento mutuo, novedades). |
-| Reloj de la Sala | columnas en `referrals` | `reminder_sent_at`, `late_flagged_at`, `last_nudge_at` garantizan idempotencia (D-030). |
+| Reloj de la Sala | columnas en `referrals` | `reminder_sent_at`, `late_flagged_at`, `last_nudge_at` garantizan idempotencia (D-030). `contacted_at` y `contact_reminder_sent_at` (D-073): primer contacto con el Interesado y su recordatorio a las 24 h. |
 
 ## 2. Ciclos de vida
 

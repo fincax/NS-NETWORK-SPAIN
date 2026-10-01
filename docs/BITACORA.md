@@ -7,6 +7,7 @@ Punto de parada y siguiente paso. Se actualiza al cerrar cada sesión de trabajo
 **Dónde estamos.**
 
 - Las PR #20 (D-065, D-066), #21 (D-067, D-068) y #22 (D-069, D-070) están fusionadas en `main`. **El servidor está al día: `actualizar.sh` lo dejó en `fc30b99` (PR #22)** con las migraciones `0015`, `0016` y `0017` aplicadas.
+- **Construido (D-073), misma rama:** F7, F9 y F10. "He contactado" en un toque desde Hoy y la tarjeta (recordatorio a las 24 h, resta solo a las 48 h sin contacto, +5 a tiempo); tiempos visibles "del Apunte a la llamada" y "del Apunte a la Mesa" en Hoy, Mi Sala y la portada (con tres contactos o más). Migración `0018_contacto`. 3 pruebas. **Pendiente de PR, fusionar y `actualizar.sh`.**
 - **Construido (D-072), misma rama:** la Brújula completa. Cuatro bloques con evidencia real (aceptación frente a la Sala, a quién le cierran rápido tus Cesiones, declinadas con motivo, señales que conviertes, Veredictos recibidos, plazos vencidos), qué ganas (Mérito, Distinciones, Valoración y Embajada, Tramo y valor del Ejercicio) y tres Movimientos con un toque (cinco tras una semana sin ceder): ceder, proponer, dar a conocer, cerrar, ofrecer a un Encargo, conocer un Dossier, reclamar una plaza; descarte con motivo. En Hoy, el primer Movimiento; `/brujula` el cuadro; "Brújula" en la navegación. 5 pruebas. **Pendiente de PR, fusionar y `actualizar.sh`.**
 - **Servidor al día en `7dfbbb1` (PR #23)** tras `actualizar.sh`; la limpieza única de Carlos se ejecuta en la primera pasada de `/api/jobs`.
 - **Construido (D-071), misma rama, tras ver en el servidor Mérito −190 y 5,9 M€ "abiertos" en la cuenta de Carlos:** la protagonista de la demo está protegida. El Reloj archiva sus Cesiones vencidas sin penalización, no le sube la Escalera ni le resta por el Comunicado; una limpieza única en `/api/jobs` retira lo acumulado; "Latir ahora" pasa a la barra "Beta privada". Con cuentas reales no cambia nada. PR #23 fusionada y aplicada.
@@ -16,7 +17,7 @@ Punto de parada y siguiente paso. Se actualiza al cerrar cada sesión de trabajo
 **Siguiente paso acordado (por este orden).**
 
 1. ~~PR #22 y #23, `actualizar.sh`~~: hecho, servidor en `7dfbbb1`. Comprobar como Carlos: Mérito limpio, Cesiones viejas archivadas, "Latir ahora" en la barra de arriba, Gaceta el domingo a las 20:00. Comprobar en la demo, como Carlos: Hoy es ahora la pila de toques; aceptar la Cesión de Lucía y aprobar el Comunicado desde la fila; en Gaceta, lo relevante para él. La primera Gaceta real sale el domingo a las 20:00.
-2. ~~Brújula completa (Protocolo III)~~ → hecha (D-072). Siguiente: F7, F9 y F10 (contacto en un toque y tiempos visibles), después F3, F4 y F8; aviso del domingo por correo para el Comunicado (F1).
+2. ~~Brújula completa (Protocolo III)~~ → hecha (D-072). ~~F7, F9 y F10~~ hechas (D-073). Siguiente: F3, F4 y F8; aviso del domingo por correo para el Comunicado (F1).
 4. Lo de siempre: especialidades Manantial y forma jurídica en el alta; notificaciones push (D-039); resto de `docs/08` con el abogado.
 
 ## 1 de octubre de 2026 (tarde) · Pregunta exprés (D-065)

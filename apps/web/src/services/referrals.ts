@@ -355,6 +355,23 @@ export async function markIntroduced(db: Db, referralId: string, memberId: strin
   await audit(db, { chapterId: ref.chapterId, kind: "INTRODUCED", actor: { type: "USER", id: memberId }, subject: { type: "Referral", id: referralId }, result: "El cedente tendió el Puente. El cesionario se compromete a responder al Interesado en 48 h.", significant: true, companyIds: [ref.originatorCompanyId, ref.receiverCompanyId] });
 }
 
+/** Primer contacto en un toque (D-073, F7): el cesionario marca que ya ha contactado al Interesado. A tiempo (48 h) suma; el hito queda en la Cesión y mide el dinamismo. */
+export async function markContacted(db: Db, referralId: string, memberId: string) {
+  const role = await roleOf(db, referralId, memberId);
+  if (role !== "RECEIVER") throw new Error("Solo el cesionario marca el contacto con el Interesado");
+  const ref = await db.query.referrals.findFirst({ where: eq(schema.referrals.id, referralId) });
+  if (!ref) throw new Error("Cesión no encontrada");
+  if (!["INTRODUCED", "MEETING", "COMMERCIAL_OPPORTUNITY"].includes(ref.state)) throw new Error("El contacto se marca después del Puente");
+  if (ref.contactedAt) return ref;
+  const now = new Date();
+  const onTime = !ref.responseDueAt || now <= ref.responseDueAt;
+  await db.update(schema.referrals).set({ contactedAt: now, updatedAt: now }).where(eq(schema.referrals.id, referralId));
+  if (onTime) await db.insert(schema.trustEvents).values({ chapterId: ref.chapterId, companyId: ref.receiverCompanyId, kind: "RESPONSE_ON_TIME", weight: 5, evidenceRef: `referral:${referralId}` });
+  const hours = ref.introducedAt ? Math.max(1, Math.round((now.getTime() - ref.introducedAt.getTime()) / 3_600_000)) : null;
+  await audit(db, { chapterId: ref.chapterId, kind: "CONTACTED", actor: { type: "USER", id: memberId }, subject: { type: "Referral", id: referralId }, policyApplied: onTime ? "contact.on_time_48h" : "contact.late", result: `El cesionario ha contactado al Interesado${hours ? ` ${hours} h después del Puente` : ""}${onTime ? "" : " (fuera de las 48 h)"}. El cedente ya lo sabe.`, significant: true, companyIds: [ref.originatorCompanyId, ref.receiverCompanyId] });
+  return { ...ref, contactedAt: now };
+}
+
 /** Seguimiento por hitos (el Agente pregunta cada 14 días). */
 export async function updateStage(db: Db, referralId: string, memberId: string, stage: "MEETING" | "COMMERCIAL_OPPORTUNITY" | "WON" | "LOST" | "NO_DECISION", notes?: string) {
   const role = await roleOf(db, referralId, memberId);

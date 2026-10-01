@@ -8,7 +8,7 @@ import { PROMISE_LABEL } from "@/core/merit";
 import { MAX_INFO_ROUNDS, QUESTION_STATES, QUICK_QUESTIONS, STATE_LABEL, TIMEOUTS } from "@/core/state-machine";
 import type { QualificationTurn, ReferralState, SignalEnvelope } from "@/core/types";
 import { infoRound, type InfoRound } from "@/services/referrals";
-import { aperturaAction, confirmValueAction, decideAction, puenteAction, stageAction, verdictAction } from "./actions";
+import { aperturaAction, confirmValueAction, contactedAction, decideAction, puenteAction, stageAction, verdictAction } from "./actions";
 
 export default async function CesionPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -290,6 +290,15 @@ export default async function CesionPage({ params }: { params: Promise<{ id: str
       {face === "SEGUIMIENTO" ? (
         <section className="card">
           <h2>Seguimiento</h2>
+          {ref.contactedAt ? (
+            <p className="mono" style={{ marginBottom: 12 }}>Contactaste al Interesado el {dateTime(ref.contactedAt)}{ref.introducedAt ? `, ${Math.max(1, Math.round((ref.contactedAt.getTime() - ref.introducedAt.getTime()) / 3_600_000))} h después del Puente` : ""}.</p>
+          ) : (
+            <form action={contactedAction} className="row" style={{ marginBottom: 14, gap: 12 }}>
+              <input type="hidden" name="referralId" value={ref.id} />
+              <button className="btn primary" type="submit">He contactado al Interesado</button>
+              <span className="mono">Compromiso: {TIMEOUTS.responseAfterIntroHours} h desde el Puente{ref.responseDueAt ? ` · quedan ${hoursUntil(ref.responseDueAt)} h` : ""}. Un toque y el cedente lo sabe.</span>
+            </form>
+          )}
           <p className="lead" style={{ fontSize: 14, marginBottom: 12 }}>Tu Agente te preguntará cada {TIMEOUTS.checkInDays} días. Actualiza el hito o cierra la Cesión para emitir el Veredicto.</p>
           <form action={stageAction} className="stack">
             <input type="hidden" name="referralId" value={ref.id} />
@@ -410,7 +419,7 @@ function nextStep(state: ReferralState, o: { iAmOriginator: boolean; iAmReceiver
     case "DIRECTOR_PENDING": return `Esperar a la Directiva (${TIMEOUTS.directorHours} h; si la excepción es solo de valor, la Cesión sigue sola).`;
     case "APPROVED": return o.iAmOriginator ? (o.info.pending ? `Responder a ${o.receiverFirst} y autorizar la Apertura en el mismo acto.` : "Autorizar la Apertura y redactar el Puente.") : `${o.originatorFirst} decidirá el alcance de la Apertura.`;
     case "INTRO_AUTHORIZED": return o.iAmOriginator ? "Enviar el Puente en persona y marcarlo como tendido." : `${o.originatorFirst} enviará el Puente.`;
-    case "INTRODUCED": return o.iAmReceiver ? `Responder al Interesado en ${TIMEOUTS.responseAfterIntroHours} h y anotar el hito.` : `${o.receiverFirst} responderá al Interesado.`;
+    case "INTRODUCED": return o.iAmReceiver ? `Contactar al Interesado en ${TIMEOUTS.responseAfterIntroHours} h y marcarlo con un toque; después, anotar el hito.` : `${o.receiverFirst} contactará al Interesado.`;
     case "MEETING": case "COMMERCIAL_OPPORTUNITY": return o.iAmReceiver ? "Actualizar el hito al cerrar." : `${o.receiverFirst} actualiza los hitos.`;
     case "WON": case "LOST": case "NO_DECISION": return o.iAmReceiver ? "Emitir el Veredicto." : `Esperar el Veredicto de ${o.receiverFirst}.`;
     default: return "Nada pendiente.";
