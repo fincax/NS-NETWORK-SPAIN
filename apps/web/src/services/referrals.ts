@@ -15,7 +15,10 @@ async function transition(db: Db, referralId: string, to: ReferralState, actor: 
   if (!ref) throw new Error("Cesión no encontrada");
   assertTransition(ref.state as ReferralState, to, actor);
   await db.insert(schema.referralTransitions).values({ referralId, fromState: ref.state, toState: to, actorType: actor === "SYSTEM" ? "SYSTEM" : ["ORIGINATOR", "RECEIVER", "DIRECTOR"].includes(actor) ? "USER" : "AGENT", actorId, reason });
-  await db.update(schema.referrals).set({ state: to, updatedAt: new Date(), ...(to === "INTRODUCED" ? { introducedAt: new Date(), responseDueAt: new Date(Date.now() + TIMEOUTS.responseAfterIntroHours * 3_600_000) } : {}), ...(["WON", "LOST", "NO_DECISION"].includes(to) ? { closedAt: new Date() } : {}) }).where(eq(schema.referrals.id, referralId));
+  const now = new Date();
+  // Cada espera tiene su propio reloj (D-066, D-068): al llegar a una mesa nueva, 72 h desde ahora y avisos a cero.
+  const review = ["ORIGINATOR_PENDING", "RECEIVER_PENDING", "DIRECTOR_PENDING"].includes(to) ? { reviewRequestedAt: now, expiresAt: new Date(now.getTime() + TIMEOUTS.expiryHours * 3_600_000), reminderSentAt: null, secondReminderSentAt: null, escalatedAt: null } : {};
+  await db.update(schema.referrals).set({ state: to, updatedAt: now, ...review, ...(to === "INTRODUCED" ? { introducedAt: now, responseDueAt: new Date(now.getTime() + TIMEOUTS.responseAfterIntroHours * 3_600_000) } : {}), ...(["WON", "LOST", "NO_DECISION"].includes(to) ? { closedAt: now } : {}) }).where(eq(schema.referrals.id, referralId));
   const updated = { ...ref, state: to };
   // Avisos con acción (D-067): al Timonel que debe actuar ahora. La Apertura anticipada no avisa de "aceptada": avisa de "Puente listo" al abrirse.
   if (to === "RECEIVER_PENDING") await notifyReferral(db, updated, "REVIEW_RECEIVER");
@@ -135,9 +138,9 @@ async function askQuestion(db: Db, ref: { matchId: string; opportunitySignalId: 
   if (full) await notifyReferral(db, full, "QUESTION", { question });
 }
 
-/** El plazo de revisión de quien tiene que actuar vuelve a empezar (7 días, recordatorio a las 24 h). */
+/** El plazo de revisión de quien tiene que actuar vuelve a empezar (72 h, recordatorios a las 24 y 48 h). */
 async function restartReviewClock(db: Db, referralId: string, now = new Date()) {
-  await db.update(schema.referrals).set({ reviewRequestedAt: now, expiresAt: new Date(now.getTime() + TIMEOUTS.expiryDays * 86_400_000), reminderSentAt: null, updatedAt: now }).where(eq(schema.referrals.id, referralId));
+  await db.update(schema.referrals).set({ reviewRequestedAt: now, expiresAt: new Date(now.getTime() + TIMEOUTS.expiryHours * H), reminderSentAt: null, secondReminderSentAt: null, updatedAt: now }).where(eq(schema.referrals.id, referralId));
 }
 
 /** Visto bueno (cara A del cesionario, cara B del cedente, Directiva por excepción), pregunta al cedente y su respuesta (D-058). */
@@ -222,10 +225,7 @@ export async function decide(db: Db, input: DecisionInput) {
   // Aceptar y preguntar (D-065): la Cesión avanza y la pregunta viaja con ella; el cedente la ve junto a la Apertura.
   if (asksQuestion && question) await askQuestion(db, ref, question, now);
 
-  // Apertura anticipada (D-067): aceptada la Cesión, la Apertura que el cedente dejó autorizada se ejecuta sola y el Puente queda redactado.
-  if (next === "APPROVED" && ref.preauthorizedScope && ref.preauthorizedByMemberId) {
-    await openIntro(db, ref.id, ref.preauthorizedByMemberId, ref.preauthorizedScope as RevealScope, { auto: true });
-  }
+  if (next === "APPROVED") await afterApproved(db, ref.id);
 
   // Promesa (D-021): al aceptar el cesionario, se confirma o ajusta y el cedente gana Mérito de Promesa
   if (role === "RECEIVER" && input.decision === "APPROVE" && ref.promise) {
@@ -276,6 +276,23 @@ export async function repairStuckInfoRequests(db: Db, now = new Date()): Promise
     repaired.push(ref.id);
   }
   return repaired;
+}
+
+/** Apertura anticipada (D-067): aceptada la Cesión, la Apertura que el cedente dejó autorizada se ejecuta sola y el Puente queda redactado. */
+async function afterApproved(db: Db, referralId: string) {
+  const ref = await db.query.referrals.findFirst({ where: eq(schema.referrals.id, referralId) });
+  if (ref?.state === "APPROVED" && ref.preauthorizedScope && ref.preauthorizedByMemberId) {
+    await openIntro(db, ref.id, ref.preauthorizedByMemberId, ref.preauthorizedScope as RevealScope, { auto: true });
+  }
+}
+
+/**
+ * Directiva en 24 h (D-068): si la única excepción es de criterio (valor por encima del umbral, periodo de prueba) y la Directiva
+ * no ha decidido, el Reloj aprueba con la excepción registrada y avisa a la Directiva. Nunca para excepciones de riesgo.
+ */
+export async function approveByClock(db: Db, referralId: string, reason: string) {
+  await transition(db, referralId, "APPROVED", "SYSTEM", "reloj", reason);
+  await afterApproved(db, referralId);
 }
 
 /** Apertura (cara B): el cedente fija el alcance de revelación y el Agente redacta el Puente. */

@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { and, eq } from "drizzle-orm";
 import { getDb, schema } from "@/db/client";
 import { requireMember } from "@/lib/session";
-import { eur, eurRange, dateTime, daysUntil, firstName } from "@/lib/format";
+import { eur, eurRange, dateTime, hoursUntil, firstName } from "@/lib/format";
 import { Encaje, StateBadge } from "@/components/ui";
 import { PROMISE_LABEL } from "@/core/merit";
 import { MAX_INFO_ROUNDS, QUESTION_STATES, QUICK_QUESTIONS, STATE_LABEL, TIMEOUTS } from "@/core/state-machine";
@@ -58,7 +58,7 @@ export default async function CesionPage({ params }: { params: Promise<{ id: str
     : iAmReceiver && ["WON", "LOST", "NO_DECISION"].includes(state) && !verdict ? "VEREDICTO"
     : "LECTURA";
 
-  const expires = daysUntil(ref.expiresAt);
+  const expires = hoursUntil(ref.expiresAt);
   // Pregunta exprés (D-065): el cedente responde desde cualquier cara; en la Apertura, en el mismo acto.
   const answerHere = iAmOriginator && Boolean(info.pending) && QUESTION_STATES.has(state) && !(face === "B" && state === "APPROVED");
   const questionDue = info.dueAt ? dateTime(info.dueAt) : null;
@@ -72,7 +72,7 @@ export default async function CesionPage({ params }: { params: Promise<{ id: str
           {ref.embassy ? <span className="badge blue">Embajada</span> : null}
           {env.chapter_layer.third_party_expects_contact ? <span className="badge green">Interesado avisado</span> : null}
           <span className="spacer" />
-          {expires !== null && ["ORIGINATOR_PENDING", "RECEIVER_PENDING"].includes(state) ? <span className="mono">caduca en {expires} días</span> : null}
+          {expires !== null && ["ORIGINATOR_PENDING", "RECEIVER_PENDING"].includes(state) ? <span className="mono">caduca en {expires} h</span> : state === "DIRECTOR_PENDING" ? <span className="mono">la Directiva decide en {TIMEOUTS.directorHours} h</span> : null}
         </div>
         <p className="eyebrow">{iAmReceiver ? "Cesión que recibes" : iAmOriginator ? "Cesión que cedes" : "Cesión de la Sala"} · {need.description}</p>
         <div className="title">
@@ -407,7 +407,7 @@ function nextStep(state: ReferralState, o: { iAmOriginator: boolean; iAmReceiver
       if (!o.iAmReceiver) return `Esperar a que ${o.receiverFirst} acepte.`;
       if (o.info.pending) return o.info.overdue ? `Decidir con lo que consta: ${o.originatorFirst} no respondió en ${TIMEOUTS.questionAnswerHours} h.` : `Aceptar o declinar cuando quieras; ${o.originatorFirst} responde en ${TIMEOUTS.questionAnswerHours} h como máximo.`;
       return (o.info.roundsLeft === 0 || o.info.answered.length) && /informaci/i.test(o.suggested) ? "Aceptar la Cesión y confirmar la Promesa, o declinar con motivo." : o.suggested;
-    case "DIRECTOR_PENDING": return "Esperar a la Directiva.";
+    case "DIRECTOR_PENDING": return `Esperar a la Directiva (${TIMEOUTS.directorHours} h; si la excepción es solo de valor, la Cesión sigue sola).`;
     case "APPROVED": return o.iAmOriginator ? (o.info.pending ? `Responder a ${o.receiverFirst} y autorizar la Apertura en el mismo acto.` : "Autorizar la Apertura y redactar el Puente.") : `${o.originatorFirst} decidirá el alcance de la Apertura.`;
     case "INTRO_AUTHORIZED": return o.iAmOriginator ? "Enviar el Puente en persona y marcarlo como tendido." : `${o.originatorFirst} enviará el Puente.`;
     case "INTRODUCED": return o.iAmReceiver ? `Responder al Interesado en ${TIMEOUTS.responseAfterIntroHours} h y anotar el hito.` : `${o.receiverFirst} responderá al Interesado.`;
@@ -432,7 +432,7 @@ function waitingText(state: ReferralState, iAmOriginator: boolean, iAmReceiver: 
     case "WON": case "LOST": case "NO_DECISION": return "Cerrada. Pendiente del Veredicto del cesionario.";
     case "VALUE_CONFIRMED": return "Valor contrastado por ambas partes.";
     case "REJECTED_BY_MEMBER": return "Declinada con motivo. No afecta a la reputación de quien declina; el cedente conserva su Mérito de Promesa.";
-    case "EXPIRED": return "Caducada por silencio. Vuelve al cedente, que puede proponerla a otra Sala.";
+    case "EXPIRED": return `Caducada por silencio (${TIMEOUTS.expiryHours} h). El Agente del cedente recupera el referido para volver a cederlo o proponerlo a otra Sala.`;
     case "BLOCKED": return "Bloqueada por Compliance.";
     default: return STATE_LABEL[state];
   }

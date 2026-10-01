@@ -21,7 +21,7 @@ Toda tarjeta muestra siempre **WHY · EVIDENCE · CONFIDENCE · UNKNOWN · NEXT 
 | **Bloque Promesa** | Valor a priori, Encaje, y cinco componentes con semáforo: necesidad real, información, decisor, plazo, presupuesto. |
 | **Qué no aparece** | La identidad del Interesado. Solo tras la Apertura del cedente (capa 2). |
 | **Plazo de respuesta** | Responder al Interesado en **48 h** tras el Puente y emitir Veredicto al cerrar. |
-| **Caducidad** | **7 días** sin respuesta (recordatorio a las 72 h). La Cesión vuelve al cedente, que puede proponerla a otra Sala. El silencio del cesionario cuenta en su Hoja de Méritos. |
+| **Caducidad** | **72 h** sin respuesta desde que llega a su mesa (recordatorios a las 24 y 48 h; D-068). La Cesión caduca, el Agente del cedente recupera el referido y le propone el relevo (volver a cederlo o Embajada). El silencio del cesionario cuenta en su Hoja de Méritos. |
 
 ## Cara A′ · el cedente responde a una pregunta (D-065)
 

@@ -1636,3 +1636,25 @@ Servicio a la red        10 %   solo suma: acciones de dirección del mes (3 = 1
 **Consequences.** Migración `0015_dinamismo`; `services/avisos.ts`, `services/accion.ts`, `app/accion/[token]`, `proxy.ts` (ruta pública); `services/referrals.ts` (`notifyReferral` en `transition`, `openIntro`, preautorización en el visto bueno), `agents/mesa.ts` (aviso al preparar), `core/state-machine.ts` (`SYSTEM` en `APPROVED → INTRO_AUTHORIZED`), tarjeta (cara B0), `agents/latido.ts` (la mitad de los cedentes ficticios preautorizan). Pruebas `avisos.test.ts` (5) y slice (1). Documentado en `docs/02` §10, `docs/15`, `docs/13`, `docs/06`, `docs/17`.
 
 **Revisit when.** Haya datos reales de cuántas decisiones llegan por el correo y cuántos cedentes eligen "decidir después". Si la Apertura anticipada se usa en más del 80 % de los casos, considerar F3 (ceder directo desde el Apunte). Notificaciones push (D-039) reutilizarán los mismos enlaces.
+
+---
+
+## D-068 · Cada espera dura 72 h y la Directiva decide en 24 h: caducidad con relevo y continuación de las excepciones de criterio (F5 y F6)
+
+**Status:** CONFIRMED (el fundador: "sigue" tras proponer F5 y F6)
+**Date:** 2026-10-01
+
+**Context.** Con el camino normal en tres pulsaciones (D-067), las dos esperas más largas que quedaban eran los 7 días de revisión (D-024) y los 5 días de la Directiva (NS-ARP §9.1), y además el plazo de revisión contaba desde que la Mesa preparaba la Cesión, no desde que llegaba a cada mesa.
+
+**Choice.**
+
+- **Cada espera tiene su propio reloj.** Al entrar en `ORIGINATOR_PENDING`, `RECEIVER_PENDING` o `DIRECTOR_PENDING`, `review_requested_at` y `expires_at` se reinician y los avisos vuelven a cero.
+- **Revisión: 72 h** (`expiryHours`), con recordatorio a las 24 h y última llamada a las 48 h (`second_reminder_sent_at`). Al vencer, `EXPIRED` y `RESPONSE_LATE` (−20) para quien calló. Si calló el cesionario, el Agente del cedente deja el **relevo** (`RELAY_PROPOSED`): recuperar el referido y volver a cederlo o proponerlo a otra Sala como Embajada (D-015). La Embajada automática llegará cuando la Embajada exista como flujo.
+- **Directiva: 24 h** (`directorHours`), recordatorio a las 4 h. Al vencer: si todas las excepciones son de criterio (`VALUE_THRESHOLD`, `TRIAL_PERIOD`; `AUTO_APPROVABLE_EXCEPTIONS`), el Reloj aprueba por `SYSTEM` con la excepción registrada en la Trazabilidad, avisa a la Directiva (`DIRECTOR_TIMEOUT`) y ejecuta la Apertura anticipada si la hay. Si alguna excepción es de riesgo (`REGULATED_SPECIALTY`, `ADJACENT_SEAT`, datos personales), la Cesión no sigue sola: escala a NS (`ESCALATED_TO_NS`, `escalated_at`) y no caduca. Fail-safe (NS-ARP §1.8) intacto.
+- La tarjeta muestra "caduca en N h" y, en Directiva, "decide en 24 h; si la excepción es solo de valor, la Cesión sigue sola".
+
+**Why.** 72 h son tres oportunidades (hoy, mañana, pasado) de decidir con un toque desde el correo; más tiempo no mejora la decisión, solo enfría el referido. La Directiva no debe ser un cuello de botella para una excepción de criterio que ella misma fijó (el umbral de valor); sí debe serlo, y escalar, cuando hay riesgo profesional o de datos.
+
+**Consequences.** Migración `0016_dinamismo_plazos`; `core/state-machine.ts` (`TIMEOUTS`, `AUTO_APPROVABLE_EXCEPTIONS`, `SYSTEM` en `DIRECTOR_PENDING → APPROVED`), `services/referrals.ts` (reinicio del reloj en `transition`, `approveByClock`, `afterApproved`), `services/clock.ts` (pasos 1a, 1c y 2), `agents/mesa.ts`, tarjeta. Pruebas: Reloj (3 nuevas), core. Documentado en `docs/02` §4 y §9.1, `docs/15`, `docs/13`, `docs/06`, `docs/11` (F5, F6 hechas). Latido: la Distinción ficticia se otorga en el primer cierre ganado del mes (estabiliza la prueba).
+
+**Revisit when.** Haya 50 Cesiones reales: medir cuántas caducan y cuántas aprueba el Reloj por silencio de la Directiva. Si las caducidades superan el 10 %, el problema es el aviso, no el plazo.

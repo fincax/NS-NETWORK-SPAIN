@@ -290,26 +290,89 @@ describe("D-065 · Pregunta exprés: nada frena la Cesión", () => {
   });
 });
 
-describe("D-030 · Reloj de la Sala", () => {
-  it("recuerda a las 24 h y caduca a los 7 días con RESPONSE_LATE para quien calló", async () => {
+describe("D-030 · Reloj de la Sala (plazos D-068)", () => {
+  const H = 3_600_000;
+  it("recuerda a las 24 y 48 h y caduca a las 72 h con RESPONSE_LATE para quien calló; el cedente recibe el relevo", async () => {
     const c = companies.guadalquivir;
     const created = await createSignal(db, { companyId: c.companyId, memberId: c.memberId, rawContent: "Mi cliente Bodegas Alcor abre nueva sede en Utrera en Q1 con 30 empleados nuevos. Presupuesto aprobado. Decide el gerente." });
     const res = await publishSignal(db, created.opportunitySignal.id, c.memberId);
     expect(res.referralIds.length).toBeGreaterThan(0);
     const id = res.referralIds[0];
     const ref0 = (await db.query.referrals.findFirst({ where: eq(schema.referrals.id, id) }))!;
-    const t72 = new Date(ref0.reviewRequestedAt!.getTime() + 25 * 3_600_000);
-    const r1 = await runClock(db, t72, chapterId);
-    expect(r1.reminders).toBeGreaterThanOrEqual(1);
-    const r1b = await runClock(db, t72, chapterId);
-    expect(r1b.reminders).toBe(0); // idempotente
-    const t8d = new Date(ref0.reviewRequestedAt!.getTime() + 8 * 86_400_000);
-    const r2 = await runClock(db, t8d, chapterId);
-    expect(r2.expired).toBeGreaterThanOrEqual(1);
+    expect(ref0.expiresAt!.getTime() - ref0.reviewRequestedAt!.getTime()).toBe(72 * H);
+    // El cedente da el visto bueno: el reloj del cesionario empieza de cero (cada espera tiene su reloj, D-066)
+    await decide(db, { referralId: id, memberId: c.memberId, decision: "APPROVE" });
     const ref1 = (await db.query.referrals.findFirst({ where: eq(schema.referrals.id, id) }))!;
-    expect(ref1.state).toBe("EXPIRED");
-    const late = await db.query.trustEvents.findFirst({ where: and(eq(schema.trustEvents.companyId, c.companyId), eq(schema.trustEvents.kind, "RESPONSE_LATE")) });
-    expect(late).toBeTruthy(); // el cedente no dio su visto bueno a tiempo
+    expect(ref1.state).toBe("RECEIVER_PENDING");
+    expect(ref1.reviewRequestedAt!.getTime()).toBeGreaterThanOrEqual(ref0.reviewRequestedAt!.getTime());
+    expect(ref1.reminderSentAt).toBeNull();
+    const t0 = ref1.reviewRequestedAt!.getTime();
+    const r1 = await runClock(db, new Date(t0 + 25 * H), chapterId);
+    expect(r1.reminders).toBeGreaterThanOrEqual(1);
+    expect((await runClock(db, new Date(t0 + 26 * H), chapterId)).reminders).toBe(0); // idempotente
+    const r2 = await runClock(db, new Date(t0 + 49 * H), chapterId);
+    expect(r2.secondReminders).toBeGreaterThanOrEqual(1);
+    expect((await db.query.referrals.findFirst({ where: eq(schema.referrals.id, id) }))!.state).toBe("RECEIVER_PENDING");
+    const r3 = await runClock(db, new Date(t0 + 73 * H), chapterId);
+    expect(r3.expired).toBeGreaterThanOrEqual(1);
+    const ref2 = (await db.query.referrals.findFirst({ where: eq(schema.referrals.id, id) }))!;
+    expect(ref2.state).toBe("EXPIRED");
+    const late = await db.query.trustEvents.findFirst({ where: and(eq(schema.trustEvents.companyId, ref2.receiverCompanyId), eq(schema.trustEvents.kind, "RESPONSE_LATE"), eq(schema.trustEvents.evidenceRef, `referral:${id}`)) });
+    expect(late?.weight).toBe(-20); // el cesionario calló
+    const relay = await db.query.auditEvents.findFirst({ where: and(eq(schema.auditEvents.kind, "RELAY_PROPOSED"), eq(schema.auditEvents.subjectId, id)) });
+    expect(relay?.companyIds).toEqual([c.companyId]);
+  });
+
+  it("Directiva en 24 h (D-068): recordatorio a las 4 h; una excepción solo de valor se aprueba sola y ejecuta la Apertura anticipada", async () => {
+    const lucia = companies.guadalquivir;
+    const carlos = companies.hispalis;
+    const created = await createSignal(db, { companyId: lucia.companyId, memberId: lucia.memberId, rawContent: "Mi cliente Aceros del Sur, empresa industrial de 150 empleados, abre una nueva nave industrial en Dos Hermanas en Q2 con 80 empleados nuevos. Presupuesto de obra aprobado de 900.000 €. Decide el Director General, con el que tengo trato directo." });
+    await publishSignal(db, created.opportunitySignal.id, lucia.memberId);
+    const ref = (await db.query.referrals.findFirst({ where: and(eq(schema.referrals.opportunitySignalId, created.opportunitySignal.id), eq(schema.referrals.receiverCompanyId, carlos.companyId)) }))!;
+    await decide(db, { referralId: ref.id, memberId: lucia.memberId, decision: "APPROVE", revealScope: "COMPANY_ONLY" });
+    await decide(db, { referralId: ref.id, memberId: carlos.memberId, decision: "APPROVE" });
+    const pending = (await db.query.referrals.findFirst({ where: eq(schema.referrals.id, ref.id) }))!;
+    expect(pending.state).toBe("DIRECTOR_PENDING"); // 900.000 € supera el umbral de la Sala
+    const match = (await db.query.matchCandidates.findFirst({ where: eq(schema.matchCandidates.id, ref.matchId) }))!;
+    expect(match.compliance!.exceptions).toContain("VALUE_THRESHOLD");
+    const t0 = pending.reviewRequestedAt!.getTime();
+    const r4 = await runClock(db, new Date(t0 + 5 * H), chapterId);
+    expect(r4.directorReminders).toBe(1);
+    expect((await runClock(db, new Date(t0 + 6 * H), chapterId)).directorReminders).toBe(0);
+    expect((await runClock(db, new Date(t0 + 23 * H), chapterId)).directorApproved).toBe(0);
+    const r24 = await runClock(db, new Date(t0 + 25 * H), chapterId);
+    expect(r24.directorApproved).toBe(1);
+    const after = (await db.query.referrals.findFirst({ where: eq(schema.referrals.id, ref.id) }))!;
+    expect(after.state).toBe("INTRO_AUTHORIZED"); // aprobada por el Reloj y Apertura anticipada ejecutada
+    const t = await db.query.referralTransitions.findFirst({ where: and(eq(schema.referralTransitions.referralId, ref.id), eq(schema.referralTransitions.toState, "APPROVED")) });
+    expect(t?.actorType).toBe("SYSTEM");
+    expect(t?.reason).toMatch(/VALUE_THRESHOLD/);
+  });
+
+  it("una excepción de riesgo no se aprueba sola: a las 24 h escala a NS y la Cesión no caduca", async () => {
+    const lucia = companies.guadalquivir;
+    const carlos = companies.hispalis;
+    const created = await createSignal(db, { companyId: lucia.companyId, memberId: lucia.memberId, rawContent: "Mi cliente Fundiciones Bética, empresa industrial de 110 empleados, abre una nueva nave industrial en Alcalá de Guadaíra en Q2 con 50 empleados nuevos. Presupuesto de obra aprobado de 800.000 €. Decide el gerente, con el que tengo trato directo." });
+    await publishSignal(db, created.opportunitySignal.id, lucia.memberId);
+    const ref = (await db.query.referrals.findFirst({ where: and(eq(schema.referrals.opportunitySignalId, created.opportunitySignal.id), eq(schema.referrals.receiverCompanyId, carlos.companyId)) }))!;
+    const match = (await db.query.matchCandidates.findFirst({ where: eq(schema.matchCandidates.id, ref.matchId) }))!;
+    await db.update(schema.matchCandidates).set({ compliance: { ...match.compliance!, exceptions: [...match.compliance!.exceptions, "REGULATED_SPECIALTY"] } }).where(eq(schema.matchCandidates.id, match.id));
+    await decide(db, { referralId: ref.id, memberId: lucia.memberId, decision: "APPROVE" });
+    await decide(db, { referralId: ref.id, memberId: carlos.memberId, decision: "APPROVE" });
+    const pending = (await db.query.referrals.findFirst({ where: eq(schema.referrals.id, ref.id) }))!;
+    expect(pending.state).toBe("DIRECTOR_PENDING");
+    const t0 = pending.reviewRequestedAt!.getTime();
+    const r = await runClock(db, new Date(t0 + 25 * H), chapterId);
+    expect(r.escalated).toBe(1);
+    expect(r.directorApproved).toBe(0);
+    expect((await runClock(db, new Date(t0 + 30 * H), chapterId)).escalated).toBe(0); // idempotente
+    const after = (await db.query.referrals.findFirst({ where: eq(schema.referrals.id, ref.id) }))!;
+    expect(after.state).toBe("DIRECTOR_PENDING");
+    expect(after.escalatedAt).not.toBeNull();
+    await runClock(db, new Date(t0 + 100 * H), chapterId); // otras Cesiones de la Sala pueden caducar; esta no: la Directiva no caduca
+    expect((await db.query.referrals.findFirst({ where: eq(schema.referrals.id, ref.id) }))!.state).toBe("DIRECTOR_PENDING");
+    const esc = await db.query.auditEvents.findFirst({ where: and(eq(schema.auditEvents.kind, "ESCALATED_TO_NS"), eq(schema.auditEvents.subjectId, ref.id)) });
+    expect(esc?.result).toMatch(/REGULATED_SPECIALTY/);
   });
 });
 

@@ -11,6 +11,7 @@ Punto de parada y siguiente paso. Se actualiza al cerrar cada sesión de trabajo
 - Arreglada de paso la prueba del Latido, que dependía de una fecha fija (15-09) y había dejado de pasar con el calendario; ahora se ancla al día siguiente al de ejecución.
 - **Recordatorio del fundador:** la pregunta es solo para casos de duda; el camino es aceptar y contactar. El botón principal es siempre Aceptar.
 - **F1 y F2 construidos (D-067), en la misma rama:** Avisos con acción en un toque desde el correo (`/accion/[token]`, un solo uso, 72 h, solo en modo real) y Apertura en el visto bueno (el cedente la deja autorizada al proponer; se ejecuta sola al aceptar el cesionario; el Puente queda redactado). Migración `0015_dinamismo`. Pruebas en verde. **Pendiente de PR, fusionar y `actualizar.sh`.**
+- **F5 y F6 construidos (D-068), misma rama:** cada espera de revisión dura 72 h desde que llega a esa mesa (avisos a las 24 y 48 h) y al caducar el Agente del cedente propone el relevo; la Directiva decide en 24 h (aviso a las 4 h) y, si no, una excepción solo de valor sigue sola y una de riesgo escala a NS sin caducar. Migración `0016_dinamismo_plazos`. 155 pruebas en verde.
 - **Dinamismo como Core (D-066):** el fundador lo eleva a principio para todo. Registrado como principio no negociable 18 (constitución y North Star) y principio 11 de NS-ARP: toda espera entre titulares tiene plazo en horas, recordatorio y continuación automática. Propuestas para aplicarlo a lo existente en `docs/11` (sección Dinamismo).
 
 **Siguiente paso acordado (por este orden).**

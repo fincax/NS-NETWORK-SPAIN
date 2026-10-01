@@ -35,7 +35,7 @@ NS-ARP es propiedad intelectual de NS Network. Debe evolucionar con versiones ex
 8. **Fail safe.** Ante duda de permiso, visibilidad o conflicto, el protocolo degrada a la acción más conservadora: no compartir, no revelar, no contactar, escalar.
 9. **Todo se audita.** Cada transición produce un `AuditEvent`. No se registran razonamientos internos; se registran decisiones, evidencia y políticas aplicadas.
 10. **Local first, global by architecture.** Todo objeto lleva `chapter_id`; el enrutamiento fuera de la Sala es una extensión explícita (§13), no un caso implícito.
-11. **Dinamismo: nada espera a nadie (D-066).** Toda espera entre titulares lleva tres cosas: un plazo en horas (`TIMEOUTS`), un recordatorio del Agente antes de vencer y una continuación automática al vencer (la Cesión sigue con lo que consta; lo que llegue después se incorpora). Un estado donde una persona bloquea a otra sin reloj es un defecto del protocolo. Presupuesto de tiempo del camino normal: Apunte → Mesa en minutos; visto bueno, aceptación y Apertura en el mismo día (recordatorio a las 24 h, caducidad a los 7 días); Puente → contacto en 48 h; pregunta en 24 h sin detener nada. Preguntar es la excepción (casos de duda); el camino es aceptar y contactar.
+11. **Dinamismo: nada espera a nadie (D-066).** Toda espera entre titulares lleva tres cosas: un plazo en horas (`TIMEOUTS`), un recordatorio del Agente antes de vencer y una continuación automática al vencer (la Cesión sigue con lo que consta; lo que llegue después se incorpora). Un estado donde una persona bloquea a otra sin reloj es un defecto del protocolo. Presupuesto de tiempo del camino normal: Apunte → Mesa en minutos; visto bueno, aceptación y Apertura en el mismo día (recordatorios a las 24 y 48 h, caducidad a las 72 h; la Directiva, 24 h); Puente → contacto en 48 h; pregunta en 24 h sin detener nada. Preguntar es la excepción (casos de duda); el camino es aceptar y contactar.
 
 ---
 
@@ -290,7 +290,7 @@ Cada agente actúa con la identidad de su `agent_id` y los permisos de la empres
 
 **S8 · Trust + Compliance Gate.** Veredicto `PASS`, `PASS_WITH_EXCEPTIONS` o `BLOCK`. Las excepciones son las de D-003 y determinan si interviene la Directiva.
 
-**S9 · Human Review.** Doble consentimiento (D-003). Orden: primero el **originador** (autoriza revelar), después el **receptor** (acepta). La Directiva entra solo con excepciones. Plazo de respuesta por defecto: 72 horas; a partir de ahí el agente recuerda y se registra `RESPONSE_LATE`.
+**S9 · Human Review.** Doble consentimiento (D-003). Orden: primero el **originador** (autoriza revelar), después el **receptor** (acepta). La Directiva entra solo con excepciones. Cada espera dura 72 horas desde que la Cesión llega a esa mesa, con recordatorios a las 24 y 48 h; al vencer, `EXPIRED` y `RESPONSE_LATE` para quien calló (D-068).
 
 **S10 · Referral.** Nace el objeto `Referral`. Se abre la capa 2 al receptor. El originador decide si revela `contact_person` o solo la empresa.
 
@@ -572,9 +572,9 @@ Estados terminales laterales desde cualquier estado previo a INTRODUCED:
 | AGENT_MATCHED → QUALIFIED | Company Agents | outcome QUALIFIED | 48 h → INSUFFICIENT_INFORMATION → EXPIRED |
 | QUALIFIED → COMPLIANCE_CHECK | Matchmaker | `score.total ≥ 0.55` | — |
 | COMPLIANCE_CHECK → MEMBER_REVIEW | Compliance | verdict ≠ BLOCK | — |
-| ORIGINATOR_PENDING → RECEIVER_PENDING | Miembro originador | `HUMAN_DECISION.APPROVE` | 24 h → recordatorio; 7 d → EXPIRED |
-| RECEIVER_PENDING → APPROVED / DIRECTOR_PENDING | Miembro receptor | `APPROVE` (con o sin pregunta) | 24 h → recordatorio; 7 d → EXPIRED |
-| DIRECTOR_PENDING → APPROVED | Director | `APPROVE` | 5 d → escalado a Presidencia de la Sala |
+| ORIGINATOR_PENDING → RECEIVER_PENDING | Miembro originador | `HUMAN_DECISION.APPROVE` | 24 h y 48 h → recordatorios; 72 h → EXPIRED (D-068) |
+| RECEIVER_PENDING → APPROVED / DIRECTOR_PENDING | Miembro receptor | `APPROVE` (con o sin pregunta) | 24 h y 48 h → recordatorios; 72 h → EXPIRED, el Agente del originador propone el relevo (D-068) |
+| DIRECTOR_PENDING → APPROVED | Director (o el Reloj) | `APPROVE` | 4 h → recordatorio; 24 h → si la excepción es solo de criterio (`VALUE_THRESHOLD`, `TRIAL_PERIOD`), APPROVED por SYSTEM con la excepción registrada; si es de riesgo, escalado a NS, sin caducar (D-068) |
 | APPROVED → INTRO_AUTHORIZED | Miembro originador | `reveal_scope` definido | — |
 | INTRO_AUTHORIZED → INTRODUCED | Miembro (persona) | introducción enviada | 14 d → recordatorio |
 | INTRODUCED → MEETING → … | Miembro receptor | actualización | check-in del agente cada 14 d |

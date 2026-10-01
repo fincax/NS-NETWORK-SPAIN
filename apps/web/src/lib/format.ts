@@ -10,3 +10,4 @@ export const greeting = () => {
 export const firstName = (full: string) => full.split(" ")[0];
 export const daysAgo = (n: number) => new Date(Date.now() - n * 86_400_000);
 export const daysUntil = (d: Date | null | undefined) => (d ? Math.max(0, Math.round((d.getTime() - Date.now()) / 86_400_000)) : null);
+export const hoursUntil = (d: Date | null | undefined) => (d ? Math.max(0, Math.ceil((d.getTime() - Date.now()) / 3_600_000)) : null);

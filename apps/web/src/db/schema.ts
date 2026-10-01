@@ -289,6 +289,9 @@ export const referrals = pgTable(
     closedAt: timestamp("closed_at", { withTimezone: true }),
     // Reloj de la Sala (D-030)
     reminderSentAt: timestamp("reminder_sent_at", { withTimezone: true }),
+    // Dinamismo (D-068): segundo aviso a las 48 h; escalado a NS de una excepción que la Directiva no resolvió en 24 h.
+    secondReminderSentAt: timestamp("second_reminder_sent_at", { withTimezone: true }),
+    escalatedAt: timestamp("escalated_at", { withTimezone: true }),
     lateFlaggedAt: timestamp("late_flagged_at", { withTimezone: true }),
     lastNudgeAt: timestamp("last_nudge_at", { withTimezone: true }),
     protocolVersion: text("protocol_version").notNull().default("0.2"),

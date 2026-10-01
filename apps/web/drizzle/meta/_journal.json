@@ -113,6 +113,13 @@
       "when": 1790847730127,
       "tag": "0015_dinamismo",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1790848680894,
+      "tag": "0016_dinamismo_plazos",
+      "breakpoints": true
     }
   ]
 }

@@ -22,7 +22,7 @@ const TRANSITIONS: Record<string, { to: ReferralState; actors: Actor[] }[]> = {
     { to: "WITHDRAWN_BY_ORIGINATOR", actors: ["ORIGINATOR"] },
     { to: "EXPIRED", actors: ["SYSTEM"] },
   ],
-  DIRECTOR_PENDING: [{ to: "APPROVED", actors: ["DIRECTOR"] }, { to: "REJECTED_BY_MEMBER", actors: ["DIRECTOR"] }, { to: "WITHDRAWN_BY_ORIGINATOR", actors: ["ORIGINATOR"] }],
+  DIRECTOR_PENDING: [{ to: "APPROVED", actors: ["DIRECTOR", "SYSTEM"] }, { to: "REJECTED_BY_MEMBER", actors: ["DIRECTOR"] }, { to: "WITHDRAWN_BY_ORIGINATOR", actors: ["ORIGINATOR"] }], // SYSTEM solo por el Reloj: excepción de criterio sin decisión en 24 h (D-068)
   APPROVED: [{ to: "INTRO_AUTHORIZED", actors: ["ORIGINATOR", "SYSTEM"] }, { to: "WITHDRAWN_BY_ORIGINATOR", actors: ["ORIGINATOR"] }], // SYSTEM solo por la Apertura anticipada del cedente (D-067)
   INTRO_AUTHORIZED: [{ to: "INTRODUCED", actors: ["ORIGINATOR"] }, { to: "WITHDRAWN_BY_ORIGINATOR", actors: ["ORIGINATOR"] }],
   INTRODUCED: [{ to: "MEETING", actors: ["RECEIVER"] }, { to: "COMMERCIAL_OPPORTUNITY", actors: ["RECEIVER"] }, { to: "LOST", actors: ["RECEIVER"] }, { to: "NO_DECISION", actors: ["RECEIVER"] }],
@@ -60,10 +60,14 @@ export const TERMINAL_STATES: ReadonlySet<ReferralState> = new Set([
 export const REVIEW_STATES: ReadonlySet<ReferralState> = new Set(["ORIGINATOR_PENDING", "RECEIVER_PENDING", "DIRECTOR_PENDING"]);
 
 /**
- * Plazos (D-024, D-065): recordatorio de revisión a las 24 h, caducidad 7 d, respuesta al Interesado 48 h tras el Puente.
- * Pregunta exprés: el cedente responde en 24 h como máximo (su Agente le recuerda a las 4 h); pasado el plazo, la Cesión sigue sin la respuesta.
+ * Plazos (D-024, D-065, D-068): cada espera de revisión dura 72 h desde que la Cesión llega a la mesa de quien decide (recordatorios a las
+ * 24 y 48 h); respuesta al Interesado 48 h tras el Puente. Pregunta exprés: 24 h (recordatorio a las 4 h), sin detener nada.
+ * Directiva: 24 h (recordatorio a las 4 h); si la excepción es solo de valor, la Cesión sigue sola; si no, escala a NS.
  */
-export const TIMEOUTS = { reminderHours: 24, expiryDays: 7, responseAfterIntroHours: 48, checkInDays: 14, questionReminderHours: 4, questionAnswerHours: 24 } as const;
+export const TIMEOUTS = { reminderHours: 24, secondReminderHours: 48, expiryHours: 72, responseAfterIntroHours: 48, checkInDays: 14, questionReminderHours: 4, questionAnswerHours: 24, directorReminderHours: 4, directorHours: 24 } as const;
+
+/** Excepciones de Compliance que el Reloj puede dar por aprobadas si la Directiva no decide en 24 h (D-068): son de criterio, no de riesgo. */
+export const AUTO_APPROVABLE_EXCEPTIONS: ReadonlySet<string> = new Set(["VALUE_THRESHOLD", "TRIAL_PERIOD"]);
 
 /** Pregunta exprés (NS-ARP §9.1, D-065): como máximo dos preguntas por Cesión, nunca dos abiertas a la vez, y ninguna detiene la Cesión. */
 export const MAX_INFO_ROUNDS = 2;

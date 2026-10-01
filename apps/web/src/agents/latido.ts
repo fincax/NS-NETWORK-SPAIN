@@ -300,9 +300,10 @@ export async function runLatido(db: Db, opts: { now?: Date; force?: boolean } = 
             const axes: VerdictAxis[] = ["TRATO", "FACILIDAD", "NEGOCIO"];
             const verdict = { ease: 4 + (h % 2), business: 4 + ((h >> 3) % 2), treatment: 5, result: "WON" as const, value_verified: value, need_was_real: true };
             try {
-              await submitVerdict(db, { referralId: r.id, memberId: member.id, verdict, recognition: h % 3 === 0 ? { axis: axes[(h >> 5) % 3], reason: "Referido bien preparado y trato impecable con el Interesado." } : undefined });
+              // La Distinción es escasa (una por titular y mes, D-020): el cesionario ficticio la otorga en su primer cierre ganado del mes.
+              await submitVerdict(db, { referralId: r.id, memberId: member.id, verdict, recognition: { axis: axes[(h >> 5) % 3], reason: "Referido bien preparado y trato impecable con el Interesado." } });
             } catch {
-              // Distinción ya otorgada este mes (máx. una por titular y mes, D-020): se emite el Veredicto sin ella.
+              // Distinción ya otorgada este mes: se emite el Veredicto sin ella.
               await submitVerdict(db, { referralId: r.id, memberId: member.id, verdict });
             }
             result.advanced.push({ referralId: r.id, from: state, to: "WON", by });

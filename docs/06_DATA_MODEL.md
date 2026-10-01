@@ -67,7 +67,7 @@ MatchCandidate      PROPOSED | BELOW_THRESHOLD | ACCEPTED | REJECTED | EXPIRED
 Referral            ver máquina de estados en src/core/state-machine.ts (NS-ARP §9 + D-024)
 ```
 
-Plazos (D-024, D-065) ejecutados por el Reloj de la Sala (D-030, `services/clock.ts`): recordatorio a las 24 h, caducidad a los 7 días de revisión, Pregunta exprés con recordatorio a las 4 h y vencimiento a las 24 h (la Cesión sigue), respuesta al Interesado en 48 h tras el Puente, check-in del Agente cada 14 días. Los plazos de la pregunta viven en el turno de la cualificación (`asked_at`, `due_at`, `reminded_at`, `unanswered_at`, `answered_at`, `answered_late`), sin columnas nuevas.
+Plazos (D-024, D-065, D-068) ejecutados por el Reloj de la Sala (D-030, `services/clock.ts`): cada espera de revisión dura 72 h desde que la Cesión llega a esa mesa (`review_requested_at` se reinicia en cada transición de revisión), recordatorios a las 24 h (`reminder_sent_at`) y 48 h (`second_reminder_sent_at`), Directiva 24 h (`escalated_at` si la excepción es de riesgo), Pregunta exprés con recordatorio a las 4 h y vencimiento a las 24 h (la Cesión sigue), respuesta al Interesado en 48 h tras el Puente, check-in del Agente cada 14 días. Los plazos de la pregunta viven en el turno de la cualificación (`asked_at`, `due_at`, `reminded_at`, `unanswered_at`, `answered_at`, `answered_late`), sin columnas nuevas.
 
 ## 3. Visibilidad en consultas
 
