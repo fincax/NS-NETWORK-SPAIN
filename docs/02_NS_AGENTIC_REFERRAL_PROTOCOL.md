@@ -35,6 +35,7 @@ NS-ARP es propiedad intelectual de NS Network. Debe evolucionar con versiones ex
 8. **Fail safe.** Ante duda de permiso, visibilidad o conflicto, el protocolo degrada a la acción más conservadora: no compartir, no revelar, no contactar, escalar.
 9. **Todo se audita.** Cada transición produce un `AuditEvent`. No se registran razonamientos internos; se registran decisiones, evidencia y políticas aplicadas.
 10. **Local first, global by architecture.** Todo objeto lleva `chapter_id`; el enrutamiento fuera de la Sala es una extensión explícita (§13), no un caso implícito.
+11. **Dinamismo: nada espera a nadie (D-066).** Toda espera entre titulares lleva tres cosas: un plazo en horas (`TIMEOUTS`), un recordatorio del Agente antes de vencer y una continuación automática al vencer (la Cesión sigue con lo que consta; lo que llegue después se incorpora). Un estado donde una persona bloquea a otra sin reloj es un defecto del protocolo. Presupuesto de tiempo del camino normal: Apunte → Mesa en minutos; visto bueno, aceptación y Apertura en el mismo día (recordatorio a las 24 h, caducidad a los 7 días); Puente → contacto en 48 h; pregunta en 24 h sin detener nada. Preguntar es la excepción (casos de duda); el camino es aceptar y contactar.
 
 ---
 

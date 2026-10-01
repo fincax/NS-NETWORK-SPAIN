@@ -1588,3 +1588,25 @@ Servicio a la red        10 %   solo suma: acciones de dirección del mes (3 = 1
 **Consequences.** `core/state-machine.ts` (transición suprimida, `TIMEOUTS`, `QUESTION_STATES`, `QUICK_QUESTIONS`), `core/types.ts` (plazos del turno), `services/referrals.ts` (`decide`, `askQuestion`, `patchPendingQuestion`, `authorizeIntro` con respuesta, reparación), `services/clock.ts` (recordatorio 4 h y vencimiento 24 h), `api/jobs` (Reloj), `agents/latido.ts`, tarjeta de Cesión (cara A con pregunta tipo, respuesta desde cualquier cara, Apertura con respuesta), Hoy. 147 pruebas en verde. Documentado en `docs/02` §9.1 y §10, `docs/15`, `docs/13`, `docs/06`, `docs/07`, `docs/17`.
 
 **Revisit when.** Haya 50 Cesiones reales con pregunta: medir cuántas se responden en 24 h, cuántas se aceptan sin respuesta y si el −5 basta para que el cedente responda. Si los Timoneles piden más de dos preguntas, abrir un hilo breve ligado a la Cesión en vez de subir el tope.
+
+---
+
+## D-066 · Dinamismo como Core: nada espera a nadie; toda espera entre titulares tiene reloj, recordatorio y continuación automática
+
+**Status:** CONFIRMED (el fundador: "este dinamismo debe ser nuestro Core, para todo")
+**Date:** 2026-10-01
+
+**Context.** Al diseñar la Pregunta exprés (D-065) el fundador fijó un principio más general que la pregunta: el valor de un referido cae con las horas, y contactar al Interesado cuanto antes debe ser seña de identidad de NS. Hasta ahora el dinamismo era una propiedad de algunos pasos (Reloj de la Sala, D-030); pasa a ser un principio no negociable que gobierna todas las features.
+
+**Choice.** Principio no negociable 18 en la constitución y el North Star, y principio 11 de diseño de NS-ARP:
+
+- **Toda espera entre titulares lleva tres cosas**: plazo en horas, recordatorio del Agente antes de vencer y continuación automática al vencer. El flujo sigue siempre con lo que consta; lo que llegue después se incorpora.
+- **Presupuesto de tiempo del camino normal**: Apunte → Mesa en minutos; visto bueno, aceptación y Apertura el mismo día; Puente → contacto en 48 h. Cuatro toques humanos en total (anotar, visto bueno, aceptar, abrir).
+- **La pregunta es la excepción**, para casos de duda; el botón principal es siempre Aceptar. Nunca es el camino.
+- **Regla de diseño**: ninguna feature puede añadir un estado en el que una persona bloquee a otra sin un reloj que lo resuelva. En la revisión de cada feature se añade la pregunta "¿quién espera a quién, cuánto, y qué pasa si no llega?".
+
+**Why.** Un referido caliente se enfría en días; NS compite con la inmediatez de una llamada entre conocidos y debe ganarla con la estructura, no perderla por ella. El dinamismo fortalece el efecto red (más Cesiones resueltas por semana), la confianza (nadie queda colgado) y la calidad (la Promesa se contrasta antes).
+
+**Consequences.** `CLAUDE.md` (principio 18 y párrafo "Dinamismo como Core"), `docs/00` (principios 17 y 18), `docs/02` §1.11. Las propuestas para aplicar el principio a lo que ya existe se registran en `docs/11` (sección Dinamismo) y se deciden una a una.
+
+**Revisit when.** Una Sala real muestre que algún plazo en horas genera decisiones apresuradas de baja calidad (la regla 3, calidad sobre cantidad, prevalece: el remedio sería mejorar la información previa, no alargar la espera).
