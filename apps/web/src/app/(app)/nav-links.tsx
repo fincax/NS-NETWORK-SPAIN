@@ -9,6 +9,7 @@ const LINKS = [
   { href: "/indicio/nuevo", label: "Ceder un Indicio" },
   { href: "/sala", label: "Mi Sala" },
   { href: "/gaceta", label: "Gaceta" },
+  { href: "/brujula", label: "Brújula" },
 ];
 
 export function NavLinks({ director = false, newCandidacies = 0 }: { director?: boolean; newCandidacies?: number }) {

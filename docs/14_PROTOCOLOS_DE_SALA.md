@@ -1,6 +1,6 @@
 # 14 · Los tres protocolos obligatorios de Sala
 
-**Estado:** D-018 y D-019 (CONFIRMED en su obligación por el fundador; nombres y parámetros PROPOSED). **Protocolo II construido** (D-069): `core/comunicado.ts`, `services/comunicado.ts`, `/comunicado`, `/gaceta`, tarjeta en Hoy, sección en Mi Sala e histórico en el Dossier. Protocolo III: Balanza y estado del Compromiso en Mi Sala y Hoy; Brújula completa y Movimientos, pendientes.
+**Estado:** D-018 y D-019 (CONFIRMED en su obligación por el fundador; nombres y parámetros PROPOSED). **Protocolo II construido** (D-069): `core/comunicado.ts`, `services/comunicado.ts`, `/comunicado`, `/gaceta`, tarjeta en Hoy, sección en Mi Sala e histórico en el Dossier. Protocolo III: Balanza en Mi Sala; **Brújula completa construida** (D-072): `services/brujula.ts`, `/brujula`, primer Movimiento en Hoy, descarte con motivo. Pendientes: sparkline de 12 semanas y Ritmo editable por Sala.
 
 Pertenecer a una Sala NS implica tres deberes que los Agentes ejecutan y las personas validan:
 

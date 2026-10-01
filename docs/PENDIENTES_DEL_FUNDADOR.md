@@ -7,7 +7,7 @@ Lo que se ha dejado deliberadamente "para más adelante". Claude lo recuerda cua
 ## Protocolos de Sala (D-018, D-019) · detalles pospuestos el 2026-09-14
 
 - ~~**Protocolo II · Dar a Conocer.** Comunicado semanal, Gaceta y Dossier vivo: sin construir~~ → construido (D-069). Quedan como parámetros a confirmar: cierre semanal (hoy domingo 20:00, hora de Madrid), tope de continuidad (hoy dos seguidos), si la Gaceta se comparte entre Salas (hoy no) y el aviso del domingo por correo con "Aprobar con un toque".
-- **Brújula completa.** Cuatro bloques (dónde estás, por qué, qué ganas, Movimientos) y tres o cinco Movimientos accionables. Hoy es una tarjeta con el estado del Compromiso.
+- ~~**Brújula completa.**~~ → construida (D-072). Pendiente: umbrales de los Tramos y de los Niveles (Miembro · Contribuidor · Referente…) para que "Qué ganas" muestre el siguiente escalón.
 - **Ritmo por Sala.** La Sala puede fijar un Ritmo mayor que 1, pero no hay pantalla para hacerlo.
 - **Calibración del Mérito frente a la Escalera.** Una Promesa vale hasta 100 y una semana sin ceder resta 5. Revisar tras cuatro semanas de la Sala piloto (D-042).
 

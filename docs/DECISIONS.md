@@ -1728,3 +1728,26 @@ Servicio a la red        10 %   solo suma: acciones de dirección del mes (3 = 1
 **Consequences.** `agents/latido.ts` (`protectedCompanyId`, `repairDemoProtagonist`), `services/clock.ts`, `services/compromiso.ts` y `services/comunicado.ts` (parámetro `shieldedCompanyId`), rutas `/api/jobs` y `/api/clock`, `app/(app)/layout.tsx` (barra), Hoy sin la línea de Sala viva. Prueba en `latido.test.ts`.
 
 **Revisit when.** Pase a cuentas reales: la protección desaparece sola. Si la demo necesita más de una cuenta protegida, `NS_LATIDO_PROTAGONISTA` pasaría a lista.
+
+---
+
+## D-072 · Brújula completa: cuatro bloques con evidencia real y Movimientos con un toque
+
+**Status:** CONFIRMED (el fundador: "vamos con esto paso a paso para ser wow: la Brújula completa")
+**Date:** 2026-10-01
+
+**Context.** D-019 fijó la Brújula como el cuadro privado donde el Agente estudia cómo mejorar los resultados de su Timonel; `docs/14` §4 la especificó en cuatro bloques. Hasta hoy era una tarjeta con el estado del Compromiso.
+
+**Choice.** `services/brujula.ts`, calculada al leer sobre hechos persistidos, visibilidad `COMPANY_ONLY`:
+
+- **Dónde estás:** Ritmo y Compromiso (estado vivo y Escalera), Comunicado, lo que recibes y lo que das (solo valor contrastado, del mes y acumulado) y la tasa de aceptación de tus Cesiones frente a la media de la Sala.
+- **Por qué:** solo evidencia: aceptación frente a la Sala; a qué titulares les cierran rápido tus Cesiones (días desde la Cesión al valor contrastado); tus Cesiones declinadas con el motivo escrito; las señales que mejor conviertes (triggers de las Cesiones contrastadas); Facilidad y Trato medios de los Veredictos recibidos; plazos vencidos en 90 días. Sin datos, lo dice.
+- **Qué ganas:** Mérito, Distinciones por eje, Valoración del último mes completo y aptitud para Embajada, plazas sin titular reclamadas por la Mesa en 30 días (prima ×2,5), Tramo de cuota y valor contrastado recibido en el Ejercicio (los umbrales los anunciará NS). Única pantalla donde aparece la cuota.
+- **Movimientos:** tres por semana, cinco tras una semana sin ceder (D-042), ordenados por rango y cada uno con origen, confianza y un toque: Ceder (Apunte en borrador), Proponer (Rastreo en borrador), Dar a conocer (Comunicado), Cerrar (Cesión recibida sin hito en 7 días; ganada sin contrastar), Ofrecer (Encargo de otro titular que coincide con las señales o sectores del ADN), Conocer (titular de tus mismos sectores al que nunca has cedido), Reclamar (plaza sin titular). **Descartar con motivo** (`MOVE_DISMISSED`, cuatro motivos) lo retira catorce días y entrena al Agente.
+- **Hoy** muestra el primer Movimiento que no sea ya un toque; `/brujula` el cuadro completo; "Brújula" en la navegación.
+
+**Why.** Es el lugar donde el Agente "estudia constantemente cómo mejorar sus estadísticas" (constitución §14). Cada línea sale de un hecho, no de un consejo: la Brújula vale porque se puede comprobar.
+
+**Consequences.** `services/brujula.ts`, `app/(app)/brujula/`, Hoy, `nav-links.tsx`. Pruebas `brujula.test.ts` (5). Sin tablas nuevas: el descarte vive en `audit_events`.
+
+**Revisit when.** Haya 50 Cesiones reales: medir qué Movimientos se ejecutan y cuáles se descartan y con qué motivo; afinar rangos y confianza. Los Movimientos "Ofrecer" y "Conocer" dependen de la calidad del ADN: si se descartan por "no encaja", el problema está en la entrevista.
