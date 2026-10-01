@@ -19,6 +19,8 @@ import { candidacyCounts } from "@/services/antesala";
 import { InstallHint } from "../install-hint";
 import { activeInterview } from "@/services/entrevista";
 import { leerEstadoCopias, mostrarEstadoCopias, valorarCopias } from "@/services/copias";
+import { comunicadoStatus, latestGazette, relevantForMe } from "@/services/comunicado";
+import { approveCommuniqueAction } from "../comunicado/actions";
 
 export default async function HoyPage() {
   await requireDemo();
@@ -67,6 +69,12 @@ export default async function HoyPage() {
   const dnaRow = await db.query.businessDna.findFirst({ where: eq(schema.businessDna.companyId, company.id), columns: { validatedAt: true } });
   const interview = dnaRow?.validatedAt ? null : await activeInterview(db, company.id);
   const latido = authMode() === "demo" ? await latidoStatus(db) : null;
+  // Protocolo II: el Comunicado de la semana (Despacho) y lo relevante de la última Gaceta.
+  const comunicado = await comunicadoStatus(db, chapter.id, company.id);
+  const comunicadoTone = comunicado.row?.status === "APPROVED" ? "green" : comunicado.continuityStreak >= 2 ? "red" : "amber";
+  const gazette = await latestGazette(db, chapter.id);
+  const relevant = gazette ? await relevantForMe(db, chapter.id, company.id, gazette.weekStart) : [];
+  const slugOf = (id: string) => companies.get(id)?.slug ?? "";
 
   return (
     <div className="stack" style={{ gap: 28 }}>
@@ -94,6 +102,28 @@ export default async function HoyPage() {
         <span><strong>Compromiso · {compromiso.label}.</strong> Esta semana {compromiso.thisWeek.validCount} de {compromiso.minimum} Cesión válida{compromiso.thisWeek.distinctSpecialties > 1 ? ` a ${compromiso.thisWeek.distinctSpecialties} especialidades` : ""}. {compromiso.nextStep}</span>
         <span className="mono">Brújula · solo tú lo ves</span>
       </section>
+
+      {comunicado.row && comunicado.row.status === "DRAFT" ? (
+        <form action={approveCommuniqueAction} className={`card ${comunicadoTone}`} style={{ display: "grid", gap: 10 }} aria-label="Tu Comunicado de esta semana">
+          <input type="hidden" name="back" value="/hoy" />
+          <div className="row" style={{ justifyContent: "space-between" }}>
+            <span><strong>Tu Comunicado de esta semana · {comunicado.label}.</strong> {comunicado.nextStep}</span>
+            <span className="mono">Dar a Conocer · {comunicado.weekLabel}</span>
+          </div>
+          {comunicado.row.delta.length + comunicado.row.declared.length ? (
+            <ul className="plain" style={{ fontSize: 14 }}>{[...comunicado.row.delta, ...comunicado.row.declared].slice(0, 3).map((d, i) => <li key={i}>· {d.text}</li>)}</ul>
+          ) : null}
+          <div className="actions" style={{ marginTop: 0 }}>
+            <button className="btn primary small" type="submit">Aprobar tal cual</button>
+            <Link href="/comunicado" className="btn small">Añadir una novedad</Link>
+          </div>
+        </form>
+      ) : comunicado.row ? (
+        <Link href="/comunicado" className={`card ${comunicadoTone} row`} style={{ justifyContent: "space-between", textDecoration: "none" }}>
+          <span><strong>Comunicado · {comunicado.label}.</strong> {comunicado.nextStep}</span>
+          <span className="mono">Dar a Conocer · {comunicado.weekLabel}</span>
+        </Link>
+      ) : null}
 
       {dnaRow && !dnaRow.validatedAt ? (
         <Link href="/entrevista" className="card amber row" style={{ justifyContent: "space-between", textDecoration: "none" }}>
@@ -125,6 +155,23 @@ export default async function HoyPage() {
           <span><strong>Antesala:</strong> {candidacies.nuevas} {candidacies.nuevas === 1 ? "candidatura nueva" : "candidaturas nuevas"} y {candidacies.pendientes - candidacies.nuevas} en conversación esperan a la Directiva.</span>
           <span className="mono">Despachar →</span>
         </Link>
+      ) : null}
+
+      {gazette ? (
+        <section className="section">
+          <div className="row" style={{ marginBottom: 14 }}>
+            <h2 style={{ margin: 0 }}>Relevante para ti · Gaceta {gazette.gazette.week}</h2>
+            <span className="spacer" />
+            <Link href="/gaceta" className="btn small">Leer la Gaceta</Link>
+          </div>
+          {relevant.length === 0 ? (
+            <Empty title="Nada de la última Gaceta toca directamente a tus clientes.">Tu Agente solo te trae lo que encaja con tu ADN o con tu historial de Cesiones.</Empty>
+          ) : (
+            <ul className="why">
+              {relevant.slice(0, 3).map((it, i) => <li key={i}><span><Link href={`/empresa/${slugOf(it.company_id)}`}><strong>{it.text}</strong></Link> <span className="mono">{it.why}</span></span></li>)}
+            </ul>
+          )}
+        </section>
       ) : null}
 
       <section className="section">

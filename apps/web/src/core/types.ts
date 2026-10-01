@@ -438,6 +438,8 @@ export const TrustEventKind = z.enum([
   "REFERRAL_FEE_VIOLATION",
   "CONTRIBUTION_QUOTA_MET",
   "CONTRIBUTION_QUOTA_MISSED",
+  "COMMUNIQUE_MET", // Protocolo II · Comunicado aprobado (o de continuidad dentro del tope)
+  "COMMUNIQUE_MISSED", // Protocolo II · continuidad por encima del tope
   "DIRECTOR_INTERCHAPTER_ACTION", // D-048 · acción entre Salas promovida por la Directiva
   "DIRECTOR_QUERY_RESOLVED", // D-048 · duda entre Timoneles resuelta por la Directiva
   "NETWORK_SEAT_BONUS", // D-047 · misma empresa titular en otra Sala de la zona

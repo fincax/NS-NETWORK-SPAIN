@@ -16,6 +16,7 @@ import type {
   SignalEnvelope,
 } from "@/core/types";
 import type { ValueTrialReport } from "@/core/prueba";
+import type { ChapterGazette, CommuniqueDelta, CommuniqueEncargo, CommuniqueStable } from "@/core/comunicado";
 
 const id = () => uuid("id").primaryKey().defaultRandom();
 const createdAt = () => timestamp("created_at", { withTimezone: true }).notNull().defaultNow();
@@ -372,6 +373,50 @@ export const contributionWeeks = pgTable(
     createdAt: createdAt(),
   },
   (t) => [uniqueIndex("contribution_week_unique").on(t.companyId, t.weekStart), index("contribution_chapter_week").on(t.chapterId, t.weekStart)],
+);
+
+/**
+ * Comunicado semanal (Protocolo II, D-018 · D-069): una fila por titular y semana. `stable` sale del ADN (capas PUBLIC y
+ * CHAPTER); `delta` lo recalcula el Agente (cambios del ADN y hechos verificados) mientras es borrador; `declared` son las
+ * líneas que añade el Timonel. Aprobado por el Timonel o de continuidad al cierre de la semana (solo lo estable).
+ */
+export const communiques = pgTable(
+  "communiques",
+  {
+    id: id(),
+    chapterId: uuid("chapter_id").notNull().references(() => chapters.id),
+    companyId: uuid("company_id").notNull().references(() => companies.id),
+    weekStart: timestamp("week_start", { withTimezone: true }).notNull(), // lunes 00:00 UTC
+    status: text("status").notNull().default("DRAFT"), // DRAFT | APPROVED | CONTINUITY
+    stable: jsonb("stable").$type<CommuniqueStable>().notNull(),
+    delta: jsonb("delta").$type<CommuniqueDelta[]>().notNull().default([]),
+    declared: jsonb("declared").$type<CommuniqueDelta[]>().notNull().default([]),
+    encargos: jsonb("encargos").$type<CommuniqueEncargo[]>().notNull().default([]),
+    asks: jsonb("asks").$type<string[]>().notNull().default([]),
+    unchanged: boolean("unchanged").notNull().default(true),
+    dnaVersion: integer("dna_version").notNull().default(1),
+    continuityStreak: integer("continuity_streak").notNull().default(0), // Comunicados de continuidad seguidos, incluido este
+    approvedByMemberId: uuid("approved_by_member_id"),
+    approvedAt: timestamp("approved_at", { withTimezone: true }),
+    closedAt: timestamp("closed_at", { withTimezone: true }),
+    protocolVersion: text("protocol_version").notNull().default("ADP-0.1"),
+    draftedAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [uniqueIndex("communique_company_week").on(t.companyId, t.weekStart), index("communique_chapter_week").on(t.chapterId, t.weekStart)],
+);
+
+/** Gaceta semanal de la Sala (Protocolo II): la compila el Chapter Intelligence Agent al cierre de la semana. Una por Sala y semana. */
+export const gazettes = pgTable(
+  "gazettes",
+  {
+    id: id(),
+    chapterId: uuid("chapter_id").notNull().references(() => chapters.id),
+    weekStart: timestamp("week_start", { withTimezone: true }).notNull(),
+    gazette: jsonb("gazette").$type<ChapterGazette>().notNull(),
+    publishedAt: createdAt(),
+  },
+  (t) => [uniqueIndex("gazette_chapter_week").on(t.chapterId, t.weekStart)],
 );
 
 export const humanDecisions = pgTable("human_decisions", {

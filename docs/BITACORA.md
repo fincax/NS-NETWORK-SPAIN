@@ -2,6 +2,20 @@
 
 Punto de parada y siguiente paso. Se actualiza al cerrar cada sesión de trabajo.
 
+## 1 de octubre de 2026 (noche) · Protocolo II construido (D-069)
+
+**Dónde estamos.**
+
+- Las PR #20 (D-065, D-066) y #21 (D-067, D-068) están fusionadas en `main`. **El servidor sigue en `699513c` (PR #19): le faltan las dos y sus migraciones `0015` y `0016`.**
+- **Construido (D-069), en la rama `claude/confident-ride-78npdj`:** el Protocolo II · Dar a Conocer. Cada lunes el Agente deja en Hoy "Tu Comunicado de esta semana" (lo estable desde el ADN, el delta con origen: inferido, verificado o declarado); el Timonel lo aprueba con un toque o añade una novedad, su capacidad y un Sondeo en `/comunicado`. El domingo a las 20:00 (Madrid) lo no aprobado sale de continuidad (segundo seguido: aviso del Agente; tercero: aviso formal de la Directiva y −5) y el Agente de la Sala publica la Gaceta en `/gaceta`, con "relevante para ti" en Hoy y en Mi Sala, novedades por titular y el Parte de cumplimiento para la Directiva. El Dossier muestra el histórico de Comunicados y la capacidad actual; consultar Gaceta o Dossier mide el conocimiento mutuo. La Valoración ya cuenta el Comunicado. En la demo, los Timoneles ficticios aprueban solos (Latido); Carlos, no. Migración `0017_comunicado`. 169 pruebas en verde, tipos y lint limpios, build correcto, recorrido de navegador con capturas. **Pendiente de PR, fusionar y `actualizar.sh`.**
+
+**Siguiente paso acordado (por este orden).**
+
+1. Abrir la PR de la rama, fusionar y lanzar `bash /opt/ns-network/deploy/actualizar.sh` (aplica #20, #21 y esta). Comprobar en la demo, como Carlos: en Hoy, "Tu Comunicado de esta semana" → "Añadir una novedad" → aprobar; en Gaceta, lo relevante para él.
+2. Brújula completa (Protocolo III): cuatro bloques y tres Movimientos accionables.
+3. Propuestas de dinamismo pendientes: F3, F4, F7, F8, F9 y F10; aviso del domingo por correo para el Comunicado (F1).
+4. Lo de siempre: especialidades Manantial y forma jurídica en el alta; notificaciones push (D-039); resto de `docs/08` con el abogado.
+
 ## 1 de octubre de 2026 (tarde) · Pregunta exprés (D-065)
 
 **Dónde estamos.**

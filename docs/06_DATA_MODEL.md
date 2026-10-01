@@ -23,6 +23,7 @@ CESIÓN                referrals (estado, Promesa, alcance de revelación, valor
 PUENTE Y CIERRE       introductions · verdicts · recognitions · trust_events
 AUDITORÍA             audit_events · agent_interactions
 RASTREO Y ENCARGOS    public_records (D-031) · demands (D-032)
+PROTOCOLO II          communiques (Comunicado semanal) · gazettes (Gaceta de la Sala)
 ```
 
 | Léxico NS | Tabla | Notas |
@@ -54,6 +55,8 @@ RASTREO Y ENCARGOS    public_records (D-031) · demands (D-032)
 | Mensajes A2A | `agent_interactions` | Catálogo NS-ARP §5 con `layer_used` y `policy_applied`. |
 | Rastreo | `public_records` | Registro público ingerido (fuente, referencia externa única por Sala, Indicio generado). |
 | Encargo | `demands` | Lo que busca un titular ahora: texto, señal, industria, vigencia, estado. |
+| Comunicado | `communiques` | Una fila por titular y semana (D-069): `stable` (del ADN, capas PUBLIC y CHAPTER), `delta` (inferido y verificado, recalculado por el Agente mientras es borrador), `declared` (líneas del Timonel), `encargos`, `asks`, `status` DRAFT/APPROVED/CONTINUITY, `continuity_streak`, `dna_version`, `approved_by_member_id/at`, `closed_at`. Única por (empresa, semana). |
+| Gaceta | `gazettes` | Una por Sala y semana: JSON `ChapterGazette` (Comunicados, servicios nuevos, cierres contrastados, Encargos, necesidades sin titular, conocimiento mutuo, novedades). |
 | Reloj de la Sala | columnas en `referrals` | `reminder_sent_at`, `late_flagged_at`, `last_nudge_at` garantizan idempotencia (D-030). |
 
 ## 2. Ciclos de vida
@@ -90,7 +93,7 @@ Plazos (D-024, D-065, D-068) ejecutados por el Reloj de la Sala (D-030, `service
 
 - Re-aceptación de las Normas NS por titulares existentes cuando cambie la versión (D-043): hoy `rules_acceptances` registra la aceptación del alta (empresa, Timonel, versión, códigos, fecha).
 - `MemberBalance` histórico de 12 semanas y `WeeklyPace` de Sala editable: hoy `weekly_pace` es un entero en la Sala (1 por defecto) y el Compromiso ya persiste en `contribution_weeks` (D-042: una fila por titular y semana con `valid_count`, `distinct_specialties`, `missed_streak`, `action`).
-- `Communique`, `ChapterGazette`, `MemberDossier` (Protocolo II) y `MemberCompass` (Protocolo III): no persisten todavía; el Dossier se deriva del ADN.
+- `MemberCompass` y `CompassMove` (Protocolo III): no persisten todavía. `Communique` y `ChapterGazette` persisten desde D-069; el Dossier se deriva del ADN más el histórico de Comunicados.
 - `FeeTier` / `AgentCostLedger` (D-025): solo la columna `fee_tier`.
 - `Waitlist` (Antesala), `ReferralRoute` (Embajada en Red), `DataSource` (integraciones) y `Permission` por fuente.
 - Adaptadores reales de Rastreo (BORME, PLACE, licencias municipales, empleo): hoy solo `SampleFeed`.

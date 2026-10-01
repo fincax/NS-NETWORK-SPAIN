@@ -25,7 +25,8 @@ Un agente NS no es un chat. Es un módulo con **entradas tipadas, salidas valida
 | **Company Agent** (uno por empresa) | S1 extracción del Indicio en cuatro capas y necesidades con plausibilidad; S2 propuesta de visibilidad; S5 interés preliminar; S6 respuestas de cualificación desde el texto y las notas privadas del cedente; S11 borrador del Puente. | `OpportunitySignal`, `Need`, `InterestClaim`, `QualificationTurn`, `IntroPackage` | `services/signals.ts`, `agents/mesa.ts`, `services/referrals.ts` |
 | **Matchmaker Agent** (uno por Sala) | S4 discovery sobre el índice estructurado de capabilities (≤ 8 por necesidad, titulares antes que secundarias); S5 puertas duras; S7 Match Score y Explanation; S9 solicitud de revisión. | `MatchCandidate`, `Explanation` | `agents/mesa.ts`, `core/scoring.ts` |
 | **Trust & Compliance Agent** (uno por Sala) | S2 redacción de datos personales en capas 0–1; S8 Salvoconducto con diez comprobaciones, excepciones y campos bloqueados; vigilancia de retribución (D-010) en cualquier texto libre. | `ComplianceVerdict`, `TrustEvent` | `core/compliance.ts`, `services/referrals.ts` |
-| **Chapter Intelligence Agent** | Registra necesidades sin titular (`NEED_UNCOVERED`, candidatas a Embajada). Gaceta y Balanza de Sala: pendientes. | `ChapterInsight` (como AuditEvent) | `agents/mesa.ts` |
+| **Chapter Intelligence Agent** | Registra necesidades sin titular (`NEED_UNCOVERED`, candidatas a Embajada). Compila la **Gaceta** semanal al cierre del domingo y calcula el conocimiento mutuo (D-069). Balanza de Sala: pendiente. | `ChapterInsight` (como AuditEvent), `ChapterGazette` | `agents/mesa.ts`, `services/comunicado.ts` |
+| **Comunicado** (parte del Company Agent, sin modelo) | Compone cada semana el Comunicado de su empresa: lo estable desde el ADN (capas PUBLIC y CHAPTER) y el delta con origen (inferido del ADN, verificado, declarado). El Timonel lo aprueba con un toque; sin toque, continuidad al cierre. Acusa recibo de los Comunicados de los demás (`COMMUNIQUE_ACK`). | `Communique`, `AgentInteraction{COMMUNIQUE, COMMUNIQUE_ACK}` | `core/comunicado.ts`, `services/comunicado.ts` |
 | **Rastreo** (parte del Company Agent) | Revisa fuentes públicas y deja Indicios en borrador para otros titulares; el Timonel decide (D-031). | `OpportunitySignal{DRAFT, source: PUBLIC_RECORD}` | `agents/rastreo.ts` |
 | **Reloj de la Sala** (sistema, sin modelo) | Ejecuta plazos y empujones de seguimiento (D-030). | `AuditEvent`, `TrustEvent`, transición `EXPIRED` | `services/clock.ts` |
 | **Executive Briefing Agent** | Hoy: síntesis por empresa a partir de AuditEvents visibles. Parte de Directiva: pendiente. | `Briefing` (vista) | `services/today.ts` |
@@ -90,5 +91,5 @@ La Mesa corre de dos formas (D-053): **en línea** al publicar (demo y pruebas, 
 - Adaptadores de Rastreo pendientes: BORME (PDF por provincia), licencias y empleo; Sondeo (grafo de relaciones). PLACE y prensa, hechos (D-051).
 - Cualificación real agente-a-agente con preguntas generadas por el Agente receptor (hoy: tres preguntas críticas fijas).
 - Recalibración de pesos a partir de S14 (`historical_conversion`, `member_reputation` son priors fijos).
-- Protocolos II y III: Comunicado, Gaceta, Brújula y Movimientos.
+- Protocolo III: Brújula completa y Movimientos (el Protocolo II está construido, D-069).
 - Enrutamiento Sala → Zona → Red y Embajada.

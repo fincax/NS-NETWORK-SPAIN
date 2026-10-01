@@ -1,6 +1,6 @@
 # 14 · Los tres protocolos obligatorios de Sala
 
-**Estado:** D-018 y D-019 (CONFIRMED en su obligación por el fundador; nombres y parámetros PROPOSED).
+**Estado:** D-018 y D-019 (CONFIRMED en su obligación por el fundador; nombres y parámetros PROPOSED). **Protocolo II construido** (D-069): `core/comunicado.ts`, `services/comunicado.ts`, `/comunicado`, `/gaceta`, tarjeta en Hoy, sección en Mi Sala e histórico en el Dossier. Protocolo III: Balanza y estado del Compromiso en Mi Sala y Hoy; Brújula completa y Movimientos, pendientes.
 
 Pertenecer a una Sala NS implica tres deberes que los Agentes ejecutan y las personas validan:
 
@@ -143,11 +143,22 @@ Accesos: desde Mi Sala (lista de miembros), desde cualquier Cesión o Pista ("ve
 - **Pleno**: la Gaceta en pantalla; solo novedades.
 - **Parte** (Directiva): cumplimiento de Comunicados, conocimiento mutuo, miembros con ADN incompleto.
 
+### 8bis. Cómo está construido (D-069)
+
+- **Tablas:** `communiques` (una por titular y semana: `stable`, `delta` recalculado por el Agente, `declared` del Timonel, `encargos`, `asks`, `status` DRAFT/APPROVED/CONTINUITY, `continuity_streak`, `dna_version`) y `gazettes` (una por Sala y semana, JSON `ChapterGazette`).
+- **Sin modelo:** el Comunicado se compone solo con datos (ADN en capas PUBLIC y CHAPTER, cierres contrastados anonimizados, actividad de la semana). Nada inferido se publica como hecho sin visto bueno: lo inferido del ADN queda marcado `INFERRED_FROM_DNA` y lo verificado `VERIFIED`; el Timonel añade lo `DECLARED_BY_MEMBER`.
+- **Reloj:** en cada pasada (`runClock`, paso 6) crea los borradores de la semana en curso y cierra las vencidas: continuidad para lo no aprobado, avisos (segundo seguido: Agente; tercero: Directiva y `COMMUNIQUE_MISSED`), Gaceta y borradores de la semana siguiente. Cierre: domingo 20:00 Europe/Madrid (`weekCloseAt`).
+- **Relevante para ti:** `relevantFor()` (función pura) sobre los Comunicados publicados de la semana y el ADN del lector, con el historial de Cesiones del lector. Máximo cinco líneas con porqué.
+- **Acuse de recibo:** `agent_interactions` `COMMUNIQUE` (a la Sala) y `COMMUNIQUE_ACK` (de cada Agente receptor). La Mesa lee el ADN vivo: el índice está al día al aprobar.
+- **Conocimiento mutuo:** `DOSSIER_VIEWED` y `GAZETTE_VIEWED` (no significativos, una constancia por persona, objeto y seis horas) → proporción de titulares con alguna consulta en la semana. Se guarda en la Gaceta de esa semana.
+- **Demo:** los Timoneles ficticios aprueban al cabo de dos horas (Latido), a veces con una novedad; la protagonista, en persona.
+
 ### 9. Pendientes del fundador
 
-1. Día y hora del cierre semanal.
-2. Si el Comunicado de continuidad cumple indefinidamente o tiene tope (propuesta: dos seguidos).
-3. Si la Gaceta se comparte también entre Salas de la zona (propuesta: solo en Confluencias).
+1. Día y hora del cierre semanal (construido: domingo 20:00, hora de Madrid; cambiarlo es un parámetro de `COMUNICADO`).
+2. Si el Comunicado de continuidad cumple indefinidamente o tiene tope (construido: tope de dos seguidos; el tercero no cuenta).
+3. Si la Gaceta se comparte también entre Salas de la zona (construido: no; propuesta: solo en Confluencias).
+4. Aviso del domingo por correo con "Aprobar con un toque" (F1 de D-066 aplicado al Comunicado): hoy el toque es en Hoy o en `/comunicado`.
 
 ---
 
