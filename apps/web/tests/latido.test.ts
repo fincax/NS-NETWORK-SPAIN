@@ -3,12 +3,13 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { and, eq, inArray } from "drizzle-orm";
 import { closeDb, getDb, schema, type Db } from "@/db/client";
 import { seedChapter } from "@/db/seed";
-import { currentSlot, LATIDO_DELAYS_H, LATIDO_INDICIOS, latidoEnabled, latidoStatus, protagonistSlug, runLatido } from "@/agents/latido";
+import { currentSlot, LATIDO_DELAYS_H, LATIDO_INDICIOS, latidoEnabled, latidoStatus, protagonistSlug, repairDemoProtagonist, runLatido } from "@/agents/latido";
 import { createSignal, publishSignal } from "@/services/signals";
 import { decide, infoRound } from "@/services/referrals";
 import { onboardCompany } from "@/services/onboarding";
 import { acceptAllNormas } from "@/core/normas";
 import { getProvider } from "@/agents/provider";
+import { runClock } from "@/services/clock";
 import { GET as jobsRoute } from "@/app/api/jobs/route";
 
 process.env.PGLITE_DATA_DIR = "memory";
@@ -233,6 +234,32 @@ describe("Banco de Indicios", () => {
       if (i.key === "asesoria-segunda-oficina") expect(res.discarded.find((d) => d.company === "Mobiliario Delta")?.code).toBe("TICKET_MISMATCH");
     }
     expect(withReferrals).toBeGreaterThanOrEqual(Math.floor(LATIDO_INDICIOS.length * 0.75));
+  });
+});
+
+describe("La protagonista está protegida (D-071)", () => {
+  it("sus Cesiones vencidas se archivan sin penalización, no sube la Escalera y la limpieza única retira lo acumulado", async () => {
+    const p = companies[protagonistSlug()];
+    // Penalizaciones acumuladas antes de D-071, como en el servidor.
+    await db.insert(schema.trustEvents).values([{ chapterId, companyId: p.companyId, kind: "RESPONSE_LATE", weight: -20, evidenceRef: "old" }, { chapterId, companyId: p.companyId, kind: "CONTRIBUTION_QUOTA_MISSED", weight: -10, evidenceRef: "old" }]);
+    const first = await repairDemoProtagonist(db);
+    expect(first).toEqual({ trustEvents: 2, weeks: 0 });
+    expect(await repairDemoProtagonist(db)).toBeNull(); // una sola vez
+    const mine = await db.query.referrals.findMany({ where: and(eq(schema.referrals.receiverCompanyId, p.companyId), eq(schema.referrals.state, "RECEIVER_PENDING")) });
+    expect(mine.length).toBeGreaterThan(0);
+    const far = hours(24 * 60);
+    const r = await runClock(db, far, chapterId);
+    expect(r.expired).toBeGreaterThan(0);
+    const after = await db.query.referrals.findMany({ where: inArray(schema.referrals.id, mine.map((m) => m.id)) });
+    expect(after.every((m) => m.state === "EXPIRED")).toBe(true);
+    const penalties = await db.query.trustEvents.findMany({ where: and(eq(schema.trustEvents.companyId, p.companyId), eq(schema.trustEvents.kind, "RESPONSE_LATE")) });
+    expect(penalties).toHaveLength(0);
+    const weeks = await db.query.contributionWeeks.findMany({ where: eq(schema.contributionWeeks.companyId, p.companyId) });
+    expect(weeks).toHaveLength(0);
+    const others = await db.query.contributionWeeks.findMany({ where: eq(schema.contributionWeeks.chapterId, chapterId) });
+    expect(others.length).toBeGreaterThan(0); // las demás sí se evalúan
+    const relay = await db.query.auditEvents.findMany({ where: and(eq(schema.auditEvents.kind, "RELAY_PROPOSED"), eq(schema.auditEvents.companyIds, [p.companyId])) });
+    expect(relay).toHaveLength(0);
   });
 });
 

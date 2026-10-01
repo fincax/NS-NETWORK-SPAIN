@@ -4,13 +4,11 @@ import { currentMember, requireDemo } from "@/lib/session";
 import { todaySummary, balance } from "@/services/today";
 import { hoyBoard } from "@/services/hoy";
 import { latestGazette, relevantForMe } from "@/services/comunicado";
-import { daysAgo, eur, eurRange, firstName, greeting, time } from "@/lib/format";
+import { daysAgo, eur, eurRange, firstName, greeting } from "@/lib/format";
 import { StateBadge } from "@/components/ui";
 import { AgentAvatar } from "@/components/brand";
-import { prepareDemo, runLatidoAction, runRastreoAction } from "../actions";
+import { prepareDemo, runRastreoAction } from "../actions";
 import { toqueAction } from "./actions";
-import { latidoStatus } from "@/agents/latido";
-import { authMode } from "@/lib/auth";
 import { runClockThrottled } from "@/services/clock";
 import { InstallHint } from "../install-hint";
 import { leerEstadoCopias, mostrarEstadoCopias, valorarCopias } from "@/services/copias";
@@ -42,7 +40,6 @@ export default async function HoyPage({ searchParams }: { searchParams: Promise<
   const gazette = await latestGazette(db, chapter.id);
   const relevant = gazette ? (await relevantForMe(db, chapter.id, company.id, gazette.weekStart)).slice(0, 3) : [];
   const companies = new Map((await db.query.companies.findMany({ columns: { id: true, slug: true } })).map((c) => [c.id, c.slug]));
-  const latido = authMode() === "demo" ? await latidoStatus(db) : null;
   const copias = member.isDirector && mostrarEstadoCopias() ? valorarCopias(await leerEstadoCopias()) : null;
   const agentState = board.toques.length ? "esperando" : summary.matches ? "encontrado" : "analizando";
   const { compromiso, comunicado } = board;
@@ -122,12 +119,6 @@ export default async function HoyPage({ searchParams }: { searchParams: Promise<
         <span className="spacer" />
         <Link href="/sala" className={`badge ${compromisoTone}`} title={compromiso.nextStep}>Compromiso · {compromiso.label.replace(/^Pendiente esta semana$/, `${compromiso.thisWeek.validCount} de ${compromiso.minimum} esta semana`)}</Link>
         {comunicado.row?.status === "APPROVED" ? <Link href="/comunicado" className="badge green">Comunicado aprobado</Link> : null}
-        {latido?.enabled ? (
-          <form action={runLatidoAction} className="row" style={{ gap: 8 }}>
-            <span className="mono" title={latido.protagonistPerson ? `Las decisiones de ${latido.protagonistName} son siempre de ${latido.protagonistPerson.split(" ")[0]}.` : undefined}>Sala viva · {latido.lastAt ? `último latido ${time(latido.lastAt)}` : "sin latidos"} · próximo {latido.nextLocalHour}:00</span>
-            <button className="btn small ghost" type="submit">Latir ahora</button>
-          </form>
-        ) : null}
         <form action={runRastreoAction}><button className="btn small ghost" type="submit">Rastrear ahora</button></form>
         {copias && copias.tone !== "green" ? <span className={`badge ${copias.tone}`} title={copias.detail}>Copias · {copias.headline}</span> : null}
       </section>

@@ -54,7 +54,7 @@ async function directorCompanyIds(db: Db, chapterId: string): Promise<string[]> 
 }
 
 /** Evalúa la última semana completa antes de `now` para todos los titulares activos de la Sala. */
-export async function evaluateCompromiso(db: Db, now: Date, chapterId: string): Promise<CompromisoResult> {
+export async function evaluateCompromiso(db: Db, now: Date, chapterId: string, shieldedCompanyId: string | null = null): Promise<CompromisoResult> {
   const res: CompromisoResult = { evaluated: 0, met: 0, notices: 0, releases: 0 };
   const chapter = await db.query.chapters.findFirst({ where: eq(schema.chapters.id, chapterId) });
   if (!chapter) return res;
@@ -70,7 +70,7 @@ export async function evaluateCompromiso(db: Db, now: Date, chapterId: string): 
   const companies = await db.query.companies.findMany({ where: and(inArray(schema.companies.id, companyIds), eq(schema.companies.status, "ACTIVE")) });
   const already = await db.query.contributionWeeks.findMany({ where: and(eq(schema.contributionWeeks.chapterId, chapterId), eq(schema.contributionWeeks.weekStart, start)), columns: { companyId: true } });
   const done = new Set(already.map((r) => r.companyId));
-  const pending = companies.filter((c) => !done.has(c.id));
+  const pending = companies.filter((c) => !done.has(c.id) && c.id !== shieldedCompanyId); // D-071: la protagonista de la demo no sube la Escalera
   if (pending.length === 0) return res;
 
   const counts = await validGivenBetween(db, chapterId, start, end);

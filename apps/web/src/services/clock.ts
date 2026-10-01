@@ -17,6 +17,7 @@ import { audit } from "@/lib/audit";
 import { AUTO_APPROVABLE_EXCEPTIONS, QUESTION_STATES, TIMEOUTS } from "@/core/state-machine";
 import { evaluateCompromiso, type CompromisoResult } from "@/services/compromiso";
 import { evaluateComunicados, type CloseResult } from "@/services/comunicado";
+import { protectedCompanyId } from "@/agents/latido";
 import { approveByClock, infoRoundsFor, patchPendingQuestion } from "@/services/referrals";
 
 export interface ClockResult {
@@ -41,6 +42,8 @@ const hoursLeft = (until: Date | null | undefined, now: Date) => Math.max(0, Mat
 export async function runClock(db: Db, now = new Date(), chapterId?: string): Promise<ClockResult> {
   const res: ClockResult = { reminders: 0, expired: 0, late: 0, nudges: 0, questionReminders: 0, questionsUnanswered: 0, secondReminders: 0, directorReminders: 0, directorApproved: 0, escalated: 0, compromiso: { evaluated: 0, met: 0, notices: 0, releases: 0 }, comunicado: { weeks: 0, continuity: 0, notices: 0, gazettes: 0, drafted: 0 } };
   const scope = chapterId ? eq(schema.referrals.chapterId, chapterId) : undefined;
+  // Demo (D-071): nadie decide por la protagonista entre demo y demo; el Reloj no la penaliza.
+  const shielded = await protectedCompanyId(db);
 
   // 1 · Recordatorio a las 24 h en revisión
   const toRemind = await db.query.referrals.findMany({
@@ -102,7 +105,7 @@ export async function runClock(db: Db, now = new Date(), chapterId?: string): Pr
     const dueAt = q.due_at ? new Date(q.due_at).getTime() : askedAt + TIMEOUTS.questionAnswerHours * H;
     if (!q.unanswered_at && now.getTime() >= dueAt) {
       await patchPendingQuestion(db, r, { unanswered_at: now.toISOString() });
-      await db.insert(schema.trustEvents).values({ chapterId: r.chapterId, companyId: r.originatorCompanyId, kind: "RESPONSE_LATE", weight: -5, evidenceRef: `referral:${r.id}` });
+      if (r.originatorCompanyId !== shielded) await db.insert(schema.trustEvents).values({ chapterId: r.chapterId, companyId: r.originatorCompanyId, kind: "RESPONSE_LATE", weight: -5, evidenceRef: `referral:${r.id}` });
       await audit(db, { chapterId: r.chapterId, kind: "QUESTION_UNANSWERED", actor: { type: "AGENT", id: "clock" }, subject: { type: "Referral", id: r.id }, policyApplied: "question.unanswered_24h", result: `El cedente no respondió en ${TIMEOUTS.questionAnswerHours} h. La Cesión sigue con lo que consta; si responde después, el cesionario verá la respuesta destacada. El retraso cuenta en el plazo de respuesta del cedente.`, significant: true, companyIds: [r.originatorCompanyId, r.receiverCompanyId] });
       res.questionsUnanswered++;
     } else if (!q.unanswered_at && !q.reminded_at && now.getTime() >= askedAt + TIMEOUTS.questionReminderHours * H) {
@@ -119,6 +122,14 @@ export async function runClock(db: Db, now = new Date(), chapterId?: string): Pr
   });
   for (const r of toExpire) {
     const silent = r.state === "ORIGINATOR_PENDING" ? r.originatorCompanyId : r.receiverCompanyId;
+    if (silent === shielded) {
+      // Demo: se archiva sin penalización ni relevo; el siguiente Latido traerá una fresca.
+      await db.insert(schema.referralTransitions).values({ referralId: r.id, fromState: r.state, toState: "EXPIRED", actorType: "SYSTEM", actorId: "clock", reason: "Archivada sin penalización: en la demo nadie decide por la protagonista (D-071)" });
+      await db.update(schema.referrals).set({ state: "EXPIRED", updatedAt: now }).where(eq(schema.referrals.id, r.id));
+      await audit(db, { chapterId: r.chapterId, kind: "EXPIRED", actor: { type: "SYSTEM", id: "clock" }, subject: { type: "Referral", id: r.id }, policyApplied: "demo.protagonist", result: "Cesión archivada sin penalización: en la demo nadie decide por la protagonista entre demo y demo.", significant: false, companyIds: [r.originatorCompanyId, r.receiverCompanyId] });
+      res.expired++;
+      continue;
+    }
     await db.insert(schema.referralTransitions).values({ referralId: r.id, fromState: r.state, toState: "EXPIRED", actorType: "SYSTEM", actorId: "clock", reason: `Caducada por silencio (${TIMEOUTS.expiryHours} h)` });
     await db.update(schema.referrals).set({ state: "EXPIRED", updatedAt: now }).where(eq(schema.referrals.id, r.id));
     await db.insert(schema.trustEvents).values({ chapterId: r.chapterId, companyId: silent, kind: "RESPONSE_LATE", weight: -20, evidenceRef: `referral:${r.id}` });
@@ -137,6 +148,7 @@ export async function runClock(db: Db, now = new Date(), chapterId?: string): Pr
   });
   for (const r of toFlag) {
     await db.update(schema.referrals).set({ lateFlaggedAt: now }).where(eq(schema.referrals.id, r.id));
+    if (r.receiverCompanyId === shielded) continue;
     await db.insert(schema.trustEvents).values({ chapterId: r.chapterId, companyId: r.receiverCompanyId, kind: "RESPONSE_LATE", weight: -10, evidenceRef: `referral:${r.id}` });
     await audit(db, { chapterId: r.chapterId, kind: "RESPONSE_LATE", actor: { type: "AGENT", id: "clock" }, subject: { type: "Referral", id: r.id }, policyApplied: "timeouts.response_48h", result: "Han pasado 48 h desde el Puente sin un hito. Responde al Interesado y actualiza el seguimiento: el plazo de respuesta de 48 h cuenta en tu Hoja de Méritos.", significant: true, companyIds: [r.receiverCompanyId] });
     res.late++;
@@ -157,9 +169,9 @@ export async function runClock(db: Db, now = new Date(), chapterId?: string): Pr
   // 6 · Comunicado semanal (Protocolo II): borradores de la semana en curso y cierre de las vencidas con Gaceta
   const chapterIds = chapterId ? [chapterId] : (await db.query.chapters.findMany({ columns: { id: true } })).map((c) => c.id);
   for (const id of chapterIds) {
-    const r = await evaluateCompromiso(db, now, id);
+    const r = await evaluateCompromiso(db, now, id, shielded);
     res.compromiso = { evaluated: res.compromiso.evaluated + r.evaluated, met: res.compromiso.met + r.met, notices: res.compromiso.notices + r.notices, releases: res.compromiso.releases + r.releases };
-    const c = await evaluateComunicados(db, now, id);
+    const c = await evaluateComunicados(db, now, id, shielded);
     res.comunicado = { weeks: res.comunicado.weeks + c.weeks, continuity: res.comunicado.continuity + c.continuity, notices: res.comunicado.notices + c.notices, gazettes: res.comunicado.gazettes + c.gazettes, drafted: res.comunicado.drafted + c.drafted };
   }
   return res;

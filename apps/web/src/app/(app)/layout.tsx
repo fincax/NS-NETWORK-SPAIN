@@ -10,6 +10,9 @@ import { logoutAction } from "../acceso/actions";
 import { authMode } from "@/lib/auth";
 import { getDb } from "@/db/client";
 import { candidacyCounts } from "@/services/antesala";
+import { latidoStatus } from "@/agents/latido";
+import { time } from "@/lib/format";
+import { runLatidoAction } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -18,8 +21,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   let members: Awaited<ReturnType<typeof listMembers>> = [];
   let newCandidacies = 0;
   let pendingTotal = 0;
+  let latido: Awaited<ReturnType<typeof latidoStatus>> | null = null;
   try {
     ctx = await currentMember();
+    if (ctx && authMode() === "demo") latido = await latidoStatus(await getDb());
     members = await listMembers();
     if (ctx?.member.isDirector) newCandidacies = (await candidacyCounts(await getDb())).nuevas;
     if (ctx) pendingTotal = (await pendingDecisions(await getDb(), ctx.chapter.id, ctx.company.id, ctx.member)).total;
@@ -31,6 +36,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <div className="beta-bar" role="status">
         <span className="dot amber" /> {authMode() === "real" ? "Beta privada · NS Sevilla" : "Beta privada · NS Sevilla · datos ficticios de demostración"}
         <span className="spacer" />
+        {latido?.enabled ? (
+          <form action={runLatidoAction} className="row" style={{ gap: 8 }} title={latido.protagonistPerson ? `Las decisiones de ${latido.protagonistName} son siempre de ${latido.protagonistPerson.split(" ")[0]}; el Reloj no la penaliza en la demo.` : undefined}>
+            <span>Sala viva · {latido.lastAt ? `último latido ${time(latido.lastAt)}` : "sin latidos"} · próximo {latido.nextLocalHour}:00</span>
+            <button type="submit" className="linkish">Latir ahora</button>
+          </form>
+        ) : null}
         <form action={logoutAction}><button type="submit" className="linkish">Salir</button></form>
       </div>
       <header className="topbar">

@@ -19,6 +19,11 @@
  *  - Publicar Indicios en nombre de la protagonista: lo que ella cede lo cede su Timonel con un Apunte.
  *  - Funcionar con cuentas reales (`NS_AUTH_MODE=real`) salvo que se pida expresamente con `NS_LATIDO=on`.
  *
+ * La protagonista está protegida (D-071): como nadie decide por ella entre demo y demo, el Reloj archiva sus Cesiones
+ * vencidas sin penalización, no le sube la Escalera del Compromiso ni le resta por el Comunicado. Su Mérito refleja solo
+ * lo que hace la persona cuando enseña la demo. `repairDemoProtagonist` retira una sola vez las penalizaciones acumuladas
+ * antes de D-071.
+ *
  * Idempotente por franja: una franja produce un Indicio como máximo, y cada Cesión avanza un paso por pasada solo
  * cuando su plazo ha vencido. Se puede lanzar cada cinco minutos sin efectos dobles.
  */
@@ -362,6 +367,29 @@ export async function runLatido(db: Db, opts: { now?: Date; force?: boolean } = 
     }
   }
   return result;
+}
+
+/** Empresa protagonista protegida en la demo (D-071), o null con cuentas reales o Latido apagado. */
+export async function protectedCompanyId(db: Db): Promise<string | null> {
+  if (!latidoEnabled()) return null;
+  const c = await db.query.companies.findFirst({ where: eq(schema.companies.slug, protagonistSlug()), columns: { id: true } });
+  return c?.id ?? null;
+}
+
+/**
+ * Limpieza única de la protagonista (D-071): retira las penalizaciones acumuladas cuando nadie decidía por ella
+ * (silencios, Compromiso, Comunicado) y pone su Escalera a cero. Idempotente: deja un evento DEMO_PROTAGONIST_RESET.
+ */
+export async function repairDemoProtagonist(db: Db): Promise<{ trustEvents: number; weeks: number } | null> {
+  const companyId = await protectedCompanyId(db);
+  if (!companyId) return null;
+  const done = await db.query.auditEvents.findFirst({ where: and(eq(schema.auditEvents.kind, "DEMO_PROTAGONIST_RESET"), eq(schema.auditEvents.subjectId, companyId)), columns: { id: true } });
+  if (done) return null;
+  const company = (await db.query.companies.findFirst({ where: eq(schema.companies.id, companyId) }))!;
+  const penalties = await db.delete(schema.trustEvents).where(and(eq(schema.trustEvents.companyId, companyId), inArray(schema.trustEvents.kind, ["RESPONSE_LATE", "CONTRIBUTION_QUOTA_MISSED", "COMMUNIQUE_MISSED"]))).returning();
+  const weeks = await db.delete(schema.contributionWeeks).where(eq(schema.contributionWeeks.companyId, companyId)).returning();
+  await audit(db, { chapterId: company.chapterId, kind: "DEMO_PROTAGONIST_RESET", actor: { type: "SYSTEM", id: "latido" }, subject: { type: "Company", id: companyId }, policyApplied: "demo.protagonist", result: `Demo: se retiran ${penalties.length} penalización(es) y ${weeks.length} semana(s) de Escalera de ${company.name}, acumuladas cuando nadie decidía por ella. Desde ahora el Reloj la protege.`, significant: false, companyIds: [companyId] });
+  return { trustEvents: penalties.length, weeks: weeks.length };
 }
 
 /** Última franja latida y siguiente prevista, para la tarjeta de Hoy. */

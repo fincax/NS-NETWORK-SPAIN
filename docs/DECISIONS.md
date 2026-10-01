@@ -1707,3 +1707,24 @@ Servicio a la red        10 %   solo suma: acciones de dirección del mes (3 = 1
 **Consequences.** `services/hoy.ts` (`hoyBoard`), `app/(app)/hoy/actions.ts` (`toqueAction`), `app/(app)/hoy/page.tsx`, CSS `.toques`, `.toque`, `.estado`, `.plegable`. Pruebas `hoy.test.ts` (5). Ningún protocolo, tabla ni servicio de fondo cambia.
 
 **Revisit when.** Con Timoneles reales: medir toques por sesión y tiempo hasta la primera decisión. Si una fila necesita más contexto del que cabe en dos líneas, el problema es la Explanation de la Pista, no Hoy.
+
+---
+
+## D-071 · La protagonista de la demo está protegida: el Reloj no la penaliza y «Latir ahora» vive en la barra de la beta
+
+**Status:** CONFIRMED (el fundador: "decide tú" ante Mérito −190 y 5,9 M€ "abiertos" en la cuenta con la que enseña la demo)
+**Date:** 2026-10-01
+
+**Context.** Las reglas funcionan sin excepción desde el 15 de septiembre: cada Cesión que esperaba a Carlos Ruiz (la protagonista, D-057) caducaba por silencio (−20), cada semana sin ceder subía la Escalera y el valor potencial acumulaba semanas de Cesiones muertas. Correcto con empresas reales; absurdo con una cuenta por la que nadie decide entre demo y demo: castigaba al escaparate.
+
+**Choice.**
+
+- **Protección en la demo** (`protectedCompanyId`, solo con `latidoEnabled()`): el Reloj archiva las Cesiones vencidas de la protagonista como `EXPIRED` sin `RESPONSE_LATE`, sin relevo y sin evento significativo; no le evalúa el Compromiso (sin filas en `contribution_weeks`, sin Escalera); su Comunicado sale de continuidad sin `COMMUNIQUE_MISSED` ni avisos; una pregunta exprés vencida no le resta; un Puente sin respuesta se marca pero no le resta. Con cuentas reales (`NS_AUTH_MODE=real`) nada de esto existe.
+- **Limpieza única** (`repairDemoProtagonist`, en `/api/jobs` y `/api/clock`): retira las penalizaciones acumuladas (`RESPONSE_LATE`, `CONTRIBUTION_QUOTA_MISSED`, `COMMUNIQUE_MISSED`) y las semanas de Escalera de la protagonista, y deja `DEMO_PROTAGONIST_RESET` para no repetirse. Las Cesiones vencidas las archiva el Reloj en la primera pasada, sin penalización, con lo que el valor abierto vuelve a ser el de las Cesiones vivas.
+- **«Latir ahora» en la barra "Beta privada"**, junto a "Salir", con el último latido y el próximo. Deja de competir con los toques de Hoy y está siempre a la vista antes de una demo.
+
+**Why.** El Mérito de la protagonista debe reflejar lo que hace la persona cuando enseña la demo, no las semanas en que nadie la abrió. La demo tiene que parecer una Sala viva, no un historial de incumplimientos.
+
+**Consequences.** `agents/latido.ts` (`protectedCompanyId`, `repairDemoProtagonist`), `services/clock.ts`, `services/compromiso.ts` y `services/comunicado.ts` (parámetro `shieldedCompanyId`), rutas `/api/jobs` y `/api/clock`, `app/(app)/layout.tsx` (barra), Hoy sin la línea de Sala viva. Prueba en `latido.test.ts`.
+
+**Revisit when.** Pase a cuentas reales: la protección desaparece sola. Si la demo necesita más de una cuenta protegida, `NS_LATIDO_PROTAGONISTA` pasaría a lista.
