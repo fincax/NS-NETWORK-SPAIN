@@ -37,7 +37,18 @@ No es una cara aparte: es un bloque que aparece encima de cualquier cara del ced
 | **Qué ve el cesionario después** | La respuesta destacada arriba de su cara A y como evidencia en "Lo que averiguaron los Agentes" (marcada "con retraso" si llegó fuera de plazo). En Hoy, el cedente ve "X te pregunta · responde en 24 h" con la pregunta literal. |
 | **Plazo** | 24 h; recordatorio del Agente a las 4 h. Vencido, la pregunta queda sin respuesta, la Cesión sigue y el retraso cuenta en el plazo de respuesta del cedente. Se puede responder tarde hasta el cierre. |
 
+## Cara B0 · el cedente propone (y deja la Apertura autorizada, D-067)
+
+| | |
+| --- | --- |
+| **Objetivo del usuario** | Proponer la Cesión en un toque y no tener que volver. |
+| **Acción primaria** | Proponer la Cesión a X. |
+| **Decisión incluida** | "Si X acepta": abrir al momento solo la empresa (por defecto), abrir al momento empresa y persona de contacto (si hay base jurídica), o decidir la Apertura después. Con la Apertura ya autorizada, en cuanto el cesionario acepta el Puente queda redactado y el cedente solo tiene que enviarlo. |
+| **Desde el correo** | El aviso "Tu Agente ha preparado una Cesión" trae el botón "Proponer la Cesión" con el alcance a elegir: un toque sin entrar en NS. |
+
 ## Cara B · el cedente autoriza la Apertura
+
+Solo aparece si el cedente eligió "decidir después" en la cara B0. Si dejó la Apertura autorizada, la tarjeta pasa directamente a "Puente listo".
 
 | | |
 | --- | --- |

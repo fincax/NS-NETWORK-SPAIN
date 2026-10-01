@@ -30,7 +30,7 @@ import { createSignal, publishSignal } from "@/services/signals";
 import { authorizeIntro, confirmValue, decide, infoRoundsFor, markIntroduced, submitVerdict, updateStage } from "@/services/referrals";
 import { QUESTION_STATES, QUICK_QUESTIONS } from "@/core/state-machine";
 import { mesaMode } from "@/services/jobs";
-import type { ReferralState, SignalEnvelope, VerdictAxis } from "@/core/types";
+import type { ReferralState, RevealScope, SignalEnvelope, VerdictAxis } from "@/core/types";
 
 export interface LatidoIndicio {
   key: string;
@@ -241,7 +241,10 @@ export async function runLatido(db: Db, opts: { now?: Date; force?: boolean } = 
           break;
         }
         case "ORIGINATOR_PENDING": {
-          await decide(db, { referralId: r.id, memberId: member.id, decision: "APPROVE" });
+          // Apertura en el visto bueno (D-067): la mitad de los cedentes ficticios dejan la Apertura autorizada al proponer.
+          const os0 = h % 2 === 0 ? await db.query.opportunitySignals.findFirst({ where: eq(schema.opportunitySignals.id, r.opportunitySignalId) }) : undefined;
+          const scope0: RevealScope | undefined = os0 ? ((os0.envelope as SignalEnvelope).identity_layer?.contact_person ? "COMPANY_AND_CONTACT" : "COMPANY_ONLY") : undefined;
+          await decide(db, { referralId: r.id, memberId: member.id, decision: "APPROVE", revealScope: scope0 });
           result.advanced.push({ referralId: r.id, from: state, to: "RECEIVER_PENDING", by });
           break;
         }

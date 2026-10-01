@@ -1610,3 +1610,29 @@ Servicio a la red        10 %   solo suma: acciones de dirección del mes (3 = 1
 **Consequences.** `CLAUDE.md` (principio 18 y párrafo "Dinamismo como Core"), `docs/00` (principios 17 y 18), `docs/02` §1.11. Las propuestas para aplicar el principio a lo que ya existe se registran en `docs/11` (sección Dinamismo) y se deciden una a una.
 
 **Revisit when.** Una Sala real muestre que algún plazo en horas genera decisiones apresuradas de baja calidad (la regla 3, calidad sobre cantidad, prevalece: el remedio sería mejorar la información previa, no alargar la espera).
+
+---
+
+## D-067 · Acción en un toque desde el correo y Apertura en el visto bueno: las dos primeras aplicaciones del dinamismo (F1 y F2)
+
+**Status:** CONFIRMED (el fundador aprueba empezar por F1 y F2 de `docs/11` §F)
+**Date:** 2026-10-01
+
+**Context.** Con D-066 el dinamismo es el Core. Las dos esperas más caras del camino normal eran que el Timonel tuviera que entrar en NS para decidir lo evidente, y que el cedente actuara dos veces (visto bueno y Apertura) con una espera entre ambas.
+
+**Choice.**
+
+**F1 · Aviso con acción en un toque** (`services/avisos.ts`, `/accion/[token]`). Cuando una Cesión pasa a la mesa de un Timonel, su Agente le escribe un correo con el botón de la decisión evidente dentro: "Proponer la Cesión" (al cedente, cuando la Mesa la prepara), "Aceptar la Cesión" (al cesionario), "Autorizar la Apertura" (al cedente que no la dejó autorizada), "Responder" (pregunta exprés), y "Ver y enviar el Puente" / "Ver la Cesión" (Puente listo, Puente tendido).
+
+- El enlace es personal, de un solo uso, caduca en 72 h y está ligado a persona, Cesión y acción (`action_links`, token con hash). Un GET nunca ejecuta nada (los lectores de correo abren enlaces): la página muestra la Cesión preparada (Promesa, encaje, tres razones) y un solo botón; la acción es el POST. Al pulsarlo, la persona entra en NS con su identidad (sesión como con un enlace de acceso, D-054) y aterriza en la tarjeta.
+- Si la acción ya no procede (la Cesión cambió de estado), el enlace sirve igualmente para entrar y ver.
+- Solo en modo real (`NS_AUTH_MODE=real`) con correo configurado: la demo tiene personas y correos ficticios. Nunca lanza: un correo que no sale se registra (`MAIL_FAILED`) y el protocolo sigue.
+- La puerta humana sigue siendo humana: la decisión la pulsa la persona; el correo solo le ahorra el camino.
+
+**F2 · Apertura en el visto bueno** (`referrals.preauthorized_scope`, `preauthorized_by_member_id`). Al proponer la Cesión (cara B0), el cedente elige: "Abrir al momento: solo la empresa" (por defecto), "Abrir al momento: empresa y persona de contacto" (si hay base jurídica) o "Decidir la Apertura después". Si la dejó autorizada, en cuanto el cesionario acepta (o la Directiva aprueba la excepción) la Apertura se ejecuta sola: `APPROVED → INTRO_AUTHORIZED` por `SYSTEM` con motivo explícito, el Agente redacta el Puente y el cedente recibe "Puente listo: envíalo". El cedente ya no recibe "aceptada": no tiene nada que decidir. El enlace "Proponer" del correo deja también la Apertura autorizada con el alcance elegido.
+
+**Why.** F1 convierte "entrar en NS" en opcional para lo evidente; F2 quita una espera entera. Con las dos, el camino normal queda en tres pulsaciones humanas (proponer, aceptar, enviar el Puente) y cabe en una jornada sin abrir la aplicación. El cedente decide el alcance de la revelación igual que antes, solo que antes de que haga falta; nada se revela que no haya autorizado.
+
+**Consequences.** Migración `0015_dinamismo`; `services/avisos.ts`, `services/accion.ts`, `app/accion/[token]`, `proxy.ts` (ruta pública); `services/referrals.ts` (`notifyReferral` en `transition`, `openIntro`, preautorización en el visto bueno), `agents/mesa.ts` (aviso al preparar), `core/state-machine.ts` (`SYSTEM` en `APPROVED → INTRO_AUTHORIZED`), tarjeta (cara B0), `agents/latido.ts` (la mitad de los cedentes ficticios preautorizan). Pruebas `avisos.test.ts` (5) y slice (1). Documentado en `docs/02` §10, `docs/15`, `docs/13`, `docs/06`, `docs/17`.
+
+**Revisit when.** Haya datos reales de cuántas decisiones llegan por el correo y cuántos cedentes eligen "decidir después". Si la Apertura anticipada se usa en más del 80 % de los casos, considerar F3 (ceder directo desde el Apunte). Notificaciones push (D-039) reutilizarán los mismos enlaces.

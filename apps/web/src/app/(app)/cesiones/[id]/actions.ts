@@ -29,7 +29,10 @@ export async function decideAction(formData: FormData) {
   const min = formData.get("promise_min");
   const max = formData.get("promise_max");
   const adjust = min || max ? { estimated_value_min: min ? Number(min) : undefined, estimated_value_max: max ? Number(max) : undefined, note: notes } : undefined;
-  await decide(db, { referralId: id, memberId: member.id, decision, notes, promiseAdjustment: adjust, question: raw === "APPROVE" ? undefined : question });
+  // Apertura en el visto bueno (D-067): el cedente puede dejarla autorizada al proponer.
+  const apertura = String(formData.get("apertura") ?? "");
+  const revealScope = apertura === "COMPANY_ONLY" || apertura === "COMPANY_AND_CONTACT" ? (apertura as RevealScope) : undefined;
+  await decide(db, { referralId: id, memberId: member.id, decision, notes, promiseAdjustment: adjust, question: raw === "APPROVE" ? undefined : question, revealScope });
   done(id);
 }
 

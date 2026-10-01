@@ -42,7 +42,8 @@ RASTREO Y ENCARGOS    public_records (D-031) · demands (D-032)
 | Interés | `interest_claims` | `preliminary_fit`, `status`, `decline_code` (puerta dura). |
 | Cualificación | `qualifications` | `turns[]` tipados, `outcome`. |
 | Pista | `match_candidates` | `score` (NSMatchScore), `explanation`, `compliance` (Salvoconducto). |
-| Cesión | `referrals` | `state` (máquina §9), `route` CHAPTER/ZONE/NETWORK, `embassy`, `promise` (D-021), `reveal_scope`, `value_potential_*`, `value_verified`, plazos (`expires_at`, `response_due_at`). |
+| Cesión | `referrals` | `state` (máquina §9), `route` CHAPTER/ZONE/NETWORK, `embassy`, `promise` (D-021), `reveal_scope`, `preauthorized_scope` y `preauthorized_by_member_id` (Apertura en el visto bueno, D-067), `value_potential_*`, `value_verified`, plazos (`expires_at`, `response_due_at`). |
+| Aviso con acción | `action_links` | Enlace de un toque desde el correo (D-067): `member_id`, `referral_id`, `action` (PROPOSE/ACCEPT/OPEN/ANSWER/VIEW), `token_hash`, `expires_at` (72 h), `used_at`. |
 | Transición | `referral_transitions` | Toda transición con actor y motivo. |
 | Visto bueno | `human_decisions` | Rol, decisión, `reveal_scope`, `seen_layers[]` (qué vio la persona al decidir). |
 | Puente | `introductions` | Borrador del Agente, mensaje final, canal, quién lo envió. |

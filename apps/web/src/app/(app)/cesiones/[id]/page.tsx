@@ -226,6 +226,15 @@ export default async function CesionPage({ params }: { params: Promise<{ id: str
           <p className="lead" style={{ fontSize: 14, marginBottom: 12 }}>Tu Agente propone ceder este Interesado a {receiver.name}. Si das el visto bueno, {receiverPerson?.fullName} verá la capa 1 (contexto sin identidad) y decidirá. La identidad solo se abre cuando tú autorices la Apertura.</p>
           <form action={decideAction} className="stack">
             <input type="hidden" name="referralId" value={ref.id} />
+            <fieldset className="field" style={{ border: 0, padding: 0, margin: 0 }}>
+              <legend style={{ marginBottom: 6 }}>Si {receiverFirst} acepta (D-067)</legend>
+              <div className="radio-row">
+                <label><input type="radio" name="apertura" value="COMPANY_ONLY" defaultChecked /> Abrir al momento: solo la empresa</label>
+                <label><input type="radio" name="apertura" value="COMPANY_AND_CONTACT" disabled={blockedContact || !env.identity_layer?.contact_person} /> Abrir al momento: empresa y persona de contacto{blockedContact ? " (bloqueado: sin base jurídica)" : ""}</label>
+                <label><input type="radio" name="apertura" value="LATER" /> Decidir la Apertura después</label>
+              </div>
+              <p className="mono">Con la Apertura ya autorizada, en cuanto {receiverFirst} acepte tu Agente redacta el Puente y solo te queda enviarlo. Nada espera.</p>
+            </fieldset>
             <div className="field"><label htmlFor="notes0">Nota para tu Agente (opcional)</label><textarea id="notes0" name="notes" placeholder="Nunca una contraprestación: es motivo de expulsión." /></div>
             <div className="actions">
               <button className="btn amber" name="decision" value="APPROVE" type="submit">Proponer la Cesión a {receiver.name}</button>
@@ -339,7 +348,7 @@ export default async function CesionPage({ params }: { params: Promise<{ id: str
         </section>
       ) : null}
       {face === "LECTURA" && !verdict ? (
-        <div className="notice">{waitingText(state, iAmOriginator, iAmReceiver, receiver.name, originator.name, info)}</div>
+        <div className="notice">{waitingText(state, iAmOriginator, iAmReceiver, receiver.name, originator.name, info, Boolean(ref.preauthorizedScope))}</div>
       ) : null}
 
       <section className="section">
@@ -408,13 +417,13 @@ function nextStep(state: ReferralState, o: { iAmOriginator: boolean; iAmReceiver
   }
 }
 
-function waitingText(state: ReferralState, iAmOriginator: boolean, iAmReceiver: boolean, receiverName: string, originatorName: string, info: InfoRound) {
+function waitingText(state: ReferralState, iAmOriginator: boolean, iAmReceiver: boolean, receiverName: string, originatorName: string, info: InfoRound, preauthorized = false) {
   switch (state) {
     case "ORIGINATOR_PENDING":
       return iAmReceiver ? `En revisión: esperando el visto bueno de ${originatorName}.` : "Esperando tu visto bueno.";
     case "RECEIVER_PENDING":
       if (info.pending && !info.overdue) return iAmOriginator ? `${receiverName} te ha preguntado; responde en ${TIMEOUTS.questionAnswerHours} h. Mientras, puede decidir.` : `Esperando tu decisión. ${originatorName} responde a tu pregunta en ${TIMEOUTS.questionAnswerHours} h como máximo.`;
-      return iAmOriginator ? `En revisión: esperando a que ${receiverName} acepte.` : "Esperando tu decisión.";
+      return iAmOriginator ? `En revisión: esperando a que ${receiverName} acepte.${preauthorized ? " La Apertura ya está autorizada: si acepta, el Puente quedará redactado al momento." : ""}` : "Esperando tu decisión.";
     case "DIRECTOR_PENDING": return "Requiere Directiva: hay una excepción de Compliance que revisar.";
     case "APPROVED": return `Aprobada. ${originatorName} decidirá el alcance de la Apertura.`;
     case "INTRO_AUTHORIZED": return `Puente listo. ${originatorName} lo enviará en persona.`;

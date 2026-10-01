@@ -241,6 +241,29 @@ describe("D-065 · Pregunta exprés: nada frena la Cesión", () => {
     await expect(decide(db, { referralId, memberId: lucia().memberId, decision: "ANSWER", notes: "otra" })).rejects.toThrow(/ninguna pregunta pendiente/);
   });
 
+  it("Apertura en el visto bueno (D-067): el cedente la deja autorizada al proponer y, al aceptar el cesionario, se ejecuta sola", async () => {
+    const created = await createSignal(db, { companyId: lucia().companyId, memberId: lucia().memberId, rawContent: "Mi cliente Talleres Guadaíra, empresa industrial de 80 empleados, abre una nueva nave industrial en Alcalá de Guadaíra en Q1 con 30 empleados nuevos. Presupuesto de obra aprobado de 450.000 €. Decide el gerente, con el que tengo trato directo." });
+    await publishSignal(db, created.opportunitySignal.id, lucia().memberId);
+    const ref = (await db.query.referrals.findFirst({ where: and(eq(schema.referrals.opportunitySignalId, created.opportunitySignal.id), eq(schema.referrals.receiverCompanyId, carlos().companyId)) }))!;
+    await decide(db, { referralId: ref.id, memberId: lucia().memberId, decision: "APPROVE", revealScope: "COMPANY_ONLY" });
+    const proposed = (await db.query.referrals.findFirst({ where: eq(schema.referrals.id, ref.id) }))!;
+    expect(proposed.state).toBe("RECEIVER_PENDING");
+    expect(proposed.preauthorizedScope).toBe("COMPANY_ONLY");
+    await decide(db, { referralId: ref.id, memberId: carlos().memberId, decision: "APPROVE" });
+    const after = (await db.query.referrals.findFirst({ where: eq(schema.referrals.id, ref.id) }))!;
+    if (after.state === "DIRECTOR_PENDING") {
+      const director = (await db.query.members.findMany({ where: eq(schema.members.chapterId, chapterId) })).find((m) => m.isDirector && m.companyId !== lucia().companyId && m.companyId !== carlos().companyId)!;
+      await decide(db, { referralId: ref.id, memberId: director.id, decision: "APPROVE" });
+    }
+    const opened = (await db.query.referrals.findFirst({ where: eq(schema.referrals.id, ref.id) }))!;
+    expect(opened.state).toBe("INTRO_AUTHORIZED");
+    expect(opened.revealScope).toBe("COMPANY_ONLY");
+    expect(await db.query.introductions.findFirst({ where: eq(schema.introductions.referralId, ref.id) })).toBeTruthy();
+    const t = await db.query.referralTransitions.findFirst({ where: and(eq(schema.referralTransitions.referralId, ref.id), eq(schema.referralTransitions.toState, "INTRO_AUTHORIZED")) });
+    expect(t?.actorType).toBe("SYSTEM");
+    expect(t?.reason).toMatch(/D-067/);
+  });
+
   it("reparación: las Cesiones que una versión anterior dejó esperando al cedente por una pregunta vuelven a la mesa del cesionario", async () => {
     const created = await createSignal(db, { companyId: lucia().companyId, memberId: lucia().memberId, rawContent: "Mi cliente Cerámicas Bajo Guadalquivir, empresa industrial de 90 empleados, abre una nueva nave industrial en Alcalá de Guadaíra en Q1 con 40 empleados nuevos. Presupuesto de obra aprobado de 500.000 €. Decide el gerente, con el que tengo trato directo." });
     await publishSignal(db, created.opportunitySignal.id, lucia().memberId);

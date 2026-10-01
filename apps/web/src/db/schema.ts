@@ -131,6 +131,22 @@ export const invites = pgTable("invites", {
   createdAt: createdAt(),
 });
 
+/** Enlace de acción (D-067): un toque desde el correo ejecuta una decisión concreta sobre una Cesión. Un solo uso, 72 h, ligado a persona, Cesión y acción. */
+export const actionLinks = pgTable(
+  "action_links",
+  {
+    id: id(),
+    memberId: uuid("member_id").notNull().references(() => members.id),
+    referralId: uuid("referral_id").notNull(),
+    action: text("action").notNull(), // PROPOSE | ACCEPT | OPEN | ANSWER | VIEW
+    tokenHash: text("token_hash").notNull().unique(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    usedAt: timestamp("used_at", { withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  (t) => [index("action_links_referral_idx").on(t.referralId)],
+);
+
 export const businessDna = pgTable("business_dna", {
   id: id(),
   companyId: uuid("company_id").notNull().references(() => companies.id).unique(),
@@ -260,6 +276,9 @@ export const referrals = pgTable(
     embassy: boolean("embassy").notNull().default(false),
     promise: jsonb("promise").$type<ReferralPromise>(),
     revealScope: text("reveal_scope"), // COMPANY_ONLY | COMPANY_AND_CONTACT
+    // Apertura en el visto bueno (D-067): el cedente deja autorizada la Apertura al proponer; se ejecuta sola cuando el cesionario acepta.
+    preauthorizedScope: text("preauthorized_scope"), // COMPANY_ONLY | COMPANY_AND_CONTACT
+    preauthorizedByMemberId: uuid("preauthorized_by_member_id"),
     valuePotentialMin: integer("value_potential_min"),
     valuePotentialMax: integer("value_potential_max"),
     valueVerified: integer("value_verified"),

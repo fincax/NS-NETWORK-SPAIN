@@ -23,7 +23,7 @@ const TRANSITIONS: Record<string, { to: ReferralState; actors: Actor[] }[]> = {
     { to: "EXPIRED", actors: ["SYSTEM"] },
   ],
   DIRECTOR_PENDING: [{ to: "APPROVED", actors: ["DIRECTOR"] }, { to: "REJECTED_BY_MEMBER", actors: ["DIRECTOR"] }, { to: "WITHDRAWN_BY_ORIGINATOR", actors: ["ORIGINATOR"] }],
-  APPROVED: [{ to: "INTRO_AUTHORIZED", actors: ["ORIGINATOR"] }, { to: "WITHDRAWN_BY_ORIGINATOR", actors: ["ORIGINATOR"] }],
+  APPROVED: [{ to: "INTRO_AUTHORIZED", actors: ["ORIGINATOR", "SYSTEM"] }, { to: "WITHDRAWN_BY_ORIGINATOR", actors: ["ORIGINATOR"] }], // SYSTEM solo por la Apertura anticipada del cedente (D-067)
   INTRO_AUTHORIZED: [{ to: "INTRODUCED", actors: ["ORIGINATOR"] }, { to: "WITHDRAWN_BY_ORIGINATOR", actors: ["ORIGINATOR"] }],
   INTRODUCED: [{ to: "MEETING", actors: ["RECEIVER"] }, { to: "COMMERCIAL_OPPORTUNITY", actors: ["RECEIVER"] }, { to: "LOST", actors: ["RECEIVER"] }, { to: "NO_DECISION", actors: ["RECEIVER"] }],
   MEETING: [{ to: "COMMERCIAL_OPPORTUNITY", actors: ["RECEIVER"] }, { to: "LOST", actors: ["RECEIVER"] }, { to: "NO_DECISION", actors: ["RECEIVER"] }, { to: "WON", actors: ["RECEIVER"] }],

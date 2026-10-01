@@ -593,15 +593,17 @@ Si dos claims sobre la misma necesidad provienen de una plaza principal y de una
 | Puerta | Quién decide | Qué decide | Qué ve |
 | --- | --- | --- | --- |
 | Publicación de señal | Originador | publicar / restringir / retirar | previsualización de capa 0 exacta |
-| Revisión del originador | Originador | aprobar revelar / rechazar | referral card + capa 0–1 del receptor + explanation |
+| Revisión del originador | Originador | proponer (dejando ya autorizada la Apertura con su alcance, o decidiéndola después; D-067) / rechazar | referral card + capa 0–1 del receptor + explanation |
 | Revisión del receptor | Receptor | aceptar / aceptar y preguntar / solo preguntar (máx. 2, sin detener nada) / rechazar | referral card + capa 1 de la señal (sin identidad) + explanation |
 | Revisión de Directiva | Director | aprobar / rechazar / derivar | referral card + excepciones + capa 1; capa 2 solo si la excepción es de datos personales |
 | Respuesta a la pregunta del receptor | Originador | responder en 24 h (desde cualquier cara; con la Apertura en el mismo acto) / callar (la Cesión sigue; cuenta en su plazo de respuesta) | la pregunta, el borrador de su Agente y su propio Indicio |
-| Alcance de revelación | Originador | empresa sola / empresa + contacto | capa 2 propia |
+| Alcance de revelación | Originador | empresa sola / empresa + contacto; en el visto bueno (se ejecuta sola al aceptar el receptor) o después | capa 2 propia |
 | Envío de introducción | Originador (persona) | enviar / editar / cancelar | `IntroPackage` |
 | Confirmación de resultado | Ambos | valor verificado | outcome propuesto por la otra parte |
 
 Toda decisión humana produce `HumanDecision{ user_id, decision, notes, seen_layers[], timestamp }`. El sistema registra qué capas vio la persona en el momento de decidir.
+
+**Aviso con acción en un toque (D-067).** Cada vez que una Cesión pasa a la mesa de una persona, su Agente le envía un correo con el botón de la decisión evidente (proponer, aceptar, autorizar la Apertura, responder). El enlace (`action_links`) es personal, de un solo uso, caduca en 72 h y está ligado a Cesión y acción; la página muestra la Cesión preparada y la acción es un POST, nunca el GET del enlace. La puerta sigue siendo humana: la pulsa la persona.
 
 ---
 

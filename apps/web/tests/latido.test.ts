@@ -160,11 +160,13 @@ describe("Las Cesiones ficticias avanzan con plazos", () => {
     // Ninguna Cesión avanzada es de la protagonista
     const p = companies[protagonistSlug()].companyId;
     expect(others.every((r) => r.receiverCompanyId !== p && r.originatorCompanyId !== p)).toBe(true);
-    // Todas las transiciones humanas las firmó una persona real de la semilla, nunca el sistema
+    // Todas las transiciones humanas las firmó una persona real de la semilla, nunca el sistema; la única excepción es la
+    // Apertura anticipada (D-067), que el sistema ejecuta por la autorización previa del cedente y deja el motivo escrito.
     const transitions = await db.query.referralTransitions.findMany({ where: inArray(schema.referralTransitions.referralId, others.map((r) => r.id)) });
     const human = transitions.filter((t) => ["RECEIVER_PENDING", "APPROVED", "INTRO_AUTHORIZED", "INTRODUCED", "MEETING", "COMMERCIAL_OPPORTUNITY", "WON", "VALUE_CONFIRMED"].includes(t.toState));
     expect(human.length).toBeGreaterThan(0);
-    expect(human.every((t) => t.actorType === "USER")).toBe(true);
+    expect(human.every((t) => t.actorType === "USER" || (t.toState === "INTRO_AUTHORIZED" && t.actorType === "SYSTEM" && /D-067/.test(t.reason ?? "")))).toBe(true);
+    expect(human.some((t) => t.toState === "INTRO_AUTHORIZED" && t.actorType === "SYSTEM")).toBe(true); // la mitad de los cedentes ficticios preautorizan
   });
   it("un Indicio recién publicado no avanza en la misma pasada aunque haya franja", async () => {
     const r = await runLatido(db, { now: hours(24 * 30), force: true });
