@@ -3,7 +3,7 @@
  *  - Revisión: recordatorios a las 24 y 48 h; caducidad a las 72 h (vuelve al cedente con el relevo propuesto; el silencio cuenta) (D-068).
  *  - Directiva (D-068): recordatorio a las 4 h; a las 24 h, una excepción de criterio se aprueba sola y una de riesgo escala a NS.
  *  - Pregunta exprés (D-065): recordatorio al cedente a las 4 h; a las 24 h la pregunta queda sin respuesta y la Cesión sigue.
- *  - Puente: respuesta al Interesado en 48 h; si no hay hito, RESPONSE_LATE para el cesionario.
+ *  - Puente: recordatorio a las 24 h si no consta el contacto (D-073); a las 48 h sin "He contactado", RESPONSE_LATE para el cesionario.
  *  - Seguimiento: el Agente pregunta cada 14 días.
  *  - Compromiso (D-042): cada semana completa, cuenta de Cesiones válidas por titular y escalera de avisos hasta la baja.
  *  - Protocolo II (D-018, D-069): borrador del Comunicado de la semana para cada titular; al cierre (domingo 20:00 Madrid),
@@ -18,12 +18,15 @@ import { AUTO_APPROVABLE_EXCEPTIONS, QUESTION_STATES, TIMEOUTS } from "@/core/st
 import { evaluateCompromiso, type CompromisoResult } from "@/services/compromiso";
 import { evaluateComunicados, type CloseResult } from "@/services/comunicado";
 import { protectedCompanyId } from "@/agents/latido";
-import { approveByClock, infoRoundsFor, patchPendingQuestion } from "@/services/referrals";
+import { approveByClock, confirmValueBySilence, infoRoundsFor, patchPendingQuestion, provisionalVerdict } from "@/services/referrals";
 
 export interface ClockResult {
   reminders: number;
   expired: number;
   late: number;
+  contactReminders: number;
+  provisionalVerdicts: number;
+  valuesBySilence: number;
   nudges: number;
   questionReminders: number;
   questionsUnanswered: number;
@@ -40,7 +43,7 @@ const D = 86_400_000;
 const hoursLeft = (until: Date | null | undefined, now: Date) => Math.max(0, Math.ceil(((until?.getTime() ?? now.getTime()) - now.getTime()) / H));
 
 export async function runClock(db: Db, now = new Date(), chapterId?: string): Promise<ClockResult> {
-  const res: ClockResult = { reminders: 0, expired: 0, late: 0, nudges: 0, questionReminders: 0, questionsUnanswered: 0, secondReminders: 0, directorReminders: 0, directorApproved: 0, escalated: 0, compromiso: { evaluated: 0, met: 0, notices: 0, releases: 0 }, comunicado: { weeks: 0, continuity: 0, notices: 0, gazettes: 0, drafted: 0 } };
+  const res: ClockResult = { reminders: 0, expired: 0, late: 0, contactReminders: 0, provisionalVerdicts: 0, valuesBySilence: 0, nudges: 0, questionReminders: 0, questionsUnanswered: 0, secondReminders: 0, directorReminders: 0, directorApproved: 0, escalated: 0, compromiso: { evaluated: 0, met: 0, notices: 0, releases: 0 }, comunicado: { weeks: 0, continuity: 0, notices: 0, gazettes: 0, drafted: 0 } };
   const scope = chapterId ? eq(schema.referrals.chapterId, chapterId) : undefined;
   // Demo (D-071): nadie decide por la protagonista entre demo y demo; el Reloj no la penaliza.
   const shielded = await protectedCompanyId(db);
@@ -142,9 +145,19 @@ export async function runClock(db: Db, now = new Date(), chapterId?: string): Pr
     res.expired++;
   }
 
-  // 3 · Respuesta al Interesado en 48 h tras el Puente
+  // 3a · Recordatorio a las 24 h del Puente si aún no consta el contacto (D-073, F7): el aviso llega a mitad de camino
+  const toRemindContact = await db.query.referrals.findMany({
+    where: and(scope, eq(schema.referrals.state, "INTRODUCED"), isNull(schema.referrals.contactedAt), isNull(schema.referrals.contactReminderSentAt), lt(schema.referrals.introducedAt, new Date(now.getTime() - TIMEOUTS.contactReminderHours * H))),
+  });
+  for (const r of toRemindContact) {
+    await db.update(schema.referrals).set({ contactReminderSentAt: now }).where(eq(schema.referrals.id, r.id));
+    await audit(db, { chapterId: r.chapterId, kind: "REMINDER", actor: { type: "AGENT", id: "clock" }, subject: { type: "Referral", id: r.id }, policyApplied: "contact.reminder_24h", result: `Han pasado ${TIMEOUTS.contactReminderHours} h desde el Puente y aún no consta tu contacto con el Interesado. Te quedan ${hoursLeft(r.responseDueAt, now)} h: llámale y marca "He contactado" con un toque.`, significant: true, companyIds: [r.receiverCompanyId] });
+    res.contactReminders++;
+  }
+
+  // 3 · Respuesta al Interesado en 48 h tras el Puente (solo si no consta el contacto)
   const toFlag = await db.query.referrals.findMany({
-    where: and(scope, eq(schema.referrals.state, "INTRODUCED"), isNull(schema.referrals.lateFlaggedAt), lt(schema.referrals.responseDueAt, now)),
+    where: and(scope, eq(schema.referrals.state, "INTRODUCED"), isNull(schema.referrals.lateFlaggedAt), isNull(schema.referrals.contactedAt), lt(schema.referrals.responseDueAt, now)),
   });
   for (const r of toFlag) {
     await db.update(schema.referrals).set({ lateFlaggedAt: now }).where(eq(schema.referrals.id, r.id));
@@ -163,6 +176,25 @@ export async function runClock(db: Db, now = new Date(), chapterId?: string): Pr
     await db.update(schema.referrals).set({ lastNudgeAt: now }).where(eq(schema.referrals.id, r.id));
     await audit(db, { chapterId: r.chapterId, kind: "CHECK_IN", actor: { type: "AGENT", id: "clock" }, subject: { type: "Referral", id: r.id }, policyApplied: "timeouts.checkin_14d", result: "Tu Agente pregunta: ¿cómo va esta Cesión? Actualiza el hito o cierra con el Veredicto. Al cedente también le gustará saberlo.", significant: true, companyIds: [r.receiverCompanyId] });
     res.nudges++;
+  }
+
+  // 4b · Veredicto exprés (D-074, F8): cierre sin Veredicto en 7 días → provisional del Agente; valor sin cuestionar en 7 días → contrastado
+  const closedNoVerdict = await db.query.referrals.findMany({ where: and(scope, inArray(schema.referrals.state, ["WON", "LOST", "NO_DECISION"]), lt(schema.referrals.closedAt, new Date(now.getTime() - TIMEOUTS.verdictDays * D))) });
+  for (const r of closedNoVerdict) {
+    const v = await db.query.verdicts.findFirst({ where: eq(schema.verdicts.referralId, r.id) });
+    if (v) {
+      if (r.state === "WON" && r.valueVerified && v.createdAt < new Date(now.getTime() - TIMEOUTS.contrastDays * D)) {
+        await confirmValueBySilence(db, r.id);
+        res.valuesBySilence++;
+      }
+      continue;
+    }
+    try {
+      await provisionalVerdict(db, r.id);
+      res.provisionalVerdicts++;
+    } catch {
+      // sin Promesa o sin Timonel: nada que emitir
+    }
   }
 
   // 5 · Compromiso semanal (D-042): última semana completa, una vez por titular

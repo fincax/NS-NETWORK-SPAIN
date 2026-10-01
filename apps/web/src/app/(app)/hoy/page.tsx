@@ -3,6 +3,8 @@ import { getDb } from "@/db/client";
 import { currentMember, requireDemo } from "@/lib/session";
 import { todaySummary, balance } from "@/services/today";
 import { hoyBoard } from "@/services/hoy";
+import { brujula } from "@/services/brujula";
+import { monthAgo, tiemposDinamismo } from "@/services/dinamismo";
 import { latestGazette, relevantForMe } from "@/services/comunicado";
 import { daysAgo, eur, eurRange, firstName, greeting } from "@/lib/format";
 import { StateBadge } from "@/components/ui";
@@ -35,12 +37,17 @@ export default async function HoyPage({ searchParams }: { searchParams: Promise<
   const { member, company, chapter } = ctx;
   await runClockThrottled(db, chapter.id);
   const board = await hoyBoard(db, { chapterId: chapter.id, companyId: company.id, member });
+  // Brújula (D-072): en Hoy solo el primer Movimiento que no sea ya un toque.
+  const compass = await brujula(db, { chapterId: chapter.id, companyId: company.id });
+  const toqueKeys = new Set(board.toques.map((t) => t.key));
+  const move = compass.movimientos.find((m) => !toqueKeys.has(m.primary?.payload.id ?? m.key) && m.key !== "comunicado");
   const summary = await todaySummary(db, chapter.id, company.id, daysAgo(7));
   const bal = await balance(db, chapter.id, company.id);
   const gazette = await latestGazette(db, chapter.id);
   const relevant = gazette ? (await relevantForMe(db, chapter.id, company.id, gazette.weekStart)).slice(0, 3) : [];
   const companies = new Map((await db.query.companies.findMany({ columns: { id: true, slug: true } })).map((c) => [c.id, c.slug]));
   const copias = member.isDirector && mostrarEstadoCopias() ? valorarCopias(await leerEstadoCopias()) : null;
+  const tiempos = await tiemposDinamismo(db, { chapterId: chapter.id, since: monthAgo() });
   const agentState = board.toques.length ? "esperando" : summary.matches ? "encontrado" : "analizando";
   const { compromiso, comunicado } = board;
   const compromisoTone = compromiso.lastAction === "RELEASE_NOTICE" || compromiso.missedStreak >= 2 ? "red" : compromiso.thisWeek.validCount >= compromiso.minimum ? "green" : "amber";
@@ -110,14 +117,41 @@ export default async function HoyPage({ searchParams }: { searchParams: Promise<
         </section>
       ) : null}
 
+      {move ? (
+        <section aria-label="Movimiento de la Brújula">
+          <ol className="toques">
+            <li className="toque">
+              <div className="ctx">
+                <span className="mono">Brújula · Movimiento {compass.movimientosObjetivo === 5 ? "1 de 5" : "1 de 3"} · {move.origin} · confianza {move.confidence.toLowerCase()}</span>
+                <strong>{move.title}</strong>
+                <p>{move.why}</p>
+              </div>
+              <div className="act">
+                {move.primary ? (
+                  <form action={toqueAction}>
+                    <input type="hidden" name="action" value={move.primary.action} />
+                    {Object.entries(move.primary.payload).map(([k, v]) => <input key={k} type="hidden" name={k} value={v} />)}
+                    <button className="btn primary" type="submit">{move.primary.label}</button>
+                  </form>
+                ) : null}
+                <Link href={move.href} className={`btn ${move.primary ? "ghost" : ""}`}>{move.hrefLabel}</Link>
+                <Link href="/brujula" className="mono">Brújula →</Link>
+              </div>
+            </li>
+          </ol>
+        </section>
+      ) : null}
+
       <InstallHint />
 
       <section className="row estado" aria-label="Estado">
         <span><span className="money" style={{ fontSize: 20, color: "var(--amber)" }}>{eurRange(summary.potential.min, summary.potential.max)}</span> en Cesiones abiertas</span>
         <span>·</span>
         <span><span className="money" style={{ fontSize: 20, color: "var(--green)" }}>{eur(bal.valueReceived)}</span> contrastado recibido · Mérito {bal.merit}</span>
+        {tiempos.contact ? <><span>·</span><span title={`${tiempos.contact.n} contacto(s) en 30 días`}>del Apunte a la llamada <strong>{tiempos.contact.hours} h</strong></span></> : null}
+        {tiempos.mesa ? <><span>·</span><span title={`${tiempos.mesa.n} Indicio(s) en 30 días`}>del Apunte a la Mesa <strong>{tiempos.mesa.minutes < 1 ? "menos de 1 min" : `${Math.round(tiempos.mesa.minutes)} min`}</strong></span></> : null}
         <span className="spacer" />
-        <Link href="/sala" className={`badge ${compromisoTone}`} title={compromiso.nextStep}>Compromiso · {compromiso.label.replace(/^Pendiente esta semana$/, `${compromiso.thisWeek.validCount} de ${compromiso.minimum} esta semana`)}</Link>
+        <Link href="/brujula" className={`badge ${compromisoTone}`} title={compromiso.nextStep}>Compromiso · {compromiso.label.replace(/^Pendiente esta semana$/, `${compromiso.thisWeek.validCount} de ${compromiso.minimum} esta semana`)}</Link>
         {comunicado.row?.status === "APPROVED" ? <Link href="/comunicado" className="badge green">Comunicado aprobado</Link> : null}
         <form action={runRastreoAction}><button className="btn small ghost" type="submit">Rastrear ahora</button></form>
         {copias && copias.tone !== "green" ? <span className={`badge ${copias.tone}`} title={copias.detail}>Copias · {copias.headline}</span> : null}

@@ -294,6 +294,9 @@ export const referrals = pgTable(
     secondReminderSentAt: timestamp("second_reminder_sent_at", { withTimezone: true }),
     escalatedAt: timestamp("escalated_at", { withTimezone: true }),
     lateFlaggedAt: timestamp("late_flagged_at", { withTimezone: true }),
+    // Primer contacto en un toque (D-073, F7): el cesionario marca "He contactado"; recordatorio a las 24 h, compromiso a las 48 h.
+    contactedAt: timestamp("contacted_at", { withTimezone: true }),
+    contactReminderSentAt: timestamp("contact_reminder_sent_at", { withTimezone: true }),
     lastNudgeAt: timestamp("last_nudge_at", { withTimezone: true }),
     protocolVersion: text("protocol_version").notNull().default("0.2"),
     createdAt: createdAt(),

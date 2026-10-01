@@ -414,6 +414,8 @@ export const ReferralVerdict = z.object({
   value_verified: z.number().optional(),
   need_was_real: z.boolean().default(true),
   notes: z.string().optional(),
+  /** Veredicto exprés (D-074, F8): lo emitió el Agente a partir de la evidencia porque el cesionario no lo hizo en 7 días; el cesionario puede matizarlo. */
+  provisional: z.boolean().optional(),
 });
 export type ReferralVerdict = z.infer<typeof ReferralVerdict>;
 

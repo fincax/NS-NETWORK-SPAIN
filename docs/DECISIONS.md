@@ -1728,3 +1728,68 @@ Servicio a la red        10 %   solo suma: acciones de dirección del mes (3 = 1
 **Consequences.** `agents/latido.ts` (`protectedCompanyId`, `repairDemoProtagonist`), `services/clock.ts`, `services/compromiso.ts` y `services/comunicado.ts` (parámetro `shieldedCompanyId`), rutas `/api/jobs` y `/api/clock`, `app/(app)/layout.tsx` (barra), Hoy sin la línea de Sala viva. Prueba en `latido.test.ts`.
 
 **Revisit when.** Pase a cuentas reales: la protección desaparece sola. Si la demo necesita más de una cuenta protegida, `NS_LATIDO_PROTAGONISTA` pasaría a lista.
+
+---
+
+## D-072 · Brújula completa: cuatro bloques con evidencia real y Movimientos con un toque
+
+**Status:** CONFIRMED (el fundador: "vamos con esto paso a paso para ser wow: la Brújula completa")
+**Date:** 2026-10-01
+
+**Context.** D-019 fijó la Brújula como el cuadro privado donde el Agente estudia cómo mejorar los resultados de su Timonel; `docs/14` §4 la especificó en cuatro bloques. Hasta hoy era una tarjeta con el estado del Compromiso.
+
+**Choice.** `services/brujula.ts`, calculada al leer sobre hechos persistidos, visibilidad `COMPANY_ONLY`:
+
+- **Dónde estás:** Ritmo y Compromiso (estado vivo y Escalera), Comunicado, lo que recibes y lo que das (solo valor contrastado, del mes y acumulado) y la tasa de aceptación de tus Cesiones frente a la media de la Sala.
+- **Por qué:** solo evidencia: aceptación frente a la Sala; a qué titulares les cierran rápido tus Cesiones (días desde la Cesión al valor contrastado); tus Cesiones declinadas con el motivo escrito; las señales que mejor conviertes (triggers de las Cesiones contrastadas); Facilidad y Trato medios de los Veredictos recibidos; plazos vencidos en 90 días. Sin datos, lo dice.
+- **Qué ganas:** Mérito, Distinciones por eje, Valoración del último mes completo y aptitud para Embajada, plazas sin titular reclamadas por la Mesa en 30 días (prima ×2,5), Tramo de cuota y valor contrastado recibido en el Ejercicio (los umbrales los anunciará NS). Única pantalla donde aparece la cuota.
+- **Movimientos:** tres por semana, cinco tras una semana sin ceder (D-042), ordenados por rango y cada uno con origen, confianza y un toque: Ceder (Apunte en borrador), Proponer (Rastreo en borrador), Dar a conocer (Comunicado), Cerrar (Cesión recibida sin hito en 7 días; ganada sin contrastar), Ofrecer (Encargo de otro titular que coincide con las señales o sectores del ADN), Conocer (titular de tus mismos sectores al que nunca has cedido), Reclamar (plaza sin titular). **Descartar con motivo** (`MOVE_DISMISSED`, cuatro motivos) lo retira catorce días y entrena al Agente.
+- **Hoy** muestra el primer Movimiento que no sea ya un toque; `/brujula` el cuadro completo; "Brújula" en la navegación.
+
+**Why.** Es el lugar donde el Agente "estudia constantemente cómo mejorar sus estadísticas" (constitución §14). Cada línea sale de un hecho, no de un consejo: la Brújula vale porque se puede comprobar.
+
+**Consequences.** `services/brujula.ts`, `app/(app)/brujula/`, Hoy, `nav-links.tsx`. Pruebas `brujula.test.ts` (5). Sin tablas nuevas: el descarte vive en `audit_events`.
+
+**Revisit when.** Haya 50 Cesiones reales: medir qué Movimientos se ejecutan y cuáles se descartan y con qué motivo; afinar rangos y confianza. Los Movimientos "Ofrecer" y "Conocer" dependen de la calidad del ADN: si se descartan por "no encaja", el problema está en la entrevista.
+
+---
+
+## D-073 · El dinamismo se ve: primer contacto en un toque y tiempos del Apunte a la llamada y a la Mesa (F7, F9 y F10)
+
+**Status:** CONFIRMED (el fundador: "paso a paso para ser wow", propuestas F7, F9 y F10 de D-066)
+**Date:** 2026-10-01
+
+**Context.** El compromiso de responder al Interesado en 48 h se medía por ausencia: si no había hito, RESPONSE_LATE. Nadie podía decir "ya le he llamado", el aviso llegaba cuando el plazo ya había vencido, y el principio "nada espera a nadie" no se veía en ninguna cifra.
+
+**Choice.**
+
+- **F7 · Primer contacto en un toque.** `referrals.contacted_at`: el cesionario marca "He contactado" desde Hoy (toque `CONTACTAR`, con las horas que quedan) o desde la tarjeta. A tiempo suma `RESPONSE_ON_TIME` (+5); el cedente lo ve (`CONTACTED`). El Reloj recuerda a las 24 h (`contact_reminder_sent_at`, `TIMEOUTS.contactReminderHours`) y solo resta a las 48 h si no consta el contacto. Pasado el plazo sin contacto, el toque pasa a contratiempo con el mismo botón. Los cesionarios ficticios lo marcan antes de la reunión.
+- **F9 · Del Apunte a la llamada.** `services/dinamismo.ts`: horas medias desde que se anotó el Indicio hasta el contacto, en 30 días. En la línea de estado de Hoy, en la cabecera de la Balanza de Mi Sala y, con al menos tres contactos, en la portada pública ("de un Apunte a la llamada al Interesado: N h de media este mes"). Nunca por persona: es la prueba del principio, no un ranking.
+- **F10 · Del Apunte a la Mesa.** Minutos desde el Indicio hasta la primera Cesión en la mesa de un cesionario; objetivo interno `MESA_TARGET_MINUTES` = 10. En Hoy y en Mi Sala.
+
+**Why.** Un compromiso se cumple mejor cuando se puede declarar con un toque y se recuerda a mitad de camino. Y el dinamismo es un argumento de venta solo si se mide con hechos.
+
+**Consequences.** Migración `0018_contacto`; `services/referrals.ts` (`markContacted`), `services/clock.ts` (3a y 3), `services/dinamismo.ts`, `services/hoy.ts`, tarjeta, Hoy, Mi Sala, portada, `agents/latido.ts`. Pruebas `dinamismo.test.ts` (3). `docs/11` §F: F7, F9 y F10 hechas.
+
+**Revisit when.** Con 50 Cesiones reales: si la media del Apunte a la llamada supera 48 h, el problema está en el Puente (F4), no en el recordatorio.
+
+---
+
+## D-074 · Ceder directo desde el Apunte, Puente desde NS y Veredicto exprés (F3, F4 y F8)
+
+**Status:** CONFIRMED (el fundador: "paso a paso para ser wow", propuestas F3, F4 y F8 de D-066)
+**Date:** 2026-10-01
+
+**Context.** Tres esperas que seguían en el camino: el visto bueno del cedente sobre un referido que él mismo apuntó con el Interesado avisado; el copiar y pegar del Puente al correo propio; y el Veredicto que el cesionario no emite, con el Mérito del cedente parado.
+
+**Choice.**
+
+- **F3 · Ceder directo desde el Apunte.** En la Mesa, si el Indicio es un Apunte (`business_signals.source = APUNTE`) con Interesado avisado (`third_party_expects_contact`), decisor identificado (turno `DECISION_MAKER` con confianza ≥ 0,6), Salvoconducto sin bloqueo (las excepciones siguen yendo a la Directiva cuando el cesionario acepta) y Encaje `HIGH` o `GOOD`, el visto bueno queda implícito: transición `ORIGINATOR_PENDING → RECEIVER_PENDING` firmada por el Timonel que apuntó, `human_decisions` APPROVE con nota, Apertura autorizada (solo la empresa), aviso al cesionario. El cedente lo ve en Hoy "En marcha" y puede retirarla hasta la Apertura. Camino: anotar, aceptar, abrir. Si falta cualquiera de las condiciones, camino normal. El Apunte añade "Me ha autorizado a dar su contacto" (base jurídica `CONSENT`); sin ese toque, la persona de contacto no se revela y el Puente desde NS no está disponible.
+- **F4 · Puente desde NS.** En la cara B, "Desde NS, en mi nombre": `sendIntroFromNS` envía el mensaje redactado desde `hola@networkspain.com` al correo del contacto (nuevo campo opcional en el Apunte y en Ceder un Indicio, capa 2), con copia a los dos Timoneles y respuesta al cedente, firmado "Enviado desde NS Network en nombre de X". Solo con correo del contacto, base jurídica distinta de NONE, Interesado avisado, correo de NS configurado y cuentas reales (o transporte en memoria). Si no se puede, la opción lo dice y queda deshabilitada; si el correo no sale, nada cambia y la persona lo envía desde su correo. Lo pulsa la persona: la puerta humana sigue intacta.
+- **F8 · Veredicto exprés.** Un cierre (ganada, perdida, sin decisión) sin Veredicto en 7 días (`TIMEOUTS.verdictDays`) recibe un **Veredicto provisional** del Agente a partir de la evidencia: Facilidad desde la Promesa, Negocio desde el resultado, Trato neutro, `provisional: true`. El cedente cobra su Mérito de Veredicto (y de Cierre si ganada con valor) sin esperar; el cesionario puede matizarlo y su Veredicto sustituye al provisional (fuera su Mérito, fuera la fila). Un valor declarado que el cedente no cuestiona en 7 días (`contrastDays`) queda contrastado por silencio (`WON → VALUE_CONFIRMED` por `SYSTEM`, `contrast.silence_7d`).
+
+**Why.** Quien apunta un referido avisado ya decidió ceder; pedirle que lo confirme es una espera sin valor. El Puente desde NS quita el último copiar y pegar sin que ningún Agente contacte a nadie. Y el Mérito del cedente no puede depender de que el cesionario encuentre un rato para tres toques.
+
+**Consequences.** `agents/mesa.ts` (S9), `services/referrals.ts` (`canSendIntroFromNS`, `sendIntroFromNS`, `provisionalVerdict`, `confirmValueBySilence`, `dropProvisionalVerdict`), `services/clock.ts` (paso 4b), `core/types.ts` (`provisional`), `core/state-machine.ts` (`SYSTEM` en `WON → VALUE_CONFIRMED`, `verdictDays`, `contrastDays`), `lib/mail.ts` (`cc`, `replyTo`, `mailMemory`), `services/signals.ts` y `services/apunte.ts` (`contactEmail`), formularios, tarjeta. Pruebas en `dinamismo.test.ts` (4 nuevas). `docs/11` §F: las diez propuestas de D-066 están hechas.
+
+**Revisit when.** Con 50 Cesiones reales: cuántas nacen directas desde el Apunte y cuántas se retiran; cuántos Puentes salen desde NS; cuántos Veredictos quedan provisionales sin matizar (si son muchos, el problema es el formulario del Veredicto, no el plazo).

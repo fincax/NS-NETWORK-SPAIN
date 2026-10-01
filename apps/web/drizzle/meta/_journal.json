@@ -127,6 +127,13 @@
       "when": 1790884404954,
       "tag": "0017_comunicado",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1790891496080,
+      "tag": "0018_contacto",
+      "breakpoints": true
     }
   ]
 }

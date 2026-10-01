@@ -18,6 +18,8 @@ export interface ApunteInput {
   need: string; // qué necesita
   contactName?: string;
   contactRole?: string;
+  contactEmail?: string;
+  contactConsent?: boolean; // la persona ha autorizado dar su contacto (base jurídica CONSENT); si no, solo se revela la empresa
   notes?: string;
   relation?: ApunteRelation;
   expectsContact?: boolean; // D-029
@@ -51,7 +53,8 @@ export async function createApunte(db: Db, input: ApunteInput) {
     visibility: "CHAPTER",
     contactName,
     contactRole: clean(input.contactRole) || undefined,
-    legalBasisForContact: contactName ? "NONE" : undefined,
+    contactEmail: clean(input.contactEmail).toLowerCase() || undefined,
+    legalBasisForContact: contactName ? (input.contactConsent ? "CONSENT" : "NONE") : undefined,
     thirdPartyExpectsContact: !!input.expectsContact,
   });
 }

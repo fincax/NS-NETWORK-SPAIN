@@ -29,7 +29,7 @@ Un agente NS no es un chat. Es un módulo con **entradas tipadas, salidas valida
 | **Comunicado** (parte del Company Agent, sin modelo) | Compone cada semana el Comunicado de su empresa: lo estable desde el ADN (capas PUBLIC y CHAPTER) y el delta con origen (inferido del ADN, verificado, declarado). El Timonel lo aprueba con un toque; sin toque, continuidad al cierre. Acusa recibo de los Comunicados de los demás (`COMMUNIQUE_ACK`). | `Communique`, `AgentInteraction{COMMUNIQUE, COMMUNIQUE_ACK}` | `core/comunicado.ts`, `services/comunicado.ts` |
 | **Rastreo** (parte del Company Agent) | Revisa fuentes públicas y deja Indicios en borrador para otros titulares; el Timonel decide (D-031). | `OpportunitySignal{DRAFT, source: PUBLIC_RECORD}` | `agents/rastreo.ts` |
 | **Reloj de la Sala** (sistema, sin modelo) | Ejecuta plazos y empujones de seguimiento (D-030). | `AuditEvent`, `TrustEvent`, transición `EXPIRED` | `services/clock.ts` |
-| **Executive Briefing Agent** | Hoy: síntesis por empresa a partir de AuditEvents visibles. Parte de Directiva: pendiente. | `Briefing` (vista) | `services/today.ts` |
+| **Executive Briefing Agent** | Hoy: pila de toques y contratiempos (D-070). Brújula: cuatro bloques con evidencia y Movimientos (D-072). Parte de Directiva: cumplimiento de Comunicados en la Gaceta. | `HoyBoard`, `Brujula` (vistas) | `services/hoy.ts`, `services/brujula.ts` |
 | **Global Routing Agent** | Fuera de v0.1. | — | — |
 
 Cada agente actúa con un `agent_id` de la tabla `agents` y con los permisos de la empresa o Sala que representa. Los agentes no consultan la base de datos libremente: el orquestador les entrega objetos ya filtrados por capa.
@@ -91,5 +91,5 @@ La Mesa corre de dos formas (D-053): **en línea** al publicar (demo y pruebas, 
 - Adaptadores de Rastreo pendientes: BORME (PDF por provincia), licencias y empleo; Sondeo (grafo de relaciones). PLACE y prensa, hechos (D-051).
 - Cualificación real agente-a-agente con preguntas generadas por el Agente receptor (hoy: tres preguntas críticas fijas).
 - Recalibración de pesos a partir de S14 (`historical_conversion`, `member_reputation` son priors fijos).
-- Protocolo III: Brújula completa y Movimientos (el Protocolo II está construido, D-069).
+- Protocolo III: Balanza de Sala con 12 semanas de historia y Ritmo editable (la Brújula y los Movimientos están construidos, D-072; el Protocolo II, D-069).
 - Enrutamiento Sala → Zona → Red y Embajada.

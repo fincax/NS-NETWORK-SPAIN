@@ -10,6 +10,7 @@ import { MANANTIALES } from "@/db/nscat";
 import { latestGazette, relevantForMe, weekCommuniques } from "@/services/comunicado";
 import { weekStart } from "@/core/compromiso";
 import { isoWeekLabel } from "@/core/comunicado";
+import { monthAgo, tiemposDinamismo } from "@/services/dinamismo";
 
 export default async function SalaPage() {
   const { chapter, company } = await requireMember();
@@ -25,6 +26,7 @@ export default async function SalaPage() {
   const live = await weekCommuniques(db, chapter.id, weekStart(new Date()));
   const liveApproved = live.filter((r) => r.status === "APPROVED").length;
   const statusByCompany = new Map(live.map((r) => [r.companyId, r.status]));
+  const tiempos = await tiemposDinamismo(db, { chapterId: chapter.id, since: monthAgo() });
   return (
     <div className="stack" style={{ gap: 28 }}>
       <div className="page-head">
@@ -82,7 +84,7 @@ export default async function SalaPage() {
 
       <section>
         <h2 style={{ marginBottom: 4 }}>Balanza</h2>
-        <p className="lead" style={{ fontSize: 14, marginBottom: 12 }}>Lo que cada titular da y recibe. Ordenada por plaza, nunca un ranking. Solo valor contrastado.</p>
+        <p className="lead" style={{ fontSize: 14, marginBottom: 12 }}>Lo que cada titular da y recibe. Ordenada por plaza, nunca un ranking. Solo valor contrastado.{tiempos.contact ? ` Dinamismo de la Sala en 30 días: del Apunte a la llamada al Interesado, ${tiempos.contact.hours} h de media (${tiempos.contact.n} ${tiempos.contact.n === 1 ? "contacto" : "contactos"})` : ""}{tiempos.mesa ? `${tiempos.contact ? ";" : " Dinamismo de la Sala en 30 días:"} del Apunte a la mesa del cesionario, ${tiempos.mesa.minutes < 1 ? "menos de un minuto" : `${Math.round(tiempos.mesa.minutes)} min`}.` : tiempos.contact ? "." : ""}</p>
         <div className="table-wrap">
           <table>
             <thead><tr><th>Titular</th><th className="num">Cesiones dadas</th><th className="num">Recibidas</th><th className="num">Valor generado</th><th className="num">Valor recibido</th><th className="num">Mérito</th><th>Ritmo</th><th>Comunicado</th></tr></thead>

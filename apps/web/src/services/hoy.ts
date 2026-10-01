@@ -22,11 +22,11 @@ import { candidacyCounts } from "@/services/antesala";
 import { activeInterview } from "@/services/entrevista";
 import { eurRange } from "@/lib/format";
 
-export type ToqueAction = "ACCEPT" | "PROPOSE" | "ANSWER_DRAFT" | "OPEN" | "PUBLISH_SIGNAL" | "APPROVE_COMMUNIQUE";
+export type ToqueAction = "ACCEPT" | "PROPOSE" | "ANSWER_DRAFT" | "OPEN" | "PUBLISH_SIGNAL" | "APPROVE_COMMUNIQUE" | "CONTACTED";
 
 export interface Toque {
   key: string;
-  kind: "PREGUNTA" | "CESION_RECIBIDA" | "CESION_PROPUESTA" | "APERTURA" | "PUENTE" | "DIRECTIVA" | "APUNTE" | "COMUNICADO" | "ANTESALA" | "ADN" | "RASTREO";
+  kind: "PREGUNTA" | "CESION_RECIBIDA" | "CESION_PROPUESTA" | "APERTURA" | "PUENTE" | "CONTACTAR" | "DIRECTIVA" | "APUNTE" | "COMUNICADO" | "ANTESALA" | "ADN" | "RASTREO";
   title: string;
   detail: string;
   meta?: string; // valor, encaje
@@ -115,11 +115,15 @@ export async function hoyBoard(db: Db, ctx: { chapterId: string; companyId: stri
       toques.push({ key: r.id, kind: "PUENTE", title: `Puente listo para ${other(r)} · envíalo hoy`, detail: "Tu Agente lo ha redactado. Revísalo, envíalo desde tu correo y márcalo como tendido: el valor de un referido cae con las horas.", meta: value, href, hrefLabel: "Ver y enviar el Puente", urgency: 5, tone: "amber" });
     } else if (REVIEW_STATES.has(r.state as ReferralState) || r.state === "APPROVED" || r.state === "INTRO_AUTHORIZED") {
       if (iAmReceiver || iAmOriginator) waiting.push(row);
+    } else if (iAmReceiver && r.state === "INTRODUCED" && !r.contactedAt && !r.lateFlaggedAt) {
+      // Primer contacto en un toque (D-073, F7): dentro de las 48 h es un toque; pasado el plazo, un contratiempo.
+      toques.push({ key: `contact-${r.id}`, kind: "CONTACTAR", title: `Puente tendido por ${other(r)} · llama al Interesado`, detail: "Ya sabe que le vas a llamar. Cuando lo hayas hecho, un toque: el cedente lo verá y el plazo queda cumplido.", meta: value, href, hrefLabel: "Ver el contacto", primary: { label: "He contactado", action: "CONTACTED", payload: { referralId: r.id } }, deadline: r.responseDueAt ? `${hoursLeft(r.responseDueAt, now)} h para contactar` : undefined, urgency: 1.5, tone: "amber" });
+      inCourse.push(row);
     } else {
       if (iAmReceiver || iAmOriginator) inCourse.push(row);
       // Interesado sin respuesta en 48 h tras el Puente (contratiempo del cesionario).
-      if (iAmReceiver && r.state === "INTRODUCED" && r.lateFlaggedAt) {
-        contratiempos.push({ key: `late-${r.id}`, title: `El Interesado de ${other(r)} lleva ${Math.round((now.getTime() - (r.introducedAt?.getTime() ?? now.getTime())) / H)} h sin respuesta tuya`, detail: "El compromiso es responderle en 48 h. Llámale y anota el hito: el retraso ya cuenta en tu Hoja de Méritos; seguir callando cuenta más.", href, actionLabel: "Anotar el hito", tone: "red" });
+      if (iAmReceiver && r.state === "INTRODUCED" && r.lateFlaggedAt && !r.contactedAt) {
+        contratiempos.push({ key: `late-${r.id}`, title: `El Interesado de ${other(r)} lleva ${Math.round((now.getTime() - (r.introducedAt?.getTime() ?? now.getTime())) / H)} h sin respuesta tuya`, detail: "El compromiso era responderle en 48 h. Llámale ahora y márcalo: el retraso ya cuenta en tu Hoja de Méritos; seguir callando cuenta más.", href, actionLabel: "Ver el contacto", primary: { label: "He contactado", action: "CONTACTED", payload: { referralId: r.id } }, tone: "red" });
       }
     }
   }
