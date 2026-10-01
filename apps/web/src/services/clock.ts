@@ -1,6 +1,7 @@
 /**
  * Reloj de la Sala (D-030): ejecuta los plazos de NS-ARP §9.1 y D-024.
- *  - Revisión: recordatorio a las 24 h; caducidad a los 7 días (vuelve al cedente; el silencio cuenta).
+ *  - Revisión: recordatorios a las 24 y 48 h; caducidad a las 72 h (vuelve al cedente con el relevo propuesto; el silencio cuenta) (D-068).
+ *  - Directiva (D-068): recordatorio a las 4 h; a las 24 h, una excepción de criterio se aprueba sola y una de riesgo escala a NS.
  *  - Pregunta exprés (D-065): recordatorio al cedente a las 4 h; a las 24 h la pregunta queda sin respuesta y la Cesión sigue.
  *  - Puente: respuesta al Interesado en 48 h; si no hay hito, RESPONSE_LATE para el cesionario.
  *  - Seguimiento: el Agente pregunta cada 14 días.
@@ -11,9 +12,9 @@ import { and, eq, inArray, lt, isNull, or } from "drizzle-orm";
 import type { Db } from "@/db/client";
 import { schema } from "@/db/client";
 import { audit } from "@/lib/audit";
-import { QUESTION_STATES, TIMEOUTS } from "@/core/state-machine";
+import { AUTO_APPROVABLE_EXCEPTIONS, QUESTION_STATES, TIMEOUTS } from "@/core/state-machine";
 import { evaluateCompromiso, type CompromisoResult } from "@/services/compromiso";
-import { infoRoundsFor, patchPendingQuestion } from "@/services/referrals";
+import { approveByClock, infoRoundsFor, patchPendingQuestion } from "@/services/referrals";
 
 export interface ClockResult {
   reminders: number;
@@ -22,14 +23,19 @@ export interface ClockResult {
   nudges: number;
   questionReminders: number;
   questionsUnanswered: number;
+  secondReminders: number;
+  directorReminders: number;
+  directorApproved: number;
+  escalated: number;
   compromiso: CompromisoResult;
 }
 
 const H = 3_600_000;
 const D = 86_400_000;
+const hoursLeft = (until: Date | null | undefined, now: Date) => Math.max(0, Math.ceil(((until?.getTime() ?? now.getTime()) - now.getTime()) / H));
 
 export async function runClock(db: Db, now = new Date(), chapterId?: string): Promise<ClockResult> {
-  const res: ClockResult = { reminders: 0, expired: 0, late: 0, nudges: 0, questionReminders: 0, questionsUnanswered: 0, compromiso: { evaluated: 0, met: 0, notices: 0, releases: 0 } };
+  const res: ClockResult = { reminders: 0, expired: 0, late: 0, nudges: 0, questionReminders: 0, questionsUnanswered: 0, secondReminders: 0, directorReminders: 0, directorApproved: 0, escalated: 0, compromiso: { evaluated: 0, met: 0, notices: 0, releases: 0 } };
   const scope = chapterId ? eq(schema.referrals.chapterId, chapterId) : undefined;
 
   // 1 · Recordatorio a las 24 h en revisión
@@ -39,8 +45,47 @@ export async function runClock(db: Db, now = new Date(), chapterId?: string): Pr
   for (const r of toRemind) {
     const waitingOn = r.state === "ORIGINATOR_PENDING" ? r.originatorCompanyId : r.receiverCompanyId;
     await db.update(schema.referrals).set({ reminderSentAt: now }).where(eq(schema.referrals.id, r.id));
-    await audit(db, { chapterId: r.chapterId, kind: "REMINDER", actor: { type: "AGENT", id: "clock" }, subject: { type: "Referral", id: r.id }, policyApplied: "timeouts.reminder_24h", result: `Tu Agente te recuerda una Cesión que espera tu decisión desde ayer. Caduca en ${Math.max(0, Math.ceil(((r.expiresAt?.getTime() ?? now.getTime()) - now.getTime()) / D))} días.`, significant: true, companyIds: [waitingOn] });
+    await audit(db, { chapterId: r.chapterId, kind: "REMINDER", actor: { type: "AGENT", id: "clock" }, subject: { type: "Referral", id: r.id }, policyApplied: "timeouts.reminder_24h", result: `Tu Agente te recuerda una Cesión que espera tu decisión desde ayer. Caduca en ${hoursLeft(r.expiresAt, now)} h.`, significant: true, companyIds: [waitingOn] });
     res.reminders++;
+  }
+
+  // 1a · Segundo aviso a las 48 h (D-068): queda un día
+  const toRemindAgain = await db.query.referrals.findMany({
+    where: and(scope, inArray(schema.referrals.state, ["ORIGINATOR_PENDING", "RECEIVER_PENDING"]), isNull(schema.referrals.secondReminderSentAt), lt(schema.referrals.reviewRequestedAt, new Date(now.getTime() - TIMEOUTS.secondReminderHours * H))),
+  });
+  for (const r of toRemindAgain) {
+    const waitingOn = r.state === "ORIGINATOR_PENDING" ? r.originatorCompanyId : r.receiverCompanyId;
+    await db.update(schema.referrals).set({ secondReminderSentAt: now, reminderSentAt: r.reminderSentAt ?? now }).where(eq(schema.referrals.id, r.id));
+    await audit(db, { chapterId: r.chapterId, kind: "REMINDER", actor: { type: "AGENT", id: "clock" }, subject: { type: "Referral", id: r.id }, policyApplied: "timeouts.reminder_48h", result: `Última llamada: esta Cesión caduca en ${hoursLeft(r.expiresAt, now)} h. ${r.state === "RECEIVER_PENDING" ? "Si no decides, vuelve al cedente y el silencio cuenta en tu Hoja de Méritos." : "Si no das el visto bueno, se pierde el referido."} Un toque basta.`, significant: true, companyIds: [waitingOn] });
+    res.secondReminders++;
+  }
+
+  // 1c · Directiva en 24 h (D-068): recordatorio a las 4 h; a las 24 h, la excepción de criterio se aprueba sola y la de riesgo escala a NS
+  const directorPending = await db.query.referrals.findMany({ where: and(scope, eq(schema.referrals.state, "DIRECTOR_PENDING"), isNull(schema.referrals.escalatedAt)) });
+  for (const r of directorPending) {
+    const since = r.reviewRequestedAt ?? r.updatedAt;
+    const age = (now.getTime() - since.getTime()) / H;
+    const directors = await db.query.members.findMany({ where: and(eq(schema.members.chapterId, r.chapterId), eq(schema.members.isDirector, true)), columns: { companyId: true } });
+    const directorCompanies = [...new Set(directors.map((d) => d.companyId))];
+    if (age >= TIMEOUTS.directorHours) {
+      const match = await db.query.matchCandidates.findFirst({ where: eq(schema.matchCandidates.id, r.matchId) });
+      const exceptions = match?.compliance?.exceptions ?? [];
+      const onlyCriteria = exceptions.length > 0 && exceptions.every((e) => AUTO_APPROVABLE_EXCEPTIONS.has(e));
+      if (onlyCriteria) {
+        await approveByClock(db, r.id, `La Directiva no decidió en ${TIMEOUTS.directorHours} h; excepción de criterio (${exceptions.join(", ")}) registrada. La Cesión sigue (D-068).`);
+        await audit(db, { chapterId: r.chapterId, kind: "DIRECTOR_TIMEOUT", actor: { type: "SYSTEM", id: "clock" }, subject: { type: "Referral", id: r.id }, policyApplied: "director.auto_approve_24h", result: `La Directiva no revisó esta excepción (${exceptions.join(", ")}) en ${TIMEOUTS.directorHours} h: la Cesión sigue con la excepción registrada. Nada espera a nadie.`, significant: true, companyIds: [...directorCompanies, r.originatorCompanyId, r.receiverCompanyId] });
+        res.directorApproved++;
+      } else {
+        const network = await db.query.members.findMany({ where: eq(schema.members.isNetwork, true), columns: { companyId: true } });
+        await db.update(schema.referrals).set({ escalatedAt: now }).where(eq(schema.referrals.id, r.id));
+        await audit(db, { chapterId: r.chapterId, kind: "ESCALATED_TO_NS", actor: { type: "SYSTEM", id: "clock" }, subject: { type: "Referral", id: r.id }, policyApplied: "director.escalate_24h", result: `La Directiva no resolvió en ${TIMEOUTS.directorHours} h una excepción de riesgo (${exceptions.join(", ") || "sin detalle"}). Escalada a NS; la Cesión no sigue sola.`, significant: true, companyIds: [...new Set([...directorCompanies, ...network.map((m) => m.companyId)])] });
+        res.escalated++;
+      }
+    } else if (!r.reminderSentAt && age >= TIMEOUTS.directorReminderHours) {
+      await db.update(schema.referrals).set({ reminderSentAt: now }).where(eq(schema.referrals.id, r.id));
+      await audit(db, { chapterId: r.chapterId, kind: "REMINDER", actor: { type: "AGENT", id: "clock" }, subject: { type: "Referral", id: r.id }, policyApplied: "director.reminder_4h", result: `Una Cesión con excepción espera a la Directiva desde hace ${TIMEOUTS.directorReminderHours} h. Quedan ${Math.max(1, Math.round(TIMEOUTS.directorHours - age))} h: después, si la excepción es solo de valor, seguirá sola.`, significant: true, companyIds: directorCompanies });
+      res.directorReminders++;
+    }
   }
 
   // 1b · Pregunta exprés (D-065): el cedente tiene 24 h; a las 4 h se le recuerda; vencido el plazo, la pregunta queda sin respuesta y la Cesión sigue.
@@ -64,16 +109,21 @@ export async function runClock(db: Db, now = new Date(), chapterId?: string): Pr
     }
   }
 
-  // 2 · Caducidad a los 7 días
+  // 2 · Caducidad a las 72 h (D-068) con relevo: la Directiva no caduca, escala (1c)
   const toExpire = await db.query.referrals.findMany({
-    where: and(scope, inArray(schema.referrals.state, ["ORIGINATOR_PENDING", "RECEIVER_PENDING", "DIRECTOR_PENDING"]), lt(schema.referrals.expiresAt, now)),
+    where: and(scope, inArray(schema.referrals.state, ["ORIGINATOR_PENDING", "RECEIVER_PENDING"]), lt(schema.referrals.expiresAt, now)),
   });
   for (const r of toExpire) {
-    const silent = r.state === "ORIGINATOR_PENDING" ? r.originatorCompanyId : r.state === "RECEIVER_PENDING" ? r.receiverCompanyId : null;
-    await db.insert(schema.referralTransitions).values({ referralId: r.id, fromState: r.state, toState: "EXPIRED", actorType: "SYSTEM", actorId: "clock", reason: "Caducada por silencio (7 días)" });
+    const silent = r.state === "ORIGINATOR_PENDING" ? r.originatorCompanyId : r.receiverCompanyId;
+    await db.insert(schema.referralTransitions).values({ referralId: r.id, fromState: r.state, toState: "EXPIRED", actorType: "SYSTEM", actorId: "clock", reason: `Caducada por silencio (${TIMEOUTS.expiryHours} h)` });
     await db.update(schema.referrals).set({ state: "EXPIRED", updatedAt: now }).where(eq(schema.referrals.id, r.id));
-    if (silent) await db.insert(schema.trustEvents).values({ chapterId: r.chapterId, companyId: silent, kind: "RESPONSE_LATE", weight: -20, evidenceRef: `referral:${r.id}` });
-    await audit(db, { chapterId: r.chapterId, kind: "EXPIRED", actor: { type: "SYSTEM", id: "clock" }, subject: { type: "Referral", id: r.id }, policyApplied: "timeouts.expiry_7d", result: silent === r.receiverCompanyId ? "Cesión caducada: el cesionario no respondió en 7 días. Vuelve al cedente, que puede proponerla a otra Sala. El silencio cuenta en la Hoja de Méritos." : "Cesión caducada por silencio en la revisión.", significant: true, companyIds: [r.originatorCompanyId, r.receiverCompanyId] });
+    await db.insert(schema.trustEvents).values({ chapterId: r.chapterId, companyId: silent, kind: "RESPONSE_LATE", weight: -20, evidenceRef: `referral:${r.id}` });
+    const receiverSilent = silent === r.receiverCompanyId;
+    await audit(db, { chapterId: r.chapterId, kind: "EXPIRED", actor: { type: "SYSTEM", id: "clock" }, subject: { type: "Referral", id: r.id }, policyApplied: "timeouts.expiry_72h", result: receiverSilent ? `Cesión caducada: el cesionario no respondió en ${TIMEOUTS.expiryHours} h. El silencio cuenta en su Hoja de Méritos.` : `Cesión caducada: el cedente no dio el visto bueno en ${TIMEOUTS.expiryHours} h. El referido se pierde para la Sala.`, significant: true, companyIds: [r.originatorCompanyId, r.receiverCompanyId] });
+    if (receiverSilent) {
+      // Relevo (D-068): el referido no se pierde. El Agente del cedente lo recupera y propone el siguiente paso.
+      await audit(db, { chapterId: r.chapterId, kind: "RELAY_PROPOSED", actor: { type: "AGENT", id: "clock" }, subject: { type: "Referral", id: r.id }, policyApplied: "relay.after_expiry", result: "Tu Agente recupera este referido. Puedes volver a cederlo desde un Apunte nuevo o, si la plaza queda sin titular que responda, proponerlo a otra Sala como Embajada (D-015). El Interesado no debería esperar.", significant: true, companyIds: [r.originatorCompanyId] });
+    }
     res.expired++;
   }
 

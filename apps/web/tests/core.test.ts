@@ -119,6 +119,11 @@ describe("Máquina de estados de la Cesión (NS-ARP §9)", () => {
     expect(TIMEOUTS.questionAnswerHours).toBe(24);
     expect(TIMEOUTS.questionReminderHours).toBeLessThan(TIMEOUTS.questionAnswerHours);
     expect(TIMEOUTS.reminderHours).toBe(24);
+    expect(TIMEOUTS.secondReminderHours).toBe(48);
+    expect(TIMEOUTS.expiryHours).toBe(72);
+    expect(TIMEOUTS.directorHours).toBe(24);
+    expect(canTransition("DIRECTOR_PENDING", "APPROVED", "SYSTEM")).toBe(true); // solo el Reloj, excepción de criterio (D-068)
+    expect(canTransition("APPROVED", "INTRO_AUTHORIZED", "SYSTEM")).toBe(true); // solo la Apertura anticipada (D-067)
     expect(QUESTION_STATES.has("RECEIVER_PENDING") && QUESTION_STATES.has("APPROVED") && QUESTION_STATES.has("INTRODUCED")).toBe(true);
     expect(QUESTION_STATES.has("ORIGINATOR_PENDING")).toBe(false);
   });

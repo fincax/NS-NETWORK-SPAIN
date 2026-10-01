@@ -7,6 +7,7 @@ import { and, eq, inArray, ne } from "drizzle-orm";
 import type { Db } from "@/db/client";
 import { schema } from "@/db/client";
 import { audit } from "@/lib/audit";
+import { notifyReferral } from "@/services/avisos";
 import { getProvider } from "./provider";
 import { buildExplanation, computeNSMatchScore, hardGates, preliminaryFit, labelKind, type CapabilityView } from "@/core/scoring";
 import { runComplianceGate } from "@/core/compliance";
@@ -204,10 +205,12 @@ export async function runMesa(db: Db, opportunitySignalId: string): Promise<Mesa
       }
       const finalState = path[path.length - 1][1];
       const promise = computePromise(envelope.chapter_layer, score, turns);
-      await db.update(schema.referrals).set({ state: finalState, promise, reviewRequestedAt: now, expiresAt: new Date(now.getTime() + TIMEOUTS.expiryDays * 86_400_000), updatedAt: now }).where(eq(schema.referrals.id, ref.id));
+      await db.update(schema.referrals).set({ state: finalState, promise, reviewRequestedAt: now, expiresAt: new Date(now.getTime() + TIMEOUTS.expiryHours * 3_600_000), updatedAt: now }).where(eq(schema.referrals.id, ref.id));
       if (finalState === "ORIGINATOR_PENDING") {
         result.referralIds.push(ref.id);
         await audit(db, { chapterId, kind: "REVIEW_REQUEST", actor: { type: "AGENT", id: matchmaker.id }, subject: { type: "Referral", id: ref.id }, result: `Cesión preparada para el visto bueno de ${originator.name} (cesionario propuesto: ${company.name}).`, significant: true });
+        const full = await db.query.referrals.findFirst({ where: eq(schema.referrals.id, ref.id) });
+        if (full) await notifyReferral(db, full, "REVIEW_ORIGINATOR");
       }
     }
   }

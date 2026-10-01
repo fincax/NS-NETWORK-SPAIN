@@ -172,7 +172,7 @@ tail -n 20 /var/log/ns-ronda.log   # la Ronda de las mañanas
 
 **Si algo falla:** vuelve a lanzar `bash instalar.sh networkspain.com tucorreo@tuempresa.es`. No borra nada: respeta las contraseñas y la base de datos que ya existan.
 
-**Para pasar a empresas reales** (cuando se cumpla la puerta de Fase 1): en `.env.production` cambia `NS_AUTH_MODE=demo` por `NS_AUTH_MODE=real`, reinicia con `pm2 restart ns-network --update-env`, y la Directiva envía desde el Dossier de cada Timonel su enlace de acceso (D-054); con el correo configurado le llega a su buzón (D-060).
+**Para pasar a empresas reales** (cuando se cumpla la puerta de Fase 1): en `.env.production` cambia `NS_AUTH_MODE=demo` por `NS_AUTH_MODE=real`, reinicia con `pm2 restart ns-network --update-env`, y la Directiva envía desde el Dossier de cada Timonel su enlace de acceso (D-054); con el correo configurado le llega a su buzón (D-060). Desde ese momento, cada Cesión que pase a la mesa de un Timonel le llega también por correo con el botón de la decisión dentro (Avisos, D-067); `NS_PUBLIC_URL` debe ser la dirección pública, porque es la base de esos enlaces.
 
 ## 4b. Cómo se despliega, técnicamente (para quien lo haga)
 

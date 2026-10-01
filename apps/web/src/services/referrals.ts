@@ -8,14 +8,24 @@ import { assertTransition, MAX_INFO_ROUNDS, QUESTION_STATES, TIMEOUTS, type Acto
 import { computeVerdictMerit } from "@/core/merit";
 import { detectsReferralFee } from "@/core/compliance";
 import { ReferralVerdict, type HumanDecisionKind, type QualificationTurn, type ReferralPromise, type ReferralState, type RevealScope, type SignalEnvelope, type VerdictAxis } from "@/core/types";
+import { notifyReferral } from "@/services/avisos";
 
 async function transition(db: Db, referralId: string, to: ReferralState, actor: Actor, actorId: string, reason?: string) {
   const ref = await db.query.referrals.findFirst({ where: eq(schema.referrals.id, referralId) });
   if (!ref) throw new Error("Cesión no encontrada");
   assertTransition(ref.state as ReferralState, to, actor);
   await db.insert(schema.referralTransitions).values({ referralId, fromState: ref.state, toState: to, actorType: actor === "SYSTEM" ? "SYSTEM" : ["ORIGINATOR", "RECEIVER", "DIRECTOR"].includes(actor) ? "USER" : "AGENT", actorId, reason });
-  await db.update(schema.referrals).set({ state: to, updatedAt: new Date(), ...(to === "INTRODUCED" ? { introducedAt: new Date(), responseDueAt: new Date(Date.now() + TIMEOUTS.responseAfterIntroHours * 3_600_000) } : {}), ...(["WON", "LOST", "NO_DECISION"].includes(to) ? { closedAt: new Date() } : {}) }).where(eq(schema.referrals.id, referralId));
-  return { ...ref, state: to };
+  const now = new Date();
+  // Cada espera tiene su propio reloj (D-066, D-068): al llegar a una mesa nueva, 72 h desde ahora y avisos a cero.
+  const review = ["ORIGINATOR_PENDING", "RECEIVER_PENDING", "DIRECTOR_PENDING"].includes(to) ? { reviewRequestedAt: now, expiresAt: new Date(now.getTime() + TIMEOUTS.expiryHours * 3_600_000), reminderSentAt: null, secondReminderSentAt: null, escalatedAt: null } : {};
+  await db.update(schema.referrals).set({ state: to, updatedAt: now, ...review, ...(to === "INTRODUCED" ? { introducedAt: now, responseDueAt: new Date(now.getTime() + TIMEOUTS.responseAfterIntroHours * 3_600_000) } : {}), ...(["WON", "LOST", "NO_DECISION"].includes(to) ? { closedAt: now } : {}) }).where(eq(schema.referrals.id, referralId));
+  const updated = { ...ref, state: to };
+  // Avisos con acción (D-067): al Timonel que debe actuar ahora. La Apertura anticipada no avisa de "aceptada": avisa de "Puente listo" al abrirse.
+  if (to === "RECEIVER_PENDING") await notifyReferral(db, updated, "REVIEW_RECEIVER");
+  else if (to === "APPROVED" && !ref.preauthorizedScope) await notifyReferral(db, updated, "ACCEPTED");
+  else if (to === "INTRO_AUTHORIZED") await notifyReferral(db, updated, "INTRO_READY");
+  else if (to === "INTRODUCED") await notifyReferral(db, updated, "INTRODUCED");
+  return updated;
 }
 
 async function roleOf(db: Db, referralId: string, memberId: string): Promise<"ORIGINATOR" | "RECEIVER" | "DIRECTOR" | null> {
@@ -33,7 +43,7 @@ export interface DecisionInput {
   memberId: string;
   decision: HumanDecisionKind;
   notes?: string;
-  revealScope?: RevealScope; // solo cedente al aprobar
+  revealScope?: RevealScope; // cedente al dar el visto bueno (D-067): deja autorizada la Apertura con ese alcance para cuando el cesionario acepte
   promiseAdjustment?: { estimated_value_min?: number; estimated_value_max?: number; note?: string }; // solo cesionario al aceptar
   /** Pregunta exprés (D-065): con REQUEST_INFO (solo preguntar) o con APPROVE del cesionario ("aceptar y preguntar"). */
   question?: string;
@@ -124,11 +134,13 @@ async function askQuestion(db: Db, ref: { matchId: string; opportunitySignalId: 
   const draft = await draftAnswer(db, ref, question);
   const turn: QualificationTurn = { kind: "FREE", question, insufficient: true, asked_by: "RECEIVER", asked_at: now.toISOString(), due_at: new Date(now.getTime() + TIMEOUTS.questionAnswerHours * H).toISOString(), ...(draft ? { draft_answer: draft } : {}) };
   await db.update(schema.qualifications).set({ turns: [...qual.turns, turn] }).where(eq(schema.qualifications.id, qual.id));
+  const full = await db.query.referrals.findFirst({ where: eq(schema.referrals.matchId, ref.matchId) });
+  if (full) await notifyReferral(db, full, "QUESTION", { question });
 }
 
-/** El plazo de revisión de quien tiene que actuar vuelve a empezar (7 días, recordatorio a las 24 h). */
+/** El plazo de revisión de quien tiene que actuar vuelve a empezar (72 h, recordatorios a las 24 y 48 h). */
 async function restartReviewClock(db: Db, referralId: string, now = new Date()) {
-  await db.update(schema.referrals).set({ reviewRequestedAt: now, expiresAt: new Date(now.getTime() + TIMEOUTS.expiryDays * 86_400_000), reminderSentAt: null, updatedAt: now }).where(eq(schema.referrals.id, referralId));
+  await db.update(schema.referrals).set({ reviewRequestedAt: now, expiresAt: new Date(now.getTime() + TIMEOUTS.expiryHours * H), reminderSentAt: null, secondReminderSentAt: null, updatedAt: now }).where(eq(schema.referrals.id, referralId));
 }
 
 /** Visto bueno (cara A del cesionario, cara B del cedente, Directiva por excepción), pregunta al cedente y su respuesta (D-058). */
@@ -191,6 +203,8 @@ export async function decide(db: Db, input: DecisionInput) {
   } else if (input.decision === "APPROVE") {
     if (role === "ORIGINATOR" && state === "ORIGINATOR_PENDING") {
       next = "RECEIVER_PENDING";
+      // Apertura en el visto bueno (D-067): el cedente decide ya el alcance; la Apertura se ejecutará sola cuando el cesionario acepte.
+      if (input.revealScope) await db.update(schema.referrals).set({ preauthorizedScope: input.revealScope, preauthorizedByMemberId: input.memberId }).where(eq(schema.referrals.id, ref.id));
     } else if (role === "RECEIVER" && state === "RECEIVER_PENDING") {
       const match = await db.query.matchCandidates.findFirst({ where: eq(schema.matchCandidates.id, ref.matchId) });
       next = match?.compliance?.required_reviewers.includes("DIRECTOR") ? "DIRECTOR_PENDING" : "APPROVED";
@@ -211,6 +225,8 @@ export async function decide(db: Db, input: DecisionInput) {
   // Aceptar y preguntar (D-065): la Cesión avanza y la pregunta viaja con ella; el cedente la ve junto a la Apertura.
   if (asksQuestion && question) await askQuestion(db, ref, question, now);
 
+  if (next === "APPROVED") await afterApproved(db, ref.id);
+
   // Promesa (D-021): al aceptar el cesionario, se confirma o ajusta y el cedente gana Mérito de Promesa
   if (role === "RECEIVER" && input.decision === "APPROVE" && ref.promise) {
     const promise: ReferralPromise = { ...ref.promise };
@@ -228,7 +244,7 @@ export async function decide(db: Db, input: DecisionInput) {
   }
 
   const verb =
-    input.decision === "APPROVE" ? (role === "ORIGINATOR" ? "dio el visto bueno" : role === "RECEIVER" ? (question ? `aceptó la Cesión, confirmó la Promesa y pregunta al cedente:${quote(question)} El cedente tiene ${TIMEOUTS.questionAnswerHours} h para responder; la Cesión no espera` : "aceptó la Cesión y confirmó la Promesa") : "aprobó la excepción")
+    input.decision === "APPROVE" ? (role === "ORIGINATOR" ? (input.revealScope ? `dio el visto bueno y dejó autorizada la Apertura (${input.revealScope === "COMPANY_AND_CONTACT" ? "empresa y contacto" : "solo la empresa"}) para cuando acepte el cesionario` : "dio el visto bueno") : role === "RECEIVER" ? (question ? `aceptó la Cesión, confirmó la Promesa y pregunta al cedente:${quote(question)} El cedente tiene ${TIMEOUTS.questionAnswerHours} h para responder; la Cesión no espera` : "aceptó la Cesión y confirmó la Promesa") : "aprobó la excepción")
     : "declinó con motivo";
   await audit(db, { chapterId: ref.chapterId, kind: "HUMAN_DECISION", actor: { type: "USER", id: input.memberId }, subject: { type: "Referral", id: ref.id }, policyApplied: `human_gate.${role.toLowerCase()}`, result: `${labels[role]} ${verb}.`, significant: true, companyIds: [ref.originatorCompanyId, ref.receiverCompanyId] });
   return updated;
@@ -262,6 +278,23 @@ export async function repairStuckInfoRequests(db: Db, now = new Date()): Promise
   return repaired;
 }
 
+/** Apertura anticipada (D-067): aceptada la Cesión, la Apertura que el cedente dejó autorizada se ejecuta sola y el Puente queda redactado. */
+async function afterApproved(db: Db, referralId: string) {
+  const ref = await db.query.referrals.findFirst({ where: eq(schema.referrals.id, referralId) });
+  if (ref?.state === "APPROVED" && ref.preauthorizedScope && ref.preauthorizedByMemberId) {
+    await openIntro(db, ref.id, ref.preauthorizedByMemberId, ref.preauthorizedScope as RevealScope, { auto: true });
+  }
+}
+
+/**
+ * Directiva en 24 h (D-068): si la única excepción es de criterio (valor por encima del umbral, periodo de prueba) y la Directiva
+ * no ha decidido, el Reloj aprueba con la excepción registrada y avisa a la Directiva. Nunca para excepciones de riesgo.
+ */
+export async function approveByClock(db: Db, referralId: string, reason: string) {
+  await transition(db, referralId, "APPROVED", "SYSTEM", "reloj", reason);
+  await afterApproved(db, referralId);
+}
+
 /** Apertura (cara B): el cedente fija el alcance de revelación y el Agente redacta el Puente. */
 export async function authorizeIntro(db: Db, referralId: string, memberId: string, revealScope: RevealScope, opts: { answer?: string } = {}) {
   const role = await roleOf(db, referralId, memberId);
@@ -270,11 +303,18 @@ export async function authorizeIntro(db: Db, referralId: string, memberId: strin
   if (!ref) throw new Error("Cesión no encontrada");
   // Responder y abrir en un solo acto (D-065): si el cesionario preguntó al aceptar, la respuesta va con la Apertura.
   if (opts.answer?.trim() && (await infoRound(db, ref)).pending) await decide(db, { referralId, memberId, decision: "ANSWER", notes: opts.answer.trim() });
+  return openIntro(db, referralId, memberId, revealScope, { auto: false });
+}
+
+/** La Apertura en sí: fija el alcance, transita y redacta el Puente. `auto` cuando la ejecuta el sistema por la autorización anticipada del cedente (D-067). */
+async function openIntro(db: Db, referralId: string, memberId: string, revealScope: RevealScope, opts: { auto: boolean }) {
+  const ref = await db.query.referrals.findFirst({ where: eq(schema.referrals.id, referralId) });
+  if (!ref) throw new Error("Cesión no encontrada");
   const match = await db.query.matchCandidates.findFirst({ where: eq(schema.matchCandidates.id, ref.matchId) });
   const blocked = match?.compliance?.blocked_fields ?? [];
   const effectiveScope: RevealScope = blocked.includes("identity_layer.contact_person") ? "COMPANY_ONLY" : revealScope;
   await db.update(schema.referrals).set({ revealScope: effectiveScope }).where(eq(schema.referrals.id, referralId));
-  await transition(db, referralId, "INTRO_AUTHORIZED", "ORIGINATOR", memberId);
+  await transition(db, referralId, "INTRO_AUTHORIZED", opts.auto ? "SYSTEM" : "ORIGINATOR", opts.auto ? "apertura-anticipada" : memberId, opts.auto ? "Apertura autorizada de antemano por el cedente al proponer la Cesión (D-067)" : undefined);
 
   const os = await db.query.opportunitySignals.findFirst({ where: eq(schema.opportunitySignals.id, ref.opportunitySignalId) });
   const envelope = os!.envelope as SignalEnvelope;
@@ -299,7 +339,7 @@ export async function authorizeIntro(db: Db, referralId: string, memberId: strin
   if (detectsReferralFee(pkg.message)) throw new Error("El Puente contiene una contraprestación. Bloqueado por la regla inmutable D-010.");
   await db.insert(schema.introductions).values({ referralId, preparedByAgent: pkg }).onConflictDoNothing();
   const agent = await db.query.agents.findFirst({ where: eq(schema.agents.companyId, ref.originatorCompanyId) });
-  await audit(db, { chapterId: ref.chapterId, kind: "INTRO_AUTHORIZED", actor: { type: "USER", id: memberId }, subject: { type: "Referral", id: referralId }, policyApplied: `reveal_scope.${effectiveScope.toLowerCase()}`, result: `Apertura autorizada: ${receiver!.name} ve ahora ${effectiveScope === "COMPANY_AND_CONTACT" ? "la empresa y el contacto" : "solo la empresa"}. El Agente de ${originator!.name} ha redactado el Puente.`, significant: true, companyIds: [ref.originatorCompanyId, ref.receiverCompanyId] });
+  await audit(db, { chapterId: ref.chapterId, kind: "INTRO_AUTHORIZED", actor: { type: "USER", id: memberId }, subject: { type: "Referral", id: referralId }, policyApplied: `reveal_scope.${effectiveScope.toLowerCase()}${opts.auto ? ".preauthorized" : ""}`, result: `${opts.auto ? `Apertura autorizada de antemano por ${originatorPerson!.fullName} al proponer la Cesión` : "Apertura autorizada"}: ${receiver!.name} ve ahora ${effectiveScope === "COMPANY_AND_CONTACT" ? "la empresa y el contacto" : "solo la empresa"}. El Agente de ${originator!.name} ha redactado el Puente.`, significant: true, companyIds: [ref.originatorCompanyId, ref.receiverCompanyId] });
   await audit(db, { chapterId: ref.chapterId, kind: "INTRO_PACKAGE_READY", actor: { type: "AGENT", id: agent!.id }, subject: { type: "Introduction", id: referralId }, result: "Puente redactado y listo para que la persona lo envíe.", significant: false, companyIds: [ref.originatorCompanyId] });
   return pkg;
 }
