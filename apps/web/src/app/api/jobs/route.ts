@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/db/client";
 import { runJobs } from "@/services/jobs";
 import { runClock } from "@/services/clock";
-import { runLatido } from "@/agents/latido";
+import { repairDemoProtagonist, runLatido } from "@/agents/latido";
 import { repairStuckInfoRequests } from "@/services/referrals";
 import { syncNscatSeats } from "@/db/seed";
 import { eq } from "drizzle-orm";
@@ -22,6 +22,8 @@ export async function GET(req: Request) {
   // Latido de la demo (D-057): un Indicio por franja y las Cesiones ficticias avanzan; apagado con cuentas reales.
   // Cesiones que quedaron en "Cualificada" con una pregunta sin dueño (antes de D-058): pasan al cedente.
   const repaired = await repairStuckInfoRequests(db);
+  // Demo (D-071): una sola vez, se retiran las penalizaciones acumuladas de la protagonista cuando nadie decidía por ella.
+  const protagonistReset = await repairDemoProtagonist(db);
   // Reloj de la Sala cada pasada: los plazos de horas de la Pregunta exprés (D-065) no pueden esperar a la Ronda de la mañana. Idempotente.
   const clock = await runClock(db);
   // Plazas nuevas de NS-CAT (D-059) en la Sala de demostración ya creada: llegan con la actualización, sin resembrar.
@@ -29,5 +31,5 @@ export async function GET(req: Request) {
   const newSeats = cumbre ? await syncNscatSeats(db, cumbre.id) : [];
   const latido = await runLatido(db);
   const jobs = await runJobs(db, { max: 25 });
-  return NextResponse.json({ ...jobs, latido, clock, repaired: repaired.length, newSeats });
+  return NextResponse.json({ ...jobs, latido, clock, repaired: repaired.length, newSeats, protagonistReset });
 }

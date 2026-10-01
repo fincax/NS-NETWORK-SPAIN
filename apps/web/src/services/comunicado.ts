@@ -176,7 +176,7 @@ export interface CloseResult {
 }
 
 /** Cierra las semanas vencidas de una Sala: continuidad para lo no aprobado, avisos, y Gaceta. Idempotente por semana. */
-export async function closeWeeks(db: Db, now: Date, chapterId: string): Promise<CloseResult> {
+export async function closeWeeks(db: Db, now: Date, chapterId: string, shieldedCompanyId: string | null = null): Promise<CloseResult> {
   const res: CloseResult = { weeks: 0, continuity: 0, notices: 0, gazettes: 0 };
   const chapter = await db.query.chapters.findFirst({ where: eq(schema.chapters.id, chapterId) });
   if (!chapter) return res;
@@ -193,6 +193,7 @@ export async function closeWeeks(db: Db, now: Date, chapterId: string): Promise<
       const streak = (prev?.status === "CONTINUITY" ? prev.continuityStreak : 0) + 1;
       await db.update(schema.communiques).set({ status: "CONTINUITY", delta: [], declared: [], unchanged: true, continuityStreak: streak, closedAt: now, updatedAt: now }).where(eq(schema.communiques.id, row.id));
       res.continuity++;
+      if (row.companyId === shieldedCompanyId) continue; // D-071: la protagonista de la demo sale de continuidad sin penalización ni avisos
       const counts = continuityCounts(streak);
       await db.insert(schema.trustEvents).values({ chapterId, companyId: row.companyId, kind: counts ? "COMMUNIQUE_MET" : "COMMUNIQUE_MISSED", weight: counts ? 0 : COMUNICADO.meritMissed, evidenceRef: `communique:${row.id}` });
       const action = continuityAction(streak);
@@ -384,8 +385,8 @@ export async function communiqueMonth(db: Db, chapterId: string, companyId: stri
 }
 
 /** Lo que el Reloj ejecuta en cada pasada: borradores de la semana en curso y cierre de las vencidas. */
-export async function evaluateComunicados(db: Db, now: Date, chapterId: string): Promise<CloseResult & { drafted: number }> {
-  const closed = await closeWeeks(db, now, chapterId);
+export async function evaluateComunicados(db: Db, now: Date, chapterId: string, shieldedCompanyId: string | null = null): Promise<CloseResult & { drafted: number }> {
+  const closed = await closeWeeks(db, now, chapterId, shieldedCompanyId);
   const drafted = await ensureDrafts(db, chapterId, weekStart(now));
   return { ...closed, drafted };
 }
