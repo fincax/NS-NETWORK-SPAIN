@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { getDb } from "@/db/client";
 import { requireMember } from "@/lib/session";
 import { authorizeIntro, confirmValue, decide, markIntroduced, submitVerdict, updateStage } from "@/services/referrals";
+import { QUICK_QUESTIONS } from "@/core/state-machine";
 import type { HumanDecisionKind, RevealScope, VerdictAxis } from "@/core/types";
 
 function done(id: string) {
@@ -16,12 +17,19 @@ export async function decideAction(formData: FormData) {
   const { member } = await requireMember();
   const db = await getDb();
   const id = String(formData.get("referralId"));
-  const decision = String(formData.get("decision")) as HumanDecisionKind;
+  const raw = String(formData.get("decision"));
+  // "Aceptar y preguntar" (D-065) es un APPROVE con pregunta; "Solo preguntar" es REQUEST_INFO. La pregunta sale de la pregunta tipo y/o de la línea libre.
+  const decision = (raw === "APPROVE_ASK" ? "APPROVE" : raw) as HumanDecisionKind;
   const notes = String(formData.get("notes") ?? "").trim() || undefined;
+  const kind = String(formData.get("question_kind") ?? "");
+  const typed = String(formData.get("question_text") ?? "").trim();
+  const quick = QUICK_QUESTIONS.find((q) => q.key === kind)?.text;
+  const question = [quick, typed].filter(Boolean).join(" ") || undefined;
+  if ((raw === "APPROVE_ASK" || raw === "REQUEST_INFO") && !question) throw new Error("Elige una pregunta tipo o escribe la tuya.");
   const min = formData.get("promise_min");
   const max = formData.get("promise_max");
   const adjust = min || max ? { estimated_value_min: min ? Number(min) : undefined, estimated_value_max: max ? Number(max) : undefined, note: notes } : undefined;
-  await decide(db, { referralId: id, memberId: member.id, decision, notes, promiseAdjustment: adjust });
+  await decide(db, { referralId: id, memberId: member.id, decision, notes, promiseAdjustment: adjust, question: raw === "APPROVE" ? undefined : question });
   done(id);
 }
 
@@ -30,7 +38,8 @@ export async function aperturaAction(formData: FormData) {
   const db = await getDb();
   const id = String(formData.get("referralId"));
   const scope = String(formData.get("reveal_scope")) as RevealScope;
-  await authorizeIntro(db, id, member.id, scope);
+  const answer = String(formData.get("answer") ?? "").trim() || undefined;
+  await authorizeIntro(db, id, member.id, scope, { answer });
   done(id);
 }
 

@@ -27,9 +27,10 @@ import { audit } from "@/lib/audit";
 import { authMode } from "@/lib/auth";
 import { SEED_COMPANIES } from "@/db/seed-data";
 import { createSignal, publishSignal } from "@/services/signals";
-import { authorizeIntro, confirmValue, decide, infoRound, markIntroduced, submitVerdict, updateStage } from "@/services/referrals";
+import { authorizeIntro, confirmValue, decide, infoRoundsFor, markIntroduced, submitVerdict, updateStage } from "@/services/referrals";
+import { QUESTION_STATES, QUICK_QUESTIONS } from "@/core/state-machine";
 import { mesaMode } from "@/services/jobs";
-import type { SignalEnvelope, VerdictAxis } from "@/core/types";
+import type { ReferralState, SignalEnvelope, VerdictAxis } from "@/core/types";
 
 export interface LatidoIndicio {
   key: string;
@@ -84,6 +85,8 @@ const MAX_ADVANCES_PER_RUN = 4;
 const HOUR = 3_600_000;
 
 /** Plazos mínimos, en horas, para que una Cesión ficticia dé el siguiente paso. Realistas: nadie decide en un minuto. */
+/** Un cedente ficticio responde a la Pregunta exprés al cabo de una hora. */
+export const LATIDO_QUESTION_DELAY_H = 1;
 export const LATIDO_DELAYS_H = { ORIGINATOR_PENDING: 1, RECEIVER_PENDING: 2, DIRECTOR_PENDING: 3, APPROVED: 1, INTRO_AUTHORIZED: 1, INTRODUCED: 24, MEETING: 48, COMMERCIAL_OPPORTUNITY: 72, WON: 24 } as const;
 type Advanceable = keyof typeof LATIDO_DELAYS_H;
 
@@ -191,6 +194,22 @@ export async function runLatido(db: Db, opts: { now?: Date; force?: boolean } = 
 
   // 2 · Las Cesiones ficticias avanzan con plazos realistas; nunca las de la protagonista ni las de empresas ajenas a la semilla
   const open = await db.query.referrals.findMany({ where: and(eq(schema.referrals.chapterId, chapterId), inArray(schema.referrals.state, Object.keys(LATIDO_DELAYS_H))), orderBy: [desc(schema.referrals.updatedAt)] });
+
+  // 2a · Pregunta exprés (D-065): el cedente ficticio responde al cabo de una hora con el borrador de su Agente o con lo que ya consta, sin inventar.
+  const rounds = await infoRoundsFor(db, open.filter((r) => QUESTION_STATES.has(r.state as ReferralState)));
+  for (const r of open) {
+    const q = rounds.get(r.id)?.pending;
+    if (!q?.asked_at || !automatable(r.originatorCompanyId)) continue;
+    if ((now.getTime() - new Date(q.asked_at).getTime()) / HOUR < LATIDO_QUESTION_DELAY_H) continue;
+    const member = await primaryMember(db, r.originatorCompanyId);
+    if (!member) continue;
+    try {
+      await decide(db, { referralId: r.id, memberId: member.id, decision: "ANSWER", notes: q.draft_answer ?? (await fictionalAnswer(db, r)) });
+      result.advanced.push({ referralId: r.id, from: r.state, to: `${r.state} · pregunta respondida`, by: byId.get(r.originatorCompanyId)!.name });
+    } catch {
+      // una respuesta que ya no procede no detiene el Latido
+    }
+  }
   const due = open
     .map((r) => ({ r, age: (now.getTime() - r.updatedAt.getTime()) / HOUR, state: r.state as Advanceable }))
     .filter(({ age, state }) => age >= LATIDO_DELAYS_H[state])
@@ -222,14 +241,6 @@ export async function runLatido(db: Db, opts: { now?: Date; force?: boolean } = 
           break;
         }
         case "ORIGINATOR_PENDING": {
-          // Pregunta del cesionario (D-058): el cedente ficticio responde con el borrador de su Agente o con lo que ya consta.
-          const round = await infoRound(db, r);
-          if (round.pending) {
-            const answer = round.pending.draft_answer ?? (await fictionalAnswer(db, r));
-            await decide(db, { referralId: r.id, memberId: member.id, decision: "ANSWER", notes: answer });
-            result.advanced.push({ referralId: r.id, from: state, to: "RECEIVER_PENDING", by });
-            break;
-          }
           await decide(db, { referralId: r.id, memberId: member.id, decision: "APPROVE" });
           result.advanced.push({ referralId: r.id, from: state, to: "RECEIVER_PENDING", by });
           break;
@@ -240,7 +251,9 @@ export async function runLatido(db: Db, opts: { now?: Date; force?: boolean } = 
             result.advanced.push({ referralId: r.id, from: state, to: "REJECTED_BY_MEMBER", by });
           } else {
             const adjust = h % 3 === 0 && r.valuePotentialMax ? { estimated_value_max: Math.round((r.valuePotentialMax * 0.8) / 1000) * 1000, note: "Ajuste por el alcance que vemos viable." } : undefined;
-            await decide(db, { referralId: r.id, memberId: member.id, decision: "APPROVE", promiseAdjustment: adjust });
+            // Aceptar y preguntar (D-065): uno de cada seis cesionarios ficticios acepta con una pregunta tipo; si el cedente es la protagonista, la responde su Timonel.
+            const question = h % 6 === 1 ? QUICK_QUESTIONS[h % QUICK_QUESTIONS.length].text : undefined;
+            await decide(db, { referralId: r.id, memberId: member.id, decision: "APPROVE", promiseAdjustment: adjust, question });
             result.advanced.push({ referralId: r.id, from: state, to: "APPROVED", by });
           }
           break;

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { buildExplanation, computeNSMatchScore, hardGates, WEIGHTS, PENALTY_WEIGHTS, type CapabilityView } from "@/core/scoring";
 import { runComplianceGate, detectsReferralFee } from "@/core/compliance";
-import { assertTransition, canTransition, MAX_INFO_ROUNDS, TransitionError } from "@/core/state-machine";
+import { assertTransition, canTransition, MAX_INFO_ROUNDS, QUESTION_STATES, TIMEOUTS, TransitionError } from "@/core/state-machine";
 import { computePromise, computeVerdictMerit } from "@/core/merit";
 import { SEED_COMPANIES } from "@/db/seed-data";
 import type { ChapterLayer, NeedDraft, QualificationLayer, QualificationTurn, SignalEnvelope } from "@/core/types";
@@ -109,13 +109,18 @@ describe("Máquina de estados de la Cesión (NS-ARP §9)", () => {
     expect(canTransition("RECEIVER_PENDING", "APPROVED", "ORIGINATOR")).toBe(false);
     expect(() => assertTransition("VALUE_CONFIRMED", "DETECTED", "SYSTEM")).toThrow(TransitionError);
   });
-  it("REQUEST_INFO lleva la pregunta al cedente (D-058), nunca a Cualificada, y un agente no puede aprobar por una persona", () => {
-    expect(canTransition("RECEIVER_PENDING", "ORIGINATOR_PENDING", "RECEIVER")).toBe(true);
+  it("una pregunta nunca mueve la Cesión (D-065): ni a Cualificada ni al cedente; y un agente no puede aprobar por una persona", () => {
+    expect(canTransition("RECEIVER_PENDING", "ORIGINATOR_PENDING", "RECEIVER")).toBe(false);
     expect(canTransition("RECEIVER_PENDING", "QUALIFIED", "RECEIVER")).toBe(false);
     expect(canTransition("ORIGINATOR_PENDING", "QUALIFIED", "ORIGINATOR")).toBe(false);
-    expect(canTransition("ORIGINATOR_PENDING", "RECEIVER_PENDING", "ORIGINATOR")).toBe(true); // la respuesta vuelve al cesionario
+    expect(canTransition("ORIGINATOR_PENDING", "RECEIVER_PENDING", "ORIGINATOR")).toBe(true); // el visto bueno del cedente
     expect(canTransition("RECEIVER_PENDING", "APPROVED", "MATCHMAKER")).toBe(false);
     expect(MAX_INFO_ROUNDS).toBe(2);
+    expect(TIMEOUTS.questionAnswerHours).toBe(24);
+    expect(TIMEOUTS.questionReminderHours).toBeLessThan(TIMEOUTS.questionAnswerHours);
+    expect(TIMEOUTS.reminderHours).toBe(24);
+    expect(QUESTION_STATES.has("RECEIVER_PENDING") && QUESTION_STATES.has("APPROVED") && QUESTION_STATES.has("INTRODUCED")).toBe(true);
+    expect(QUESTION_STATES.has("ORIGINATOR_PENDING")).toBe(false);
   });
 });
 

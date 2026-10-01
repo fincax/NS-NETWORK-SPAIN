@@ -20,7 +20,6 @@ const TRANSITIONS: Record<string, { to: ReferralState; actors: Actor[] }[]> = {
     { to: "DIRECTOR_PENDING", actors: ["RECEIVER"] },
     { to: "REJECTED_BY_MEMBER", actors: ["RECEIVER"] },
     { to: "WITHDRAWN_BY_ORIGINATOR", actors: ["ORIGINATOR"] },
-    { to: "ORIGINATOR_PENDING", actors: ["RECEIVER"] }, // REQUEST_INFO (D-058): la pregunta va al cedente y vuelve con la respuesta
     { to: "EXPIRED", actors: ["SYSTEM"] },
   ],
   DIRECTOR_PENDING: [{ to: "APPROVED", actors: ["DIRECTOR"] }, { to: "REJECTED_BY_MEMBER", actors: ["DIRECTOR"] }, { to: "WITHDRAWN_BY_ORIGINATOR", actors: ["ORIGINATOR"] }],
@@ -60,11 +59,27 @@ export const TERMINAL_STATES: ReadonlySet<ReferralState> = new Set([
 
 export const REVIEW_STATES: ReadonlySet<ReferralState> = new Set(["ORIGINATOR_PENDING", "RECEIVER_PENDING", "DIRECTOR_PENDING"]);
 
-/** Plazos (D-024): recordatorio 72 h, caducidad 7 d, respuesta al Interesado 48 h tras el Puente. */
-export const TIMEOUTS = { reminderHours: 72, expiryDays: 7, responseAfterIntroHours: 48, checkInDays: 14 } as const;
+/**
+ * Plazos (D-024, D-065): recordatorio de revisión a las 24 h, caducidad 7 d, respuesta al Interesado 48 h tras el Puente.
+ * Pregunta exprés: el cedente responde en 24 h como máximo (su Agente le recuerda a las 4 h); pasado el plazo, la Cesión sigue sin la respuesta.
+ */
+export const TIMEOUTS = { reminderHours: 24, expiryDays: 7, responseAfterIntroHours: 48, checkInDays: 14, questionReminderHours: 4, questionAnswerHours: 24 } as const;
 
-/** Pregunta al cedente (NS-ARP §9.1, D-058): el cesionario puede pedir información como máximo dos veces por Cesión. */
+/** Pregunta exprés (NS-ARP §9.1, D-065): como máximo dos preguntas por Cesión, nunca dos abiertas a la vez, y ninguna detiene la Cesión. */
 export const MAX_INFO_ROUNDS = 2;
+
+/** Estados en los que una pregunta puede estar abierta o responderse (incluida una respuesta tardía): desde la revisión del cesionario hasta el cierre. */
+export const QUESTION_STATES: ReadonlySet<ReferralState> = new Set(["RECEIVER_PENDING", "DIRECTOR_PENDING", "APPROVED", "INTRO_AUTHORIZED", "INTRODUCED", "MEETING", "COMMERCIAL_OPPORTUNITY", "WON"]);
+
+/** Preguntas tipo del cesionario (D-065): se eligen con un toque; el cedente contesta con sí, no o una línea. */
+export const QUICK_QUESTIONS = [
+  { key: "DECISION_MAKER", text: "¿Quién decide y cómo llego a esa persona?" },
+  { key: "EXPECTS_CONTACT", text: "¿Sabe el Interesado que le vamos a contactar?" },
+  { key: "CHANNEL", text: "¿Cuál es el mejor canal y horario para contactarle?" },
+  { key: "BUDGET_TIMING", text: "¿Hay presupuesto o fecha límite?" },
+  { key: "INCUMBENT", text: "¿Trabaja ya con otro proveedor de lo mío?" },
+  { key: "MENTION", text: "¿Puedo mencionarte al contactarle?" },
+] as const;
 
 /** Etiquetas de estado en léxico NS para la tarjeta. */
 export const STATE_LABEL: Record<ReferralState, string> = {

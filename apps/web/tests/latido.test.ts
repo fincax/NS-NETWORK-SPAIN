@@ -20,7 +20,9 @@ let companies: Record<string, { companyId: string; memberId: string }>;
 const env = process.env as Record<string, string | undefined>;
 
 // Un momento fijo: martes 15 de septiembre de 2026, 13:30 hora de Madrid (11:30 UTC).
-const T0 = new Date("2026-09-15T11:30:00Z");
+/** Mañana a las 12:30Z (13:30 o 14:30 de Madrid, franja de las 13): siempre después de la siembra, para que las edades de las Cesiones sean positivas. */
+const T0 = (() => { const d = new Date(); d.setUTCDate(d.getUTCDate() + 1); d.setUTCHours(12, 30, 0, 0); return d; })();
+const DAY0 = T0.toISOString().slice(0, 10);
 const hours = (h: number) => new Date(T0.getTime() + h * 3_600_000);
 /** Pasadas sucesivas del Latido en el mismo instante hasta que ninguna Cesión ficticia tenga nada que avanzar (máx. 4 por pasada). */
 async function settle(now: Date) {
@@ -82,7 +84,7 @@ describe("Un Indicio por franja", () => {
     const before = await db.query.opportunitySignals.findMany({ where: eq(schema.opportunitySignals.chapterId, chapterId) });
     const r1 = await runLatido(db, { now: T0 });
     expect(r1.enabled).toBe(true);
-    expect(r1.slot).toBe("2026-09-15T13");
+    expect(r1.slot).toBe(`${DAY0}T13`);
     expect(r1.indicio?.key).toBe(LATIDO_INDICIOS[0].key);
     expect(r1.indicio?.queued).toBe(false);
     expect(r1.indicio!.referrals).toBeGreaterThan(0);
@@ -96,7 +98,7 @@ describe("Un Indicio por franja", () => {
   });
   it("la franja siguiente toma el siguiente Indicio del banco; la Mesa lo anuncia con el nombre de la empresa ficticia", async () => {
     const r = await runLatido(db, { now: hours(5) }); // 18:30 Madrid
-    expect(r.slot).toBe("2026-09-15T18");
+    expect(r.slot).toBe(`${DAY0}T18`);
     expect(r.indicio?.key).toBe(LATIDO_INDICIOS[1].key);
     const events = await db.query.auditEvents.findMany({ where: and(eq(schema.auditEvents.chapterId, chapterId), eq(schema.auditEvents.kind, "SIGNAL_PUBLISHED")) });
     expect(events.some((e) => e.result.includes(r.indicio!.originator))).toBe(true);
@@ -121,15 +123,16 @@ describe("Un Indicio por franja", () => {
   });
 });
 
-describe("Pregunta al cedente (D-058)", () => {
-  it("si la protagonista pregunta, el cedente ficticio responde al cabo de una hora y la Cesión vuelve a su mesa", async () => {
+describe("Pregunta exprés (D-065)", () => {
+  it("si la protagonista pregunta, la Cesión no se mueve y el cedente ficticio responde al cabo de una hora", async () => {
     const p = companies[protagonistSlug()];
     const mine = await db.query.referrals.findFirst({ where: and(eq(schema.referrals.receiverCompanyId, p.companyId), eq(schema.referrals.state, "RECEIVER_PENDING")) });
     expect(mine).toBeTruthy();
-    await decide(db, { referralId: mine!.id, memberId: p.memberId, decision: "REQUEST_INFO", notes: "¿La nave necesita instalaciones especiales?" });
+    await decide(db, { referralId: mine!.id, memberId: p.memberId, decision: "REQUEST_INFO", question: "¿La nave necesita instalaciones especiales?" });
     const t = new Date();
     await runLatido(db, { now: t }); // recién preguntada: nadie responde en el minuto
-    expect((await db.query.referrals.findFirst({ where: eq(schema.referrals.id, mine!.id) }))!.state).toBe("ORIGINATOR_PENDING");
+    expect((await db.query.referrals.findFirst({ where: eq(schema.referrals.id, mine!.id) }))!.state).toBe("RECEIVER_PENDING");
+    expect((await infoRound(db, mine!)).pending).not.toBeNull();
     await runLatido(db, { now: new Date(t.getTime() + 2 * 3_600_000) });
     const back = (await db.query.referrals.findFirst({ where: eq(schema.referrals.id, mine!.id) }))!;
     expect(back.state).toBe("RECEIVER_PENDING");

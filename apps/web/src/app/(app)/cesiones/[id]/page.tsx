@@ -5,7 +5,7 @@ import { requireMember } from "@/lib/session";
 import { eur, eurRange, dateTime, daysUntil, firstName } from "@/lib/format";
 import { Encaje, StateBadge } from "@/components/ui";
 import { PROMISE_LABEL } from "@/core/merit";
-import { MAX_INFO_ROUNDS, STATE_LABEL, TIMEOUTS } from "@/core/state-machine";
+import { MAX_INFO_ROUNDS, QUESTION_STATES, QUICK_QUESTIONS, STATE_LABEL, TIMEOUTS } from "@/core/state-machine";
 import type { QualificationTurn, ReferralState, SignalEnvelope } from "@/core/types";
 import { infoRound, type InfoRound } from "@/services/referrals";
 import { aperturaAction, confirmValueAction, decideAction, puenteAction, stageAction, verdictAction } from "./actions";
@@ -50,9 +50,8 @@ export default async function CesionPage({ params }: { params: Promise<{ id: str
   const receiverFirst = receiverPerson ? firstName(receiverPerson.fullName) : receiver.name;
   const originatorFirst = originatorPerson ? firstName(originatorPerson.fullName) : originator.name;
 
-  const face: "A" | "B" | "B0" | "PREGUNTA" | "SEGUIMIENTO" | "VEREDICTO" | "LECTURA" =
+  const face: "A" | "B" | "B0" | "SEGUIMIENTO" | "VEREDICTO" | "LECTURA" =
     iAmReceiver && state === "RECEIVER_PENDING" ? "A"
-    : iAmOriginator && state === "ORIGINATOR_PENDING" && info.pending ? "PREGUNTA"
     : iAmOriginator && state === "ORIGINATOR_PENDING" ? "B0"
     : iAmOriginator && ["APPROVED", "INTRO_AUTHORIZED"].includes(state) ? "B"
     : iAmReceiver && ["INTRODUCED", "MEETING", "COMMERCIAL_OPPORTUNITY"].includes(state) && !verdict ? "SEGUIMIENTO"
@@ -60,6 +59,9 @@ export default async function CesionPage({ params }: { params: Promise<{ id: str
     : "LECTURA";
 
   const expires = daysUntil(ref.expiresAt);
+  // Pregunta exprés (D-065): el cedente responde desde cualquier cara; en la Apertura, en el mismo acto.
+  const answerHere = iAmOriginator && Boolean(info.pending) && QUESTION_STATES.has(state) && !(face === "B" && state === "APPROVED");
+  const questionDue = info.dueAt ? dateTime(info.dueAt) : null;
 
   return (
     <div className="referral">
@@ -143,7 +145,30 @@ export default async function CesionPage({ params }: { params: Promise<{ id: str
         </section>
       </div>
 
-      {/* ───────── Cara A · el cesionario acepta ───────── */}
+      {/* ───────── Pregunta exprés · el cedente responde desde cualquier cara (D-065) ───────── */}
+      {answerHere && info.pending ? (
+        <section className="card amber">
+          <h2>Una pregunta de {receiverPerson?.fullName ?? receiver.name}</h2>
+          <p className="lead" style={{ fontSize: 14, marginBottom: 12 }}>
+            {info.overdue
+              ? `El plazo de ${TIMEOUTS.questionAnswerHours} h venció y la Cesión ha seguido sin tu respuesta. Si contestas ahora, ${receiverFirst} la verá destacada: nunca es tarde para ayudar a cerrar.`
+              : `${receiverFirst} quiere saber algo más del Interesado. Tienes hasta ${questionDue ?? "mañana"} y tu Agente te deja un borrador: confírmalo en un toque. La Cesión no espera a tu respuesta.`}
+          </p>
+          <div className="notice" style={{ marginBottom: 12 }}><strong>{receiverFirst} pregunta:</strong> {info.pending.question}</div>
+          <form action={decideAction} className="stack">
+            <input type="hidden" name="referralId" value={ref.id} />
+            <div className="field">
+              <label htmlFor="answer">Tu respuesta{info.pending.draft_answer ? " · borrador de tu Agente a partir del Indicio; corrígelo si hace falta" : " · sí, no, «no lo sé» o una línea bastan"}</label>
+              <textarea id="answer" name="notes" required defaultValue={info.pending.draft_answer ?? ""} placeholder="Solo lo que puedas compartir. La identidad del Interesado sigue reservada hasta la Apertura." />
+            </div>
+            <div className="actions">
+              <button className="btn amber" name="decision" value="ANSWER" type="submit">Enviar la respuesta a {receiver.name}</button>
+            </div>
+          </form>
+        </section>
+      ) : null}
+
+      {/* ───────── Cara A · el cesionario acepta (y pregunta, si quiere, sin frenar nada) ───────── */}
       {face === "A" ? (
         <section className="card amber">
           <h2>Tu decisión</h2>
@@ -152,9 +177,15 @@ export default async function CesionPage({ params }: { params: Promise<{ id: str
               {info.answered.map((t, i) => (
                 <div key={i} className="notice">
                   <p className="mono">Preguntaste: {t.question}</p>
-                  <p><strong>{originatorFirst} responde:</strong> {t.answer}</p>
+                  <p><strong>{originatorFirst} responde{t.answered_late ? " (con retraso)" : ""}:</strong> {t.answer}</p>
                 </div>
               ))}
+            </div>
+          ) : null}
+          {info.pending ? (
+            <div className="notice" style={{ marginBottom: 14 }}>
+              <p className="mono">Tu pregunta a {originatorFirst}: {info.pending.question}</p>
+              <p>{info.overdue ? <><strong>Sin respuesta en {TIMEOUTS.questionAnswerHours} h.</strong> Decide con lo que consta; si {originatorFirst} responde después, lo verás aquí.</> : <>Esperando su respuesta{questionDue ? ` (hasta ${questionDue})` : ""}. No hace falta esperar: puedes decidir ya.</>}</p>
             </div>
           ) : null}
           <p className="lead" style={{ fontSize: 14, marginBottom: 12 }}>Al aceptar te comprometes a responder al Interesado en {TIMEOUTS.responseAfterIntroHours} h tras el Puente y a emitir Veredicto al cerrar. Puedes confirmar la Promesa tal cual o ajustarla; tu Agente registrará la diferencia.</p>
@@ -164,33 +195,26 @@ export default async function CesionPage({ params }: { params: Promise<{ id: str
               <div className="field"><label htmlFor="pmin">Ajustar valor mínimo (opcional)</label><input id="pmin" name="promise_min" type="number" min={0} step={1000} placeholder={String(promise?.estimated_value_min ?? "")} /></div>
               <div className="field"><label htmlFor="pmax">Ajustar valor máximo (opcional)</label><input id="pmax" name="promise_max" type="number" min={0} step={1000} placeholder={String(promise?.estimated_value_max ?? "")} /></div>
             </div>
-            <div className="field"><label htmlFor="notes">Motivo o pregunta (obligatorio al declinar o pedir información)</label><textarea id="notes" name="notes" placeholder={info.roundsLeft > 0 ? "Por ejemplo: ¿tiene presupuesto cerrado?; o, al declinar: sin decisor identificado." : "Por ejemplo, al declinar: sin decisor identificado."} /></div>
+            {!info.pending && info.roundsLeft > 0 ? (
+              <div className="form-grid">
+                <div className="field">
+                  <label htmlFor="qkind">Pregunta a {originatorFirst} (opcional · responde en {TIMEOUTS.questionAnswerHours} h · nunca frena la Cesión)</label>
+                  <select id="qkind" name="question_kind" defaultValue="">
+                    <option value="">Elige una pregunta tipo o escribe la tuya</option>
+                    {QUICK_QUESTIONS.map((q) => <option key={q.key} value={q.key}>{q.text}</option>)}
+                  </select>
+                </div>
+                <div className="field"><label htmlFor="qtext">Tu pregunta, en una línea</label><input id="qtext" name="question_text" placeholder="Por ejemplo: ¿la obra incluye instalaciones?" /></div>
+              </div>
+            ) : null}
+            <div className="field"><label htmlFor="notes">Motivo al declinar (obligatorio) o nota al ajustar la Promesa</label><textarea id="notes" name="notes" placeholder="Por ejemplo, al declinar: sin decisor identificado." /></div>
             <div className="actions">
               <button className="btn amber" name="decision" value="APPROVE" type="submit">Aceptar y confirmar la Promesa</button>
-              {info.roundsLeft > 0 ? <button className="btn" name="decision" value="REQUEST_INFO" type="submit">Pedir más información a {originatorFirst}</button> : null}
+              {!info.pending && info.roundsLeft > 0 ? <button className="btn" name="decision" value="APPROVE_ASK" type="submit">Aceptar y preguntar a {originatorFirst}</button> : null}
+              {!info.pending && info.roundsLeft > 0 ? <button className="btn ghost" name="decision" value="REQUEST_INFO" type="submit">Solo preguntar, decido después</button> : null}
               <button className="btn danger ghost" name="decision" value="REJECT" type="submit">Declinar con motivo</button>
             </div>
-            <p className="mono">{info.roundsLeft === MAX_INFO_ROUNDS ? `Puedes pedir información hasta ${MAX_INFO_ROUNDS} veces; la pregunta va al cedente y vuelve aquí con su respuesta.` : info.roundsLeft > 0 ? `Te queda ${info.roundsLeft} pregunta al cedente.` : `Ya has pedido información ${MAX_INFO_ROUNDS} veces: acepta o declina.`}</p>
-          </form>
-        </section>
-      ) : null}
-
-      {/* ───────── Cara Pregunta · el cedente responde al cesionario (D-058) ───────── */}
-      {face === "PREGUNTA" && info.pending ? (
-        <section className="card amber">
-          <h2>Una pregunta de {receiverPerson?.fullName ?? receiver.name}</h2>
-          <p className="lead" style={{ fontSize: 14, marginBottom: 12 }}>Antes de aceptar, {receiverFirst} quiere saber algo más del Interesado. Tu respuesta se añade a lo que averiguaron los Agentes y la Cesión vuelve a su mesa. Ronda {info.roundsUsed} de {MAX_INFO_ROUNDS}.</p>
-          <div className="notice" style={{ marginBottom: 12 }}><strong>{receiverFirst} pregunta:</strong> {info.pending.question}</div>
-          <form action={decideAction} className="stack">
-            <input type="hidden" name="referralId" value={ref.id} />
-            <div className="field">
-              <label htmlFor="answer">Tu respuesta{info.pending.draft_answer ? " · tu Agente propone un borrador a partir del Indicio; corrígelo si hace falta" : ""}</label>
-              <textarea id="answer" name="notes" required defaultValue={info.pending.draft_answer ?? ""} placeholder="Solo lo que puedas compartir. La identidad del Interesado sigue reservada hasta la Apertura." />
-            </div>
-            <div className="actions">
-              <button className="btn amber" name="decision" value="ANSWER" type="submit">Enviar la respuesta a {receiver.name}</button>
-              <button className="btn danger ghost" name="decision" value="REJECT" type="submit">No ceder</button>
-            </div>
+            <p className="mono">{info.pending ? `Tu pregunta está en curso. Puedes aceptar o declinar sin esperar.` : info.roundsLeft > 0 ? `Puedes preguntar ${info.roundsLeft === MAX_INFO_ROUNDS ? `hasta ${MAX_INFO_ROUNDS} veces` : `${info.roundsLeft} vez más`}. ${originatorFirst} responde en ${TIMEOUTS.questionAnswerHours} h como máximo; si no, la Cesión sigue y decides con lo que consta.` : `Ya has preguntado ${MAX_INFO_ROUNDS} veces: acepta o declina con lo que consta.`}</p>
           </form>
         </section>
       ) : null}
@@ -218,11 +242,20 @@ export default async function CesionPage({ params }: { params: Promise<{ id: str
           <p className="lead" style={{ fontSize: 14, marginBottom: 12 }}>{receiverPerson?.fullName} ({receiver.name}) ha aceptado y confirmado la Promesa. Ya has ganado {promise?.merit_promise} de Mérito de Promesa. Decide qué revela tu Agente.</p>
           <form action={aperturaAction} className="stack">
             <input type="hidden" name="referralId" value={ref.id} />
+            {info.pending ? (
+              <>
+                <div className="notice"><strong>{receiverFirst} pregunta al aceptar:</strong> {info.pending.question}{info.overdue ? <span className="mono"> · sin respuesta en {TIMEOUTS.questionAnswerHours} h</span> : questionDue ? <span className="mono"> · hasta {questionDue}</span> : null}</div>
+                <div className="field">
+                  <label htmlFor="apertura-answer">Tu respuesta, en el mismo acto{info.pending.draft_answer ? " · borrador de tu Agente; corrígelo si hace falta" : ""}</label>
+                  <textarea id="apertura-answer" name="answer" defaultValue={info.pending.draft_answer ?? ""} placeholder="Sí, no, «no lo sé» o una línea. Si lo dejas vacío, la Apertura sigue igualmente." />
+                </div>
+              </>
+            ) : null}
             <div className="radio-row">
               <label><input type="radio" name="reveal_scope" value="COMPANY_ONLY" defaultChecked /> Solo la empresa</label>
               <label><input type="radio" name="reveal_scope" value="COMPANY_AND_CONTACT" disabled={blockedContact || !env.identity_layer?.contact_person} /> Empresa y persona de contacto{blockedContact ? " (bloqueado: sin base jurídica)" : ""}</label>
             </div>
-            <div className="actions"><button className="btn amber" type="submit">Autorizar la Apertura y redactar el Puente</button></div>
+            <div className="actions"><button className="btn amber" type="submit">{info.pending ? "Responder y autorizar la Apertura" : "Autorizar la Apertura y redactar el Puente"}</button></div>
           </form>
         </section>
       ) : null}
@@ -345,7 +378,7 @@ async function QualificationList({ qualificationId }: { qualificationId: string 
       {q.turns.map((t: QualificationTurn, i: number) => (
         <li key={i}>
           {t.asked_by === "RECEIVER" ? (
-            <span><span className="mono">Pregunta del cesionario</span> · {t.question} {t.answered_by ? <>· <strong>respondió el cedente:</strong> {t.answer}</> : <span style={{ color: "var(--amber)" }}>· esperando al cedente</span>}</span>
+            <span><span className="mono">Pregunta del cesionario</span> · {t.question} {t.answered_by ? <>· <strong>respondió el cedente{t.answered_late ? " (con retraso)" : ""}:</strong> {t.answer}</> : t.unanswered_at ? <span style={{ color: "var(--amber)" }}>· sin respuesta en {TIMEOUTS.questionAnswerHours} h; la Cesión siguió</span> : <span style={{ color: "var(--amber)" }}>· esperando al cedente{t.due_at ? ` hasta ${dateTime(new Date(t.due_at))}` : ""}</span>}</span>
           ) : (
             <span><span className="mono">{label[t.kind]}</span> · {t.insufficient ? <span style={{ color: "var(--amber)" }}>sin información suficiente</span> : t.answer}{t.confidence !== undefined && !t.insufficient ? <span className="mono"> · conf {Math.round(t.confidence * 100)} %</span> : null}</span>
           )}
@@ -359,13 +392,14 @@ async function QualificationList({ qualificationId }: { qualificationId: string 
 function nextStep(state: ReferralState, o: { iAmOriginator: boolean; iAmReceiver: boolean; info: InfoRound; suggested: string; receiverFirst: string; originatorFirst: string }): string {
   switch (state) {
     case "ORIGINATOR_PENDING":
-      if (o.info.pending) return o.iAmOriginator ? `Responder a la pregunta de ${o.receiverFirst}.` : `${o.originatorFirst} está respondiendo a tu pregunta.`;
       return o.iAmOriginator ? "Dar el visto bueno para proponer la Cesión." : `Esperar el visto bueno de ${o.originatorFirst}.`;
     case "RECEIVER_PENDING":
+      if (o.iAmOriginator && o.info.pending && !o.info.overdue) return `Responder a la pregunta de ${o.receiverFirst} en ${TIMEOUTS.questionAnswerHours} h. La Cesión sigue en su mesa.`;
       if (!o.iAmReceiver) return `Esperar a que ${o.receiverFirst} acepte.`;
-      return o.info.roundsLeft === 0 && /informaci/i.test(o.suggested) ? "Aceptar la Cesión y confirmar la Promesa, o declinar con motivo." : o.suggested;
+      if (o.info.pending) return o.info.overdue ? `Decidir con lo que consta: ${o.originatorFirst} no respondió en ${TIMEOUTS.questionAnswerHours} h.` : `Aceptar o declinar cuando quieras; ${o.originatorFirst} responde en ${TIMEOUTS.questionAnswerHours} h como máximo.`;
+      return (o.info.roundsLeft === 0 || o.info.answered.length) && /informaci/i.test(o.suggested) ? "Aceptar la Cesión y confirmar la Promesa, o declinar con motivo." : o.suggested;
     case "DIRECTOR_PENDING": return "Esperar a la Directiva.";
-    case "APPROVED": return o.iAmOriginator ? "Autorizar la Apertura y redactar el Puente." : `${o.originatorFirst} decidirá el alcance de la Apertura.`;
+    case "APPROVED": return o.iAmOriginator ? (o.info.pending ? `Responder a ${o.receiverFirst} y autorizar la Apertura en el mismo acto.` : "Autorizar la Apertura y redactar el Puente.") : `${o.originatorFirst} decidirá el alcance de la Apertura.`;
     case "INTRO_AUTHORIZED": return o.iAmOriginator ? "Enviar el Puente en persona y marcarlo como tendido." : `${o.originatorFirst} enviará el Puente.`;
     case "INTRODUCED": return o.iAmReceiver ? `Responder al Interesado en ${TIMEOUTS.responseAfterIntroHours} h y anotar el hito.` : `${o.receiverFirst} responderá al Interesado.`;
     case "MEETING": case "COMMERCIAL_OPPORTUNITY": return o.iAmReceiver ? "Actualizar el hito al cerrar." : `${o.receiverFirst} actualiza los hitos.`;
@@ -377,9 +411,10 @@ function nextStep(state: ReferralState, o: { iAmOriginator: boolean; iAmReceiver
 function waitingText(state: ReferralState, iAmOriginator: boolean, iAmReceiver: boolean, receiverName: string, originatorName: string, info: InfoRound) {
   switch (state) {
     case "ORIGINATOR_PENDING":
-      if (info.pending) return iAmReceiver ? `Tu pregunta está en manos de ${originatorName}. Cuando responda, la Cesión vuelve aquí.` : `${originatorName} responde a la pregunta de ${receiverName}.`;
       return iAmReceiver ? `En revisión: esperando el visto bueno de ${originatorName}.` : "Esperando tu visto bueno.";
-    case "RECEIVER_PENDING": return iAmOriginator ? `En revisión: esperando a que ${receiverName} acepte.` : "Esperando tu decisión.";
+    case "RECEIVER_PENDING":
+      if (info.pending && !info.overdue) return iAmOriginator ? `${receiverName} te ha preguntado; responde en ${TIMEOUTS.questionAnswerHours} h. Mientras, puede decidir.` : `Esperando tu decisión. ${originatorName} responde a tu pregunta en ${TIMEOUTS.questionAnswerHours} h como máximo.`;
+      return iAmOriginator ? `En revisión: esperando a que ${receiverName} acepte.` : "Esperando tu decisión.";
     case "DIRECTOR_PENDING": return "Requiere Directiva: hay una excepción de Compliance que revisar.";
     case "APPROVED": return `Aprobada. ${originatorName} decidirá el alcance de la Apertura.`;
     case "INTRO_AUTHORIZED": return `Puente listo. ${originatorName} lo enviará en persona.`;

@@ -2,6 +2,20 @@
 
 Punto de parada y siguiente paso. Se actualiza al cerrar cada sesión de trabajo.
 
+## 1 de octubre de 2026 (tarde) · Pregunta exprés (D-065)
+
+**Dónde estamos.**
+
+- El fundador fija el principio: nada debe frenar el dinamismo entre titulares; contactar al Interesado cuanto antes es seña de identidad de NS. Si alguien no contesta, se continúa siempre sin respuesta; si la respuesta llega después, se incorpora.
+- **Construido (D-065), en la rama `claude/optimistic-hawking-rnkanv`:** la Pregunta exprés sustituye a la Pregunta al cedente (D-058). La pregunta nunca mueve la Cesión; "Aceptar y preguntar" en un acto; el cedente responde en 24 h (recordatorio a las 4 h) desde cualquier cara y con la Apertura en el mismo toque; vencido el plazo, la Cesión sigue y el retraso cuenta en el plazo de respuesta del cedente (−5); una respuesta tardía se incorpora marcada. Seis preguntas tipo. Recordatorio de revisión a 24 h (antes 72 h). El Reloj corre en cada drenaje de `/api/jobs`. Reparación de las Cesiones que D-058 dejó esperando al cedente. Latido adaptado. 147 pruebas en verde, tipos y lint limpios. **Pendiente de PR, fusionar y `actualizar.sh`.**
+- Arreglada de paso la prueba del Latido, que dependía de una fecha fija (15-09) y había dejado de pasar con el calendario; ahora se ancla al día siguiente al de ejecución.
+
+**Siguiente paso acordado (por este orden).**
+
+1. Abrir la PR de la rama, fusionar y lanzar `bash /opt/ns-network/deploy/actualizar.sh`. Comprobar en la demo, como Carlos: "Aceptar y preguntar" en una Cesión y, una hora después, la respuesta destacada.
+2. Protocolo II (Comunicado y Gaceta); después, Brújula.
+3. Lo de siempre: especialidades Manantial y forma jurídica en el alta; notificaciones push (D-039); resto de `docs/08` con el abogado.
+
 ## 1 de octubre de 2026 · el servidor ya envía correo
 
 **Dónde estamos.**

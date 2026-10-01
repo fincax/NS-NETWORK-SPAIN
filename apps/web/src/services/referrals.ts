@@ -4,7 +4,7 @@ import type { Db } from "@/db/client";
 import { schema } from "@/db/client";
 import { audit } from "@/lib/audit";
 import { getProvider } from "@/agents/provider";
-import { assertTransition, MAX_INFO_ROUNDS, TIMEOUTS, type Actor } from "@/core/state-machine";
+import { assertTransition, MAX_INFO_ROUNDS, QUESTION_STATES, TIMEOUTS, type Actor } from "@/core/state-machine";
 import { computeVerdictMerit } from "@/core/merit";
 import { detectsReferralFee } from "@/core/compliance";
 import { ReferralVerdict, type HumanDecisionKind, type QualificationTurn, type ReferralPromise, type ReferralState, type RevealScope, type SignalEnvelope, type VerdictAxis } from "@/core/types";
@@ -35,12 +35,18 @@ export interface DecisionInput {
   notes?: string;
   revealScope?: RevealScope; // solo cedente al aprobar
   promiseAdjustment?: { estimated_value_min?: number; estimated_value_max?: number; note?: string }; // solo cesionario al aceptar
+  /** Pregunta exprés (D-065): con REQUEST_INFO (solo preguntar) o con APPROVE del cesionario ("aceptar y preguntar"). */
+  question?: string;
 }
 
-/** Pregunta al cedente (D-058): qué hay pendiente y cuántas rondas quedan en una Cesión. */
+/** Pregunta exprés (D-065): qué hay pendiente y cuántas preguntas quedan en una Cesión. */
 export interface InfoRound {
-  /** Pregunta del cesionario que el cedente aún no ha respondido. */
+  /** Pregunta del cesionario que el cedente aún no ha respondido (también si ya venció su plazo: puede responder tarde). */
   pending: QualificationTurn | null;
+  /** La pregunta pendiente venció sin respuesta: la Cesión siguió sin ella. */
+  overdue: boolean;
+  /** Hasta cuándo tiene el cedente para responder. */
+  dueAt: Date | null;
   /** Preguntas ya respondidas por el cedente, en orden. */
   answered: QualificationTurn[];
   roundsUsed: number;
@@ -48,6 +54,7 @@ export interface InfoRound {
 }
 
 const isQuestion = (t: QualificationTurn) => t.asked_by === "RECEIVER";
+const H = 3_600_000;
 
 async function qualificationOf(db: Db, matchId: string) {
   const match = await db.query.matchCandidates.findFirst({ where: eq(schema.matchCandidates.id, matchId) });
@@ -59,7 +66,7 @@ function infoRoundFromTurns(turns: QualificationTurn[]): InfoRound {
   const questions = turns.filter(isQuestion);
   const pending = questions.find((t) => !t.answered_by) ?? null;
   const answered = questions.filter((t) => Boolean(t.answered_by));
-  return { pending, answered, roundsUsed: questions.length, roundsLeft: Math.max(0, MAX_INFO_ROUNDS - questions.length) };
+  return { pending, overdue: Boolean(pending?.unanswered_at), dueAt: pending?.due_at ? new Date(pending.due_at) : null, answered, roundsUsed: questions.length, roundsLeft: Math.max(0, MAX_INFO_ROUNDS - questions.length) };
 }
 
 export async function infoRound(db: Db, referral: { matchId: string }): Promise<InfoRound> {
@@ -98,7 +105,28 @@ async function draftAnswer(db: Db, ref: { opportunitySignalId: string }, questio
   }
 }
 
-/** Cada ida y vuelta de la pregunta reinicia el plazo de revisión de quien tiene que actuar (7 días, recordatorio a las 72 h). */
+/** Modifica la pregunta pendiente de una Cesión (la usa el Reloj para el recordatorio y el vencimiento). */
+export async function patchPendingQuestion(db: Db, referral: { matchId: string }, patch: Partial<QualificationTurn>) {
+  const qual = await qualificationOf(db, referral.matchId);
+  if (!qual) return false;
+  const turns = [...qual.turns];
+  const i = turns.findIndex((t) => isQuestion(t) && !t.answered_by);
+  if (i < 0) return false;
+  turns[i] = { ...turns[i], ...patch };
+  await db.update(schema.qualifications).set({ turns }).where(eq(schema.qualifications.id, qual.id));
+  return true;
+}
+
+/** La pregunta queda en la cualificación de la Pista con su plazo de 24 h y el borrador del Agente del cedente, si lo hay. */
+async function askQuestion(db: Db, ref: { matchId: string; opportunitySignalId: string }, question: string, now = new Date()) {
+  const qual = await qualificationOf(db, ref.matchId);
+  if (!qual) return;
+  const draft = await draftAnswer(db, ref, question);
+  const turn: QualificationTurn = { kind: "FREE", question, insufficient: true, asked_by: "RECEIVER", asked_at: now.toISOString(), due_at: new Date(now.getTime() + TIMEOUTS.questionAnswerHours * H).toISOString(), ...(draft ? { draft_answer: draft } : {}) };
+  await db.update(schema.qualifications).set({ turns: [...qual.turns, turn] }).where(eq(schema.qualifications.id, qual.id));
+}
+
+/** El plazo de revisión de quien tiene que actuar vuelve a empezar (7 días, recordatorio a las 24 h). */
 async function restartReviewClock(db: Db, referralId: string, now = new Date()) {
   await db.update(schema.referrals).set({ reviewRequestedAt: now, expiresAt: new Date(now.getTime() + TIMEOUTS.expiryDays * 86_400_000), reminderSentAt: null, updatedAt: now }).where(eq(schema.referrals.id, referralId));
 }
@@ -114,37 +142,54 @@ export async function decide(db: Db, input: DecisionInput) {
     throw new Error("Las notas contienen una contraprestación condicionada al referido. Regla inmutable D-010.");
   }
   const state = ref.state as ReferralState;
-  const question = input.notes?.trim();
+  const now = new Date();
+  // Pregunta exprés (D-065): con REQUEST_INFO la pregunta puede venir en `question` o en `notes`; con APPROVE del cesionario, solo en `question`.
+  const question = (input.question ?? (input.decision === "REQUEST_INFO" ? input.notes : undefined))?.trim() || undefined;
+  const answer = input.decision === "ANSWER" ? input.notes?.trim() : undefined;
 
-  // Pregunta al cedente (D-058): se valida antes de registrar nada, para que una petición inválida no cuente como ronda.
+  // Se valida antes de registrar nada, para que una petición inválida no cuente como pregunta ni como decisión.
   let round: InfoRound | null = null;
-  if (input.decision === "REQUEST_INFO") {
-    if (role !== "RECEIVER" || state !== "RECEIVER_PENDING") throw new Error("Solo el cesionario puede pedir más información, y solo mientras la Cesión espera su decisión.");
+  const asksQuestion = input.decision === "REQUEST_INFO" || (input.decision === "APPROVE" && role === "RECEIVER" && Boolean(question));
+  if (asksQuestion) {
+    if (role !== "RECEIVER" || state !== "RECEIVER_PENDING") throw new Error("Solo el cesionario pregunta al cedente, y solo mientras la Cesión espera su decisión.");
     if (!question) throw new Error("Escribe la pregunta concreta para el cedente.");
     round = await infoRound(db, ref);
-    if (round.pending) throw new Error("Ya hay una pregunta esperando al cedente.");
-    if (round.roundsLeft <= 0) throw new Error(`Ya has pedido información ${MAX_INFO_ROUNDS} veces en esta Cesión: acepta o declina.`);
+    if (round.pending) throw new Error("Ya hay una pregunta esperando al cedente. Decide con lo que consta o espera su respuesta.");
+    if (round.roundsLeft <= 0) throw new Error(`Ya has preguntado ${MAX_INFO_ROUNDS} veces en esta Cesión: acepta o declina con lo que consta.`);
   } else if (input.decision === "ANSWER") {
-    if (role !== "ORIGINATOR" || state !== "ORIGINATOR_PENDING") throw new Error("Solo el cedente responde, y solo mientras la pregunta espera su respuesta.");
+    if (role !== "ORIGINATOR") throw new Error("Solo el cedente responde a la pregunta del cesionario.");
+    if (!QUESTION_STATES.has(state)) throw new Error("Esta Cesión ya no admite respuestas.");
     round = await infoRound(db, ref);
     if (!round.pending) throw new Error("Esta Cesión no tiene ninguna pregunta pendiente.");
-    if (!question) throw new Error("Escribe la respuesta para el cesionario.");
+    if (!answer) throw new Error("Escribe la respuesta para el cesionario.");
   }
 
   const seenLayers = role === "ORIGINATOR" ? [0, 1, 2] : role === "RECEIVER" ? [0, 1] : [0, 1];
   const record = () => db.insert(schema.humanDecisions).values({ referralId: ref.id, memberId: input.memberId, role, decision: input.decision, revealScope: input.revealScope, notes: input.notes, seenLayers });
   let next: ReferralState | null = null;
 
+  const labels: Record<string, string> = { ORIGINATOR: "El cedente", RECEIVER: "El cesionario", DIRECTOR: "La Directiva" };
+  const quote = (text: string) => ` «${text.length > 140 ? `${text.slice(0, 137)}…` : text}»`;
+
   if (input.decision === "REJECT") {
     next = "REJECTED_BY_MEMBER";
     await db.insert(schema.trustEvents).values({ chapterId: ref.chapterId, companyId: role === "ORIGINATOR" ? ref.originatorCompanyId : ref.receiverCompanyId, kind: "REFERRAL_DECLINED_WITH_REASON", weight: 0, evidenceRef: `referral:${ref.id}` });
-  } else if (input.decision === "REQUEST_INFO") {
-    next = "ORIGINATOR_PENDING";
-  } else if (input.decision === "ANSWER") {
-    next = "RECEIVER_PENDING";
+  } else if (input.decision === "REQUEST_INFO" && question) {
+    // Solo preguntar (D-065): la Cesión no se mueve; sigue en la mesa del cesionario, que puede decidir cuando quiera.
+    await record();
+    await askQuestion(db, ref, question, now);
+    await audit(db, { chapterId: ref.chapterId, kind: "QUESTION", actor: { type: "USER", id: input.memberId }, subject: { type: "Referral", id: ref.id }, policyApplied: "question.express_24h", result: `El cesionario pregunta al cedente (${(round?.roundsUsed ?? 0) + 1} de ${MAX_INFO_ROUNDS}):${quote(question)} La Cesión sigue en su mesa; el cedente tiene ${TIMEOUTS.questionAnswerHours} h para responder.`, significant: true, companyIds: [ref.originatorCompanyId, ref.receiverCompanyId] });
+    return ref;
+  } else if (input.decision === "ANSWER" && answer && round?.pending) {
+    // La respuesta se incorpora como evidencia, a tiempo o tarde; la Cesión no cambia de estado.
+    const late = Boolean(round.pending.unanswered_at) || (round.dueAt ? now > round.dueAt : false);
+    await record();
+    await patchPendingQuestion(db, ref, { answer, confidence: 0.9, insufficient: false, answered_by: "ORIGINATOR", answered_at: now.toISOString(), answered_late: late });
+    if (!late) await db.insert(schema.trustEvents).values({ chapterId: ref.chapterId, companyId: ref.originatorCompanyId, kind: "RESPONSE_ON_TIME", weight: 0, evidenceRef: `referral:${ref.id}` });
+    await audit(db, { chapterId: ref.chapterId, kind: "HUMAN_DECISION", actor: { type: "USER", id: input.memberId }, subject: { type: "Referral", id: ref.id }, policyApplied: late ? "question.answered_late" : "question.answered", result: `El cedente respondió${late ? " con retraso" : ""} a la pregunta del cesionario:${quote(answer)}${late ? " La Cesión había seguido sin la respuesta; el cesionario la ve ahora destacada." : ""}`, significant: true, companyIds: [ref.originatorCompanyId, ref.receiverCompanyId] });
+    return ref;
   } else if (input.decision === "APPROVE") {
     if (role === "ORIGINATOR" && state === "ORIGINATOR_PENDING") {
-      if ((await infoRound(db, ref)).pending) throw new Error("El cesionario te ha hecho una pregunta: respóndela para que la Cesión vuelva a su mesa.");
       next = "RECEIVER_PENDING";
     } else if (role === "RECEIVER" && state === "RECEIVER_PENDING") {
       const match = await db.query.matchCandidates.findFirst({ where: eq(schema.matchCandidates.id, ref.matchId) });
@@ -163,26 +208,8 @@ export async function decide(db: Db, input: DecisionInput) {
   const actor: Actor = role;
   const updated = await transition(db, ref.id, next, actor, input.memberId, input.notes);
 
-  // Pregunta al cedente (D-058): queda en la cualificación de la Pista, con el borrador del Agente del cedente si lo hay.
-  if (input.decision === "REQUEST_INFO" && question) {
-    const qual = await qualificationOf(db, ref.matchId);
-    if (qual) {
-      const draft = await draftAnswer(db, ref, question);
-      const turn: QualificationTurn = { kind: "FREE", question, insufficient: true, asked_by: "RECEIVER", ...(draft ? { draft_answer: draft } : {}) };
-      await db.update(schema.qualifications).set({ turns: [...qual.turns, turn] }).where(eq(schema.qualifications.id, qual.id));
-    }
-    await restartReviewClock(db, ref.id);
-  }
-  if (input.decision === "ANSWER" && question) {
-    const qual = await qualificationOf(db, ref.matchId);
-    if (qual) {
-      const turns = [...qual.turns];
-      const i = turns.findIndex((t) => isQuestion(t) && !t.answered_by);
-      if (i >= 0) turns[i] = { ...turns[i], answer: question, confidence: 0.9, insufficient: false, answered_by: "ORIGINATOR" };
-      await db.update(schema.qualifications).set({ turns }).where(eq(schema.qualifications.id, qual.id));
-    }
-    await restartReviewClock(db, ref.id);
-  }
+  // Aceptar y preguntar (D-065): la Cesión avanza y la pregunta viaja con ella; el cedente la ve junto a la Apertura.
+  if (asksQuestion && question) await askQuestion(db, ref, question, now);
 
   // Promesa (D-021): al aceptar el cesionario, se confirma o ajusta y el cedente gana Mérito de Promesa
   if (role === "RECEIVER" && input.decision === "APPROVE" && ref.promise) {
@@ -200,50 +227,49 @@ export async function decide(db: Db, input: DecisionInput) {
     await db.insert(schema.trustEvents).values({ chapterId: ref.chapterId, companyId: ref.receiverCompanyId, kind: hours <= TIMEOUTS.reminderHours ? "RESPONSE_ON_TIME" : "RESPONSE_LATE", weight: 0, evidenceRef: `referral:${ref.id}` });
   }
 
-  const labels: Record<string, string> = { ORIGINATOR: "El cedente", RECEIVER: "El cesionario", DIRECTOR: "La Directiva" };
-  const quoted = question ? ` «${question.length > 140 ? `${question.slice(0, 137)}…` : question}»` : "";
   const verb =
-    input.decision === "APPROVE" ? (role === "ORIGINATOR" ? "dio el visto bueno" : role === "RECEIVER" ? "aceptó la Cesión y confirmó la Promesa" : "aprobó la excepción")
-    : input.decision === "REJECT" ? "declinó con motivo"
-    : input.decision === "ANSWER" ? `respondió a la pregunta del cesionario:${quoted}`
-    : `pidió más información al cedente (ronda ${(round?.roundsUsed ?? 0) + 1} de ${MAX_INFO_ROUNDS}):${quoted}`;
+    input.decision === "APPROVE" ? (role === "ORIGINATOR" ? "dio el visto bueno" : role === "RECEIVER" ? (question ? `aceptó la Cesión, confirmó la Promesa y pregunta al cedente:${quote(question)} El cedente tiene ${TIMEOUTS.questionAnswerHours} h para responder; la Cesión no espera` : "aceptó la Cesión y confirmó la Promesa") : "aprobó la excepción")
+    : "declinó con motivo";
   await audit(db, { chapterId: ref.chapterId, kind: "HUMAN_DECISION", actor: { type: "USER", id: input.memberId }, subject: { type: "Referral", id: ref.id }, policyApplied: `human_gate.${role.toLowerCase()}`, result: `${labels[role]} ${verb}.`, significant: true, companyIds: [ref.originatorCompanyId, ref.receiverCompanyId] });
   return updated;
 }
 
 /**
- * Reparación (D-058): antes, pedir información devolvía la Cesión a "Cualificada" y nadie la recogía. Las que quedaron así
- * pasan al cedente con la pregunta registrada, como si se hubieran pedido hoy. Idempotente: solo toca Cesiones en QUALIFIED
- * cuya última transición humana fue una petición de información.
+ * Reparación (D-058, D-065): una pregunta del cesionario nunca detiene la Cesión. Las Cesiones que una versión anterior dejó
+ * paradas por una pregunta (en "Cualificada", antes de D-058; o esperando al cedente, con D-058) vuelven a la mesa del
+ * cesionario con la pregunta registrada y su plazo de 24 h contando desde ahora. Idempotente.
  */
 export async function repairStuckInfoRequests(db: Db, now = new Date()): Promise<string[]> {
-  const stuck = await db.query.referrals.findMany({ where: eq(schema.referrals.state, "QUALIFIED") });
+  const candidates = await db.query.referrals.findMany({ where: inArray(schema.referrals.state, ["QUALIFIED", "ORIGINATOR_PENDING"]) });
   const repaired: string[] = [];
-  for (const ref of stuck) {
-    const last = await db.query.referralTransitions.findFirst({ where: eq(schema.referralTransitions.referralId, ref.id), orderBy: [desc(schema.referralTransitions.occurredAt)] });
-    if (!last || last.toState !== "QUALIFIED" || !["ORIGINATOR_PENDING", "RECEIVER_PENDING"].includes(last.fromState) || last.actorType !== "USER") continue;
-    const request = await db.query.humanDecisions.findFirst({ where: and(eq(schema.humanDecisions.referralId, ref.id), eq(schema.humanDecisions.decision, "REQUEST_INFO")), orderBy: [desc(schema.humanDecisions.occurredAt)] });
-    const question = request?.notes?.trim() || "El cesionario pidió más información antes de decidir, sin concretar la pregunta. Cuéntale lo que sepas del Interesado que no esté ya en el Indicio.";
+  for (const ref of candidates) {
     const qual = await qualificationOf(db, ref.matchId);
-    if (qual && !qual.turns.some((t) => isQuestion(t) && !t.answered_by)) {
-      const draft = await draftAnswer(db, ref, question);
-      await db.update(schema.qualifications).set({ turns: [...qual.turns, { kind: "FREE", question, insufficient: true, asked_by: "RECEIVER", ...(draft ? { draft_answer: draft } : {}) }] }).where(eq(schema.qualifications.id, qual.id));
-    }
-    await db.insert(schema.referralTransitions).values({ referralId: ref.id, fromState: "QUALIFIED", toState: "ORIGINATOR_PENDING", actorType: "SYSTEM", actorId: "reparacion", reason: "Pregunta del cesionario pendiente de respuesta (D-058)" });
-    await db.update(schema.referrals).set({ state: "ORIGINATOR_PENDING", updatedAt: now }).where(eq(schema.referrals.id, ref.id));
+    const open = qual?.turns.find((t) => isQuestion(t) && !t.answered_by);
+    if (ref.state === "QUALIFIED") {
+      const last = await db.query.referralTransitions.findFirst({ where: eq(schema.referralTransitions.referralId, ref.id), orderBy: [desc(schema.referralTransitions.occurredAt)] });
+      if (!last || last.toState !== "QUALIFIED" || !["ORIGINATOR_PENDING", "RECEIVER_PENDING"].includes(last.fromState) || last.actorType !== "USER") continue;
+    } else if (!open) continue; // esperando al cedente por su visto bueno, no por una pregunta: nada que reparar
+    const request = await db.query.humanDecisions.findFirst({ where: and(eq(schema.humanDecisions.referralId, ref.id), eq(schema.humanDecisions.decision, "REQUEST_INFO")), orderBy: [desc(schema.humanDecisions.occurredAt)] });
+    const question = open?.question || request?.notes?.trim() || "El cesionario pidió más información antes de decidir, sin concretar la pregunta. Cuéntale lo que sepas del Interesado que no esté ya en el Indicio.";
+    if (qual && !open) await askQuestion(db, ref, question, now);
+    else if (open && !open.due_at) await patchPendingQuestion(db, ref, { asked_at: open.asked_at ?? now.toISOString(), due_at: new Date(now.getTime() + TIMEOUTS.questionAnswerHours * H).toISOString() });
+    await db.insert(schema.referralTransitions).values({ referralId: ref.id, fromState: ref.state, toState: "RECEIVER_PENDING", actorType: "SYSTEM", actorId: "reparacion", reason: "Una pregunta nunca detiene la Cesión: vuelve a la mesa del cesionario con la pregunta en curso (D-065)" });
+    await db.update(schema.referrals).set({ state: "RECEIVER_PENDING", updatedAt: now }).where(eq(schema.referrals.id, ref.id));
     await restartReviewClock(db, ref.id, now);
-    await audit(db, { chapterId: ref.chapterId, kind: "REVIEW_REQUEST", actor: { type: "SYSTEM", id: "reparacion" }, subject: { type: "Referral", id: ref.id }, policyApplied: "info_round.repair", result: "La pregunta del cesionario pasa al cedente para que la responda.", significant: true, companyIds: [ref.originatorCompanyId, ref.receiverCompanyId] });
+    await audit(db, { chapterId: ref.chapterId, kind: "REVIEW_REQUEST", actor: { type: "SYSTEM", id: "reparacion" }, subject: { type: "Referral", id: ref.id }, policyApplied: "question.repair", result: `La Cesión vuelve a la mesa del cesionario: su pregunta sigue en curso y el cedente tiene ${TIMEOUTS.questionAnswerHours} h para responder.`, significant: true, companyIds: [ref.originatorCompanyId, ref.receiverCompanyId] });
     repaired.push(ref.id);
   }
   return repaired;
 }
 
 /** Apertura (cara B): el cedente fija el alcance de revelación y el Agente redacta el Puente. */
-export async function authorizeIntro(db: Db, referralId: string, memberId: string, revealScope: RevealScope) {
+export async function authorizeIntro(db: Db, referralId: string, memberId: string, revealScope: RevealScope, opts: { answer?: string } = {}) {
   const role = await roleOf(db, referralId, memberId);
   if (role !== "ORIGINATOR") throw new Error("Solo el cedente autoriza la Apertura");
   const ref = await db.query.referrals.findFirst({ where: eq(schema.referrals.id, referralId) });
   if (!ref) throw new Error("Cesión no encontrada");
+  // Responder y abrir en un solo acto (D-065): si el cesionario preguntó al aceptar, la respuesta va con la Apertura.
+  if (opts.answer?.trim() && (await infoRound(db, ref)).pending) await decide(db, { referralId, memberId, decision: "ANSWER", notes: opts.answer.trim() });
   const match = await db.query.matchCandidates.findFirst({ where: eq(schema.matchCandidates.id, ref.matchId) });
   const blocked = match?.compliance?.blocked_fields ?? [];
   const effectiveScope: RevealScope = blocked.includes("identity_layer.contact_person") ? "COMPANY_ONLY" : revealScope;

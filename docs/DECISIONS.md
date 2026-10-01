@@ -1559,3 +1559,32 @@ Servicio a la red        10 %   solo suma: acciones de dirección del mes (3 = 1
 
 **Revisit when.** Algún titular largo se lea mal en móvil, o se registre la marca y se necesite una letra con licencia comercial exclusiva.
 
+---
+
+## D-065 · Pregunta exprés: una pregunta nunca detiene la Cesión; el cedente responde en 24 h como máximo y, si no, la Cesión sigue sin la respuesta
+
+**Status:** CONFIRMED (el fundador fija el principio: "que nada frene el dinamismo del flujo entre titulares; si alguien no contesta, se continúa siempre sin respuesta, y si luego se da, se modifica lo necesario")
+**Date:** 2026-10-01
+
+**Context.** Con D-058, pedir información movía la Cesión a la mesa del cedente y la revisión del cesionario quedaba parada hasta la respuesta, con 7 días de plazo por cada ida y vuelta y hasta dos rondas. En el peor caso, tres semanas antes de llamar al Interesado, y dos viajes al cedente (la pregunta y la Apertura). Un referido caliente se enfría en días. El fundador quiere que contactar al Interesado cuanto antes sea una seña de identidad de NS.
+
+**Options.** (a) Mantener D-058 y acortar sus plazos: sigue parando la Cesión. (b) Suprimir la pregunta: el cesionario acepta a ciegas y pregunta por el Puente; se pierde la evidencia estructurada y el Mérito de Facilidad. (c) Que la pregunta viaje con la Cesión sin detenerla, con plazo de horas, respuesta de un toque y continuación automática si no hay respuesta.
+
+**Choice.** (c), la **Pregunta exprés**. Sustituye a D-058 en lo que contradice; la reparación de Cesiones atascadas y el registro como turno de la cualificación se mantienen.
+
+- **Nunca mueve la Cesión.** `REQUEST_INFO` ya no transita a `ORIGINATOR_PENDING`; la Cesión sigue en la mesa del cesionario, que puede aceptar o declinar en cualquier momento, con o sin respuesta. `ANSWER` tampoco transita.
+- **Aceptar y preguntar.** El cesionario puede aceptar y preguntar en un solo acto (`APPROVE` con `question`). El cedente ve la pregunta junto a la Apertura y responde y abre en el mismo toque (`authorizeIntro` con `answer`). Camino normal: cesionario acepta y pregunta → cedente responde y abre → Puente el mismo día. "Solo preguntar" sigue existiendo para quien no quiera comprometerse aún.
+- **Plazo de 24 h.** El cedente tiene `questionAnswerHours` (24 h) para responder; a las 4 h (`questionReminderHours`) su Agente le recuerda, con el borrador listo. Vencido el plazo, el Reloj deja la pregunta "sin respuesta" (`unanswered_at`), avisa al cesionario para que decida con lo que consta y anota `RESPONSE_LATE` (−5) al cedente: el plazo de respuesta cuenta en su Valoración (D-046).
+- **La respuesta tardía se incorpora.** El cedente puede responder después del plazo, en cualquier estado desde la revisión del cesionario hasta el cierre (`QUESTION_STATES`). La respuesta queda como evidencia marcada `answered_late` y el cesionario la ve destacada: "si luego se da, se modifica lo necesario".
+- **Un toque para preguntar y para responder.** Seis preguntas tipo (`QUICK_QUESTIONS`: decisor, Interesado avisado, canal y horario, presupuesto o plazo, proveedor actual, mencionar al cedente) más una línea libre; el cedente contesta sí, no, "no lo sé" o una línea, con el borrador de su Agente prellenado.
+- **Dos preguntas por Cesión como máximo, nunca dos abiertas a la vez** (`MAX_INFO_ROUNDS` = 2). Preguntar no alarga el propio plazo de revisión del cesionario.
+- **El recordatorio de revisión pasa de 72 h a 24 h** (`reminderHours`). La caducidad sigue en 7 días (D-024). 24 h es la unidad de tiempo de NS entre titulares.
+- **Reloj en cada drenaje.** `GET /api/jobs` (cada cinco minutos en el servidor) ejecuta también el Reloj, porque los plazos de horas no pueden esperar a la Ronda de la mañana. Idempotente.
+- **Reparación.** Las Cesiones que D-058 dejó esperando al cedente por una pregunta vuelven a la mesa del cesionario con la pregunta en curso y 24 h desde la actualización (`repairStuckInfoRequests`).
+- **Latido (D-057).** El cedente ficticio responde al cabo de una hora sin mover la Cesión; uno de cada seis cesionarios ficticios acepta con una pregunta tipo, para que la protagonista vea el flujo también como cedente.
+
+**Why.** El valor de un referido cae con las horas. Una pregunta es información útil, no una condición: el cesionario decide, el cedente ayuda, y nadie espera a nadie. Con el plazo en horas y la continuación automática, el peor caso pasa de tres semanas a un día, y el camino normal cabe en una jornada. El Timonel sigue mandando (D-027): su Agente redacta, él confirma en un toque; nadie responde por él. La Valoración recoge quién responde a tiempo, sin convertirlo en castigo.
+
+**Consequences.** `core/state-machine.ts` (transición suprimida, `TIMEOUTS`, `QUESTION_STATES`, `QUICK_QUESTIONS`), `core/types.ts` (plazos del turno), `services/referrals.ts` (`decide`, `askQuestion`, `patchPendingQuestion`, `authorizeIntro` con respuesta, reparación), `services/clock.ts` (recordatorio 4 h y vencimiento 24 h), `api/jobs` (Reloj), `agents/latido.ts`, tarjeta de Cesión (cara A con pregunta tipo, respuesta desde cualquier cara, Apertura con respuesta), Hoy. 147 pruebas en verde. Documentado en `docs/02` §9.1 y §10, `docs/15`, `docs/13`, `docs/06`, `docs/07`, `docs/17`.
+
+**Revisit when.** Haya 50 Cesiones reales con pregunta: medir cuántas se responden en 24 h, cuántas se aceptan sin respuesta y si el −5 basta para que el cedente responda. Si los Timoneles piden más de dos preguntas, abrir un hilo breve ligado a la Cesión en vez de subir el tope.
