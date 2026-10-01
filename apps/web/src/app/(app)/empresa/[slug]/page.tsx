@@ -14,6 +14,8 @@ import { VALORACION } from "@/core/valoracion";
 import { listSources, MAX_SOURCES_PER_AGENT } from "@/services/sources";
 import { dateTime } from "@/lib/format";
 import { mailEnabled } from "@/lib/mail";
+import { communiqueHistory, recordView } from "@/services/comunicado";
+import { DELTA_LABEL, STATUS_LABEL, isoWeekLabel, type CommuniqueStatus } from "@/core/comunicado";
 
 export default async function EmpresaPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ fuente?: string; adn?: string; error?: string; invite?: string; enviado?: string; correo?: string }> }) {
   const { slug } = await params;
@@ -39,6 +41,10 @@ export default async function EmpresaPage({ params, searchParams }: { params: Pr
   const sources = own ? await listSources(db, company.id) : [];
   const dna = dnaRow?.dna;
   if (!dna) notFound();
+  // Protocolo II: el Dossier es vivo. Histórico de Comunicados y constancia de consulta (conocimiento mutuo, nunca vigilancia).
+  const communiques = await communiqueHistory(db, company.id, 8);
+  const lastCommunique = communiques[0];
+  if (!own) await recordView(db, { chapterId: chapter.id, companyId: me.id, memberId: viewer.id, kind: "DOSSIER_VIEWED", subjectId: company.id });
   return (
     <div className="stack" style={{ gap: 24 }}>
       <div className="page-head">
@@ -68,6 +74,24 @@ export default async function EmpresaPage({ params, searchParams }: { params: Pr
         <section className="card"><p className="eyebrow">Cesión perfecta</p><p>{dna.referrals.perfect_referral || "—"}</p>{dna.referrals.disqualifiers.length ? <p className="mono" style={{ marginTop: 8 }}>Nunca: {dna.referrals.disqualifiers.join(", ")}</p> : null}</section>
         <section className="card"><p className="eyebrow">Cómo presentarla</p><p>{dna.referrals.introduction_preferences || "Sin preferencia declarada."}</p><p className="mono" style={{ marginTop: 8 }}>Ticket {dna.commercial.ticket_min?.toLocaleString("es-ES") ?? "—"} – {dna.commercial.ticket_max?.toLocaleString("es-ES") ?? "—"} € · capacidad {dna.offering.capacity.toLowerCase()} · Timonel: {person?.fullName} ({person?.role})</p></section>
       </div>
+      <section className="card" aria-label="Comunicados">
+        <div className="row" style={{ justifyContent: "space-between" }}>
+          <p className="eyebrow" style={{ marginBottom: 0 }}>Comunicados · lo que ha dado a conocer</p>
+          {own ? <Link href="/comunicado" className="btn small">Mi Comunicado de esta semana</Link> : null}
+        </div>
+        {lastCommunique ? <p className="mono" style={{ marginTop: 8 }}>Capacidad ahora: {lastCommunique.stable.capacity_now} · último Comunicado {isoWeekLabel(lastCommunique.weekStart)} ({STATUS_LABEL[lastCommunique.status as CommuniqueStatus].toLowerCase()})</p> : <p className="lead" style={{ fontSize: 14, marginTop: 8 }}>Todavía sin Comunicados publicados: el primero sale al cerrar esta semana.</p>}
+        {communiques.length ? (
+          <ul className="plain" style={{ marginTop: 10 }}>
+            {communiques.map((h) => (
+              <li key={h.id} className="row" style={{ alignItems: "flex-start" }}>
+                <span className="mono" style={{ minWidth: 84 }}>{isoWeekLabel(h.weekStart)}</span>
+                <span className={`badge ${h.status === "APPROVED" ? "green" : "amber"}`}>{h.status === "APPROVED" ? "Aprobado" : "Continuidad"}</span>
+                <span style={{ flex: 1 }}>{[...h.delta, ...h.declared].length ? [...h.delta, ...h.declared].map((d, i) => <span key={i}>{i ? " · " : ""}<span className="mono">{DELTA_LABEL[d.kind]}:</span> {d.text}</span>) : <span className="mono">sin novedades</span>}</span>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </section>
       <section className="card">
         <p className="eyebrow">Encargos · lo que busca ahora</p>
         {demandsOpen.length === 0 ? <p className="lead" style={{ fontSize: 14 }}>Sin Encargos abiertos.</p> : (

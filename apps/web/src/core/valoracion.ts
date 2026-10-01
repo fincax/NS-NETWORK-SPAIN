@@ -18,7 +18,7 @@ export const VALORACION_WEIGHT: Record<ValoracionKey, number> = {
   calidad_cedida: 0.4, // Veredictos recibidos por lo que cedió: Facilidad, Negocio, Trato
   compromiso: 0.25, // semanas del mes con el Compromiso cumplido
   plazo_respuesta: 0.15, // como cesionario: respuestas al Interesado dentro de 48 h
-  comunicado: 0.1, // Comunicados semanales aprobados (sin datos hasta el Protocolo II)
+  comunicado: 0.1, // Comunicados semanales aprobados o de continuidad dentro del tope (Protocolo II, D-069)
   servicio_red: 0.1, // Directores: acciones entre Salas y dudas resueltas (solo suma)
 };
 
@@ -67,7 +67,7 @@ export function computeValoracion(input: ValoracionInput): Valoracion {
   c.push({ key: "compromiso", label: VALORACION_LABEL.compromiso, weight: VALORACION_WEIGHT.compromiso, value: input.weeksEvaluated ? input.weeksMet / input.weeksEvaluated : null, detail: input.weeksEvaluated ? `${input.weeksMet} de ${input.weeksEvaluated} semanas cumplidas` : "sin semanas evaluadas" });
   const responses = input.onTime + input.late;
   c.push({ key: "plazo_respuesta", label: VALORACION_LABEL.plazo_respuesta, weight: VALORACION_WEIGHT.plazo_respuesta, value: responses ? input.onTime / responses : null, detail: responses ? `${input.onTime} de ${responses} respuestas en 48 h` : "sin Puentes recibidos este mes" });
-  c.push({ key: "comunicado", label: VALORACION_LABEL.comunicado, weight: VALORACION_WEIGHT.comunicado, value: input.communiqueWeeks ? (input.communiqueMet ?? 0) / input.communiqueWeeks : null, detail: input.communiqueWeeks ? `${input.communiqueMet ?? 0} de ${input.communiqueWeeks} Comunicados aprobados` : "sin datos hasta el Protocolo II" });
+  c.push({ key: "comunicado", label: VALORACION_LABEL.comunicado, weight: VALORACION_WEIGHT.comunicado, value: input.communiqueWeeks ? (input.communiqueMet ?? 0) / input.communiqueWeeks : null, detail: input.communiqueWeeks ? `${input.communiqueMet ?? 0} de ${input.communiqueWeeks} Comunicados aprobados` : "sin Comunicados publicados este mes" });
   c.push({ key: "servicio_red", label: VALORACION_LABEL.servicio_red, weight: VALORACION_WEIGHT.servicio_red, value: input.directorActions > 0 ? Math.min(1, input.directorActions / VALORACION.directorActionsForFull) : null, detail: input.directorActions > 0 ? `${input.directorActions} acción(es) de dirección` : "solo suma: acciones entre Salas y dudas resueltas" });
 
   const available = c.filter((x) => x.value !== null);

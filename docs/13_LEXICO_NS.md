@@ -103,11 +103,11 @@ Criterios de cada nombre: castellano; una palabra siempre que sea posible; insti
 
 | Término NS | Qué es | Identificador técnico |
 | --- | --- | --- |
-| **Comunicado** | Informe semanal estructurado que el Agente de una empresa envía a los Agentes de la Sala: lo estable (qué hace) y el delta (qué ha cambiado esta semana). El Timonel lo aprueba en el Despacho. | `Communique` |
-| **Comunicado de continuidad** | El que envía el Agente cuando el Timonel no aprueba a tiempo: solo lo estable ya validado, sin nuevas afirmaciones. | `Communique{ approved_by: CONTINUITY }` |
-| **Gaceta** | Digesto semanal de la Sala compilado por el Chapter Intelligence Agent a partir de los Comunicados, con vista general y "relevante para ti" por Timonel. En el Pleno sustituye la ronda de presentaciones. | `ChapterGazette` |
-| **Dossier** | Ficha viva de cada miembro: qué hace, a quién sirve, Cesión perfecta, capacidad ahora, Encargos, cómo presentarla, Hoja de Méritos, histórico de Comunicados. Dos toques desde cualquier pantalla. | `MemberDossier` |
-| **Conocimiento mutuo** | Métrica de salud de la Sala: proporción de Timoneles que consultan la Gaceta o un Dossier cada semana. | `MutualKnowledgeRate` |
+| **Comunicado** | Informe semanal estructurado que el Agente de una empresa envía a los Agentes de la Sala: lo estable (qué hace) y el delta (qué ha cambiado esta semana). El Timonel lo aprueba en el Despacho. | `communiques` (`Communique`) |
+| **Comunicado de continuidad** | El que envía el Agente cuando el Timonel no aprueba a tiempo: solo lo estable ya validado, sin nuevas afirmaciones. | `communiques{ status: CONTINUITY, continuity_streak }` |
+| **Gaceta** | Digesto semanal de la Sala compilado por el Chapter Intelligence Agent a partir de los Comunicados, con vista general y "relevante para ti" por Timonel. En el Pleno sustituye la ronda de presentaciones. | `gazettes` (`ChapterGazette`) |
+| **Dossier** | Ficha viva de cada miembro: qué hace, a quién sirve, Cesión perfecta, capacidad ahora, Encargos, cómo presentarla, Hoja de Méritos, histórico de Comunicados. Dos toques desde cualquier pantalla. | `/empresa/[slug]` (ADN + `communiques`) |
+| **Conocimiento mutuo** | Métrica de salud de la Sala: proporción de Timoneles que consultan la Gaceta o un Dossier cada semana. | `mutualKnowledge()` · `DOSSIER_VIEWED`, `GAZETTE_VIEWED` |
 
 ## 4ter. Protocolo III · Cuentas Claras
 

@@ -9,6 +9,8 @@
  *     Mesa un Indicio verosímil de un banco rotatorio, y la Mesa lo cualifica como siempre (NS-ARP S1–S9).
  *  2. Las Cesiones entre empresas ficticias avanzan solas con plazos realistas: visto bueno, aceptación, Apertura,
  *     Puente, reunión, propuesta, Veredicto y valor contrastado. Así la Balanza, el Mérito y el Libro de Valor crecen.
+ *  3. Los Timoneles ficticios aprueban su Comunicado semanal (Protocolo II) al cabo de dos horas, a veces con una novedad
+ *     del banco `LATIDO_NOVEDADES`, para que la Gaceta de la Sala tenga vida. La protagonista aprueba el suyo en persona.
  *
  * Lo que el Latido nunca hace (el Timonel manda, D-027):
  *  - Decidir por la empresa protagonista (por defecto Reformas Industriales Híspalis, la persona con la que se enseña
@@ -30,6 +32,8 @@ import { createSignal, publishSignal } from "@/services/signals";
 import { authorizeIntro, confirmValue, decide, infoRoundsFor, markIntroduced, submitVerdict, updateStage } from "@/services/referrals";
 import { QUESTION_STATES, QUICK_QUESTIONS } from "@/core/state-machine";
 import { mesaMode } from "@/services/jobs";
+import { approveCommunique, ensureDrafts } from "@/services/comunicado";
+import { weekStart } from "@/core/compromiso";
 import type { ReferralState, RevealScope, SignalEnvelope, VerdictAxis } from "@/core/types";
 
 export interface LatidoIndicio {
@@ -78,6 +82,21 @@ export const LATIDO_INDICIOS: LatidoIndicio[] = [
   { key: "cervezas-guadaira-marca", originator: "guadalquivir", shows: "Nueva dirección y nueva línea: identidad de marca", rawContent: "Mi cliente Cervezas Guadaíra tiene nuevo director general y quiere reconstruir la identidad de marca antes del lanzamiento de su nueva línea en marzo. 55 empleados. Presupuesto de marca de 45.000 €. Decide el nuevo director general, con el que tengo trato directo." },
 ];
 
+/** Novedades verosímiles que los Timoneles ficticios declaran en su Comunicado (Protocolo II). Concretas, sin adjetivos. */
+export const LATIDO_NOVEDADES: Record<string, string[]> = {
+  guadalquivir: ["Programa de ciberriesgo para pymes industriales disponible desde octubre", "Incorporamos una gestora de siniestros de flotas"],
+  "prl-andaluza": ["Abrimos coordinación de actividades para obras con varias contratas", "Capacidad para dos auditorías reglamentarias al mes"],
+  "talento-sur": ["Nueva línea de selección de perfiles de mantenimiento industrial", "Plazo medio de selección este trimestre: 28 días"],
+  securenet: ["Respuesta a incidentes en cuatro horas para clientes con contrato", "Certificación ENS nivel alto renovada"],
+  "mobiliario-delta": ["Exposición nueva en Dos Hermanas", "Plazo de entrega de puestos operativos: tres semanas"],
+  "branding-atelier": ["Nuevo servicio: adaptación de marca para exportación", "Agenda abierta en noviembre"],
+  "fiscal-triana": ["Unidad de fiscalidad internacional con convenio con un despacho de Lisboa", "Cierre del calendario de cierres fiscales: 15 de diciembre"],
+  "bufete-alameda": ["Pactos de socios para rondas semilla con honorarios cerrados", "Dos compraventas de empresa cerradas este mes"],
+  "valoraciones-ibericas": ["Informe de valoración en 15 días para sucesión familiar", "Analista nuevo para el sector agroalimentario"],
+};
+/** Horas que tarda un Timonel ficticio en aprobar su Comunicado desde que su Agente lo deja listo. */
+export const LATIDO_COMUNICADO_DELAY_H = 2;
+
 /** Franjas del día en las que un Agente lleva un Indicio a la Mesa (hora de Madrid). */
 export const LATIDO_SLOTS_LOCAL = [9, 13, 18] as const;
 const TZ = "Europe/Madrid";
@@ -122,6 +141,7 @@ export interface LatidoResult {
   slot: string | null;
   indicio: { key: string; originator: string; referrals: number; discarded: number; queued: boolean } | null;
   advanced: { referralId: string; from: string; to: string; by: string }[];
+  communiques: number;
 }
 
 function hash(s: string): number {
@@ -146,7 +166,7 @@ async function primaryMember(db: Db, companyId: string): Promise<typeof schema.m
 
 export async function runLatido(db: Db, opts: { now?: Date; force?: boolean } = {}): Promise<LatidoResult> {
   const now = opts.now ?? new Date();
-  const result: LatidoResult = { enabled: latidoEnabled() || Boolean(opts.force), slot: null, indicio: null, advanced: [] };
+  const result: LatidoResult = { enabled: latidoEnabled() || Boolean(opts.force), slot: null, indicio: null, advanced: [], communiques: 0 };
   if (!result.enabled) return result;
 
   const seedSlugs = SEED_COMPANIES.map((c) => c.slug);
@@ -319,6 +339,26 @@ export async function runLatido(db: Db, opts: { now?: Date; force?: boolean } = 
     } catch (e) {
       // Un paso que no procede (p. ej. una transición ya hecha por una persona) no detiene el Latido.
       await audit(db, { chapterId, kind: "LATIDO_SKIPPED", actor: { type: "SYSTEM", id: "latido" }, subject: { type: "Referral", id: r.id }, policyApplied: "demo.latido", result: `Latido: no se avanzó la Cesión (${state}): ${e instanceof Error ? e.message : String(e)}`, significant: false, companyIds: [r.originatorCompanyId, r.receiverCompanyId] });
+    }
+  }
+
+  // 3 · Comunicado semanal (Protocolo II): los Timoneles ficticios aprueban su borrador al cabo de dos horas (al momento con "Latir ahora").
+  const week = weekStart(now);
+  await ensureDrafts(db, chapterId, week);
+  const drafts = await db.query.communiques.findMany({ where: and(eq(schema.communiques.chapterId, chapterId), eq(schema.communiques.weekStart, week), eq(schema.communiques.status, "DRAFT")) });
+  for (const d of drafts) {
+    if (!automatable(d.companyId)) continue;
+    if (!opts.force && (now.getTime() - d.draftedAt.getTime()) / HOUR < LATIDO_COMUNICADO_DELAY_H) continue;
+    const member = await primaryMember(db, d.companyId);
+    if (!member) continue;
+    const bank = LATIDO_NOVEDADES[byId.get(d.companyId)!.slug] ?? [];
+    const h = hash(d.id);
+    const note = bank.length && h % 3 === 0 ? bank[(h >> 2) % bank.length] : undefined;
+    try {
+      await approveCommunique(db, { chapterId, companyId: d.companyId, memberId: member.id, now, weekStartAt: week, note });
+      result.communiques++;
+    } catch {
+      // una semana ya cerrada o un borrador ya aprobado no detienen el Latido
     }
   }
   return result;

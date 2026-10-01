@@ -120,6 +120,13 @@
       "when": 1790848680894,
       "tag": "0016_dinamismo_plazos",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1790884404954,
+      "tag": "0017_comunicado",
+      "breakpoints": true
     }
   ]
 }

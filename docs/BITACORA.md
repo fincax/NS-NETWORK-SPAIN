@@ -2,6 +2,21 @@
 
 Punto de parada y siguiente paso. Se actualiza al cerrar cada sesión de trabajo.
 
+## 1 de octubre de 2026 (noche) · Protocolo II construido (D-069) y Hoy como pila de toques (D-070)
+
+**Dónde estamos.**
+
+- Las PR #20 (D-065, D-066) y #21 (D-067, D-068) están fusionadas en `main`. **El servidor sigue en `699513c` (PR #19): le faltan las dos y sus migraciones `0015` y `0016`.**
+- **Construido (D-070), misma rama:** Hoy rehecho como pila de toques. Arriba, solo lo que espera la decisión del Timonel, por urgencia y con el botón dentro de la fila (aceptar, proponer, responder con el borrador del Agente, autorizar la Apertura, publicar un Apunte, aprobar el Comunicado); debajo, los contratiempos con su solución en un toque (pregunta vencida, Interesado sin respuesta, referido caducado por silencio ajeno, Indicio sin cualificar, semanas sin ceder); el resto, en una línea de estado o plegado. Móvil primero. 5 pruebas nuevas; recorrido de navegador con tres toques seguidos desde Hoy.
+- **Construido (D-069), en la rama `claude/confident-ride-78npdj`:** el Protocolo II · Dar a Conocer. Cada lunes el Agente deja en Hoy "Tu Comunicado de esta semana" (lo estable desde el ADN, el delta con origen: inferido, verificado o declarado); el Timonel lo aprueba con un toque o añade una novedad, su capacidad y un Sondeo en `/comunicado`. El domingo a las 20:00 (Madrid) lo no aprobado sale de continuidad (segundo seguido: aviso del Agente; tercero: aviso formal de la Directiva y −5) y el Agente de la Sala publica la Gaceta en `/gaceta`, con "relevante para ti" en Hoy y en Mi Sala, novedades por titular y el Parte de cumplimiento para la Directiva. El Dossier muestra el histórico de Comunicados y la capacidad actual; consultar Gaceta o Dossier mide el conocimiento mutuo. La Valoración ya cuenta el Comunicado. En la demo, los Timoneles ficticios aprueban solos (Latido); Carlos, no. Migración `0017_comunicado`. 169 pruebas en verde, tipos y lint limpios, build correcto, recorrido de navegador con capturas. **Pendiente de PR, fusionar y `actualizar.sh`.**
+
+**Siguiente paso acordado (por este orden).**
+
+1. Abrir la PR de la rama, fusionar y lanzar `bash /opt/ns-network/deploy/actualizar.sh` (aplica #20, #21 y esta). Comprobar en la demo, como Carlos: Hoy es ahora la pila de toques; aceptar la Cesión de Lucía y aprobar el Comunicado desde la fila; en Gaceta, lo relevante para él.
+2. Brújula completa (Protocolo III): cuatro bloques y tres Movimientos accionables.
+3. Propuestas de dinamismo pendientes: F3, F4, F7, F8, F9 y F10; aviso del domingo por correo para el Comunicado (F1).
+4. Lo de siempre: especialidades Manantial y forma jurídica en el alta; notificaciones push (D-039); resto de `docs/08` con el abogado.
+
 ## 1 de octubre de 2026 (tarde) · Pregunta exprés (D-065)
 
 **Dónde estamos.**

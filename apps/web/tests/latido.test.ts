@@ -64,7 +64,7 @@ describe("Interruptor", () => {
   it("sin Latido, la pasada no toca nada", async () => {
     env.NS_LATIDO = "off";
     const r = await runLatido(db, { now: T0 });
-    expect(r).toEqual({ enabled: false, slot: null, indicio: null, advanced: [] });
+    expect(r).toEqual({ enabled: false, slot: null, indicio: null, advanced: [], communiques: 0 });
     env.NS_LATIDO = "on";
   });
 });
@@ -88,8 +88,11 @@ describe("Un Indicio por franja", () => {
     expect(r1.indicio?.key).toBe(LATIDO_INDICIOS[0].key);
     expect(r1.indicio?.queued).toBe(false);
     expect(r1.indicio!.referrals).toBeGreaterThan(0);
+    // Protocolo II: los nueve Timoneles ficticios aprueban su Comunicado (el borrador lleva más de dos horas listo); la protagonista, no.
+    expect(r1.communiques).toBe(9);
     const r2 = await runLatido(db, { now: hours(0.5) });
     expect(r2.indicio).toBeNull();
+    expect(r2.communiques).toBe(0);
     const after = await db.query.opportunitySignals.findMany({ where: eq(schema.opportunitySignals.chapterId, chapterId) });
     expect(after.length - before.length).toBe(1);
     const published = after.find((o) => !before.some((b) => b.id === o.id))!;
@@ -105,10 +108,14 @@ describe("Un Indicio por franja", () => {
     const latidos = await db.query.auditEvents.findMany({ where: eq(schema.auditEvents.kind, "LATIDO") });
     expect(latidos.every((e) => e.significant === false)).toBe(true); // no ensucia la Mesa
   });
-  it("«Latir ahora» fuerza un Indicio fuera de franja", async () => {
+  it("«Latir ahora» fuerza un Indicio fuera de franja; los Comunicados ficticios ya aprobados no se repiten y la protagonista sigue en borrador", async () => {
     const r = await runLatido(db, { now: hours(5.1), force: true });
     expect(r.slot).toMatch(/^manual:/);
     expect(r.indicio?.key).toBe(LATIDO_INDICIOS[2].key);
+    expect(r.communiques).toBe(0);
+    const rows = await db.query.communiques.findMany({ where: eq(schema.communiques.chapterId, chapterId) });
+    expect(rows.filter((c) => c.status === "APPROVED")).toHaveLength(9);
+    expect(rows.find((c) => c.companyId === companies[protagonistSlug()].companyId)?.status).toBe("DRAFT");
   });
   it("la protagonista recibe Cesiones del Latido y nadie decide por ella", async () => {
     // El primer Indicio (traslado de planta) es para la protagonista, entre otros.

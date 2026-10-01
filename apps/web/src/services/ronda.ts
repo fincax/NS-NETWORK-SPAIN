@@ -66,7 +66,7 @@ export async function runRonda(db: Db, now = new Date(), feed: PublicFeed = defa
       ownSources.errors += o.errors;
     }
 
-    const worked = jobs.done + jobs.needsHuman + clock.reminders + clock.expired + clock.late + clock.nudges + clock.compromiso.evaluated + rastreo.drafts + ownSources.drafts > 0;
+    const worked = jobs.done + jobs.needsHuman + clock.reminders + clock.expired + clock.late + clock.nudges + clock.compromiso.evaluated + clock.comunicado.gazettes + rastreo.drafts + ownSources.drafts > 0;
     if (worked) {
       const parts = [
         jobs.done ? `${jobs.done} Indicio(s) cualificado(s) en la Mesa` : null,
@@ -75,6 +75,7 @@ export async function runRonda(db: Db, now = new Date(), feed: PublicFeed = defa
         clock.late ? `${clock.late} respuesta(s) tardía(s)` : null,
         clock.nudges ? `${clock.nudges} check-in(s)` : null,
         clock.compromiso.evaluated ? `Compromiso de la semana evaluado a ${clock.compromiso.evaluated} titular(es): ${clock.compromiso.met} cumplen${clock.compromiso.notices ? `, ${clock.compromiso.notices} aviso(s)` : ""}${clock.compromiso.releases ? `, ${clock.compromiso.releases} baja(s) notificada(s)` : ""}` : null,
+        clock.comunicado.gazettes ? `Gaceta de la semana publicada (${clock.comunicado.continuity} Comunicado(s) de continuidad)` : null,
         rastreo.drafts ? `${rastreo.drafts} Indicio(s) en borrador desde fuentes públicas` : null,
         ownSources.drafts ? `${ownSources.drafts} Indicio(s) en borrador desde fuentes propias de los Agentes` : null,
       ].filter(Boolean);

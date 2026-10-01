@@ -6,6 +6,8 @@
  *  - Puente: respuesta al Interesado en 48 h; si no hay hito, RESPONSE_LATE para el cesionario.
  *  - Seguimiento: el Agente pregunta cada 14 días.
  *  - Compromiso (D-042): cada semana completa, cuenta de Cesiones válidas por titular y escalera de avisos hasta la baja.
+ *  - Protocolo II (D-018, D-069): borrador del Comunicado de la semana para cada titular; al cierre (domingo 20:00 Madrid),
+ *    continuidad para lo no aprobado, avisos y Gaceta de la Sala.
  * Idempotente: cada acción se marca en la Cesión y no se repite. El empujón lo recibe el Timonel, nunca el Interesado.
  */
 import { and, eq, inArray, lt, isNull, or } from "drizzle-orm";
@@ -14,6 +16,7 @@ import { schema } from "@/db/client";
 import { audit } from "@/lib/audit";
 import { AUTO_APPROVABLE_EXCEPTIONS, QUESTION_STATES, TIMEOUTS } from "@/core/state-machine";
 import { evaluateCompromiso, type CompromisoResult } from "@/services/compromiso";
+import { evaluateComunicados, type CloseResult } from "@/services/comunicado";
 import { approveByClock, infoRoundsFor, patchPendingQuestion } from "@/services/referrals";
 
 export interface ClockResult {
@@ -28,6 +31,7 @@ export interface ClockResult {
   directorApproved: number;
   escalated: number;
   compromiso: CompromisoResult;
+  comunicado: CloseResult & { drafted: number };
 }
 
 const H = 3_600_000;
@@ -35,7 +39,7 @@ const D = 86_400_000;
 const hoursLeft = (until: Date | null | undefined, now: Date) => Math.max(0, Math.ceil(((until?.getTime() ?? now.getTime()) - now.getTime()) / H));
 
 export async function runClock(db: Db, now = new Date(), chapterId?: string): Promise<ClockResult> {
-  const res: ClockResult = { reminders: 0, expired: 0, late: 0, nudges: 0, questionReminders: 0, questionsUnanswered: 0, secondReminders: 0, directorReminders: 0, directorApproved: 0, escalated: 0, compromiso: { evaluated: 0, met: 0, notices: 0, releases: 0 } };
+  const res: ClockResult = { reminders: 0, expired: 0, late: 0, nudges: 0, questionReminders: 0, questionsUnanswered: 0, secondReminders: 0, directorReminders: 0, directorApproved: 0, escalated: 0, compromiso: { evaluated: 0, met: 0, notices: 0, releases: 0 }, comunicado: { weeks: 0, continuity: 0, notices: 0, gazettes: 0, drafted: 0 } };
   const scope = chapterId ? eq(schema.referrals.chapterId, chapterId) : undefined;
 
   // 1 · Recordatorio a las 24 h en revisión
@@ -150,14 +154,13 @@ export async function runClock(db: Db, now = new Date(), chapterId?: string): Pr
   }
 
   // 5 · Compromiso semanal (D-042): última semana completa, una vez por titular
-  if (chapterId) {
-    res.compromiso = await evaluateCompromiso(db, now, chapterId);
-  } else {
-    const chapters = await db.query.chapters.findMany({ columns: { id: true } });
-    for (const c of chapters) {
-      const r = await evaluateCompromiso(db, now, c.id);
-      res.compromiso = { evaluated: res.compromiso.evaluated + r.evaluated, met: res.compromiso.met + r.met, notices: res.compromiso.notices + r.notices, releases: res.compromiso.releases + r.releases };
-    }
+  // 6 · Comunicado semanal (Protocolo II): borradores de la semana en curso y cierre de las vencidas con Gaceta
+  const chapterIds = chapterId ? [chapterId] : (await db.query.chapters.findMany({ columns: { id: true } })).map((c) => c.id);
+  for (const id of chapterIds) {
+    const r = await evaluateCompromiso(db, now, id);
+    res.compromiso = { evaluated: res.compromiso.evaluated + r.evaluated, met: res.compromiso.met + r.met, notices: res.compromiso.notices + r.notices, releases: res.compromiso.releases + r.releases };
+    const c = await evaluateComunicados(db, now, id);
+    res.comunicado = { weeks: res.comunicado.weeks + c.weeks, continuity: res.comunicado.continuity + c.continuity, notices: res.comunicado.notices + c.notices, gazettes: res.comunicado.gazettes + c.gazettes, drafted: res.comunicado.drafted + c.drafted };
   }
   return res;
 }

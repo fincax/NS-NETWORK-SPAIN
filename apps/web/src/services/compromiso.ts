@@ -182,7 +182,7 @@ export async function compromisoStatus(db: Db, chapterId: string, companyId: str
   const streak = last?.missedStreak ?? 0;
   const lastAction = (last?.action ?? "NONE") as CompromisoAction;
   const metNow = live.validCount >= minimum;
-  const label = lastAction === "RELEASE_NOTICE" ? ACTION_LABEL.RELEASE_NOTICE : metNow ? (live.distinctSpecialties > 1 ? "Por encima" : "En Ritmo") : live.validCount > 0 ? `Por debajo del mínimo · ${live.validCount} de ${minimum}` : streak === 0 ? "Pendiente esta semana" : `${ACTION_LABEL[lastAction]} · ${streak} ${streak === 1 ? "semana" : "semanas"} sin ceder`;
+  const label = lastAction === "RELEASE_NOTICE" ? ACTION_LABEL.RELEASE_NOTICE : metNow ? (live.distinctSpecialties > 1 ? "Por encima" : "En Ritmo") : live.validCount > 0 ? `Por debajo del mínimo · ${live.validCount} de ${minimum}` : streak === 0 ? "Pendiente esta semana" : lastAction === "MISSED" ? `${streak} ${streak === 1 ? "semana" : "semanas"} sin ceder` : `${ACTION_LABEL[lastAction]} · ${streak} ${streak === 1 ? "semana" : "semanas"} sin ceder`;
   const nextStep =
     lastAction === "RELEASE_NOTICE" ? "La Directiva propone la baja y NS la confirma." :
     metNow ? (live.distinctSpecialties > 1 ? "Semana cumplida con varias especialidades: así se destaca." : "Semana cumplida. Para destacar, cede otra a una especialidad distinta.") :

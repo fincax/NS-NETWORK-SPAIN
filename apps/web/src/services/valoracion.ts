@@ -3,6 +3,7 @@ import { and, eq, gte, inArray, lt } from "drizzle-orm";
 import type { Db } from "@/db/client";
 import { schema } from "@/db/client";
 import { computeValoracion, lastCompletedMonthStart, monthLabel, monthStart, nextMonth, verdictScore, type Valoracion } from "@/core/valoracion";
+import { communiqueMonth } from "@/services/comunicado";
 
 export interface ValoracionMensual extends Valoracion {
   monthStart: Date;
@@ -16,12 +17,15 @@ export async function valoracionMensual(db: Db, chapterId: string, companyId: st
   const weeks = await db.query.contributionWeeks.findMany({ where: and(eq(schema.contributionWeeks.chapterId, chapterId), eq(schema.contributionWeeks.companyId, companyId), gte(schema.contributionWeeks.weekStart, start), lt(schema.contributionWeeks.weekStart, end)) });
   const events = await db.query.trustEvents.findMany({ where: and(eq(schema.trustEvents.chapterId, chapterId), eq(schema.trustEvents.companyId, companyId), gte(schema.trustEvents.createdAt, start), lt(schema.trustEvents.createdAt, end)) });
   const count = (k: string) => events.filter((e) => e.kind === k).length;
+  const communique = await communiqueMonth(db, chapterId, companyId, start, end);
   const v = computeValoracion({
     verdictScores: verdicts.map((x) => verdictScore(x.verdict)),
     weeksMet: weeks.filter((w) => w.action === "NONE").length,
     weeksEvaluated: weeks.length,
     onTime: count("RESPONSE_ON_TIME"),
     late: count("RESPONSE_LATE"),
+    communiqueMet: communique.met,
+    communiqueWeeks: communique.weeks,
     directorActions: count("DIRECTOR_INTERCHAPTER_ACTION") + count("DIRECTOR_QUERY_RESOLVED"),
   });
   return { ...v, monthStart: start, monthLabel: monthLabel(start) };
