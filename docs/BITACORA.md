@@ -4,6 +4,8 @@ Punto de parada y siguiente paso. Se actualiza al cerrar cada sesión de trabajo
 
 ## 1 de octubre de 2026 (noche) · Protocolo II construido (D-069) y Hoy como pila de toques (D-070)
 
+**Punto de parada (01-10, noche).** Sesión cerrada por el fundador ("mañana seguimos"). `main` y el servidor están en `f3fb156` (PR #24); la rama `claude/confident-ride-78npdj` parte de `main` y no tiene cambios pendientes. Al retomar: comprobar como Carlos la pila de toques, la Brújula y una Cesión directa desde un Apunte; el lunes, la primera Gaceta real.
+
 **Dónde estamos.**
 
 - Las PR #20 (D-065, D-066), #21 (D-067, D-068) y #22 (D-069, D-070) están fusionadas en `main`. **El servidor está al día: `actualizar.sh` lo dejó en `fc30b99` (PR #22)** con las migraciones `0015`, `0016` y `0017` aplicadas.
