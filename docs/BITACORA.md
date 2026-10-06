@@ -12,6 +12,8 @@ Punto de parada y siguiente paso. Se actualiza al cerrar cada sesión de trabajo
 - Guía que se estaba siguiendo, en cuatro partes: **1** fusionar la PR en GitHub (hecho); **2** en PowerShell, `ssh root@200.234.236.135` y `bash /opt/ns-network/deploy/actualizar.sh`, comprobar `Actualizado a … #25` y `pm2 status` en `online` (pendiente de confirmar); **3** clave del modelo: `nano /opt/ns-network/apps/web/.env.production`, quitar la almohadilla a `ANTHROPIC_API_KEY=` y pegar la clave `sk-ant-…`, opcionalmente añadir `NS_LATIDO=off` para la sesión en grupo, `Ctrl+O`, `Enter`, `Ctrl+X`, y `pm2 restart ns-network --update-env`; **4** comprobar en networkspain.com: «Mi Agente» en el menú, la frase «Este trimestre quiero clientes industriales grandes. Nada por debajo de 30.000 €» → propuesta → Confirmar → Encargo visible y ADN v2; como Inés, Antesala → Interruptores.
 - Para la **demo a varios Timoneles** quedan tres cosas antes de la sesión: la clave del modelo (Parte 3), decidir si el Latido va apagado durante la sesión (recomendado: `NS_LATIDO=off` y «Latir ahora» a mano) y mirar la Balanza por si las empresas ficticias no protegidas por D-071 acumulan Mérito negativo; si está feo, construir una limpieza de los datos de la Sala de demostración para el servidor (hoy no existe).
 
+- **Guía del Timonel para la demo** (`docs/exports/NS_Guia_del_Timonel_demo_2026-10-06.pdf`, 8 páginas con capturas reales de la Sala sembrada; fuente HTML y capturas en `docs/exports/guia-timonel/`, se regenera con Chromium). Pensada para entregar a los asistentes antes o durante la sesión.
+
 **Siguiente paso acordado (por este orden).**
 
 1. Parte 3 y Parte 4 de la guía (clave del modelo, Latido, comprobación en el navegador).
