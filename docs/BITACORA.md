@@ -2,6 +2,22 @@
 
 Punto de parada y siguiente paso. Se actualiza al cerrar cada sesión de trabajo.
 
+## 6 de octubre de 2026 (noche) · PR #25 fusionada; el servidor, en proceso de actualización
+
+**Punto de parada.** El fundador pausa la sesión a mitad de la guía para subir al servidor lo de hoy. Al retomar, empezar **exactamente en la "Parte 3 · La clave del modelo"** de la guía paso a paso (más abajo). Las Partes 1 y 2 se dan por hechas; lo primero al retomar es confirmarlo con una pregunta: ¿la última línea de `actualizar.sh` dijo `Actualizado a … Merge pull request #25`?
+
+**Dónde estamos.**
+
+- **PR #25 fusionada en `main`** (`4090e76`) por el fundador a las 18:01 UTC: Mi Agente y «Dile a tu Agente» (D-075) e Interruptores e historial del ADN (D-076). La rama `claude/practical-heisenberg-kequa2` se ha reiniciado desde `main` para el trabajo siguiente.
+- Guía que se estaba siguiendo, en cuatro partes: **1** fusionar la PR en GitHub (hecho); **2** en PowerShell, `ssh root@200.234.236.135` y `bash /opt/ns-network/deploy/actualizar.sh`, comprobar `Actualizado a … #25` y `pm2 status` en `online` (pendiente de confirmar); **3** clave del modelo: `nano /opt/ns-network/apps/web/.env.production`, quitar la almohadilla a `ANTHROPIC_API_KEY=` y pegar la clave `sk-ant-…`, opcionalmente añadir `NS_LATIDO=off` para la sesión en grupo, `Ctrl+O`, `Enter`, `Ctrl+X`, y `pm2 restart ns-network --update-env`; **4** comprobar en networkspain.com: «Mi Agente» en el menú, la frase «Este trimestre quiero clientes industriales grandes. Nada por debajo de 30.000 €» → propuesta → Confirmar → Encargo visible y ADN v2; como Inés, Antesala → Interruptores.
+- Para la **demo a varios Timoneles** quedan tres cosas antes de la sesión: la clave del modelo (Parte 3), decidir si el Latido va apagado durante la sesión (recomendado: `NS_LATIDO=off` y «Latir ahora» a mano) y mirar la Balanza por si las empresas ficticias no protegidas por D-071 acumulan Mérito negativo; si está feo, construir una limpieza de los datos de la Sala de demostración para el servidor (hoy no existe).
+
+**Siguiente paso acordado (por este orden).**
+
+1. Parte 3 y Parte 4 de la guía (clave del modelo, Latido, comprobación en el navegador).
+2. Si el fundador da la fecha de la sesión en grupo: guion de la demo (qué persona toma cada uno, qué Apunte escribe, en qué orden, qué debe verse en cada pantalla) y, si hace falta, la limpieza de la Sala de demostración.
+3. Después: decidir la navegación primaria/secundaria tras dos semanas de uso de Mi Agente; `TRIGGER_LABEL` único (cosmético); lo de siempre (aviso del domingo por correo, Manantial y forma jurídica en el alta, push, `docs/08` con el abogado).
+
 ## 6 de octubre de 2026 · auditoría del panel del Timonel y «Mi Agente» construido (D-075)
 
 **Dónde estamos.**
