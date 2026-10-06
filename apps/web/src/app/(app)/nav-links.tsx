@@ -8,6 +8,7 @@ const LINKS = [
   { href: "/cesiones", label: "Cesiones" },
   { href: "/indicio/nuevo", label: "Ceder un Indicio" },
   { href: "/sala", label: "Mi Sala" },
+  { href: "/agente", label: "Mi Agente" },
   { href: "/gaceta", label: "Gaceta" },
   { href: "/brujula", label: "Brújula" },
 ];

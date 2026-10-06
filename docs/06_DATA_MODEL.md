@@ -24,6 +24,7 @@ PUENTE Y CIERRE       introductions · verdicts · recognitions · trust_events
 AUDITORÍA             audit_events · agent_interactions
 RASTREO Y ENCARGOS    public_records (D-031) · demands (D-032)
 PROTOCOLO II          communiques (Comunicado semanal) · gazettes (Gaceta de la Sala)
+MI AGENTE             agent_intents («Dile a tu Agente», D-075)
 ```
 
 | Léxico NS | Tabla | Notas |
@@ -57,6 +58,7 @@ PROTOCOLO II          communiques (Comunicado semanal) · gazettes (Gaceta de la
 | Encargo | `demands` | Lo que busca un titular ahora: texto, señal, industria, vigencia, estado. |
 | Comunicado | `communiques` | Una fila por titular y semana (D-069): `stable` (del ADN, capas PUBLIC y CHAPTER), `delta` (inferido y verificado, recalculado por el Agente mientras es borrador), `declared` (líneas del Timonel), `encargos`, `asks`, `status` DRAFT/APPROVED/CONTINUITY, `continuity_streak`, `dna_version`, `approved_by_member_id/at`, `closed_at`. Única por (empresa, semana). |
 | Gaceta | `gazettes` | Una por Sala y semana: JSON `ChapterGazette` (Comunicados, servicios nuevos, cierres contrastados, Encargos, necesidades sin titular, conocimiento mutuo, novedades). |
+| Dile a tu Agente | `agent_intents` | Lo que el Timonel dijo (`text`), la propuesta tipada de su Agente (`proposal`: Encargo, parche del ADN o Apunte, o INSUFICIENTE con pregunta), `provider`, `status` PROPOSED/CONFIRMED/DISMISSED y `result` (Encargo, versión del ADN o Indicio creados). Privado de la empresa; nada cambia hasta CONFIRMED (D-075). |
 | Reloj de la Sala | columnas en `referrals` | `reminder_sent_at`, `late_flagged_at`, `last_nudge_at` garantizan idempotencia (D-030). `contacted_at` y `contact_reminder_sent_at` (D-073): primer contacto con el Interesado y su recordatorio a las 24 h. |
 
 ## 2. Ciclos de vida

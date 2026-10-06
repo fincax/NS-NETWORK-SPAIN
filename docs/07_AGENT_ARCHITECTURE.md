@@ -26,6 +26,7 @@ Un agente NS no es un chat. Es un módulo con **entradas tipadas, salidas valida
 | **Matchmaker Agent** (uno por Sala) | S4 discovery sobre el índice estructurado de capabilities (≤ 8 por necesidad, titulares antes que secundarias); S5 puertas duras; S7 Match Score y Explanation; S9 solicitud de revisión. | `MatchCandidate`, `Explanation` | `agents/mesa.ts`, `core/scoring.ts` |
 | **Trust & Compliance Agent** (uno por Sala) | S2 redacción de datos personales en capas 0–1; S8 Salvoconducto con diez comprobaciones, excepciones y campos bloqueados; vigilancia de retribución (D-010) en cualquier texto libre. | `ComplianceVerdict`, `TrustEvent` | `core/compliance.ts`, `services/referrals.ts` |
 | **Chapter Intelligence Agent** | Registra necesidades sin titular (`NEED_UNCOVERED`, candidatas a Embajada). Compila la **Gaceta** semanal al cierre del domingo y calcula el conocimiento mutuo (D-069). Balanza de Sala: pendiente. | `ChapterInsight` (como AuditEvent), `ChapterGazette` | `agents/mesa.ts`, `services/comunicado.ts` |
+| **Intención** (parte del Company Agent) | «Dile a tu Agente» (D-075): traduce lo que el Timonel escribe o dicta a una propuesta tipada (Encargo, parche del ADN, Apunte o INSUFICIENTE con pregunta). Nunca cambia estado: la propuesta se persiste y el Timonel confirma con un toque; al confirmar, cada parte pasa por `createDemand`, `updateDna` (versión nueva validada) o `createApunte`. | `AgentIntent`, `IntentProposal` | `agents/intencion.ts`, `services/agente.ts` |
 | **Comunicado** (parte del Company Agent, sin modelo) | Compone cada semana el Comunicado de su empresa: lo estable desde el ADN (capas PUBLIC y CHAPTER) y el delta con origen (inferido del ADN, verificado, declarado). El Timonel lo aprueba con un toque; sin toque, continuidad al cierre. Acusa recibo de los Comunicados de los demás (`COMMUNIQUE_ACK`). | `Communique`, `AgentInteraction{COMMUNIQUE, COMMUNIQUE_ACK}` | `core/comunicado.ts`, `services/comunicado.ts` |
 | **Rastreo** (parte del Company Agent) | Revisa fuentes públicas y deja Indicios en borrador para otros titulares; el Timonel decide (D-031). | `OpportunitySignal{DRAFT, source: PUBLIC_RECORD}` | `agents/rastreo.ts` |
 | **Reloj de la Sala** (sistema, sin modelo) | Ejecuta plazos y empujones de seguimiento (D-030). | `AuditEvent`, `TrustEvent`, transición `EXPIRED` | `services/clock.ts` |
@@ -41,6 +42,8 @@ interface LLMProvider {
   extractSignal(input): Promise<ExtractionOutput>;      // capas 0/1/2 + needs[] + triggers[]  (zod)
   answerQualification(input): Promise<QualificationAnswer>; // { answer, confidence, insufficient }
   draftIntro(input): Promise<IntroPackage>;             // asunto, mensaje, contexto, siguiente paso
+  interview(input): Promise<InterviewStep>;             // entrevista del ADN (D-040)
+  interpretIntent(input): Promise<IntentProposal>;      // «Dile a tu Agente» (D-075): intención → propuesta tipada
 }
 ```
 

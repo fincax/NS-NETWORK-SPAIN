@@ -1793,3 +1793,30 @@ Servicio a la red        10 %   solo suma: acciones de dirección del mes (3 = 1
 **Consequences.** `agents/mesa.ts` (S9), `services/referrals.ts` (`canSendIntroFromNS`, `sendIntroFromNS`, `provisionalVerdict`, `confirmValueBySilence`, `dropProvisionalVerdict`), `services/clock.ts` (paso 4b), `core/types.ts` (`provisional`), `core/state-machine.ts` (`SYSTEM` en `WON → VALUE_CONFIRMED`, `verdictDays`, `contrastDays`), `lib/mail.ts` (`cc`, `replyTo`, `mailMemory`), `services/signals.ts` y `services/apunte.ts` (`contactEmail`), formularios, tarjeta. Pruebas en `dinamismo.test.ts` (4 nuevas). `docs/11` §F: las diez propuestas de D-066 están hechas.
 
 **Revisit when.** Con 50 Cesiones reales: cuántas nacen directas desde el Apunte y cuántas se retiran; cuántos Puentes salen desde NS; cuántos Veredictos quedan provisionales sin matizar (si son muchos, el problema es el formulario del Veredicto, no el plazo).
+
+## D-075 · Mi Agente y «Dile a tu Agente»: una página para entender al Agente y una caja, no un chat, para hablarle
+
+**Status:** CONFIRMED (el fundador, tras la auditoría del panel del Timonel: "Hazlo y solo eso, si suma")
+**Date:** 2026-10-06
+
+**Context.** La auditoría de las treinta propuestas de evolución del panel del Timonel y de NS Agentic OS contra la demo real concluyó que la cadena Apunte → Indicio → Pista → Salvoconducto → Cesión → Promesa → Puente → Veredicto está completa, que Hoy ya es decision-first (D-070) y que ninguna propuesta exige cambiar estados ni puertas de NS-ARP. Lo que faltaba al Timonel no era más pantalla, sino dos cosas: un sitio donde entender a su Agente sin leer la Mesa, y una forma de decirle lo que quiere sin rellenar formularios ni conversar.
+
+**Options.**
+
+1. Un chat global permanente con el Agente ("Pregúntale a tu Agente…").
+2. Formularios: Encargo por un lado, edición del ADN por otro, Apunte por otro (lo que ya hay).
+3. Una página **Mi Agente** que compone lo existente, con una sola caja, **«Dile a tu Agente»**, que traduce lo dicho a una propuesta tipada y la aplica solo tras un toque de confirmación.
+
+**Choice.** Opción 3.
+
+- **Mi Agente** (`/agente`, "Mi Agente" en el menú, sin quitar ninguna ruta) responde cinco preguntas con servicios que ya existían: qué sabe de ti (ADN, huecos, entrevista), qué buscan para ti (Encargos propios, D-032), qué está haciendo ahora (carga de la Mesa, borradores, última Ronda, fuentes propias), qué puede y qué no (`permissions` y `never_share` del ADN) y qué te propone (Movimientos de la Brújula, D-072). Nada se calcula nuevo; solo se reúne.
+- **«Dile a tu Agente»** es una caja de texto o voz (dictado de D-052). El Agente devuelve **una propuesta tipada** (`IntentProposal`) con exactamente tres destinos posibles, porque son los tres objetos que ya existen: **Encargo** (lo coyuntural: "este trimestre quiero…", "busca empresas que…"), **cambio de ADN** (lo estructural: ticket mínimo o máximo, sectores que añade o quita, lo que no quiere recibir, zonas, tamaño, capacidad, objetivo) o **Apunte** (si habla de un tercero con una necesidad). Un texto puede ser Encargo y cambio de ADN a la vez. Si el Agente no está seguro, devuelve **INSUFICIENTE** con una pregunta, nunca inventa (NS-ARP §12).
+- La propuesta se persiste como `agent_intents` en estado `PROPOSED` y **nada cambia hasta que el Timonel pulsa Confirmar**. Al confirmar, cada parte pasa por el servicio que ya usa la interfaz: `createDemand`, `updateDna` (versión nueva del ADN validada por el Timonel) y `createApunte` (borrador, que sigue el camino normal de publicación). Descartar cierra la propuesta y devuelve el texto a la caja para reformularlo. Una contraprestación en el texto se rechaza antes de interpretar (D-010).
+- El contrato del proveedor gana un método **aditivo**, `interpretIntent`, implementado por reglas en el determinista (reglas sobre el texto: tercero → Apunte; "nada por debajo de X €" → ticket mínimo; sector negado → exclusión; plural normalizado antes de las reglas de señales) y con salida estructurada en Anthropic. Nada de lo existente cambia.
+
+**Why.** Un chat compite con Hoy, invita a conversar en vez de decidir y las decisiones se pierden en el hilo; una caja que devuelve una propuesta con un botón convierte la intención en estado estructurado, que es lo que la Mesa consume, y mantiene la regla crítica: ningún parámetro estructural (ticket, sectores, zonas, permisos) cambia en silencio. Los permisos del Agente no se tocan desde la caja: siguen en la entrevista.
+
+**Consequences.** `core/intencion.ts` (esquema, `applyDnaPatch`, `describePatch`), `agents/intencion.ts` (intérprete determinista), `agents/provider.ts` (`IntentInput`, `interpretIntent`), `agents/deterministic.ts` y `agents/anthropic.ts`, `db/schema.ts` y migración `0019_intencion` (`agent_intents`), `services/agente.ts` (`agenteView`, `proposeIntent`, `confirmIntent`, `dismissIntent`), `app/(app)/agente/`, `nav-links.tsx`. Eventos de auditoría privados `INTENT_PROPOSED`, `INTENT_CONFIRMED`, `INTENT_DISMISSED`. 14 pruebas en `tests/agente.test.ts`. La navegación conserva todas las rutas; reorganizarla en primaria y secundaria queda para una decisión aparte del fundador.
+
+**Revisit when.** Con las primeras empresas reales: qué proporción de propuestas se confirma, se reformula o se descarta, y cuántas acaban en INSUFICIENTE (si son muchas con el determinista, activar la clave del modelo; si lo son con el modelo, el problema es la caja, no el intérprete).
+

@@ -57,6 +57,12 @@ function clauses(text: string): string[] {
     .filter((c) => c.length > 2);
 }
 
+/** Las reglas de señales del Indicio están escritas en singular ("abre una nueva sede"); la intención suele venir en plural. */
+function singular(fragment: string): string {
+  const map: Record<string, string> = { sedes: "sede", plantas: "planta", naves: "nave", oficinas: "oficina", delegaciones: "delegación", fábricas: "fábrica", fabricas: "fabrica" };
+  return fragment.replace(/\b(nuevas|nuevos)\b/gi, "nueva").replace(/\b(sedes|plantas|naves|oficinas|delegaciones|f[aá]bricas)\b/gi, (w) => map[w.toLowerCase()] ?? w);
+}
+
 function industriesIn(fragment: string): string[] {
   return [...new Set(INDUSTRY_RULES.filter((r) => r.re.test(fragment)).map((r) => r.industry))];
 }
@@ -125,7 +131,7 @@ export function interpretIntentRules(input: IntentInput): IntentProposal {
       if (ABOVE.test(clause) && neg) { patch.ticket_min = euros; understood.push(`Solo proyectos de ${euros.toLocaleString("es-ES")} € o más.`); continue; }
     }
     const industries = industriesIn(clause);
-    const triggers = TRIGGER_RULES.filter((r) => r.re.test(clause)).map((r) => r.trigger);
+    const triggers = TRIGGER_RULES.filter((r) => r.re.test(clause) || r.re.test(singular(clause))).map((r) => r.trigger);
     const sizes = sizesIn(clause);
     const cities = citiesIn(clause);
     if (neg && industries.length) { patch.exclusions_add.push(...industries); patch.industries_remove.push(...industries); understood.push(`No quieres recibir ${industries.join(", ").toLowerCase()}.`); continue; }
