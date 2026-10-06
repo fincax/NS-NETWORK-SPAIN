@@ -1793,3 +1793,50 @@ Servicio a la red        10 %   solo suma: acciones de dirección del mes (3 = 1
 **Consequences.** `agents/mesa.ts` (S9), `services/referrals.ts` (`canSendIntroFromNS`, `sendIntroFromNS`, `provisionalVerdict`, `confirmValueBySilence`, `dropProvisionalVerdict`), `services/clock.ts` (paso 4b), `core/types.ts` (`provisional`), `core/state-machine.ts` (`SYSTEM` en `WON → VALUE_CONFIRMED`, `verdictDays`, `contrastDays`), `lib/mail.ts` (`cc`, `replyTo`, `mailMemory`), `services/signals.ts` y `services/apunte.ts` (`contactEmail`), formularios, tarjeta. Pruebas en `dinamismo.test.ts` (4 nuevas). `docs/11` §F: las diez propuestas de D-066 están hechas.
 
 **Revisit when.** Con 50 Cesiones reales: cuántas nacen directas desde el Apunte y cuántas se retiran; cuántos Puentes salen desde NS; cuántos Veredictos quedan provisionales sin matizar (si son muchos, el problema es el formulario del Veredicto, no el plazo).
+
+## D-075 · Mi Agente y «Dile a tu Agente»: una página para entender al Agente y una caja, no un chat, para hablarle
+
+**Status:** CONFIRMED (el fundador, tras la auditoría del panel del Timonel: "Hazlo y solo eso, si suma")
+**Date:** 2026-10-06
+
+**Context.** La auditoría de las treinta propuestas de evolución del panel del Timonel y de NS Agentic OS contra la demo real concluyó que la cadena Apunte → Indicio → Pista → Salvoconducto → Cesión → Promesa → Puente → Veredicto está completa, que Hoy ya es decision-first (D-070) y que ninguna propuesta exige cambiar estados ni puertas de NS-ARP. Lo que faltaba al Timonel no era más pantalla, sino dos cosas: un sitio donde entender a su Agente sin leer la Mesa, y una forma de decirle lo que quiere sin rellenar formularios ni conversar.
+
+**Options.**
+
+1. Un chat global permanente con el Agente ("Pregúntale a tu Agente…").
+2. Formularios: Encargo por un lado, edición del ADN por otro, Apunte por otro (lo que ya hay).
+3. Una página **Mi Agente** que compone lo existente, con una sola caja, **«Dile a tu Agente»**, que traduce lo dicho a una propuesta tipada y la aplica solo tras un toque de confirmación.
+
+**Choice.** Opción 3.
+
+- **Mi Agente** (`/agente`, "Mi Agente" en el menú, sin quitar ninguna ruta) responde cinco preguntas con servicios que ya existían: qué sabe de ti (ADN, huecos, entrevista), qué buscan para ti (Encargos propios, D-032), qué está haciendo ahora (carga de la Mesa, borradores, última Ronda, fuentes propias), qué puede y qué no (`permissions` y `never_share` del ADN) y qué te propone (Movimientos de la Brújula, D-072). Nada se calcula nuevo; solo se reúne.
+- **«Dile a tu Agente»** es una caja de texto o voz (dictado de D-052). El Agente devuelve **una propuesta tipada** (`IntentProposal`) con exactamente tres destinos posibles, porque son los tres objetos que ya existen: **Encargo** (lo coyuntural: "este trimestre quiero…", "busca empresas que…"), **cambio de ADN** (lo estructural: ticket mínimo o máximo, sectores que añade o quita, lo que no quiere recibir, zonas, tamaño, capacidad, objetivo) o **Apunte** (si habla de un tercero con una necesidad). Un texto puede ser Encargo y cambio de ADN a la vez. Si el Agente no está seguro, devuelve **INSUFICIENTE** con una pregunta, nunca inventa (NS-ARP §12).
+- La propuesta se persiste como `agent_intents` en estado `PROPOSED` y **nada cambia hasta que el Timonel pulsa Confirmar**. Al confirmar, cada parte pasa por el servicio que ya usa la interfaz: `createDemand`, `updateDna` (versión nueva del ADN validada por el Timonel) y `createApunte` (borrador, que sigue el camino normal de publicación). Descartar cierra la propuesta y devuelve el texto a la caja para reformularlo. Una contraprestación en el texto se rechaza antes de interpretar (D-010).
+- El contrato del proveedor gana un método **aditivo**, `interpretIntent`, implementado por reglas en el determinista (reglas sobre el texto: tercero → Apunte; "nada por debajo de X €" → ticket mínimo; sector negado → exclusión; plural normalizado antes de las reglas de señales) y con salida estructurada en Anthropic. Nada de lo existente cambia.
+
+**Why.** Un chat compite con Hoy, invita a conversar en vez de decidir y las decisiones se pierden en el hilo; una caja que devuelve una propuesta con un botón convierte la intención en estado estructurado, que es lo que la Mesa consume, y mantiene la regla crítica: ningún parámetro estructural (ticket, sectores, zonas, permisos) cambia en silencio. Los permisos del Agente no se tocan desde la caja: siguen en la entrevista.
+
+**Consequences.** `core/intencion.ts` (esquema, `applyDnaPatch`, `describePatch`), `agents/intencion.ts` (intérprete determinista), `agents/provider.ts` (`IntentInput`, `interpretIntent`), `agents/deterministic.ts` y `agents/anthropic.ts`, `db/schema.ts` y migración `0019_intencion` (`agent_intents`), `services/agente.ts` (`agenteView`, `proposeIntent`, `confirmIntent`, `dismissIntent`), `app/(app)/agente/`, `nav-links.tsx`. Eventos de auditoría privados `INTENT_PROPOSED`, `INTENT_CONFIRMED`, `INTENT_DISMISSED`. 14 pruebas en `tests/agente.test.ts`. La navegación conserva todas las rutas; reorganizarla en primaria y secundaria queda para una decisión aparte del fundador.
+
+**Revisit when.** Con las primeras empresas reales: qué proporción de propuestas se confirma, se reformula o se descarta, y cuántas acaban en INSUFICIENTE (si son muchas con el determinista, activar la clave del modelo; si lo son con el modelo, el problema es la caja, no el intérprete).
+
+## D-076 · Interruptores que funcionan y historial del ADN: los dos hallazgos de la auditoría que eran deuda real
+
+**Status:** CONFIRMED (el fundador: "adelante", tras la propuesta de cerrar primero la deuda barata antes de nada nuevo)
+**Date:** 2026-10-06
+
+**Context.** La auditoría del 6 de octubre encontró que `agents.status` y `chapters.status` existían desde la primera migración pero ningún servicio las leía: un Agente o una Sala "desactivados" en base de datos seguían cualificando, rastreando y corriendo plazos. Y que `updateDna` sobrescribía el documento del ADN subiendo solo el número de versión: el contenido anterior se perdía. Con «Dile a tu Agente» (D-075) el Timonel puede cambiar su ADN desde una frase, así que la capacidad de deshacer tenía que existir antes de las primeras empresas reales.
+
+**Choice.**
+
+- **Agente en pausa** (`agents.status = PAUSED`). La Mesa no lo consulta como candidato (su empresa no recibe Pistas nuevas; evento privado `AGENT_PAUSED_SKIPPED`), la Ronda no rastrea con él (fuentes públicas ni propias) y el Latido no publica en su nombre. Lo que su empresa tiene en curso sigue: Cesiones, plazos y Comunicado son obligaciones de la empresa, no del Agente. Lo pausa y lo reanuda la Directiva de su Sala o NS, siempre con motivo; el cambio es un evento significativo de la Mesa Permanente (`AGENT_PAUSED` / `AGENT_RESUMED`): una pausa no es un secreto para la Sala.
+- **Sala en pausa** (`chapters.status = PAUSED`). Nada agentic ocurre: la Mesa no cualifica (`MesaPausedError`), lo que se publica queda `PUBLISHED` y espera en la cola sin consumir intentos, la cola no reclama trabajos de Salas que no operan, el Reloj no corre (ningún plazo cuenta durante una pausa: nadie es penalizado por ella), la Ronda y el Latido la saltan. Solo NS pausa y reanuda una Sala (`CHAPTER_PAUSED` / `CHAPTER_RESUMED`). Una Sala en fundación (`FORMING`) no se pausa porque aún no opera. Al reanudar, la cola cualifica lo que esperaba.
+- **Dónde se ve.** Hoy y Mi Agente avisan al Timonel si su Agente o su Sala están en pausa. La Antesala tiene una sección "Interruptores": estado de la Sala y de cada Agente, con el botón y el motivo; pausar la Sala solo aparece a NS.
+- **Historial del ADN** (`business_dna_versions`, migración `0020_adn_versiones`). Antes de sustituir el ADN, la versión vigente se guarda tal cual, con quién la validó, quién provocó el cambio y el motivo (`entrevista`, `comunicado.capacidad`, `intencion`, `actualizacion`). Las tres escrituras del ADN pasan por `snapshotDna`. Mi Agente muestra cuántas versiones anteriores se conservan. Restaurar una versión queda para cuando haga falta: el dato ya no se pierde.
+
+**Why.** Son los primeros controles operativos de NS sin desplegar, y el Timonel merece poder deshacer lo que le dice a su Agente. Las dos cosas eran baratas hoy y caras con empresas reales.
+
+**Consequences.** `services/interruptores.ts`, `agents/mesa.ts`, `services/jobs.ts` (`claim`), `services/signals.ts` (`publishSignal` en pausa devuelve `MesaResult` vacío con `paused`), `services/ronda.ts`, `services/clock.ts`, `agents/latido.ts`, `services/onboarding.ts` (`snapshotDna`, `dnaHistory`, `updateDna` con motivo), `services/comunicado.ts`, `services/agente.ts`, Hoy, Mi Agente, Antesala. 7 pruebas en `tests/interruptores.test.ts`. Ningún estado ni puerta de NS-ARP cambia.
+
+**Revisit when.** Haya que restaurar una versión del ADN (añadir el botón entonces, no antes) o la Directiva pida pausar algo más fino que un Agente (una fuente, una acción): hoy el interruptor por fuente es `agent_sources.active`.
+

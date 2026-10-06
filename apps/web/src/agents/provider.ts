@@ -4,6 +4,7 @@
  */
 import { z } from "zod";
 import { BusinessDNA, BusinessTrigger, ChapterLayer, IdentityLayer, IntroPackage, NeedDraft, QualificationLayer, type QualificationQuestionKind } from "@/core/types";
+import type { IntentProposal } from "@/core/intencion";
 
 export const ExtractionOutput = z.object({
   chapter_layer: ChapterLayer,
@@ -81,12 +82,22 @@ export interface InterviewInput {
   availableTriggers: { code: string; label: string }[];
 }
 
+// ───────────── "Dile a tu Agente" (D-075): intención del Timonel → propuesta tipada, confirmada con un toque ─────────────
+export interface IntentInput {
+  text: string; // lo que el Timonel ha escrito o dictado, tal cual
+  companyName: string;
+  dna: BusinessDNA; // para no proponer lo que ya consta y para entender "mi sector"
+  triggerLabels: Record<string, string>; // código → etiqueta en castellano
+}
+
 export interface LLMProvider {
   readonly name: string;
   extractSignal(input: ExtractionInput): Promise<ExtractionOutput>;
   answerQualification(input: QualificationInput): Promise<QualificationAnswer>;
   draftIntro(input: IntroInput): Promise<IntroPackage>;
   interview(input: InterviewInput): Promise<InterviewStep>;
+  /** Traduce la intención a Encargo, parche del ADN o Apunte. Nunca cambia estado: el servicio lo persiste como propuesta y el Timonel confirma. */
+  interpretIntent(input: IntentInput): Promise<IntentProposal>;
 }
 
 let cached: LLMProvider | undefined;

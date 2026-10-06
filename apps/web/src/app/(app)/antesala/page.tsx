@@ -4,7 +4,8 @@ import { requireDirector } from "@/lib/session";
 import { NSCAT, SPECIALTY_NAME } from "@/db/nscat";
 import { dateTime } from "@/lib/format";
 import { Empty } from "@/components/ui";
-import { candidacyAction, foundingAction, releaseAction, directorActionAction, trialAction } from "./actions";
+import { candidacyAction, foundingAction, releaseAction, directorActionAction, trialAction, switchAction } from "./actions";
+import { listAgentSwitches } from "@/services/interruptores";
 import { listTrials } from "@/services/prueba";
 import { VALUE_TRIAL_DAYS } from "@/core/prueba";
 import { listDirectorActions } from "@/services/direccion";
@@ -143,6 +144,8 @@ export default async function AntesalaPage({ searchParams }: { searchParams: Pro
   const db = await getDb();
   const [counts, rows, foundings, releases, directorActions, trials] = await Promise.all([candidacyCounts(db), listCandidacies(db, view), listFoundings(db, ctx.chapter.zoneId), pendingReleases(db, ctx.chapter.id), listDirectorActions(db, ctx.chapter.id), listTrials(db, ctx.chapter.id)]);
   const triaged = await Promise.all(rows.map(async (c) => ({ c, t: await triageCandidacy(db, ctx.chapter.id, c) })));
+  const switches = await listAgentSwitches(db, ctx.chapter.id);
+  const pausedAgents = switches.filter((s) => s.status === "PAUSED");
   const countFor: Record<CandidacyView, number> = { pendientes: counts.pendientes, espera: counts.espera, aprobadas: counts.aprobadas, declinadas: counts.declinadas, todas: counts.todas };
 
   return (
@@ -169,6 +172,39 @@ export default async function AntesalaPage({ searchParams }: { searchParams: Pro
           <button type="submit" className="btn small">Registrar</button>
         </form>
         {directorActions.length ? <ul className="plain">{directorActions.map((a) => <li key={a.id} className="row"><span className="mono">{when(a.occurredAt)}</span><span>{a.result}</span></li>)}</ul> : <p className="mono">Ninguna acción registrada todavía.</p>}
+      </section>
+
+      <section id="interruptores" className="card" style={{ display: "grid", gap: 10 }}>
+        <div><p className="eyebrow">Interruptores</p><strong>Pausar un Agente o la Sala, con motivo, sin desplegar nada (D-076).</strong><p className="lead" style={{ fontSize: 14, marginTop: 4 }}>Un Agente en pausa no recibe Pistas nuevas ni rastrea; lo que su empresa tiene en curso sigue. Una Sala en pausa detiene la Mesa y el Reloj: ningún plazo cuenta. Cada cambio queda en la Mesa Permanente con su motivo.</p></div>
+        <div className="row" style={{ gap: 8 }}>
+          <span className={`badge ${ctx.chapter.status === "ACTIVE" ? "green" : "red"}`}>{ctx.chapter.name} · {ctx.chapter.status === "ACTIVE" ? "operativa" : ctx.chapter.status === "PAUSED" ? "en pausa" : "en fundación"}</span>
+          <span className="mono">{pausedAgents.length ? `${pausedAgents.length} Agente(s) en pausa: ${pausedAgents.map((s) => s.company!.name).join(", ")}` : "Todos los Agentes activos"}</span>
+        </div>
+        {ctx.member.isNetwork && ctx.chapter.status !== "FORMING" ? (
+          <form action={switchAction} className="row" style={{ alignItems: "end" }}>
+            <input type="hidden" name="view" value={view} />
+            <input type="hidden" name="status" value={ctx.chapter.status === "ACTIVE" ? "PAUSED" : "ACTIVE"} />
+            <div className="field" style={{ flex: 1, minWidth: 260 }}><label htmlFor="sw-chapter">Motivo (la Sala lo verá)</label><input id="sw-chapter" name="reason" required minLength={6} placeholder={ctx.chapter.status === "ACTIVE" ? "Incidencia en el proveedor del modelo; revisamos las Pistas de hoy" : "Incidencia resuelta"} /></div>
+            <button type="submit" className={`btn small ${ctx.chapter.status === "ACTIVE" ? "danger ghost" : "primary"}`}>{ctx.chapter.status === "ACTIVE" ? "Pausar la Sala" : "Reanudar la Sala"}</button>
+          </form>
+        ) : <p className="mono">Solo NS pausa o reanuda la Sala entera.</p>}
+        <details className="plegable">
+          <summary>Agentes de la Sala · {switches.length}</summary>
+          <ul className="plain" style={{ marginTop: 10 }}>
+            {switches.map((s) => (
+              <li key={s.agentId}>
+                <form action={switchAction} className="row" style={{ alignItems: "end", gap: 8 }}>
+                  <input type="hidden" name="view" value={view} />
+                  <input type="hidden" name="companyId" value={s.companyId} />
+                  <input type="hidden" name="status" value={s.status === "ACTIVE" ? "PAUSED" : "ACTIVE"} />
+                  <span style={{ minWidth: 220 }}><Link href={`/empresa/${s.company!.slug}`}>{s.company!.name}</Link> <span className={`badge ${s.status === "ACTIVE" ? "green" : "red"}`}>{s.status === "ACTIVE" ? "activo" : "en pausa"}</span></span>
+                  <div className="field" style={{ flex: 1, minWidth: 200 }}><label htmlFor={`sw-${s.agentId}`} className="mono">Motivo</label><input id={`sw-${s.agentId}`} name="reason" required minLength={6} placeholder={s.status === "ACTIVE" ? "Pistas repetidas fuera de su especialidad; lo revisamos con el Timonel" : "Revisado con el Timonel"} /></div>
+                  <button type="submit" className={`btn small ${s.status === "ACTIVE" ? "ghost" : "primary"}`}>{s.status === "ACTIVE" ? "Pausar" : "Reanudar"}</button>
+                </form>
+              </li>
+            ))}
+          </ul>
+        </details>
       </section>
 
       {releases.length ? (

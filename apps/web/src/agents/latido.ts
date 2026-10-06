@@ -178,6 +178,9 @@ export async function runLatido(db: Db, opts: { now?: Date; force?: boolean } = 
   const seeded = await db.query.companies.findMany({ where: inArray(schema.companies.slug, seedSlugs) });
   if (seeded.length === 0) return result;
   const chapterId = seeded[0].chapterId;
+  const chapterRow = await db.query.chapters.findFirst({ where: eq(schema.chapters.id, chapterId), columns: { status: true } });
+  if (chapterRow?.status !== "ACTIVE") return result; // Sala en pausa (D-076): la demo tampoco late
+  const pausedAgents = new Set((await db.query.agents.findMany({ where: and(eq(schema.agents.chapterId, chapterId), eq(schema.agents.kind, "COMPANY"), eq(schema.agents.status, "PAUSED")), columns: { companyId: true } })).map((a) => a.companyId));
   const bySlug = new Map(seeded.map((c) => [c.slug, c]));
   const byId = new Map(seeded.map((c) => [c.id, c]));
   const protagonist = protagonistSlug();
@@ -203,7 +206,7 @@ export async function runLatido(db: Db, opts: { now?: Date; force?: boolean } = 
     const done = await db.query.auditEvents.findFirst({ where: and(eq(schema.auditEvents.kind, "LATIDO"), eq(schema.auditEvents.subjectId, slot)) });
     if (!done) {
       const previous = await db.query.auditEvents.findMany({ where: eq(schema.auditEvents.kind, "LATIDO"), columns: { id: true } });
-      const candidates = LATIDO_INDICIOS.filter((i) => i.originator !== protagonist && automatable(bySlug.get(i.originator)?.id ?? ""));
+      const candidates = LATIDO_INDICIOS.filter((i) => i.originator !== protagonist && automatable(bySlug.get(i.originator)?.id ?? "") && !pausedAgents.has(bySlug.get(i.originator)?.id ?? ""));
       if (candidates.length > 0) {
         const indicio = candidates[previous.length % candidates.length];
         const company = bySlug.get(indicio.originator)!;

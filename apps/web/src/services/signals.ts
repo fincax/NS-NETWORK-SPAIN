@@ -4,6 +4,7 @@ import type { Db } from "@/db/client";
 import { schema } from "@/db/client";
 import { audit } from "@/lib/audit";
 import { getProvider } from "@/agents/provider";
+import { isChapterActive } from "@/services/interruptores";
 import { enqueueMesa } from "@/services/jobs";
 import { runMesa, type MesaResult } from "@/agents/mesa";
 import type { PermissionVerb, SignalEnvelope, Visibility } from "@/core/types";
@@ -81,6 +82,14 @@ export async function publishSignal(db: Db, opportunitySignalId: string, memberI
     await audit(db, { chapterId: os.chapterId, kind: "HUMAN_DECISION", actor: { type: "USER", id: memberId ?? "member" }, subject: { type: "OpportunitySignal", id: os.id }, policyApplied: "human_gate.publish", result: "El cedente revisó la capa 0 y publicó el Indicio en la Sala.", significant: false, companyIds: [os.originatorCompanyId] });
   } else {
     await audit(db, { chapterId: os.chapterId, kind: "INTERNAL_SEARCH_AUTHORIZED", actor: { type: "USER", id: memberId ?? "member" }, subject: { type: "OpportunitySignal", id: os.id }, policyApplied: "visibility.company_only", result: "El titular autorizó a su Agente a buscar internamente sin publicar nada.", significant: false, companyIds: [os.originatorCompanyId] });
+  }
+  // Interruptor (D-076): con la Sala en pausa, el Indicio queda publicado y espera en la cola; la Mesa lo cualifica al reanudar.
+  const paused = !(await isChapterActive(db, os.chapterId));
+  if (paused) {
+    const job = await enqueueMesa(db, os.chapterId, os.id);
+    await audit(db, { chapterId: os.chapterId, kind: "MESA_QUEUED", actor: { type: "AGENT", id: "jobs" }, subject: { type: "OpportunitySignal", id: os.id }, policyApplied: "switch.chapter.paused", result: "La Sala está en pausa: tu Indicio queda publicado y la Mesa lo cualificará en cuanto NS la reanude.", significant: true, companyIds: [os.originatorCompanyId] });
+    if ((opts.mode ?? "inline") === "async") return { queued: true, jobId: job.id };
+    return { referralIds: [], discarded: [], belowThreshold: [], uncovered: [], paused: true, jobId: job.id };
   }
   if ((opts.mode ?? "inline") === "async") {
     const job = await enqueueMesa(db, os.chapterId, os.id);

@@ -2,6 +2,23 @@
 
 Punto de parada y siguiente paso. Se actualiza al cerrar cada sesión de trabajo.
 
+## 6 de octubre de 2026 · auditoría del panel del Timonel y «Mi Agente» construido (D-075)
+
+**Dónde estamos.**
+
+- Hecha la **auditoría** de las treinta propuestas de evolución (panel del Timonel y NS Agentic OS) contra la demo real. Conclusión: la cadena Apunte → Indicio → Pista → Salvoconducto → Cesión → Promesa → Puente → Veredicto está completa; Hoy ya es decision-first; ninguna propuesta exige cambiar estados ni puertas de NS-ARP. Hallazgos pendientes de decidir: `agents.status` y `chapters.status` no los lee ningún servicio (un Agente o una Sala "desactivados" en base de datos no se desactivan); `updateDna` sobrescribe sin historial de versiones; `TRIGGER_LABEL` está duplicado en `entrevista.ts` y `brujula.ts`. El informe completo quedó en la conversación de la sesión.
+- **Decisión del fundador:** construir únicamente **Mi Agente** con **«Dile a tu Agente»** dentro, sin quitar ninguna ruta. Registrado como **D-075**.
+- **Construido (D-075), en la rama `claude/practical-heisenberg-kequa2`:** `/agente` ("Mi Agente" en el menú) con cinco secciones compuestas de lo que ya existía (qué sabe de ti, qué buscan para ti, qué está haciendo ahora, qué puede y qué no, qué te propone) y la caja «Dile a tu Agente»: el Timonel escribe o dicta; el Agente devuelve una propuesta tipada (Encargo, cambio de ADN como versión nueva validada, Apunte en borrador, o una pregunta si no entiende); nada cambia hasta Confirmar; Reformular devuelve el texto a la caja. Método aditivo `interpretIntent` en el contrato del proveedor (reglas en el determinista, salida estructurada en Anthropic), tabla `agent_intents`, migración `0019_intencion`, eventos privados `INTENT_*`. 14 pruebas nuevas (201 en total, en verde), tipos y lint limpios, build correcto, recorrido de navegador con las tres frases del fundador, un referido, una frase que no se entiende y móvil. **Pendiente de PR, fusionar y `actualizar.sh`.**
+
+- **PR #25 abierta** con Mi Agente (D-075). **Construido después, en la misma rama y misma PR (D-076):** los dos hallazgos de la auditoría que eran deuda. Interruptores: `agents.status` y `chapters.status` por fin se leen (Agente en pausa: fuera de la Mesa como candidato, sin Rastreo ni Latido; Sala en pausa: Mesa, cola, Reloj, Ronda y Latido detenidos, nadie penalizado), con sección "Interruptores" en la Antesala y avisos en Hoy y Mi Agente. Historial del ADN: `business_dna_versions` (migración `0020_adn_versiones`), toda escritura del ADN pasa por `snapshotDna`. 7 pruebas nuevas (208 en total). El tercer hallazgo (`TRIGGER_LABEL` duplicado) queda pendiente: es cosmético.
+
+**Siguiente paso acordado (por este orden).**
+
+1. Fusionar la **PR #25** y lanzar `bash /opt/ns-network/deploy/actualizar.sh` (aplica las migraciones `0019` y `0020`). Comprobar como Carlos: «Mi Agente» en el menú; escribir «Este trimestre quiero clientes industriales grandes. Nada por debajo de 30.000 €», ver la propuesta y confirmar; el Encargo aparece en «Qué buscan para ti», el ADN pasa a v2 con ticket mínimo 30.000 € y "1 versión anterior conservada". Como Inés (Directiva y NS): en la Antesala, sección Interruptores, pausar y reanudar un Agente y ver el motivo en la Mesa Permanente.
+2. Poner `ANTHROPIC_API_KEY` en `.env.production`: «Dile a tu Agente» con el determinista entiende las frases del documento; con empresarios reales hablando a su manera, la diferencia está en el modelo.
+3. Decidir si la navegación se reorganiza en primaria (Hoy · Cesiones · Mi Sala · Mi Agente) y secundaria, conservando rutas; después de usar Mi Agente dos semanas, no antes.
+4. Lo de siempre: aviso del domingo por correo para el Comunicado (F1); especialidades Manantial y forma jurídica en el alta; notificaciones push (D-039); resto de `docs/08` con el abogado.
+
 ## 1 de octubre de 2026 (noche) · Protocolo II construido (D-069) y Hoy como pila de toques (D-070)
 
 **Dónde estamos.**

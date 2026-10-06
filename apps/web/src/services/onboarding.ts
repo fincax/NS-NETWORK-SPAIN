@@ -1,5 +1,5 @@
 /** Alta de empresa: comprueba la plaza (una empresa por especialidad en la Sala), crea empresa, persona, ADN, capability y Agente. */
-import { and, eq, inArray } from "drizzle-orm";
+import { and, desc, eq, inArray } from "drizzle-orm";
 import type { Db } from "@/db/client";
 import { schema } from "@/db/client";
 import { audit } from "@/lib/audit";
@@ -97,10 +97,20 @@ export async function addSeat(db: Db, input: { chapterId: string; companyId: str
   return { specialty, seats: seats.length };
 }
 
-export async function updateDna(db: Db, companyId: string, dnaInput: unknown, validatedBy?: string) {
+/** Historial (D-076): antes de sustituir el ADN, la versión vigente se guarda tal cual. Nunca se pierde una versión. */
+export async function snapshotDna(db: Db, existing: typeof schema.businessDna.$inferSelect, reason: string, replacedBy?: string) {
+  await db.insert(schema.businessDnaVersions).values({ companyId: existing.companyId, version: existing.version, dna: existing.dna, validatedBy: existing.validatedBy, validatedAt: existing.validatedAt, replacedBy: replacedBy ?? null, reason });
+}
+
+export async function dnaHistory(db: Db, companyId: string) {
+  return db.query.businessDnaVersions.findMany({ where: eq(schema.businessDnaVersions.companyId, companyId), orderBy: [desc(schema.businessDnaVersions.version)] });
+}
+
+export async function updateDna(db: Db, companyId: string, dnaInput: unknown, validatedBy?: string, reason = "actualizacion") {
   const dna = BusinessDNA.parse(dnaInput);
   const existing = await db.query.businessDna.findFirst({ where: eq(schema.businessDna.companyId, companyId) });
   if (!existing) throw new Error("ADN no encontrado");
+  await snapshotDna(db, existing, reason, validatedBy);
   await db.update(schema.businessDna).set({ dna, version: existing.version + 1, validatedBy: validatedBy ?? existing.validatedBy, validatedAt: validatedBy ? new Date() : existing.validatedAt, updatedAt: new Date() }).where(eq(schema.businessDna.id, existing.id));
   const company = await db.query.companies.findFirst({ where: eq(schema.companies.id, companyId) });
   if (company) await audit(db, { chapterId: company.chapterId, kind: "DNA_UPDATED", actor: { type: "USER", id: validatedBy ?? "member" }, subject: { type: "BusinessDNA", id: existing.id }, result: `${company.name} actualizó su ADN de Empresa (v${existing.version + 1}).`, significant: false, companyIds: [companyId] });

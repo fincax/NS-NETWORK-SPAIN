@@ -8,11 +8,12 @@
  *    con aviso al cedente en Hoy. La Mesa es idempotente por Indicio, así que un reintento nunca duplica Cesiones.
  *  - Se drena tras cada publicación (after()), en cada Ronda y en GET /api/jobs.
  */
-import { and, asc, eq, inArray, lte, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, lte, notInArray, sql } from "drizzle-orm";
 import type { Db } from "@/db/client";
 import { schema } from "@/db/client";
 import { audit } from "@/lib/audit";
 import { runMesa } from "@/agents/mesa";
+import { inactiveChapterIds } from "@/services/interruptores";
 
 export const MAX_ATTEMPTS = 3;
 const BACKOFF_MS = [0, 60_000, 5 * 60_000];
@@ -34,8 +35,10 @@ export interface JobsResult {
 
 /** Reclama un trabajo: solo gana quien lo pasa de QUEUED a RUNNING. */
 async function claim(db: Db, now: Date, chapterId?: string) {
+  // Interruptor (D-076): los trabajos de una Sala en pausa esperan en la cola sin consumir intentos.
+  const paused = await inactiveChapterIds(db);
   const candidate = await db.query.agentJobs.findFirst({
-    where: and(eq(schema.agentJobs.status, "QUEUED"), lte(schema.agentJobs.runAfter, now), chapterId ? eq(schema.agentJobs.chapterId, chapterId) : undefined),
+    where: and(eq(schema.agentJobs.status, "QUEUED"), lte(schema.agentJobs.runAfter, now), chapterId ? eq(schema.agentJobs.chapterId, chapterId) : undefined, paused.length ? notInArray(schema.agentJobs.chapterId, paused) : undefined),
     orderBy: [asc(schema.agentJobs.runAfter), asc(schema.agentJobs.createdAt)],
   });
   if (!candidate) return null;

@@ -134,6 +134,20 @@
       "when": 1790891496080,
       "tag": "0018_contacto",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1791307111590,
+      "tag": "0019_intencion",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1791308580733,
+      "tag": "0020_adn_versiones",
+      "breakpoints": true
     }
   ]
 }

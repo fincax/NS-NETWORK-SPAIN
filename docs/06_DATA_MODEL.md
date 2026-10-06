@@ -24,19 +24,20 @@ PUENTE Y CIERRE       introductions · verdicts · recognitions · trust_events
 AUDITORÍA             audit_events · agent_interactions
 RASTREO Y ENCARGOS    public_records (D-031) · demands (D-032)
 PROTOCOLO II          communiques (Comunicado semanal) · gazettes (Gaceta de la Sala)
+MI AGENTE             agent_intents («Dile a tu Agente», D-075) · business_dna_versions (historial del ADN, D-076)
 ```
 
 | Léxico NS | Tabla | Notas |
 | --- | --- | --- |
 | Zona | `zones` | "NS Sevilla". |
-| Sala | `chapters` | Nombre único en la red (D-014). `value_threshold_eur` (umbral de Directiva), `weekly_pace` (Ritmo), `protocol_version`. |
+| Sala | `chapters` | Nombre único en la red (D-014). `value_threshold_eur` (umbral de Directiva), `weekly_pace` (Ritmo), `protocol_version`. `status` ACTIVE/PAUSED/FORMING: solo ACTIVE opera; en PAUSED la Mesa, la cola, el Reloj, la Ronda y el Latido se detienen (D-076). |
 | Especialidad (NS-CAT) | `specialties` | `nscat_code`, `cnae_class`, `status` OFFICIAL/NS_EXTENDED/PROVISIONAL, `regulated`, `overlaps_with[]`. Catálogo inicial en `src/db/nscat.ts`. La marca **Manantial** (D-059) vive hoy solo en el catálogo (`manantial`, `MANANTIALES`); pasará a columna cuando la Antesala la use en consultas. |
 | Plaza | `category_seats` | Única por (Sala, especialidad). `status` ACTIVE/VACANT/WAITLISTED/RELEASED. |
 | Titular | `companies` | `status`, `tier` (Niveles), `fee_tier` (Tramo, D-025). |
 | Timonel | `members` | La persona que decide por la empresa (D-027). `is_primary` marca al Timonel; un segundo registro con `is_primary = false` es el Timonel suplente. `is_director` marca a la Directiva. |
-| ADN de Empresa | `business_dna` | JSONB validado por `BusinessDNA` (zod), versionado, `validated_by/at`. |
+| ADN de Empresa | `business_dna` | JSONB validado por `BusinessDNA` (zod), versionado, `validated_by/at`. Cada versión sustituida se conserva en `business_dna_versions` con quién la validó, quién la cambió y el motivo (D-076). |
 | Capability | `capabilities` | Lo que la empresa cubre; `is_primary_seat` marca la plaza (prioridad D-001). |
-| Agente NS | `agents` | `kind` COMPANY (uno por empresa) o de Sala: MATCHMAKER, COMPLIANCE, CHAPTER_INTELLIGENCE, BRIEFING. |
+| Agente NS | `agents` | `kind` COMPANY (uno por empresa) o de Sala: MATCHMAKER, COMPLIANCE, CHAPTER_INTELLIGENCE, BRIEFING. `status` ACTIVE/PAUSED es un interruptor real (D-076): en pausa, la Mesa no lo consulta y no rastrea. |
 | Indicio (bruto) | `business_signals` | Fuente, contenido, `permissions[]` (verbos NS-ARP §2.1). |
 | Indicio | `opportunity_signals` | `envelope` JSONB con las cuatro capas; `visibility`; `status` DRAFT/PUBLISHED/WITHDRAWN/EXPIRED. |
 | Necesidad | `needs` | `specialty_hints[]`, `plausibility`, `status` ACTIVE/LATENT/UNCOVERED/SELF. |
@@ -57,6 +58,7 @@ PROTOCOLO II          communiques (Comunicado semanal) · gazettes (Gaceta de la
 | Encargo | `demands` | Lo que busca un titular ahora: texto, señal, industria, vigencia, estado. |
 | Comunicado | `communiques` | Una fila por titular y semana (D-069): `stable` (del ADN, capas PUBLIC y CHAPTER), `delta` (inferido y verificado, recalculado por el Agente mientras es borrador), `declared` (líneas del Timonel), `encargos`, `asks`, `status` DRAFT/APPROVED/CONTINUITY, `continuity_streak`, `dna_version`, `approved_by_member_id/at`, `closed_at`. Única por (empresa, semana). |
 | Gaceta | `gazettes` | Una por Sala y semana: JSON `ChapterGazette` (Comunicados, servicios nuevos, cierres contrastados, Encargos, necesidades sin titular, conocimiento mutuo, novedades). |
+| Dile a tu Agente | `agent_intents` | Lo que el Timonel dijo (`text`), la propuesta tipada de su Agente (`proposal`: Encargo, parche del ADN o Apunte, o INSUFICIENTE con pregunta), `provider`, `status` PROPOSED/CONFIRMED/DISMISSED y `result` (Encargo, versión del ADN o Indicio creados). Privado de la empresa; nada cambia hasta CONFIRMED (D-075). |
 | Reloj de la Sala | columnas en `referrals` | `reminder_sent_at`, `late_flagged_at`, `last_nudge_at` garantizan idempotencia (D-030). `contacted_at` y `contact_reminder_sent_at` (D-073): primer contacto con el Interesado y su recordatorio a las 24 h. |
 
 ## 2. Ciclos de vida
