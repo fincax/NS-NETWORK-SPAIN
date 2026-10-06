@@ -16,6 +16,13 @@ import { assertTransition, TIMEOUTS } from "@/core/state-machine";
 import { NeedDraft, VALUE_BAND_RANGE, type QualificationTurn, type SignalEnvelope } from "@/core/types";
 import { matchingDemand, openDemands } from "@/services/demands";
 
+/** La Sala está en pausa (D-076): la Mesa no cualifica. El trabajo espera en la cola; nada se pierde. */
+export class MesaPausedError extends Error {
+  constructor(public chapterName: string) {
+    super(`${chapterName} está en pausa: la Mesa no cualifica hasta que NS la reanude.`);
+  }
+}
+
 const MIN_PLAUSIBILITY = 0.4;
 const MIN_PRELIMINARY_FIT = 0.35;
 const MIN_SCORE = 0.55;
@@ -25,6 +32,9 @@ export interface MesaResult {
   discarded: { company: string; code: string; reason: string }[];
   belowThreshold: { company: string; total: number }[];
   uncovered: string[]; // especialidades sin titular en la Sala
+  /** D-076: la Sala estaba en pausa; nada se cualificó y el Indicio espera en la cola (`jobId`). */
+  paused?: true;
+  jobId?: string;
 }
 
 const QUESTIONS: { kind: QualificationTurn["kind"]; question: string }[] = [
@@ -49,6 +59,7 @@ export async function runMesa(db: Db, opportunitySignalId: string): Promise<Mesa
   if (!bs || !originator || !originatorDna || !originatorAgent || !matchmaker || !compliance) throw new Error("Faltan agentes o datos de la Sala");
   const chapter = await db.query.chapters.findFirst({ where: eq(schema.chapters.id, chapterId) });
   if (!chapter) throw new Error("Sala no encontrada");
+  if (chapter.status !== "ACTIVE") throw new MesaPausedError(chapter.name);
 
   const isInternal = os.visibility === "COMPANY_ONLY";
   const result: MesaResult = { referralIds: [], discarded: [], belowThreshold: [], uncovered: [] };
@@ -106,6 +117,11 @@ export async function runMesa(db: Db, opportunitySignalId: string): Promise<Mesa
       const companyAgent = await db.query.agents.findFirst({ where: and(eq(schema.agents.companyId, cap.companyId), eq(schema.agents.kind, "COMPANY")) });
       const specialty = specialtyById.get(cap.specialtyId);
       if (!company || !dnaRow || !companyAgent || !specialty) continue;
+      // Interruptor (D-076): un Agente en pausa no se consulta. Su empresa no recibe Pistas nuevas hasta que se reanude.
+      if (companyAgent.status === "PAUSED") {
+        await audit(db, { chapterId, kind: "AGENT_PAUSED_SKIPPED", actor: { type: "AGENT", id: matchmaker.id }, subject: { type: "Need", id: needRow.id }, policyApplied: "switch.agent.paused", result: `El Agente de ${company.name} está en pausa: no se le consulta esta necesidad.`, significant: false, companyIds: [company.id] });
+        continue;
+      }
       const demandsOfReceiver = await openDemands(db, chapterId, company.id);
       const openDemand = matchingDemand(demandsOfReceiver, envelope.qualification_layer?.triggers ?? [], envelope.chapter_layer.industry);
       const capView: CapabilityView = { companyId: company.id, companyName: company.name, specialtyCode: specialty.nscatCode, isPrimarySeat: cap.isPrimarySeat, dna: dnaRow.dna, openDemand };

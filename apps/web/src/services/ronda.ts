@@ -29,6 +29,8 @@ export interface RondaChapterResult {
   clock: ClockResult;
   rastreo: { agents: number; drafts: number; skipped: number };
   ownSources: { sources: number; drafts: number; errors: number };
+  /** D-076: la Sala no opera (en pausa o en fundación); la Ronda la saltó entera. */
+  paused?: boolean;
 }
 
 export interface RondaResult {
@@ -41,6 +43,10 @@ export async function runRonda(db: Db, now = new Date(), feed: PublicFeed = defa
   const out: RondaResult = { ranAt: now.toISOString(), chapters: [] };
 
   for (const chapter of chapters) {
+    if (chapter.status !== "ACTIVE") {
+      out.chapters.push({ chapterId: chapter.id, chapterName: chapter.name, paused: true, jobs: { done: 0, failed: 0, needsHuman: 0 }, clock: await runClock(db, now, chapter.id), rastreo: { agents: 0, drafts: 0, skipped: 0 }, ownSources: { sources: 0, drafts: 0, errors: 0 } });
+      continue;
+    }
     const jobs = await runJobs(db, { now, chapterId: chapter.id, max: 20 }); // la Mesa pendiente, primero (D-053)
     const clock = await runClock(db, now, chapter.id);
 
@@ -55,7 +61,7 @@ export async function runRonda(db: Db, now = new Date(), feed: PublicFeed = defa
     const ownSources = { sources: 0, drafts: 0, errors: 0 };
     for (const c of ordered) {
       const agent = await db.query.agents.findFirst({ where: and(eq(schema.agents.companyId, c.id), eq(schema.agents.kind, "COMPANY")) });
-      if (!agent) continue;
+      if (!agent || agent.status === "PAUSED") continue; // un Agente en pausa no rastrea (D-076); TRIAL (D-050) sí rastrea
       const r = await runRastreo(db, c.id, feed);
       rastreo.agents++;
       rastreo.drafts += r.ingested.length;

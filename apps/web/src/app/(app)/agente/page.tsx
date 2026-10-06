@@ -32,11 +32,13 @@ export default async function AgentePage({ searchParams }: { searchParams: Promi
           <h1>Tu Agente, {firstName(member.fullName)}.</h1>
           <p className="lead">Qué sabe de ti, qué buscan para ti, qué está haciendo, qué puede y qué te propone. Y una caja para decirle lo que quieres: él lo traduce, tú confirmas.</p>
         </div>
-        <AgentAvatar state={state} label={state === "analizando" ? "En la Mesa con un Indicio tuyo" : state === "encontrado" ? "Tiene propuestas para ti" : state === "sin-informacion" ? "Trabaja a ciegas: valida tu ADN" : "En la Mesa, atento"} />
+        <AgentAvatar state={v.estado.agente === "PAUSED" || v.estado.sala !== "ACTIVE" ? "sin-informacion" : state} label={v.estado.agente === "PAUSED" || v.estado.sala !== "ACTIVE" ? "En pausa" : state === "analizando" ? "En la Mesa con un Indicio tuyo" : state === "encontrado" ? "Tiene propuestas para ti" : state === "sin-informacion" ? "Trabaja a ciegas: valida tu ADN" : "En la Mesa, atento"} />
       </div>
 
       {error ? <div className="notice error" role="alert">{error}</div> : null}
       {ok ? <div className="notice" role="status" style={{ borderColor: "var(--green)" }}>Hecho. Tu Agente trabaja ya con ello.</div> : null}
+      {v.estado.sala !== "ACTIVE" ? <div className="notice amber" role="status"><strong>{chapter.name} está en pausa.</strong> NS ha detenido la actividad agentic de la Sala: la Mesa no cualifica y ningún plazo corre. Lo que digas aquí queda guardado y tu Agente lo retoma al reanudar.</div> : null}
+      {v.estado.agente === "PAUSED" ? <div className="notice amber" role="status"><strong>Tu Agente está en pausa.</strong> La Directiva lo ha detenido: no recibe Pistas nuevas ni rastrea hasta que lo reanude. Tus Cesiones en curso y tu Comunicado siguen siendo tuyos. El motivo está en la Mesa Permanente.</div> : null}
 
       <section className="card" aria-label="Dile a tu Agente" style={{ display: "grid", gap: 12 }}>
         <div className="row" style={{ justifyContent: "space-between" }}>
@@ -99,7 +101,7 @@ export default async function AgentePage({ searchParams }: { searchParams: Promi
       <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 380px), 1fr))" }}>
         <section className="card" style={{ display: "grid", gap: 8, alignContent: "start" }} aria-label="Qué sabe de ti">
           <p className="eyebrow">Qué sabe de ti</p>
-          <p><span className={`badge ${v.sabe.validated ? "green" : "amber"}`}>ADN v{v.sabe.version} · {v.sabe.validated ? "validado" : "sin validar"}</span></p>
+          <p><span className={`badge ${v.sabe.validated ? "green" : "amber"}`}>ADN v{v.sabe.version} · {v.sabe.validated ? "validado" : "sin validar"}</span>{v.sabe.previousVersions ? <span className="mono" style={{ marginLeft: 8 }}>{v.sabe.previousVersions} {v.sabe.previousVersions === 1 ? "versión anterior conservada" : "versiones anteriores conservadas"}</span> : null}</p>
           {v.sabe.description ? <p>{v.sabe.description}</p> : null}
           <ul className="plain dna-rows">
             {v.sabe.services.length ? <li><span className="mono">Haces</span><span>{v.sabe.services.join(" · ")}</span></li> : null}

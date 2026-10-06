@@ -14,6 +14,7 @@ import { toqueAction } from "./actions";
 import { runClockThrottled } from "@/services/clock";
 import { InstallHint } from "../install-hint";
 import { leerEstadoCopias, mostrarEstadoCopias, valorarCopias } from "@/services/copias";
+import { companyAgentStatus } from "@/services/interruptores";
 
 /**
  * Hoy (D-070): el tiempo del Timonel es oro. Arriba, solo lo que espera su toque, con el botón dentro. Después, los
@@ -48,7 +49,9 @@ export default async function HoyPage({ searchParams }: { searchParams: Promise<
   const companies = new Map((await db.query.companies.findMany({ columns: { id: true, slug: true } })).map((c) => [c.id, c.slug]));
   const copias = member.isDirector && mostrarEstadoCopias() ? valorarCopias(await leerEstadoCopias()) : null;
   const tiempos = await tiemposDinamismo(db, { chapterId: chapter.id, since: monthAgo() });
-  const agentState = board.toques.length ? "esperando" : summary.matches ? "encontrado" : "analizando";
+  const agentStatus = await companyAgentStatus(db, company.id);
+  const paused = chapter.status !== "ACTIVE" || agentStatus === "PAUSED";
+  const agentState = paused ? "sin-informacion" : board.toques.length ? "esperando" : summary.matches ? "encontrado" : "analizando";
   const { compromiso, comunicado } = board;
   const compromisoTone = compromiso.lastAction === "RELEASE_NOTICE" || compromiso.missedStreak >= 2 ? "red" : compromiso.thisWeek.validCount >= compromiso.minimum ? "green" : "amber";
 
@@ -60,11 +63,13 @@ export default async function HoyPage({ searchParams }: { searchParams: Promise<
           <h1>{greeting()}, {firstName(member.fullName)}.</h1>
           <p className="lead">Mientras estabas fuera: {summary.agentConversations} conversaciones entre Agentes, {summary.signals} Indicios y {summary.matches} Pistas en siete días. {board.toques.length === 0 ? "Nada espera tu toque." : board.toques.length === 1 ? "Una decisión espera tu toque." : `${board.toques.length} decisiones esperan tu toque.`}</p>
         </div>
-        <AgentAvatar state={agentState} label={agentState === "esperando" ? "Tu Agente espera tu decisión" : agentState === "encontrado" ? "Tu Agente ha encontrado algo" : "Tu Agente está en la Mesa"} />
+        <AgentAvatar state={agentState} label={paused ? "En pausa" : agentState === "esperando" ? "Tu Agente espera tu decisión" : agentState === "encontrado" ? "Tu Agente ha encontrado algo" : "Tu Agente está en la Mesa"} />
       </div>
 
       {error ? <div className="notice error" role="alert">{error}</div> : null}
       {ok ? <div className="notice" role="status" style={{ borderColor: "var(--green)" }}>Hecho. Tu Agente sigue con el resto.</div> : null}
+      {chapter.status !== "ACTIVE" ? <div className="notice amber" role="status"><strong>{chapter.name} está en pausa.</strong> NS ha detenido la actividad agentic de la Sala: la Mesa no cualifica y ningún plazo corre mientras dure. Tus toques siguen aquí; lo que publiques espera en la cola.</div> : null}
+      {agentStatus === "PAUSED" && chapter.status === "ACTIVE" ? <div className="notice amber" role="status"><strong>Tu Agente está en pausa.</strong> La Directiva lo ha detenido: no recibe Pistas nuevas ni rastrea. Tus Cesiones en curso, plazos y Comunicado siguen. <Link href="/agente">Ver en Mi Agente</Link>.</div> : null}
 
       <section aria-label="Para tu toque">
         {board.toques.length === 0 ? (

@@ -13,6 +13,7 @@
  *    GAZETTE_VIEWED, nunca para vigilar).
  * Idempotente: una fila por titular y semana; una Gaceta por Sala y semana.
  */
+import { snapshotDna } from "@/services/onboarding";
 import { and, asc, desc, eq, gte, inArray, lt, ne, or } from "drizzle-orm";
 import type { Db } from "@/db/client";
 import { schema } from "@/db/client";
@@ -137,6 +138,7 @@ export async function approveCommunique(db: Db, input: ApproveInput) {
     const dnaRow = await db.query.businessDna.findFirst({ where: eq(schema.businessDna.companyId, input.companyId) });
     if (dnaRow) {
       const dna = { ...dnaRow.dna, offering: { ...dnaRow.dna.offering, capacity: CAPACITY_TO_DNA[input.capacity] } };
+      await snapshotDna(db, dnaRow, "comunicado.capacidad", input.memberId); // historial (D-076)
       await db.update(schema.businessDna).set({ dna, version: dnaRow.version + 1, updatedAt: now }).where(eq(schema.businessDna.id, dnaRow.id));
     }
     declared.push({ kind: "CAPACITY", text: `Capacidad ${input.capacity} (antes ${row.stable.capacity_now})`, source: "DECLARED_BY_MEMBER" });

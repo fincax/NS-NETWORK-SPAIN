@@ -8,6 +8,7 @@ import { activateFounding, FoundingError, joinFounding, startFounding } from "@/
 import { CompromisoError, confirmRelease, proposeRelease } from "@/services/compromiso";
 import { DireccionError, logDirectorAction } from "@/services/direccion";
 import { generateValueTrialReport, PruebaError, startValueTrial } from "@/services/prueba";
+import { InterruptorError, setAgentStatus, setChapterStatus } from "@/services/interruptores";
 
 const STATUSES: CandidacyStatus[] = ["NEW", "CONTACTED", "INTERVIEW", "APPROVED", "WAITLISTED", "FOUNDING", "DECLINED", "ACTIVATED"];
 
@@ -108,3 +109,23 @@ export async function trialAction(formData: FormData) {
   revalidatePath("/antesala");
   redirect(`/antesala?vista=${view}#c-${candidacyId}`);
 }
+
+/** Interruptores (D-076): pausar o reanudar un Agente (Directiva o NS) o la Sala entera (solo NS), con motivo visible en la Mesa. */
+export async function switchAction(formData: FormData) {
+  const { member, chapter } = await requireMember();
+  const db = await getDb();
+  const view = String(formData.get("view") ?? "pendientes");
+  const status = String(formData.get("status")) === "PAUSED" ? "PAUSED" : "ACTIVE";
+  const reason = String(formData.get("reason") ?? "");
+  try {
+    const companyId = String(formData.get("companyId") ?? "");
+    if (companyId) await setAgentStatus(db, { chapterId: chapter.id, companyId, memberId: member.id, status, reason });
+    else await setChapterStatus(db, { chapterId: chapter.id, memberId: member.id, status, reason });
+  } catch (e) {
+    const msg = e instanceof InterruptorError ? e.message : "No se pudo cambiar el interruptor.";
+    redirect(`/antesala?vista=${view}&error=${encodeURIComponent(msg)}#interruptores`);
+  }
+  revalidatePath("/", "layout");
+  redirect(`/antesala?vista=${view}#interruptores`);
+}
+

@@ -637,3 +637,25 @@ export const agentIntents = pgTable(
   },
   (t) => [index("agent_intent_company").on(t.companyId, t.createdAt)],
 );
+
+/**
+ * Historial del ADN (D-076). Hasta aquí `business_dna` solo guardaba la versión vigente y subía el número: el contenido
+ * anterior se perdía. Cada vez que el ADN cambia (entrevista, Comunicado, «Dile a tu Agente») la versión que se sustituye
+ * queda aquí tal cual, con quién la había validado y qué la reemplazó. Privado de la empresa.
+ */
+export const businessDnaVersions = pgTable(
+  "business_dna_versions",
+  {
+    id: id(),
+    companyId: uuid("company_id").notNull().references(() => companies.id),
+    version: integer("version").notNull(), // la versión que se sustituye
+    dna: jsonb("dna").$type<BusinessDNA>().notNull(),
+    validatedBy: uuid("validated_by"),
+    validatedAt: timestamp("validated_at", { withTimezone: true }),
+    replacedBy: uuid("replaced_by"), // Timonel que provocó el cambio, si lo hubo
+    reason: text("reason").notNull(), // "entrevista" | "comunicado.capacidad" | "intencion" | "actualizacion"
+    replacedAt: createdAt(),
+  },
+  (t) => [index("dna_version_company").on(t.companyId, t.version)],
+);
+

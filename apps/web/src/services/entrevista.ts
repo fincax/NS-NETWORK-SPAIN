@@ -89,7 +89,7 @@ export async function finishInterview(db: Db, opts: { interviewId: string; membe
   if (!row) throw new InterviewError("Entrevista no encontrada.");
   if (row.status === "DONE") return row;
   const ctx = await context(db, row.companyId, opts.memberId);
-  await updateDna(db, row.companyId, row.draftDna, ctx.member.id);
+  await updateDna(db, row.companyId, row.draftDna, ctx.member.id, "entrevista");
   const [done] = await db.update(schema.dnaInterviews).set({ status: "DONE", updatedAt: new Date() }).where(eq(schema.dnaInterviews.id, row.id)).returning();
   const answered = row.transcript.filter((t) => t.role === "timonel").length;
   await audit(db, { chapterId: ctx.company.chapterId, kind: "DNA_VALIDATED", actor: { type: "USER", id: ctx.member.id }, subject: { type: "BusinessDNA", id: row.companyId }, policyApplied: "dna.human_validation", result: `${ctx.member.fullName} validó el ADN de ${ctx.company.name} tras la entrevista con su Agente (${answered} respuestas). El Agente trabaja ya con él en la Mesa.`, significant: true, companyIds: [ctx.company.id] });

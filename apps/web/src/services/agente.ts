@@ -18,7 +18,8 @@ import { getProvider } from "@/agents/provider";
 import { detectsReferralFee } from "@/core/compliance";
 import { applyDnaPatch, describePatch, patchIsEmpty, type IntentProposal } from "@/core/intencion";
 import { createDemand, openDemands } from "@/services/demands";
-import { updateDna } from "@/services/onboarding";
+import { dnaHistory, updateDna } from "@/services/onboarding";
+import { companyAgentStatus, type SwitchStatus } from "@/services/interruptores";
 import { createApunte } from "@/services/apunte";
 import { activeInterview, dnaGaps, TRIGGER_LABEL } from "@/services/entrevista";
 import { listSources } from "@/services/sources";
@@ -75,7 +76,7 @@ export async function confirmIntent(db: Db, input: { intentId: string; memberId:
     const dnaRow = await db.query.businessDna.findFirst({ where: eq(schema.businessDna.companyId, row.companyId) });
     if (!dnaRow) throw new IntentError("Empresa sin ADN.");
     const next = applyDnaPatch(dnaRow.dna, p.dna_patch);
-    await updateDna(db, row.companyId, next, member.id); // versión nueva, validada por el Timonel: nunca en silencio
+    await updateDna(db, row.companyId, next, member.id, "intencion"); // versión nueva, validada por el Timonel: nunca en silencio
     outcome.dnaVersion = dnaRow.version + 1;
     done.push(`ADN en versión ${dnaRow.version + 1}`);
   }
@@ -125,7 +126,8 @@ export function proposalLines(p: IntentProposal): { understood: string[]; willDo
 // ───────────────────────── La vista ─────────────────────────
 
 export interface AgenteView {
-  sabe: { validated: boolean; version: number; gaps: string[]; interviewProgress: number | null; description: string; services: string[]; industries: string[]; ticketMin?: number; ticketMax?: number; perfectReferral: string; triggers: string[] };
+  estado: { agente: SwitchStatus | null; sala: string };
+  sabe: { validated: boolean; version: number; previousVersions: number; gaps: string[]; interviewProgress: number | null; description: string; services: string[]; industries: string[]; ticketMin?: number; ticketMax?: number; perfectReferral: string; triggers: string[] };
   buscanParaTi: { id: string; text: string; trigger: string | null; industry: string | null; activeUntil: Date | null }[];
   hace: { mesaMine: number; mesaTotal: number; needsHuman: number; drafts: number; lastRonda: { at: Date; result: string } | null; sources: { label: string; lastStatus: string | null; lastFetchedAt: Date | null }[] };
   puede: { autoPublish: boolean; externalContact: boolean; humanApproval: boolean; neverShare: string[]; chapterOnly: string[] };
@@ -146,8 +148,11 @@ export async function agenteView(db: Db, ctx: { chapterId: string; companyId: st
   const sources = await listSources(db, companyId);
   const compass = await brujula(db, { chapterId, companyId });
   const reciente = await recentIntents(db, companyId);
+  const chapter = await db.query.chapters.findFirst({ where: eq(schema.chapters.id, chapterId), columns: { status: true } });
+  const history = await dnaHistory(db, companyId);
   return {
-    sabe: { validated: Boolean(dnaRow.validatedAt), version: dnaRow.version, gaps: dnaGaps(dna), interviewProgress: interview ? interview.progress : null, description: dna.company.description, services: dna.offering.services, industries: dna.ideal_customer.industries, ticketMin: dna.commercial.ticket_min, ticketMax: dna.commercial.ticket_max, perfectReferral: dna.referrals.perfect_referral, triggers: dna.ideal_customer.triggers.map((t) => TRIGGER_LABEL[t] ?? t) },
+    estado: { agente: await companyAgentStatus(db, companyId), sala: chapter?.status ?? "ACTIVE" },
+    sabe: { validated: Boolean(dnaRow.validatedAt), version: dnaRow.version, previousVersions: history.length, gaps: dnaGaps(dna), interviewProgress: interview ? interview.progress : null, description: dna.company.description, services: dna.offering.services, industries: dna.ideal_customer.industries, ticketMin: dna.commercial.ticket_min, ticketMax: dna.commercial.ticket_max, perfectReferral: dna.referrals.perfect_referral, triggers: dna.ideal_customer.triggers.map((t) => TRIGGER_LABEL[t] ?? t) },
     buscanParaTi: demands.map((d) => ({ id: d.id, text: d.text, trigger: d.trigger, industry: d.industry, activeUntil: d.activeUntil })),
     hace: { mesaMine: load.mine, mesaTotal: load.total, needsHuman: load.needsHuman, drafts: drafts.length, lastRonda: ronda ? { at: ronda.occurredAt, result: ronda.result } : null, sources: sources.map((s) => ({ label: s.label, lastStatus: s.lastStatus, lastFetchedAt: s.lastFetchedAt })) },
     puede: { autoPublish: dna.permissions.auto_publish_chapter_signals, externalContact: dna.permissions.external_contact, humanApproval: dna.permissions.human_approval_required, neverShare: dna.knowledge.never_share, chapterOnly: dna.knowledge.chapter_only },

@@ -19,6 +19,7 @@ import { evaluateCompromiso, type CompromisoResult } from "@/services/compromiso
 import { evaluateComunicados, type CloseResult } from "@/services/comunicado";
 import { protectedCompanyId } from "@/agents/latido";
 import { approveByClock, confirmValueBySilence, infoRoundsFor, patchPendingQuestion, provisionalVerdict } from "@/services/referrals";
+import { activeChapterIds } from "@/services/interruptores";
 
 export interface ClockResult {
   reminders: number;
@@ -44,7 +45,10 @@ const hoursLeft = (until: Date | null | undefined, now: Date) => Math.max(0, Mat
 
 export async function runClock(db: Db, now = new Date(), chapterId?: string): Promise<ClockResult> {
   const res: ClockResult = { reminders: 0, expired: 0, late: 0, contactReminders: 0, provisionalVerdicts: 0, valuesBySilence: 0, nudges: 0, questionReminders: 0, questionsUnanswered: 0, secondReminders: 0, directorReminders: 0, directorApproved: 0, escalated: 0, compromiso: { evaluated: 0, met: 0, notices: 0, releases: 0 }, comunicado: { weeks: 0, continuity: 0, notices: 0, gazettes: 0, drafted: 0 } };
-  const scope = chapterId ? eq(schema.referrals.chapterId, chapterId) : undefined;
+  // Interruptor (D-076): en una Sala en pausa no corre ningún plazo; nadie es penalizado por una pausa.
+  const activeIds = await activeChapterIds(db);
+  if (chapterId && !activeIds.includes(chapterId)) return res;
+  const scope = chapterId ? eq(schema.referrals.chapterId, chapterId) : activeIds.length ? inArray(schema.referrals.chapterId, activeIds) : eq(schema.referrals.chapterId, "00000000-0000-0000-0000-000000000000");
   // Demo (D-071): nadie decide por la protagonista entre demo y demo; el Reloj no la penaliza.
   const shielded = await protectedCompanyId(db);
 
@@ -199,7 +203,7 @@ export async function runClock(db: Db, now = new Date(), chapterId?: string): Pr
 
   // 5 · Compromiso semanal (D-042): última semana completa, una vez por titular
   // 6 · Comunicado semanal (Protocolo II): borradores de la semana en curso y cierre de las vencidas con Gaceta
-  const chapterIds = chapterId ? [chapterId] : (await db.query.chapters.findMany({ columns: { id: true } })).map((c) => c.id);
+  const chapterIds = chapterId ? [chapterId] : activeIds;
   for (const id of chapterIds) {
     const r = await evaluateCompromiso(db, now, id, shielded);
     res.compromiso = { evaluated: res.compromiso.evaluated + r.evaluated, met: res.compromiso.met + r.met, notices: res.compromiso.notices + r.notices, releases: res.compromiso.releases + r.releases };
