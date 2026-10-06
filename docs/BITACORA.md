@@ -2,6 +2,28 @@
 
 Punto de parada y siguiente paso. Se actualiza al cerrar cada sesión de trabajo.
 
+## 6 de octubre de 2026 · auditoría del panel del Timonel y arranque de «Mi Agente» (D-075, en construcción)
+
+**Punto de parada.** Sesión pausada por el fundador a mitad de construcción. La rama `claude/practical-heisenberg-kequa2` está subida con el trabajo a medias; **no hay PR abierta**. Tipos y lint limpios; las 187 pruebas existentes siguen en verde (lo nuevo aún no tiene pruebas ni migración).
+
+**Dónde estamos.**
+
+- Hecha la **auditoría** de las treinta propuestas de evolución (panel del Timonel y NS Agentic OS) contra la demo real. Conclusión: la cadena Apunte → Indicio → Pista → Salvoconducto → Cesión → Promesa → Puente → Veredicto está completa; Hoy ya es decision-first; ninguna propuesta exige cambiar estados ni puertas de NS-ARP. Hallazgos: `agents.status` y `chapters.status` no los lee ningún servicio; `updateDna` sobrescribe sin historial; `TRIGGER_LABEL` está duplicado en `entrevista.ts` y `brujula.ts`. El informe completo quedó en la conversación de la sesión; lo que se decidió construir es solo lo de abajo.
+- **Decisión del fundador:** construir únicamente la página **Mi Agente** con **«Dile a tu Agente»** dentro (una caja, no un chat: el Agente traduce lo dicho a una propuesta tipada y nada cambia hasta el toque de confirmación), añadiendo la entrada al menú sin quitar ninguna ruta.
+- **Construido hasta ahora (compila, sin usar todavía desde la interfaz):**
+  - `src/core/intencion.ts`: esquema zod `IntentProposal` (ENCARGO · ADN · APUNTE · INSUFICIENTE), `DnaPatch`, `applyDnaPatch` (función pura), `describePatch`.
+  - `src/agents/intencion.ts`: intérprete determinista por reglas (tercero → Apunte; cifras con «nada por debajo» → ticket mínimo; sectores negados → exclusiones; coyuntural o imperativo → Encargo; si no entiende, pregunta).
+  - `src/agents/provider.ts`: método aditivo `interpretIntent(IntentInput)` en el contrato; implementado en `deterministic.ts` (delega en las reglas) y en `anthropic.ts` (salida estructurada). `INDUSTRY_RULES` pasa a exportarse.
+  - `src/db/schema.ts`: tabla `agent_intents` (texto, propuesta, proveedor, estado PROPOSED/CONFIRMED/DISMISSED, resultado). **Sin migración generada aún.**
+
+**Siguiente paso acordado (por este orden).**
+
+1. `pnpm db:generate` → migración `0019_intencion`.
+2. `src/services/agente.ts`: `agenteView` (qué sabe: ADN y huecos; qué buscan para ti: Encargos; qué hace ahora: `mesaLoad`, última Ronda, fuentes; qué puede y qué no: `dna.permissions` y `never_share`; qué te propone: Movimientos de la Brújula) y `proposeIntent` / `confirmIntent` / `dismissIntent` (Encargo → `createDemand`; ADN → `applyDnaPatch` + `updateDna` validado por el Timonel; Apunte → `createApunte` y redirección a `/apunte?ok=`). Rechazar contraprestaciones con `detectsReferralFee` (D-010). Auditar `INTENT_PROPOSED/CONFIRMED/DISMISSED` como privados.
+3. `src/app/(app)/agente/page.tsx` + `actions.ts`: caja con `DictationButton`, tarjeta de propuesta con «Confirmar», «Descartar» y enlaces a Apunte y entrevista; las cinco secciones. Enlace «Mi Agente» en `nav-links.tsx` sin quitar nada.
+4. `tests/agente.test.ts`: las tres frases del documento del fundador («Durante este trimestre quiero clientes industriales grandes», «No quiero proyectos inferiores a 30.000 €», «Busca empresas que estén abriendo nuevas sedes»), un referido («Mi cliente X va a abrir…») y el flujo proponer → confirmar (Encargo creado, ADN en versión nueva con `ticket_min`, Apunte en borrador) y descartar.
+5. Registrar **D-075** en `DECISIONS.md`; filas en `docs/06` (tabla `agent_intents`) y `docs/07` (Company Agent: interpretar la intención); README. Después `pnpm test`, `typecheck`, `lint`, `build`, PR y `actualizar.sh`.
+
 ## 1 de octubre de 2026 (noche) · Protocolo II construido (D-069) y Hoy como pila de toques (D-070)
 
 **Dónde estamos.**

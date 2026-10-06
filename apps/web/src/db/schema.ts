@@ -17,6 +17,7 @@ import type {
 } from "@/core/types";
 import type { ValueTrialReport } from "@/core/prueba";
 import type { ChapterGazette, CommuniqueDelta, CommuniqueEncargo, CommuniqueStable } from "@/core/comunicado";
+import type { IntentProposal } from "@/core/intencion";
 
 const id = () => uuid("id").primaryKey().defaultRandom();
 const createdAt = () => timestamp("created_at", { withTimezone: true }).notNull().defaultNow();
@@ -617,3 +618,22 @@ export const betaRequests = pgTable("beta_requests", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   createdAt: createdAt(),
 });
+
+/** "Dile a tu Agente" (D-075): lo que el Timonel dijo, lo que su Agente propuso y qué se hizo con ello. Privado de la empresa. */
+export const agentIntents = pgTable(
+  "agent_intents",
+  {
+    id: id(),
+    chapterId: uuid("chapter_id").notNull().references(() => chapters.id),
+    companyId: uuid("company_id").notNull().references(() => companies.id),
+    memberId: uuid("member_id").notNull().references(() => members.id),
+    text: text("text").notNull(), // lo dicho, tal cual
+    proposal: jsonb("proposal").$type<IntentProposal>().notNull(),
+    provider: text("provider").notNull(), // deterministic | anthropic:<modelo>
+    status: text("status").notNull().default("PROPOSED"), // PROPOSED | CONFIRMED | DISMISSED
+    result: jsonb("result").$type<{ demandId?: string; dnaVersion?: number; opportunitySignalId?: string }>(),
+    resolvedAt: timestamp("resolved_at", { withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  (t) => [index("agent_intent_company").on(t.companyId, t.createdAt)],
+);

@@ -4,8 +4,10 @@
  * lo que no está en el texto se devuelve como insuficiente o con confianza baja.
  */
 import type { BusinessTrigger, IntroPackage, NeedDraft, SizeBand, TimingBand, ValueBand } from "@/core/types";
-import type { ExtractionInput, ExtractionOutput, InterviewInput, InterviewStep, IntroInput, LLMProvider, QualificationAnswer, QualificationInput } from "./provider";
+import type { ExtractionInput, ExtractionOutput, IntentInput, InterviewInput, InterviewStep, IntroInput, LLMProvider, QualificationAnswer, QualificationInput } from "./provider";
 import { scriptedInterview } from "./interview-script";
+import { interpretIntentRules } from "./intencion";
+import type { IntentProposal } from "@/core/intencion";
 
 export const TRIGGER_RULES: { trigger: BusinessTrigger; re: RegExp }[] = [
   { trigger: "NEW_SITE", re: /nueva (sede|planta|nave|oficina|f[aá]brica|delegaci[oó]n)|abr(e|ir[aá]|ir|iendo) (una |otra |su )?(nueva )?(planta|sede|nave|oficina|delegaci[oó]n|f[aá]brica)|traslad(a|o|ar[aá]) (la|su) (sede|planta)/i },
@@ -83,7 +85,7 @@ const EXPLICIT_NEEDS: { re: RegExp; code: string; p: number; desc: string }[] = 
   { re: /prevenci[oó]n de riesgos|\bprl\b/i, code: "PRL", p: 0.9, desc: "Servicio de prevención." },
 ];
 
-const INDUSTRY_RULES: { re: RegExp; industry: string }[] = [
+export const INDUSTRY_RULES: { re: RegExp; industry: string }[] = [
   { re: /metal[uú]rgic|industrial|f[aá]brica|planta|producci[oó]n|manufactur/i, industry: "Industrial" },
   { re: /saas|software|startup|tecnol[oó]g|app\b/i, industry: "Tecnología" },
   { re: /agro|alimentaci[oó]n|aceite|bodega/i, industry: "Agroalimentario" },
@@ -263,6 +265,10 @@ export class DeterministicProvider implements LLMProvider {
 
   async interview(input: InterviewInput): Promise<InterviewStep> {
     return scriptedInterview(input);
+  }
+
+  async interpretIntent(input: IntentInput): Promise<IntentProposal> {
+    return interpretIntentRules(input);
   }
 
   async draftIntro(input: IntroInput): Promise<IntroPackage> {

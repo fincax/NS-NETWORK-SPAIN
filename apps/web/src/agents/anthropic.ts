@@ -5,7 +5,8 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { IntroPackage } from "@/core/types";
-import { ExtractionOutput, InterviewStep, QualificationAnswer, type ExtractionInput, type InterviewInput, type IntroInput, type LLMProvider, type QualificationInput } from "./provider";
+import { IntentProposal } from "@/core/intencion";
+import { ExtractionOutput, InterviewStep, QualificationAnswer, type ExtractionInput, type IntentInput, type InterviewInput, type IntroInput, type LLMProvider, type QualificationInput } from "./provider";
 
 const MODEL = process.env.NS_LLM_MODEL ?? "claude-opus-5";
 
@@ -105,6 +106,33 @@ ${history || "(aún no ha empezado: saluda en una frase y haz la primera pregunt
       output_config: { format: zodOutputFormat(InterviewStep) },
     });
     if (!res.parsed_output) throw new Error("La salida del modelo no valida contra el esquema de la entrevista.");
+    return res.parsed_output;
+  }
+
+  async interpretIntent(input: IntentInput): Promise<IntentProposal> {
+    const res = await this.client.messages.parse({
+      model: MODEL,
+      max_tokens: 4000,
+      system: `${SYSTEM}
+Ahora tu Timonel te dice algo en lenguaje natural (D-075, "Dile a tu Agente"). Tradúcelo a UNA propuesta tipada; nunca ejecutes nada: el Timonel confirmará con un toque.
+Destinos posibles:
+- APUNTE: habla de un tercero (un cliente, un conocido, algo que ha oído) que necesita algo → who, need, relation (CLIENT si es su cliente, HEARD si se lo han contado, KNOWN en otro caso), expects_contact solo si lo dice.
+- ENCARGO: lo que quiere recibir ahora o en un plazo ("este trimestre quiero…", "busca empresas que…") → text (una frase, en sus palabras), trigger (solo con estos códigos: ${Object.entries(input.triggerLabels).map(([c, l]) => `${c} = ${l}`).join(", ")}), industry, value_band.
+- ADN: un cambio estructural en cómo trabaja (ticket mínimo o máximo en euros, sectores que añade o quita, lo que no quiere recibir, zonas, tamaño de cliente, capacidad, objetivo del trimestre) → dna_patch con SOLO lo que ha dicho.
+Un mismo texto puede ser ENCARGO con dna_patch (lo coyuntural y lo estructural a la vez). kind es el principal.
+- INSUFICIENTE si no puedes traducirlo con confianza: question con la pregunta corta que lo desatasca.
+Reglas: nunca inventes cifras, sectores ni nombres; no repitas en dna_patch lo que ya consta en el ADN; "understood" son frases cortas y comprobables; "summary" en segunda persona empieza por "He entendido". Un referido nunca se cobra: si menciona dinero por referir, INSUFICIENTE con una pregunta que lo recuerde.`,
+      messages: [
+        {
+          role: "user",
+          content: `Empresa: ${input.companyName}.
+ADN actual (resumen): ${JSON.stringify({ industries: input.dna.ideal_customer.industries, exclusions: input.dna.ideal_customer.exclusions, geography: input.dna.ideal_customer.geography, company_size: input.dna.ideal_customer.company_size, triggers: input.dna.ideal_customer.triggers, ticket_min: input.dna.commercial.ticket_min, ticket_max: input.dna.commercial.ticket_max, capacity: input.dna.offering.capacity, quarterly: input.dna.objectives.quarterly })}
+Lo que dice el Timonel: """${input.text}"""`,
+        },
+      ],
+      output_config: { format: zodOutputFormat(IntentProposal) },
+    });
+    if (!res.parsed_output) throw new Error("La salida del modelo no valida contra el esquema de la propuesta.");
     return res.parsed_output;
   }
 }
