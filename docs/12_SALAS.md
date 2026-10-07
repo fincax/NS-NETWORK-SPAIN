@@ -1,6 +1,6 @@
 # 12 · La Sala: eje de NS Network
 
-**Estado:** especificación fundacional (D-013, CONFIRMED por el fundador).
+**Estado:** especificación fundacional (D-013, CONFIRMED por el fundador). Plazas sin tope, tres pruebas de Especialidad y profesiones tecnológicas priorizadas: D-080 (CONFIRMED, sustituye a D-006).
 **Sustituye a:** la propuesta territorial (D-011, superada).
 **Premisas del fundador:** el modelo de sala. En un mismo territorio (por ejemplo, Sevilla) se pueden crear todas las Salas que permita la saturación de la zona. La sectorización toma como eje una clasificación parecida a la CNAE, pero no inmutable: cuando la casuística hace surgir una nueva profesión, NS la contempla antes que la administración.
 
@@ -14,7 +14,7 @@ Una **Sala NS** es un grupo cerrado de empresas seleccionadas, con **una empresa
 NS Network
 └── NS España
     └── Zona NS Sevilla
-        ├── NS Cumbre      (Sala · 25–35 empresas, una por especialidad)
+        ├── NS Cumbre      (Sala · una empresa por especialidad; sin tope: tantas plazas como Especialidades NS)
         ├── NS Ágora       (Sala)
         ├── NS Meridiana   (Sala)
         └── ...            tantas como permita la saturación de la zona
@@ -26,8 +26,10 @@ Vocabulario oficial:
 | --- | --- | --- |
 | **Sala** | Unidad fundamental. Exclusividad, comunidad, cuota de contribución, rituales. | `Chapter`, `chapter_id`, visibilidad `CHAPTER` |
 | **Zona** | Ámbito geográfico (ciudad o área metropolitana) que aloja Salas. Definida con unidades INE. | `Zone`, `zone_id` |
-| **Plaza** | Posición única de una especialidad dentro de una Sala. | `CategorySeat` |
-| **Especialidad NS** | Nivel de la clasificación NS-CAT que otorga plaza. | `Specialty` |
+| **Plaza** | Posición única de una especialidad dentro de una Sala. Una Sala tiene tantas plazas posibles como Especialidades NS vigentes: no hay tope numérico (D-080). | `CategorySeat` |
+| **Plaza base** | Especialidad que NS-CAT marca para fundar cualquier Sala: Manantiales primero, profesiones tecnológicas segundo, después el resto (D-080). | `Specialty{ base }` |
+| **Plaza por demanda** | Cualquier otra Especialidad NS. Se abre en una Sala cuando sus Agentes detectan necesidades de esa especialidad que salen por Embajada o se pierden (D-080). | `Specialty` sin `base` + `CategorySeat` |
+| **Especialidad NS** | Nivel de la clasificación NS-CAT que otorga plaza. Existe solo si pasa a la vez las tres pruebas de §3.4. | `Specialty` |
 | **Directiva de Sala** | Presidencia y consejo de la Sala. | `Director` |
 | **Directiva de Zona** | Gobierna apertura, escisión y fusión de Salas en la zona. | `ZoneDirector` |
 
@@ -69,9 +71,9 @@ Una empresa pertenece a **una sola Sala por zona**. Una empresa con unidades loc
 
 La Directiva de Zona abre la Sala N+1 cuando se cumplen las tres condiciones:
 
-1. **Demanda real.** Existe una lista de espera de solicitantes **ya admitidos** (D-004) que no caben en las Salas existentes porque su especialidad está ocupada, y suman al menos 12–15 empresas fundadoras (D-006) que cubren las especialidades más demandadas de la zona (construcción/reforma, legal, fiscal, seguros, IT, marketing, RR.HH., financiación, inmobiliario, consultoría) y, antes que ninguna, las especialidades **Manantial** (administración de fincas, asesoría fiscal, correduría de seguros, arquitectura), que son las que más Cesiones de calidad traen desde el primer día (D-059).
+1. **Demanda real.** Existe una lista de espera de solicitantes **ya admitidos** (D-004) que no caben en las Salas existentes porque su especialidad está ocupada, y alcanzan el **mínimo de fundación** (parámetro de cada Fundación, por defecto 12, D-041) cubriendo **plazas base** (D-080): antes que ninguna, las especialidades **Manantial** (administración de fincas, asesoría fiscal, correduría de seguros, arquitectura), que son las que más Cesiones de calidad traen desde el primer día (D-059); después, las **profesiones tecnológicas** (software a medida, ERP, ciberseguridad, nube, datos e IA, telecomunicaciones), las más receptivas a lo agentic de NS y las que más señales generan para las demás plazas; y por último el resto de plazas base (construcción/reforma, legal, seguros, marketing, RR.HH., financiación, inmobiliario, consultoría).
 2. **Profundidad de mercado.** El censo de empresas objetivo de la zona (DIRCE por CNAE y tamaño, filtrado por los ICP de las especialidades fundadoras) soporta una Sala más sin que el flujo esperado de referidos válidos por miembro caiga por debajo del umbral configurado (propuesta: ≥ 3× el Compromiso semanal de D-042).
-3. **Salud de las Salas existentes.** Las Salas activas están en o por encima del objetivo de 25–35 plazas y su tasa de cumplimiento de cuota es sana. No se abre una Sala nueva para descargar una Sala que no funciona.
+3. **Salud de las Salas existentes.** Las Salas activas tienen cubiertas sus plazas base, su tasa de cumplimiento del Compromiso es sana y no pierden Indicios por falta de plaza que la Antesala pudiera cubrir. No se abre una Sala nueva para descargar una Sala que no funciona, y nunca por tamaño: una Sala no se parte por grande (D-080).
 
 **Quién empuja (D-041).** La empresa cuya plaza está ocupada no se queda en lista: NS le ofrece ser **Promotora** de la siguiente Sala. Reúne fundadoras en la Antesala (una por especialidad), la Directiva funda la Sala al alcanzar el mínimo, y la Promotora recibe una **gratificación** anunciada por NS (propuesta: meses de cuota gratis). Reglas completas en D-041.
 
@@ -114,8 +116,9 @@ Especialidad NS        69.10-NS-03  Derecho laboral
                        69.10-NS-07  Compliance y protección de datos
 ```
 
-- La **plaza se otorga a nivel de Especialidad NS**. Nunca a nivel de clase CNAE (demasiado ancho: "Actividades jurídicas" bloquearía a diez despachos que no compiten).
-- Cada Especialidad NS tiene: código, nombre comprensible, descripción en lenguaje de negocio, `overlaps_with[]` (matriz de solapamiento, D-001), ejemplos de referido perfecto y de referido que no le corresponde, estado y la marca **Manantial** cuando, por naturaleza, ve necesidades de muchos sectores (D-059). La marca no cambia ninguna regla de la plaza: sirve para captar, para preparar al Agente y para reconocer la amplitud de lo cedido.
+- La **plaza se otorga a nivel de Especialidad NS**. Nunca a nivel de clase CNAE (demasiado ancho: "69.10 Actividades jurídicas" bloquearía a diez despachos que no compiten; "62.02 Consultoría informática" dejaría fuera a toda la tecnología menos a una empresa). La CNAE es el índice, nunca la plaza (D-001, D-080).
+- **No hay tope de plazas por Sala** (D-080). El máximo es el número de Especialidades NS vigentes en la versión de NS-CAT sobre la que opera la Sala. Lo que limita es la demanda (§4, plaza base y plaza por demanda), y lo que protege la promesa "nadie compite conmigo" es la definición de la especialidad (§3.4).
+- Cada Especialidad NS tiene: código, nombre comprensible, descripción en lenguaje de negocio, `overlaps_with[]` (matriz de solapamiento, D-001), ejemplos de referido perfecto y de referido que no le corresponde, estado, la marca **base** cuando es plaza de fundación (D-080), la marca **Manantial** cuando, por naturaleza, ve necesidades de muchos sectores (D-059) y la marca **tech** cuando es una profesión tecnológica (D-080). Las marcas no cambian ninguna regla de la plaza: sirven para captar, para ordenar la Antesala, para preparar al Agente y para reconocer la amplitud de lo cedido.
 - Un solicitante elige su especialidad con ayuda del agente durante la solicitud; el agente propone la especialidad a partir del CNAE declarado, la web y la entrevista, y detecta solapamientos antes de enviar la solicitud.
 
 ### 3.2 Estados de una especialidad
@@ -124,7 +127,7 @@ Especialidad NS        69.10-NS-03  Derecho laboral
 | --- | --- | --- |
 | `OFICIAL` | Derivada directamente de una clase CNAE. | Base estable de la taxonomía. |
 | `NS_EXTENDIDA` | Creada por NS por debajo de una clase CNAE porque el mercado la distingue (por ejemplo, "Paid Media B2B" dentro de publicidad). | Otorga plaza como cualquier otra. |
-| `PROVISIONAL` | Nueva profesión que la administración aún no recoge (por ejemplo, un perfil emergente de servicios de IA, sostenibilidad o nuevas formas de financiación). | Otorga plaza en periodo de prueba de dos periodos de contribución. Se consolida como `NS_EXTENDIDA` si genera y recibe referidos válidos; si no, se fusiona con la más cercana. |
+| `PROVISIONAL` | Nueva profesión que la administración aún no recoge (por ejemplo, integración de agentes de IA, gobierno del dato, operaciones de modelos, sostenibilidad o nuevas formas de financiación). Las profesiones tecnológicas emergentes entran por esta vía en diez días como máximo, sin esperar a la CNAE (D-080). | Otorga plaza en periodo de prueba de dos periodos de contribución. Se consolida como `NS_EXTENDIDA` si genera y recibe referidos válidos; si no, se fusiona con la más cercana. |
 | `RETIRADA` | Fusionada o eliminada. | Las plazas existentes migran a la especialidad sucesora con preaviso. |
 
 ### 3.3 Cómo nace una profesión nueva en NS
@@ -141,20 +144,60 @@ Solicitud de plaza con actividad no contemplada
 
 NS-CAT lleva versión propia (`nscat_version`). Cada Sala opera sobre una versión; los cambios se aplican con migración de plazas explícita.
 
-### 3.4 La prueba del referido
+### 3.4 Las tres pruebas de Especialidad NS (D-080)
 
-La CNAE es el índice; la regla de conflicto es de producto:
+La CNAE es el índice; la definición de la plaza es de producto. Sin tope de plazas, la única defensa contra trocear una especialidad para colar a un competidor es esta definición. **Una Especialidad NS existe, y es plaza, solo si pasa las tres pruebas a la vez:**
 
-> **Dos empresas son de la misma especialidad si un mismo referido válido debería enviarse legítimamente a las dos.**
+| Prueba | Pregunta | Ejemplo que la pasa | Ejemplo que no la pasa |
+| --- | --- | --- | --- |
+| **Del referido** | ¿Un referido válido para A deja de serlo para B? | Un despido colectivo no es un referido para el mercantilista: laboral y mercantil son dos plazas. | "Despidos" y "convenios colectivos": el mismo referido vale para las dos. Una sola plaza, laboral. |
+| **De la unidad de contratación** | ¿El cliente contrataría proveedores distintos para A y para B? | Implantación de ERP y software a medida: el cliente contrata a un implantador de Odoo o SAP y a otra empresa para su aplicación propia. Dos plazas. | Desarrollo web y comercio electrónico cuando el cliente contrata a la misma empresa para las dos cosas. Una plaza. |
+| **De la señal** | ¿El Agente puede enrutar la necesidad a A o a B desde un Indicio típico sin preguntar? | "Han sufrido un ataque y han perdido datos" va a ciberseguridad; "quieren mover los servidores fuera de la oficina" va a nube e infraestructura. Dos plazas. | "Quieren digitalizar la empresa" no distingue entre A y B: mientras ningún Indicio típico las separe, A y B no son dos plazas. |
+
+Condición de creación, además de las tres pruebas: **prueba de mercado**. Al menos tres empresas independientes la ofrecen como actividad principal en la zona. Para las especialidades tecnológicas, que se prestan en remoto, la prueba de mercado se mide en España, no en la zona (§3.5).
+
+**Ejemplo completo: 69.10 Actividades jurídicas** se despliega en laboral; mercantil y societario; fiscal; concursal; inmobiliario y urbanístico; administrativo y contratación pública; penal económico; propiedad intelectual; compliance y protección de datos; familia y sucesiones; extranjería (las dos últimas son plaza gracias a D-079: el Interesado puede ser un particular). El despacho generalista sigue D-001: una plaza principal, capacidades secundarias sin exclusividad, `ADJACENT` a revisión de la Directiva. El despacho con varias especialidades reales, D-047: varias titularidades.
 
 Con datos reales, la taxonomía se corrige sola: si los referidos de dos especialidades "distintas" acaban de forma sistemática en las mismas empresas, el Comité las fusiona; si una especialidad recibe referidos heterogéneos que su titular declina por sistema, se divide (como prevé D-001 para "Marketing" → "Paid Media", "Branding", "SEO/Contenido").
+
+### 3.5 Las profesiones tecnológicas: desplegadas con finura y priorizadas (D-080)
+
+Instrucción del fundador: las nuevas profesiones tecnológicas serán las más receptivas a lo agentic de NS. La CNAE las describe peor que a ninguna otra, así que NS-CAT las trata con cuatro reglas propias:
+
+1. **Finura.** La sección J (61 telecomunicaciones, 62 programación y consultoría informática, 63 datos y hosting) y las partes tecnológicas de 70–74 se despliegan con al menos la misma finura que la 69.10. Despliegue inicial propuesto, cada especialidad sometida a las tres pruebas de §3.4:
+
+   | Especialidad NS propuesta | Clase CNAE índice | En NS-CAT v0.1 |
+   | --- | --- | --- |
+   | Desarrollo de software a medida | 62.01 | no |
+   | Implantación de ERP y sistemas de gestión | 62.02 | no |
+   | Implantación de CRM y automatización comercial | 62.02 | no |
+   | Ciberseguridad | 62.02 | sí (`CIBERSEGURIDAD`) |
+   | Nube e infraestructura | 62.03 / 63.11 | no |
+   | Datos, analítica e inteligencia de negocio | 62.02 / 63.11 | no |
+   | Inteligencia artificial y agentes | 62.01 / 62.02 | no (`PROVISIONAL` si hace falta) |
+   | Automatización de procesos e integraciones | 62.02 | no |
+   | Comercio electrónico y plataformas digitales | 62.01 / 47.91 | no |
+   | Producto digital y experiencia de usuario | 62.01 / 74.10 | no |
+   | Telecomunicaciones y redes | 61.10 | sí (`TELECOMUNICACIONES`) |
+   | Internet de las cosas e industria 4.0 | 62.09 / 26.51 | no |
+   | Soporte y sistemas gestionados | 62.03 / 62.09 | no |
+   | Marketing digital de resultados · SEO y contenido | 73.11 | previstas en D-001 |
+
+   La lista es una propuesta de Claude pendiente de confirmación del fundador junto con la lista de plazas base (`docs/PENDIENTES_DEL_FUNDADOR.md`). NS-CAT v0.1 en código no cambia hasta entonces.
+
+2. **Prueba de mercado nacional.** Las especialidades tecnológicas se prestan en remoto y §4 ya admite como titular a la empresa nacional o 100 % remota con equipo o clientes verificables en la zona. Su prueba de mercado se mide en España: una plaza tecnológica puede abrirse por demanda en una Sala aunque en la zona solo haya una empresa que la ofrezca.
+
+3. **Prioridad en la Antesala y en la Fundación.** Tras los Manantiales, las especialidades con la marca `tech` son el segundo bloque de plazas base que la Antesala busca al fundar y al completar una Sala. Sus Timoneles adoptan antes al Agente, alimentan antes las Fuentes propias y «Dile a tu Agente» (D-075), y sus proyectos generan señales para muchas plazas: un ERP nuevo arrastra datos, ciberseguridad, formación, financiación y mobiliario.
+
+4. **Vía rápida a `PROVISIONAL`.** Una profesión tecnológica que la administración aún no recoge entra por §3.3 en diez días como máximo. Para una candidata tecnológica, el Agente de admisión propone la especialidad desde su web, sus casos y su pila tecnológica, nunca desde su CNAE, que en tecnología no distingue nada.
 
 ---
 
 ## 4. La plaza dentro de la Sala
 
-Reglas (integran D-001 y D-004):
+Reglas (integran D-001, D-004 y D-080):
 
+0. **Sin tope.** Una Sala tiene tantas plazas posibles como Especialidades NS vigentes en su versión de NS-CAT. Hay dos clases: **plaza base**, la que NS-CAT marca para fundar cualquier Sala (Manantiales primero, profesiones tecnológicas segundo, después el resto), y **plaza por demanda**, cualquier otra Especialidad NS, que una Sala abre cuando sus Agentes detectan necesidades de esa especialidad que salen por Embajada (D-015) o se pierden. Tres Embajadas de una misma especialidad en un Ejercicio abren candidatura preferente; la Antesala ofrece la plaza desde la primera. El tamaño de cada Sala emerge de sus datos.
 1. Una empresa, una plaza principal por Sala y, si tiene varias especialidades (varios CNAE), tantas titularidades como plazas vacantes ocupe (D-047). Cada titularidad tiene su exclusividad y su Compromiso. NS premia con Mérito de Red llevar cada especialidad a una Sala distinta.
 2. Especialidad ocupada en la Sala solicitada → el solicitante admitido elige: otra Sala de la zona con la plaza libre, lista de espera de esa Sala, o lista de fundadores de la próxima Sala.
 3. Solapamiento `ADJACENT` → revisión de la Directiva de Sala antes de admitir. `CONFLICT` → no en esa Sala.
@@ -172,7 +215,9 @@ Reglas (integran D-001 y D-004):
 | Dos solicitantes admitidos para la misma plaza | Rúbrica de admisión (D-004) y calidad del Business DNA deciden. El otro pasa a lista de espera con prioridad para la siguiente Sala o para la primera vacante. |
 | Miembro que cambia de especialidad | Nueva solicitud; la plaza anterior se libera con preaviso de un periodo. |
 | Traslado entre Salas de la zona | Permitido una vez por año con vacante en destino y sin cuota pendiente; la reputación viaja con la empresa. |
-| Profesión no contemplada | §3.3: especialidad `PROVISIONAL`. |
+| Profesión no contemplada | §3.3: especialidad `PROVISIONAL`. Si es tecnológica, vía rápida de §3.5: diez días, especialidad propuesta desde la web y los casos, no desde la CNAE. |
+| Candidata que pide una plaza "nueva" junto a una ocupada (trocear la especialidad) | Las tres pruebas de §3.4 deciden. Si el cliente contrataría al mismo proveedor para las dos cosas, o el Agente no puede separarlas desde un Indicio típico, no hay plaza nueva: es `CONFLICT` con la ocupada (D-001) y la candidata va a otra Sala, a la Antesala o a promover la siguiente (D-041). |
+| Profesión tecnológica con una sola empresa en la zona | La prueba de mercado se mide en España (§3.5). Puede ocupar plaza por demanda si la Sala detecta necesidades de esa especialidad. |
 | Concentrador de referidos (cualquier empresa o profesión que ve necesidades de muchos sectores; p. ej., administración de fincas, gestoría, correduría) | Es un **Manantial** (D-059): titular como cualquier otro, en la plaza de su especialidad, con las mismas Normas, cuota y Compromiso. NS lo prioriza en la Antesala y prepara a su Agente para desplegar varias Cesiones de un mismo Interesado. No existe un miembro "fuente de referidos" sin plaza. |
 | Autónomo (persona física con NIF) | Puede ser titular: la persona como empresa. Una persona sin empresa no puede ser miembro (D-059). |
 
@@ -201,15 +246,17 @@ Cuando un miembro dispone de un buen referido y **en su Sala no hay titular de e
 ## 6. Ciclo de vida de una Sala
 
 ```text
-EN_FORMACIÓN   12–15 fundadoras admitidas; Directiva provisional; agentes activados; código provisional; nombre propuesto pendiente de autorización NS
-  → ACTIVA     ≥ 15 plazas ocupadas; nombre autorizado (NS <Nombre>); cuota de contribución en vigor
-  → CONSOLIDADA  25–35 plazas; consejo elegido; rituales estables
-  → ESCISIÓN   > 35 plazas con lista de espera: la Directiva de Zona planifica la Sala N+1 y ofrece a los miembros interesados fundarla
-  → FUSIÓN     < 12 plazas activas durante 2 periodos: se fusiona con otra Sala de la zona (las plazas en conflicto se resuelven por antigüedad y reputación)
+EN_FORMACIÓN   mínimo de fundación alcanzado en la Antesala (parámetro, por defecto 12; D-041); Directiva provisional; Agentes activados; código provisional; nombre propuesto pendiente de autorización NS
+  → ACTIVA     nombre autorizado (NS <Nombre>); Compromiso, Comunicado y Balanza en vigor; plazas base cubriéndose desde la Antesala
+  → CONSOLIDADA  plazas base cubiertas; Directiva elegida; rituales estables; las plazas por demanda se abren con los datos de la Sala
+  → EN_PAUSA   la Directiva o NS detienen la Sala (Mesa, cola, Reloj, Ronda y Latido parados; nadie penalizado; D-076)
+  → FUSIÓN     por debajo del mínimo de fundación durante 2 periodos: se fusiona con otra Sala de la zona (las plazas en conflicto se resuelven por antigüedad y reputación)
   → CIERRE     solo si la fusión no es posible; los miembros pasan a lista de espera prioritaria
 ```
 
-Gobierno: Presidencia y consejo de Sala (rotación anual), Directiva de Zona (apertura, escisión, fusión, Comité de Clasificación), NS España (versión de NS-CAT y de NS-ARP).
+**No existe la escisión por tamaño** (D-080): una Sala nunca se parte por grande. La Sala N+1 de una zona nace por Fundación (D-041): una empresa encuentra su plaza ocupada, promueve la siguiente Sala y reúne fundadoras en la Antesala. Sin tope de plazas, la Sala crece por donde sus Agentes detectan negocio sin cubrir, y la zona crece por donde las plazas ya están ocupadas.
+
+Gobierno: Directiva de Sala (D-048, D-061), Consejo de Zona (apertura, fusión, Comité de Clasificación), NS España (versión de NS-CAT y de NS-ARP).
 
 ---
 
@@ -241,10 +288,12 @@ Regla: el encuentro entre Salas nunca sustituye la prioridad de la propia Sala e
 
 ```text
 Zone          { id, country, name, ine_municipalities[], status, saturation_indicators }
-Chapter(Sala) { id, zone_id, sequence (interno), name ("NS <Nombre>", único en la red), name_status: PROPOSED|AUTHORIZED|REJECTED, status: FORMING|ACTIVE|CONSOLIDATED|SPLITTING|MERGING|CLOSED,
-                council[], nscat_version, protocol_version }
+Chapter(Sala) { id, zone_id, sequence (interno), name ("NS <Nombre>", único en la red), name_status: PROPOSED|AUTHORIZED|REJECTED, status: FORMING|ACTIVE|PAUSED|MERGING|CLOSED,
+                council[], nscat_version, protocol_version }            # sin SPLITTING: no hay escisión por tamaño (D-080); en código hoy FORMING|ACTIVE|PAUSED
 Specialty     { id, nscat_code, cnae_class, name, description, status: OFFICIAL|NS_EXTENDED|PROVISIONAL|RETIRED,
-                overlaps_with[], perfect_referral_examples[], not_for_examples[] }
+                overlaps_with[], perfect_referral_examples[], not_for_examples[],
+                base: bool, manantial: bool, tech: bool,                  # plaza base (D-080), Manantial (D-059), profesión tecnológica (D-080)
+                market_proof_scope: ZONE|COUNTRY }                        # prueba de mercado; COUNTRY para tech (D-080)
 CategorySeat  { id, chapter_id, specialty_id, company_id, status: ACTIVE|VACANT|WAITLISTED|RELEASED, granted_at }
 Waitlist      { zone_id, chapter_id?, specialty_id, application_id, priority, founder_candidate: bool }
 ReferralRoute { referral_id, origin_chapter_id, target_chapter_id, level: CHAPTER|ZONE|NETWORK, consent_ref }
@@ -255,7 +304,8 @@ ReferralRoute { referral_id, origin_chapter_id, target_chapter_id, level: CHAPTE
 ## 9. Pendientes del fundador
 
 1. Delimitar la Zona NS Sevilla (solo capital, o capital + área metropolitana).
-2. Confirmar la lista de especialidades fundadoras de la primera Sala de NS Sevilla (30–40) y su primera versión NS-CAT, incluida la lista de especialidades Manantial (D-059).
-5. Decidir el formato y ritmo de los encuentros entre Salas (§6bis).
-3. Fijar los umbrales de apertura y saturación (propuesta: ≥ 3× el Compromiso semanal de D-042, es decir, 3 Cesiones válidas por titular y semana en el flujo esperado; dos periodos de caída de flujo).
-4. Decidir si el enrutamiento a otras Salas de la zona requiere consentimiento del originador en cada caso o una preferencia general en su Business DNA.
+2. Confirmar la lista de **plazas base** de NS-CAT (D-080), con las especialidades Manantial (D-059) y el bloque de profesiones tecnológicas de §3.5, y con ella la primera versión NS-CAT de NS Sevilla. Ya no hay un número objetivo de plazas: el mínimo de fundación es un parámetro (D-041) y el máximo, el número de Especialidades NS.
+3. Fijar `nscat_version` sobre la CNAE-2025 antes de las admisiones reales: NS-CAT v0.1 en código usa clases de la CNAE-2009; verificar la correspondencia contra el INE.
+4. Fijar los umbrales de apertura y saturación (propuesta: ≥ 3× el Compromiso semanal de D-042, es decir, 3 Cesiones válidas por titular y semana en el flujo esperado; dos periodos de caída de flujo).
+5. Decidir si el enrutamiento a otras Salas de la zona requiere consentimiento del originador en cada caso o una preferencia general en su Business DNA.
+6. Decidir el formato y ritmo de los encuentros entre Salas (§6bis).

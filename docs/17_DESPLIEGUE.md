@@ -66,7 +66,7 @@ A esto se suman las decisiones de producto que siguen esperándote y que la web 
 Pasamos a producción cuando se cumpla todo esto:
 
 - Las cinco condiciones anteriores, hechas y probadas.
-- Entre 12 y 15 empresas fundadoras con plaza confirmada y ADN completo (D-006).
+- El mínimo de fundación de empresas fundadoras con plaza confirmada y ADN completo (parámetro, por defecto 12; D-041, D-080), cubriendo plazas base: Manantiales y profesiones tecnológicas primero.
 - El Timonel de cada una ha hecho al menos un Indicio en la demo y ha aceptado una Cesión ficticia (sabe usarlo).
 - Las reglas inmutables y la cuota firmadas en la Candidatura.
 - Una Directiva nombrada (Presidencia de la Sala).
