@@ -10,6 +10,8 @@ import { and, eq } from "drizzle-orm";
 import { schema } from "@/db/client";
 import { requireDemo, requireMember } from "@/lib/session";
 import { runRastreo } from "@/agents/rastreo";
+import { defaultPublicFeed } from "@/agents/feeds-public";
+import { runOwnSources } from "@/services/sources";
 import { runLatido } from "@/agents/latido";
 
 export async function setPersona(memberId: string) {
@@ -48,11 +50,16 @@ export async function runLatidoAction() {
   revalidatePath("/sala");
 }
 
-/** Rastreo público a demanda (D-031). En producción lo lanza el Reloj de la Sala cada mañana. */
+/**
+ * Rastreo a demanda (D-031): lo mismo que hace la Ronda cada mañana para esta empresa, sin esperar a mañana.
+ * Lee las fuentes públicas que marque NS_PUBLIC_FEEDS (reales en el servidor, lote de muestra en la demo) y las
+ * fuentes propias del Agente (D-038).
+ */
 export async function runRastreoAction() {
   const { company } = await requireMember();
   const db = await getDb();
-  await runRastreo(db, company.id);
+  await runRastreo(db, company.id, defaultPublicFeed());
+  await runOwnSources(db, company.id);
   revalidatePath("/hoy");
   revalidatePath("/mesa");
 }
