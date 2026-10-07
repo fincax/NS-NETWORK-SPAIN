@@ -21,6 +21,7 @@ import { comunicadoStatus, type ComunicadoStatus } from "@/services/comunicado";
 import { candidacyCounts } from "@/services/antesala";
 import { activeInterview } from "@/services/entrevista";
 import { eurRange } from "@/lib/format";
+import { needPhrase } from "@/core/headline";
 
 export type ToqueAction = "ACCEPT" | "PROPOSE" | "ANSWER_DRAFT" | "OPEN" | "PUBLISH_SIGNAL" | "APPROVE_COMMUNIQUE" | "CONTACTED";
 
@@ -77,7 +78,9 @@ export async function hoyBoard(db: Db, ctx: { chapterId: string; companyId: stri
   const rounds = await infoRoundsFor(db, open);
   const matches = new Map((await db.query.matchCandidates.findMany({ where: inArray(schema.matchCandidates.id, open.map((r) => r.matchId).concat("00000000-0000-0000-0000-000000000000")) })).map((m) => [m.id, m]));
   const fitOf = (r: { matchId: string }) => { const m = matches.get(r.matchId); return m ? `${Math.round(m.score.total * 100)} %` : ""; };
-  const whyOf = (r: { matchId: string }) => matches.get(r.matchId)?.explanation.why[0] ?? "";
+  const needs = new Map((await db.query.needs.findMany({ where: inArray(schema.needs.id, open.map((r) => r.needId).concat("00000000-0000-0000-0000-000000000000")), columns: { id: true, description: true } })).map((n) => [n.id, n]));
+  // La necesidad emparejada abre el detalle (D-077): un Indicio sirve a varios titulares y cada Cesión dice qué pide de este.
+  const whyOf = (r: { matchId: string; needId: string }) => { const n = needs.get(r.needId); const why = matches.get(r.matchId)?.explanation.why[0] ?? ""; return n ? `Necesita ${needPhrase(n.description)}. ${why}`.trim() : why; };
 
   const toques: Toque[] = [];
   const contratiempos: Contratiempo[] = [];

@@ -169,3 +169,29 @@ describe("D-029 · Interesado avisado y D-032 · Encargo", () => {
     expect(buildExplanation(withDemand, needObra, turnsA).why.some((w) => w.includes("Encargo"))).toBe(true);
   });
 });
+
+describe("Titular de la Cesión (D-077)", () => {
+  it("la Cesión se titula con la necesidad emparejada, no con la cabecera del Indicio", async () => {
+    const { cesionHeadline, needPhrase, subjectOf } = await import("@/core/headline");
+    // Un Indicio de contratación (cabecera: selección de personal) también deriva obra para Híspalis.
+    const layer0: ChapterLayer = { ...layer0A, need_summary: "Empresa industrial de 51–200 empleados necesita selección de las nuevas incorporaciones · 90 días · fuente pública" };
+    expect(subjectOf(layer0)).toBe("Empresa industrial de 51–200 empleados");
+    expect(needPhrase("Adecuación de la línea de producción.")).toBe("adecuación de la línea de producción");
+    expect(cesionHeadline({ description: "Adecuación de la línea de producción." }, layer0)).toBe("Empresa industrial de 51–200 empleados necesita adecuación de la línea de producción");
+    expect(cesionHeadline({ description: "Marca de la nueva línea." }, { industry: "Tecnología", company_size_band: "1-10" })).toBe("Empresa tecnológica de 1–10 empleados necesita marca de la nueva línea");
+    expect(cesionHeadline({ description: "Fiscalidad internacional." }, { industry: "Agroalimentario", company_size_band: "11-50" })).toBe("Empresa de agroalimentario de 11–50 empleados necesita fiscalidad internacional");
+  });
+
+  it("el Puente determinista presenta la necesidad del cesionario, no la cabecera del Indicio", async () => {
+    const { DeterministicProvider } = await import("@/agents/deterministic");
+    const pkg = await new DeterministicProvider().draftIntro({
+      originatorCompany: "Consultora Fiscal Triana", originatorPerson: "Alberto Vidal", receiverCompany: "Reformas Industriales Híspalis", receiverPerson: "Carlos Ruiz",
+      receiverServices: ["Adecuación de plantas de producción", "Oficinas dentro de nave"], thirdPartyCompany: "Farmalab Andalucía", contactName: "Lucía",
+      needSummary: "Empresa industrial de 51–200 empleados necesita selección de las nuevas incorporaciones · 90 días · relación directa",
+      needDescription: "Adecuación de la línea de producción.", detailedContext: "Nueva línea en Alcalá.", introductionPreferences: "Visita a planta.",
+    });
+    expect(pkg.subject).toBe("Presentación: Reformas Industriales Híspalis · Adecuación de la línea de producción");
+    expect(pkg.message).toContain("vuestra empresa industrial de 51–200 empleados necesita adecuación de la línea de producción");
+    expect(pkg.message).not.toMatch(/selección/);
+  });
+});

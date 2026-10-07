@@ -4,6 +4,7 @@ import { getDb, schema } from "@/db/client";
 import { requireMember } from "@/lib/session";
 import { eurRange, dateTime } from "@/lib/format";
 import { Empty, StateBadge } from "@/components/ui";
+import { needPhrase } from "@/core/headline";
 
 export default async function CesionesPage() {
   const { company, chapter, member } = await requireMember();
@@ -16,6 +17,7 @@ export default async function CesionesPage() {
   });
   const companies = new Map((await db.query.companies.findMany()).map((c) => [c.id, c]));
   const matches = new Map((await db.query.matchCandidates.findMany({ where: inArray(schema.matchCandidates.id, rows.map((r) => r.matchId).concat("00000000-0000-0000-0000-000000000000")) })).map((m) => [m.id, m]));
+  const needs = new Map((await db.query.needs.findMany({ where: inArray(schema.needs.id, rows.map((r) => r.needId).concat("00000000-0000-0000-0000-000000000000")), columns: { id: true, description: true } })).map((n) => [n.id, n]));
   return (
     <div className="stack" style={{ gap: 24 }}>
       <div className="page-head">
@@ -40,7 +42,7 @@ export default async function CesionesPage() {
                 return (
                   <tr key={r.id}>
                     <td><StateBadge state={r.state} /></td>
-                    <td><Link href={`/cesiones/${r.id}`}>{companies.get(r.originatorCompanyId)?.name} → {companies.get(r.receiverCompanyId)?.name}</Link><br /><span className="mono">{gives ? "cedes" : r.receiverCompanyId === company.id ? "recibes" : "Sala"}</span></td>
+                    <td><Link href={`/cesiones/${r.id}`}>{companies.get(r.originatorCompanyId)?.name} → {companies.get(r.receiverCompanyId)?.name}</Link><br /><span className="mono">{gives ? "cedes" : r.receiverCompanyId === company.id ? "recibes" : "Sala"}{needs.get(r.needId) ? ` · necesita ${needPhrase(needs.get(r.needId)!.description)}` : ""}</span></td>
                     <td>{m ? `${Math.round(m.score.total * 100)} %` : "—"}</td>
                     <td className="num money">{r.valueVerified ? `${r.valueVerified.toLocaleString("es-ES")} €` : eurRange(r.valuePotentialMin, r.valuePotentialMax)}</td>
                     <td className="mono">{dateTime(r.updatedAt)}</td>

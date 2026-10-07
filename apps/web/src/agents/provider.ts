@@ -44,7 +44,8 @@ export interface IntroInput {
   receiverServices: string[];
   thirdPartyCompany: string;
   contactName?: string;
-  needSummary: string;
+  needSummary: string; // resumen del Indicio (contexto)
+  needDescription: string; // la necesidad que cubre el cesionario (D-077)
   detailedContext: string;
   introductionPreferences: string;
 }

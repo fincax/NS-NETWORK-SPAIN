@@ -1840,3 +1840,20 @@ Servicio a la red        10 %   solo suma: acciones de dirección del mes (3 = 1
 
 **Revisit when.** Haya que restaurar una versión del ADN (añadir el botón entonces, no antes) o la Directiva pida pausar algo más fino que un Agente (una fuente, una acción): hoy el interruptor por fuente es `agent_sources.active`.
 
+## D-077 · La Cesión se titula con la necesidad emparejada, no con la cabecera del Indicio
+
+**Status:** CONFIRMED (el fundador, al preparar la demo para empresarios: "corrige")
+**Date:** 2026-10-07
+
+**Context.** Un Indicio deriva varias necesidades para titulares distintos (D-004: una señal, varias oportunidades). Su resumen de capa 0 se encabeza con la necesidad más probable: "Empresa industrial de 51–200 empleados necesita selección de las nuevas incorporaciones". La Cesión que la Mesa propone a Reformas Industriales Híspalis es por otra necesidad del mismo Indicio, "Adecuación de la línea de producción", pero la ficha, Hoy y el Puente determinista usaban el resumen del Indicio como titular. Carlos leía "necesita selección de personal" en una Cesión suya y concluía, con razón, que no iba con él. Contradice NS-ARP §7.5: toda recomendación explica qué pide de ti.
+
+**Options.** (1) Dejar el resumen del Indicio y añadir la necesidad en letra pequeña (es lo que había: no se lee). (2) Titular con la necesidad emparejada y dejar el resumen del Indicio como contexto. (3) Generar un resumen por necesidad en la extracción (más llamadas al modelo, y el Indicio es uno).
+
+**Choice.** (2). `core/headline.ts` (puro): `cesionHeadline(need, capa0)` = sujeto de la capa 0 + "necesita" + necesidad. La ficha de la Cesión titula así y muestra "Indicio de [cedente]: [resumen]" como contexto; la lista de Cesiones añade "necesita …" a cada fila; en Hoy, el detalle de la Cesión recibida y de la propuesta empieza por "Necesita …"; el Puente recibe `needDescription` además de `needSummary` y presenta al cesionario por lo que cubre (determinista y modelo).
+
+**Why.** El cesionario decide en 30 segundos sobre lo que le piden a él. El Indicio es la historia; la Cesión es su parte.
+
+**Consequences.** `core/headline.ts`, `cesiones/[id]/page.tsx`, `cesiones/page.tsx`, `services/hoy.ts`, `agents/provider.ts` (`IntroInput.needDescription`), `agents/deterministic.ts`, `agents/anthropic.ts`, `services/referrals.ts`. Dos pruebas en `tests/core.test.ts`. Ningún estado ni puerta de NS-ARP cambia. `docs/15` recoge la regla.
+
+**Revisit when.** El modelo genere resúmenes por necesidad con coste despreciable, o un titular haga falta en más superficies (Gaceta, Crónica).
+

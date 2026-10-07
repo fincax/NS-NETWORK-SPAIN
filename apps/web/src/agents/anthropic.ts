@@ -68,7 +68,7 @@ Notas privadas (nunca se comparten literalmente; extrae solo el hecho): """${inp
         {
           role: "user",
           content: `Redacta el Puente (introducción cálida) que ${input.originatorPerson} (${input.originatorCompany}) enviará desde su propio correo a ${input.contactName ?? "su contacto"} en ${input.thirdPartyCompany}, presentando a ${input.receiverPerson} de ${input.receiverCompany} (${input.receiverServices.join(", ")}).
-Necesidad: ${input.needSummary}. Contexto: ${input.detailedContext}. Preferencia de introducción del cesionario: ${input.introductionPreferences}.
+Lo que el Interesado necesita de ${input.receiverCompany}: ${input.needDescription} Resumen del Indicio: ${input.needSummary}. Contexto: ${input.detailedContext}. Preferencia de introducción del cesionario: ${input.introductionPreferences}.
 Tono: cercano, breve, de empresario a empresario. Sin jerga. Sin mencionar NS ni agentes. Nunca menciones dinero, comisiones ni contraprestaciones.`,
         },
       ],

@@ -335,6 +335,7 @@ async function openIntro(db: Db, referralId: string, memberId: string, revealSco
     thirdPartyCompany: envelope.identity_layer?.third_party_company.name ?? "vuestra empresa",
     contactName: effectiveScope === "COMPANY_AND_CONTACT" ? envelope.identity_layer?.contact_person?.name : undefined,
     needSummary: envelope.chapter_layer.need_summary,
+    needDescription: (await db.query.needs.findFirst({ where: eq(schema.needs.id, ref.needId), columns: { description: true } }))?.description ?? envelope.chapter_layer.need_summary,
     detailedContext: envelope.qualification_layer?.detailed_context ?? "",
     introductionPreferences: receiverDna!.dna.referrals.introduction_preferences,
   });
