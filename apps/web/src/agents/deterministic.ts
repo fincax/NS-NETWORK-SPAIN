@@ -88,6 +88,27 @@ const EXPLICIT_NEEDS: { re: RegExp; code: string; p: number; desc: string }[] = 
   { re: /seguro/i, code: "SEGUROS_EMPRESA", p: 0.7, desc: "Revisión del programa de seguros." },
   { re: /mobiliario/i, code: "MOBILIARIO_OFICINA", p: 0.8, desc: "Equipamiento de oficinas." },
   { re: /prevenci[oó]n de riesgos|\bprl\b/i, code: "PRL", p: 0.9, desc: "Servicio de prevención." },
+  // Bloque tecnológico y plazas base nuevas de NS-CAT v0.2 (D-080). Solo mención explícita de la necesidad, nunca por trigger:
+  // la plaza por demanda se abre con lo que el Interesado busca, no con lo que ya tiene.
+  { re: /(busca|buscan|quiere|quieren|necesita|necesitan|va a|van a|plantea|plantean|valora|valoran|cambiar|elegir|renovar)[^.]{0,40}\berp\b|\berp\b nuevo que|sin erp/i, code: "ERP_GESTION", p: 0.8, desc: "Selección e implantación de un ERP." },
+  { re: /\bcrm\b/i, code: "CRM_AUTOMATIZACION", p: 0.8, desc: "Implantación de CRM y automatización comercial." },
+  { re: /(a|en) la nube|migrar (los )?servidores|servidores fuera de la oficina|\bcloud\b|copias de seguridad/i, code: "NUBE_INFRAESTRUCTURA", p: 0.8, desc: "Migración a la nube e infraestructura." },
+  { re: /software a medida|aplicaci[oó]n (propia|a medida|interna)|desarrollo a medida|programa a medida|portal (interno|de clientes)/i, code: "SOFTWARE_MEDIDA", p: 0.8, desc: "Desarrollo de software a medida." },
+  { re: /cuadro(s)? de mando|business intelligence|\bbi\b|anal[ií]tica de datos|informes de direcci[oó]n|datos dispersos/i, code: "DATOS_ANALITICA", p: 0.8, desc: "Cuadros de mando e inteligencia de negocio." },
+  { re: /inteligencia artificial|\bia\b|agentes? de ia|chatbot|automatizar (la )?atenci[oó]n/i, code: "IA_AGENTES", p: 0.8, desc: "Asistentes y agentes de IA." },
+  { re: /automatizar (procesos|tareas|la facturaci[oó]n|los pedidos)|integrar (los )?sistemas|robotizar/i, code: "AUTOMATIZACION_PROCESOS", p: 0.75, desc: "Automatización de procesos e integraciones." },
+  { re: /tienda online|comercio electr[oó]nico|e-?commerce|vender (online|por internet)|marketplace/i, code: "ECOMMERCE_PLATAFORMAS", p: 0.85, desc: "Tienda online o plataforma digital." },
+  { re: /experiencia de usuario|\bux\b|dise[nñ]o de producto digital|prototip/i, code: "PRODUCTO_DIGITAL_UX", p: 0.75, desc: "Producto digital y experiencia de usuario." },
+  { re: /sensoriz|internet de las cosas|\biot\b|industria 4\.0|mantenimiento predictivo/i, code: "IOT_INDUSTRIA", p: 0.8, desc: "Sensorización e industria 4.0." },
+  { re: /soporte inform[aá]tico|mantenimiento inform[aá]tico|servicio gestionado|puestos de trabajo inform[aá]ticos/i, code: "SISTEMAS_GESTIONADOS", p: 0.75, desc: "Soporte y sistemas gestionados." },
+  { re: /campa[nñ]as? (de pago|online|digitales)|captar clientes online|marketing digital|google ads|publicidad (online|digital)/i, code: "MARKETING_DIGITAL", p: 0.8, desc: "Captación digital de clientes." },
+  { re: /\bseo\b|posicionamiento (web|org[aá]nico|en google)|contenidos para la web/i, code: "SEO_CONTENIDO", p: 0.8, desc: "Posicionamiento orgánico y contenidos." },
+  { re: /despido(s)?|\bere\b|\berte\b|convenio colectivo|inspecci[oó]n de trabajo|demanda laboral/i, code: "DERECHO_LABORAL", p: 0.85, desc: "Asesoramiento y defensa laboral." },
+  { re: /busca(n)? (una )?(nave|oficina|local)|alquilar (una )?(nave|oficina|local)|(nave|oficina|local) en alquiler|vender (la|su) nave/i, code: "INMOBILIARIO_EMPRESA", p: 0.8, desc: "Búsqueda o venta de nave, oficina o local." },
+  { re: /autoconsumo|placas solares|fotovoltaic|eficiencia energ[eé]tica|factura (de la luz|el[eé]ctrica)/i, code: "ENERGIA_EFICIENCIA", p: 0.8, desc: "Energía y eficiencia energética." },
+  { re: /limpieza de (oficinas|la nave|las instalaciones|naves)|empresa de limpieza/i, code: "LIMPIEZA", p: 0.8, desc: "Limpieza de instalaciones." },
+  { re: /protecci[oó]n de datos|\brgpd\b|\bgdpr\b|canal de denuncias|compliance|\bdpo\b/i, code: "COMPLIANCE_DATOS", p: 0.8, desc: "Compliance y protección de datos." },
+  { re: /formaci[oó]n (para|de) (la plantilla|el equipo|los empleados|directivos)|formaci[oó]n bonificada|formar al equipo/i, code: "FORMACION_EMPRESAS", p: 0.75, desc: "Formación para la plantilla." },
 ];
 
 export const INDUSTRY_RULES: { re: RegExp; industry: string }[] = [

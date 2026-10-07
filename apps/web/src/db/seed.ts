@@ -7,26 +7,25 @@ import { SEED_CANDIDACIES, SEED_COMPANIES } from "./seed-data";
 import { acceptAllNormas } from "@/core/normas";
 import { onboardCompany } from "@/services/onboarding";
 import { hasPassword, setPassword } from "@/lib/accounts";
+import { ensureBaseSeats } from "@/services/plazas";
 
 /**
- * Especialidades de NS-CAT que aún no existen en la base de datos → especialidad nueva y plaza vacante en la Sala.
- * Idempotente. Lo llaman la semilla y /api/jobs, para que una especialidad añadida a NS-CAT (p. ej. Administración de
- * fincas, D-059) llegue al servidor con `actualizar.sh`, sin volver a ejecutar la semilla. Devuelve los códigos añadidos.
+ * Sincroniza NS-CAT con la base de datos y abre en la Sala las plazas base que falten (D-080).
+ * Toda especialidad del catálogo existe en `specialties` (las de demanda también: el Agente puede enrutar necesidades a
+ * ellas), pero solo las marcadas `base` reciben fila de plaza vacante; las demás se abren por demanda (`services/plazas`).
+ * Idempotente. Lo llaman la semilla y /api/jobs, para que una especialidad añadida a NS-CAT llegue al servidor con
+ * `actualizar.sh`, sin volver a ejecutar la semilla. Devuelve los códigos de las plazas abiertas.
  */
 export async function syncNscatSeats(db: Db, chapterId: string): Promise<string[]> {
-  const added: string[] = [];
   for (const s of NSCAT) {
     const existing = await db.query.specialties.findFirst({ where: eq(schema.specialties.nscatCode, s.code) });
-    const [row] = existing
-      ? [existing]
-      : await db.insert(schema.specialties).values({ nscatCode: s.code, cnaeClass: s.cnae, name: s.name, description: s.description, status: s.status, regulated: s.regulated ?? false, overlapsWith: s.overlapsWith ?? [] }).returning();
-    const seat = await db.query.categorySeats.findFirst({ where: eq(schema.categorySeats.specialtyId, row.id) });
-    if (!seat) {
-      await db.insert(schema.categorySeats).values({ chapterId, specialtyId: row.id, status: "VACANT" });
-      added.push(s.code);
+    if (!existing) {
+      await db.insert(schema.specialties).values({ nscatCode: s.code, cnaeClass: s.cnae, name: s.name, description: s.description, status: s.status, regulated: s.regulated ?? false, overlapsWith: s.overlapsWith ?? [] });
+    } else if (existing.name !== s.name || existing.description !== s.description || existing.status !== s.status || JSON.stringify(existing.overlapsWith) !== JSON.stringify(s.overlapsWith ?? [])) {
+      await db.update(schema.specialties).set({ name: s.name, description: s.description, status: s.status, regulated: s.regulated ?? false, overlapsWith: s.overlapsWith ?? [] }).where(eq(schema.specialties.id, existing.id));
     }
   }
-  return added;
+  return ensureBaseSeats(db, chapterId);
 }
 
 export async function seedChapter(db: Db) {

@@ -3,6 +3,7 @@
  * Company Agent (cedente y candidatos), Matchmaker, Trust & Compliance. Todo se persiste y se audita.
  * Los agentes producen estimaciones tipadas; el Match Score y las puertas son funciones puras.
  */
+import { openSeatOnDemand } from "@/services/plazas";
 import { and, eq, inArray, ne } from "drizzle-orm";
 import type { Db } from "@/db/client";
 import { schema } from "@/db/client";
@@ -101,7 +102,16 @@ export async function runMesa(db: Db, opportunitySignalId: string): Promise<Mesa
       const names = need.specialty_hints.map((c) => specialtyByCode.get(c)?.name ?? c);
       result.uncovered.push(...names);
       await db.update(schema.needs).set({ status: "UNCOVERED" }).where(eq(schema.needs.id, needRow.id));
-      await audit(db, { chapterId, kind: "NEED_UNCOVERED", actor: { type: "AGENT", id: matchmaker.id }, subject: { type: "Need", id: needRow.id }, policyApplied: "routing.chapter_first", result: `Sin titular en la Sala para ${names.join(", ")}: plaza vacante. Candidata a Embajada.`, significant: !isInternal, companyIds: isInternal ? [os.originatorCompanyId] : [] });
+      // Plaza por demanda (D-080): si la Sala aún no tenía fila de plaza para la especialidad, la Mesa la abre. Solo con
+      // Indicios de Sala: un Indicio confidencial (Escenario D) no deja huella en las plazas.
+      const opened: string[] = [];
+      if (!isInternal) {
+        for (const specialtyId of specialtyIds) {
+          const r = await openSeatOnDemand(db, { chapterId, specialtyId, reason: `necesidad detectada por la Mesa, "${need.description}"`, actor: { type: "AGENT", id: matchmaker.id } });
+          if (r.opened) opened.push(r.specialtyName);
+        }
+      }
+      await audit(db, { chapterId, kind: "NEED_UNCOVERED", actor: { type: "AGENT", id: matchmaker.id }, subject: { type: "Need", id: needRow.id }, policyApplied: "routing.chapter_first", result: `Sin titular en la Sala para ${names.join(", ")}: plaza vacante. Candidata a Embajada.${opened.length ? ` Plaza de ${opened.join(", ")} abierta por demanda (D-080).` : ""}`, significant: !isInternal, companyIds: isInternal ? [os.originatorCompanyId] : [] });
       continue;
     }
     if (!isInternal) {

@@ -6,7 +6,7 @@ import { balance } from "@/services/today";
 import { eur } from "@/lib/format";
 import { openDemands } from "@/services/demands";
 import { compromisoStatus } from "@/services/compromiso";
-import { MANANTIALES } from "@/db/nscat";
+import { compareSeats, MANANTIALES, NSCAT, NSCAT_VERSION, seatClassLabel, TECH } from "@/db/nscat";
 import { latestGazette, relevantForMe, weekCommuniques } from "@/services/comunicado";
 import { weekStart } from "@/core/compromiso";
 import { isoWeekLabel } from "@/core/comunicado";
@@ -20,6 +20,9 @@ export default async function SalaPage() {
   const byId = new Map(companies.map((c) => [c.id, c]));
   const balances = await Promise.all(companies.filter((c) => c.status === "ACTIVE" || c.status === "SUSPENDED").map(async (c) => ({ c, b: await balance(db, chapter.id, c.id), r: await compromisoStatus(db, chapter.id, c.id) })));
   const occupied = seats.filter((s) => s.status === "ACTIVE").length;
+  const orderedSeats = [...seats].map((s) => ({ ...s, name: s.specialtyName })).sort(compareSeats);
+  const openedCodes = new Set(seats.map((s) => s.code));
+  const onDemand = NSCAT.filter((s) => !openedCodes.has(s.code)).sort(compareSeats);
   const demandsOpen = await openDemands(db, chapter.id);
   const gazette = await latestGazette(db, chapter.id);
   const relevant = gazette ? await relevantForMe(db, chapter.id, company.id, gazette.weekStart) : [];
@@ -39,18 +42,30 @@ export default async function SalaPage() {
       </div>
 
       <section>
-        <h2 style={{ marginBottom: 12 }}>Plazas</h2>
+        <h2 style={{ marginBottom: 4 }}>Plazas</h2>
+        <p className="muted" style={{ marginTop: 0, marginBottom: 12 }}>En orden de captación de la Antesala: Manantiales, profesiones tecnológicas, resto de plazas base y plazas abiertas por demanda (D-059, D-080).</p>
         <div className="seats">
-          {seats.map((s) => {
+          {orderedSeats.map((s) => {
             const holder = s.companyId ? byId.get(s.companyId) : undefined;
+            const cls = seatClassLabel(s.code);
             return (
               <div key={s.id} className={`seat ${holder ? "" : "vacant"}`}>
-                <span className="mono">{s.specialtyName}{MANANTIALES.has(s.code) ? <span className="badge blue" title="Especialidad Manantial (D-059): ve necesidades de muchos sectores; misma plaza y mismas reglas que cualquier titular" style={{ marginLeft: 8 }}>Manantial</span> : null}</span>
+                <span className="mono">
+                  {s.specialtyName}
+                  {MANANTIALES.has(s.code) ? <span className="badge blue" title="Especialidad Manantial (D-059): ve necesidades de muchos sectores; misma plaza y mismas reglas que cualquier titular" style={{ marginLeft: 8 }}>Manantial</span> : null}
+                  {TECH.has(s.code) ? <span className="badge" title="Profesión tecnológica (D-080): segundo bloque de captación tras los Manantiales; prueba de mercado nacional" style={{ marginLeft: 8 }}>Tech</span> : null}
+                  {cls === "Por demanda" ? <span className="badge amber" title="Plaza abierta por demanda (D-080): la Sala detectó necesidades de esta especialidad sin titular" style={{ marginLeft: 8 }}>Por demanda</span> : null}
+                </span>
                 {holder ? <Link className="name" href={`/empresa/${holder.slug}`}>{holder.name}{holder.id === company.id ? " · tú" : ""}</Link> : <span className="name">Plaza vacante · Antesala</span>}
               </div>
             );
           })}
         </div>
+        {onDemand.length ? (
+          <p className="muted" style={{ marginTop: 12 }}>
+            <strong>{onDemand.length} especialidades más en NS-CAT v{NSCAT_VERSION}</strong> aún sin plaza en esta Sala. Se abren por demanda: cuando la Mesa detecta una necesidad sin titular o la Directiva aprueba una candidatura (D-080). {onDemand.map((s) => s.name).join(" · ")}.
+          </p>
+        ) : null}
       </section>
 
       <section>

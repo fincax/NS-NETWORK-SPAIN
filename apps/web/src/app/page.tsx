@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { asc, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { getDb, schema } from "@/db/client";
-import { NSCAT } from "@/db/nscat";
+import { MANANTIALES, NSCAT, TECH, compareSeats } from "@/db/nscat";
 import { monthAgo, tiemposDinamismo } from "@/services/dinamismo";
 import { Monogram } from "@/components/brand";
 import { betaRequestAction } from "./beta-actions";
@@ -20,22 +20,31 @@ async function networkPace(): Promise<{ hours: number; n: number } | null> {
   }
 }
 
-async function seatAvailability() {
+type SeatState = "taken" | "vacant" | "demand";
+const SEAT_STATE_LABEL: Record<SeatState, string> = { taken: "ocupada", vacant: "vacante", demand: "se abre por demanda" };
+
+/** Toda Especialidad NS del catálogo, con su estado en NS Cumbre (D-080): ocupada, vacante (plaza abierta) o por demanda (aún sin plaza). */
+async function seatAvailability(): Promise<{ code: string; name: string; taken: boolean; state: SeatState }[]> {
+  const fallback = () => NSCAT.map((s) => ({ code: s.code, name: s.name, taken: false, state: (s.base ? "vacant" : "demand") as SeatState })).sort(compareSeats);
   try {
     const db = await getDb();
     const chapter = await db.query.chapters.findFirst({ where: eq(schema.chapters.slug, "ns-cumbre") });
-    if (!chapter) return NSCAT.map((s) => ({ code: s.code, name: s.name, taken: false }));
-    const rows = await db.select({ code: schema.specialties.nscatCode, name: schema.specialties.name, status: schema.categorySeats.status }).from(schema.categorySeats).innerJoin(schema.specialties, eq(schema.specialties.id, schema.categorySeats.specialtyId)).where(eq(schema.categorySeats.chapterId, chapter.id)).orderBy(asc(schema.specialties.name));
-    return rows.map((r) => ({ code: r.code, name: r.name, taken: r.status === "ACTIVE" }));
+    if (!chapter) return fallback();
+    const rows = await db.select({ code: schema.specialties.nscatCode, status: schema.categorySeats.status }).from(schema.categorySeats).innerJoin(schema.specialties, eq(schema.specialties.id, schema.categorySeats.specialtyId)).where(eq(schema.categorySeats.chapterId, chapter.id));
+    const byCode = new Map(rows.map((r) => [r.code, r.status]));
+    return NSCAT.map((s) => {
+      const st = byCode.get(s.code);
+      const state: SeatState = st === "ACTIVE" ? "taken" : st ? "vacant" : "demand";
+      return { code: s.code, name: s.name, taken: state === "taken", state };
+    }).sort(compareSeats);
   } catch {
-    return NSCAT.map((s) => ({ code: s.code, name: s.name, taken: false }));
+    return fallback();
   }
 }
 
 export default async function LandingPage({ searchParams }: { searchParams: Promise<{ ok?: string; error?: string }> }) {
   const { ok, error } = await searchParams;
   const seats = await seatAvailability();
-  const vacant = seats.filter((s) => !s.taken);
   const pace = await networkPace();
   return (
     <div className="public-shell">
@@ -59,7 +68,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
           <a href="#plaza" className="btn primary">Solicitar plaza en la beta</a>
           <a href="#disponibilidad" className="btn">Comprobar disponibilidad de mi sector</a>
         </div>
-        <p className="mono" style={{ marginTop: 10 }}>Beta privada en NS Sevilla · NS-CAT tiene {seats.length} especialidades · {vacant.length} sin titular en NS Cumbre{pace ? ` · de un Apunte a la llamada al Interesado: ${pace.hours} h de media este mes` : ""}</p>
+        <p className="mono" style={{ marginTop: 10 }}>Beta privada en NS Sevilla · NS-CAT tiene {seats.length} especialidades · {seats.filter((s) => s.state === "vacant").length} plazas abiertas sin titular en NS Cumbre · {seats.filter((s) => s.state === "demand").length} se abren por demanda{pace ? ` · de un Apunte a la llamada al Interesado: ${pace.hours} h de media este mes` : ""}</p>
       </section>
 
       <section id="como" className="narrative">
@@ -95,12 +104,12 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
 
       <section id="disponibilidad" className="public-section">
         <h2>Disponibilidad en NS Cumbre</h2>
-        <p className="lead">Una plaza por especialidad. Las ocupadas no admiten otra empresa del mismo sector; las vacantes esperan en la Antesala.</p>
+        <p className="lead">Una plaza por especialidad y sin tope de plazas: la Sala tiene tantas como Especialidades NS. Las ocupadas no admiten otra empresa del mismo sector; las vacantes esperan en la Antesala; las que aún no tienen plaza se abren con la demanda de la Sala o con tu candidatura (D-080). Primero los Manantiales y las profesiones tecnológicas.</p>
         <div className="notice" style={{ marginTop: 16 }}><strong>¿Tu especialidad está ocupada?</strong> Presenta la candidatura igualmente. NS te ayuda a promover y fundar la siguiente Sala de tu zona: si reúnes el mínimo de empresas fundadoras, la Promotora recibe una gratificación que NS anuncia, como meses de cuota gratis.</div>
         <div className="seats" style={{ marginTop: 16 }}>
           {seats.map((s) => (
             <div key={s.code} className={`seat ${s.taken ? "" : "vacant"}`}>
-              <span className="mono">{s.taken ? "ocupada" : "vacante"}</span>
+              <span className="mono">{SEAT_STATE_LABEL[s.state]}{TECH.has(s.code) ? " · tech" : ""}{MANANTIALES.has(s.code) ? " · manantial" : ""}</span>
               <span className="name">{s.name}</span>
             </div>
           ))}
@@ -123,7 +132,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
               <label htmlFor="sp">Especialidad</label>
               <select id="sp" name="specialtyCode" defaultValue="">
                 <option value="">Mi sector no está en la lista</option>
-                {seats.map((s) => <option key={s.code} value={s.code}>{s.name}{s.taken ? " · plaza ocupada (Antesala)" : " · vacante"}</option>)}
+                {seats.map((s) => <option key={s.code} value={s.code}>{s.name}{s.state === "taken" ? " · plaza ocupada (Antesala)" : s.state === "vacant" ? " · vacante" : " · se abre con tu candidatura"}</option>)}
               </select>
             </div>
             <div className="field" style={{ gridColumn: "1 / -1" }}><label htmlFor="msg">Cuéntanos en una frase a quién sirve tu empresa (opcional)</label><input id="msg" name="message" maxLength={280} /></div>

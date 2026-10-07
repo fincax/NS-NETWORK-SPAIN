@@ -6,11 +6,12 @@
  * Al alcanzar el mínimo, la Directiva funda la Sala (nombre propio con prefijo NS, nunca territorial, D-014)
  * y la Promotora recibe la gratificación de fundación que NS anuncia.
  */
+import { ensureBaseSeats } from "@/services/plazas";
 import { and, asc, eq, inArray } from "drizzle-orm";
 import type { Db } from "@/db/client";
 import { schema } from "@/db/client";
 import { audit } from "@/lib/audit";
-import { NSCAT, SPECIALTY_NAME } from "@/db/nscat";
+import { SPECIALTY_NAME } from "@/db/nscat";
 import { CITIES } from "@/agents/deterministic";
 
 /** Mínimo de fundadoras para abrir una Sala (D-006: 12–15). "A determinar en la práctica", por eso vive en la fundación, no en el código. */
@@ -102,10 +103,8 @@ export async function activateFounding(db: Db, input: { foundingId: string; name
   const slug = norm(name).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
   if (await db.query.chapters.findFirst({ where: eq(schema.chapters.slug, slug) })) throw new FoundingError("Ya existe una Sala con ese nombre en la red: el nombre es único (D-014).");
   const [chapter] = await db.insert(schema.chapters).values({ zoneId: f.zoneId, name, slug, nameStatus: "PROPOSED", status: "FORMING" }).returning();
-  for (const s of NSCAT) {
-    const sp = await db.query.specialties.findFirst({ where: eq(schema.specialties.nscatCode, s.code) });
-    if (sp) await db.insert(schema.categorySeats).values({ chapterId: chapter.id, specialtyId: sp.id, status: "VACANT" });
-  }
+  // La Sala nace con sus plazas base (D-080); las plazas por demanda se abrirán cuando sus Agentes detecten la necesidad.
+  await ensureBaseSeats(db, chapter.id);
   const now = new Date();
   await db.update(schema.chapterFoundings).set({ status: "ACTIVATED", proposedName: name, chapterId: chapter.id, rewardGrantedAt: now, updatedAt: now }).where(eq(schema.chapterFoundings.id, f.id));
   await db.update(schema.betaRequests).set({ status: "APPROVED", decidedAt: now, updatedAt: now }).where(and(eq(schema.betaRequests.foundingId, f.id), eq(schema.betaRequests.status, "FOUNDING")));

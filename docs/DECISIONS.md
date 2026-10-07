@@ -1939,3 +1939,43 @@ Servicio a la red        10 %   solo suma: acciones de dirección del mes (3 = 1
 **Consequences.** D-006 pasa a `SUPERSEDED`. `docs/12_SALAS.md`: §0, §2.2 (condiciones de apertura sin cifras), §3.4 (las tres pruebas), §3.5 nuevo (profesiones tecnológicas), §4 (plaza base y por demanda, casuística de troceo y de profesión tecnológica emergente), §6 (ciclo de vida sin escisión por tamaño), §8 (modelo) y §9. `CLAUDE.md` §3, `docs/13_LEXICO_NS.md` (Sala, Plaza, Plaza base, Plaza por demanda, Especialidad, Pruebas de Especialidad), `docs/05` y `docs/17` (referencias a D-006). En código no hay tope que desactivar: `FOUNDING_MIN_DEFAULT` sigue siendo 12 y `chapters.status` sigue siendo FORMING/ACTIVE/PAUSED (nunca hubo escisión). El bloque tecnológico y la lista de plazas base entran en NS-CAT cuando el fundador confirme la lista (`docs/PENDIENTES_DEL_FUNDADOR.md`); hasta entonces NS-CAT v0.1 no cambia.
 
 **Revisit when.** Una Sala supere las 60 plazas ocupadas y se degraden el plazo de respuesta de la Directiva o la lectura de la Gaceta; más del 20 % de las Candidaturas se clasifiquen `ADJACENT` (umbral heredado de D-001); o la primera especialidad tecnológica `PROVISIONAL` cumpla sus dos periodos de prueba.
+
+---
+
+## D-081 · NS-CAT v0.2: la lista de plazas base con el bloque tecnológico, y la plaza por demanda que se abre sola
+
+**Status:** CONFIRMED (el fundador delega la lista en el equipo fundador: "¿puedes establecer tú la lista de plazas base con el bloque tecnológico?")
+**Date:** 2026-10-07
+
+**Context.** D-080 dejó pendiente la lista de plazas base y el bloque tecnológico. Sin ella, la Sala de demostración seguía con las dieciséis especialidades de NS-CAT v0.1, todas precreadas como plazas, y la plaza por demanda era solo un concepto en `docs/12`. El fundador pide que la lista la fije el equipo fundador.
+
+**Options.** (1) Esperar a una lista del fundador. (2) Fijar NS-CAT v0.2 ahora aplicando las tres pruebas de D-080 a cada candidata, marcar `base` y `tech`, y construir la plaza por demanda en código. (3) Ampliar el catálogo sin tocar la mecánica de plazas (todas precreadas).
+
+**Choice.** (2). **NS-CAT v0.2: 35 Especialidades NS, 24 plazas base y 11 por demanda.**
+
+| Bloque | Especialidades | Clase |
+| --- | --- | --- |
+| **Manantiales** (D-059), primero en la Antesala | Administración de fincas · Asesoría fiscal · Seguros de empresa · Arquitectura · **Implantación de ERP y sistemas de gestión** (nuevo, Manantial tecnológico) | base |
+| **Tecnológicas**, segundo bloque (D-080) | Desarrollo de software a medida · Nube e infraestructura · Datos, analítica e inteligencia de negocio · Inteligencia artificial y agentes · Ciberseguridad · Telecomunicaciones · Marketing digital de resultados | base |
+| **Resto de plazas base** | Obra y reforma industrial · PRL · Selección de personal · Mobiliario de oficina · Branding · Legal M&A · Valoración de empresas · Financiación de empresa · Logística · Facility management · Derecho laboral · Inmobiliario de empresa | base |
+| **Por demanda · tecnológicas** | Implantación de CRM y automatización comercial · Automatización de procesos e integraciones · Comercio electrónico y plataformas digitales · Producto digital y experiencia de usuario · Internet de las cosas e industria 4.0 · Soporte y sistemas gestionados · SEO y contenido | demanda |
+| **Por demanda · resto** | Energía y eficiencia energética · Limpieza de instalaciones · Compliance y protección de datos · Formación para empresas | demanda |
+
+Cada especialidad lleva en `nscat.ts` su clase CNAE índice, su descripción en lenguaje de negocio con lo que **no** es (la prueba de la unidad de contratación hecha texto: "No es implantar un ERP ni montar una tienda online") y su matriz de solapamiento. Ejemplos de las tres pruebas aplicadas: ERP y software a medida son dos plazas (proveedores distintos); ciberseguridad y nube son dos plazas (la auditoría y la migración no son el mismo referido); desarrollo web no es plaza aparte de comercio electrónico (misma empresa); despidos y convenios son una sola plaza, Derecho laboral; gestoría de nóminas no es plaza aparte de Asesoría fiscal (la pyme contrata una sola asesoría).
+
+**La implantación de ERP es Manantial tecnológico.** Decisión del equipo fundador, revocable por el fundador: un ERP nuevo arrastra datos, ciberseguridad, formación, financiación y mobiliario, y el implantador conoce la operación entera del cliente. Inmobiliario de empresa queda como candidata a Manantial, sin la marca, hasta ver datos.
+
+**La plaza por demanda, en código:**
+
+- `syncNscatSeats` mete todo el catálogo en `specialties` (las de demanda también: el Agente puede enrutar necesidades a ellas) y abre fila de plaza vacante solo para las `base` (`ensureBaseSeats`, `services/plazas.ts`). Corre en la semilla y en cada pasada de `/api/jobs`, para todas las Salas, así que llega al servidor con `actualizar.sh`.
+- Una Sala nueva nace con sus plazas base (`activateFounding`).
+- **La Mesa abre la plaza** (`openSeatOnDemand`) cuando una necesidad de una especialidad sin fila de plaza queda sin titular (`NEED_UNCOVERED`), con evento `SEAT_OPENED_ON_DEMAND` en la Mesa Permanente. Solo con Indicios de Sala: un Indicio confidencial (Escenario D) no deja huella en las plazas. Idempotente.
+- **La Antesala abre la plaza** cuando la Directiva aprueba una candidatura para una especialidad sin fila de plaza: el veredicto dice "Plaza por demanda: se abre al aprobar" y se puede aprobar.
+- El extractor determinista reconoce menciones explícitas de las especialidades nuevas ("quieren montar una tienda online", "migrar a la nube", "buscan una nave", "despidos", "autoconsumo"), nunca por trigger: la plaza se abre con lo que el Interesado busca, no con lo que ya tiene. El proveedor Anthropic las recibe del catálogo en la base de datos.
+- **Pantallas.** Mi Sala ordena las plazas por orden de captación (Manantial · Tech · Base · Por demanda), con sus marcas, y enumera las especialidades de NS-CAT aún sin plaza en la Sala. La portada muestra las 35 especialidades en tres estados (ocupada, vacante, se abre por demanda) y el selector de candidatura las ofrece todas. El alta de empresa ofrece todas las especialidades: la de demanda se abre al activar.
+
+**Why.** El fundador quiere las profesiones tecnológicas dentro desde el primer día y la lista no puede esperar a la administración ni a una ronda de reuniones: las tres pruebas de D-080 permiten fijarla con criterio y corregirla con datos. Construir la plaza por demanda a la vez evita precrear 35 plazas vacías en cada Sala, que es lo que haría parecer vacío lo que es un catálogo.
+
+**Consequences.** `apps/web/src/db/nscat.ts` (v0.2: `NSCAT_VERSION`, `base`, `tech`, `BASE_SEATS`, `TECH`, `seatPriority`, `compareSeats`, `seatClassLabel`), `services/plazas.ts` (nuevo), `db/seed.ts`, `services/fundacion.ts`, `services/antesala.ts`, `agents/mesa.ts`, `agents/deterministic.ts`, `app/api/jobs/route.ts`, Mi Sala, portada y alta. 11 pruebas nuevas en `tests/nscat.test.ts` (236 en total). Sin migración: las marcas viven en el catálogo, como la de Manantial; la columna llegará cuando una consulta las necesite. En el servidor, la primera pasada de `/api/jobs` tras actualizar inserta las 19 especialidades nuevas y abre 8 plazas base en NS Cumbre; las 11 de demanda aparecen en Mi Sala como "aún sin plaza". `docs/12` §3.5, `docs/06`, `docs/07` y el léxico recogen la lista. Pendientes del fundador: revocar o confirmar ERP como Manantial, decidir Inmobiliario de empresa, y la migración a CNAE-2025.
+
+**Revisit when.** La primera Sala real complete sus plazas base, o una especialidad por demanda reciba tres Embajadas en un Ejercicio (D-015) y convenga pasarla a base; o la primera tecnológica `PROVISIONAL` entre por §3.3.

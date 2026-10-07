@@ -164,26 +164,27 @@ Con datos reales, la taxonomía se corrige sola: si los referidos de dos especia
 
 Instrucción del fundador: las nuevas profesiones tecnológicas serán las más receptivas a lo agentic de NS. La CNAE las describe peor que a ninguna otra, así que NS-CAT las trata con cuatro reglas propias:
 
-1. **Finura.** La sección J (61 telecomunicaciones, 62 programación y consultoría informática, 63 datos y hosting) y las partes tecnológicas de 70–74 se despliegan con al menos la misma finura que la 69.10. Despliegue inicial propuesto, cada especialidad sometida a las tres pruebas de §3.4:
+1. **Finura.** La sección J (61 telecomunicaciones, 62 programación y consultoría informática, 63 datos y hosting) y las partes tecnológicas de 70–74 se despliegan con al menos la misma finura que la 69.10. Despliegue en **NS-CAT v0.2** (D-081), cada especialidad sometida a las tres pruebas de §3.4:
 
-   | Especialidad NS propuesta | Clase CNAE índice | En NS-CAT v0.1 |
-   | --- | --- | --- |
-   | Desarrollo de software a medida | 62.01 | no |
-   | Implantación de ERP y sistemas de gestión | 62.02 | no |
-   | Implantación de CRM y automatización comercial | 62.02 | no |
-   | Ciberseguridad | 62.02 | sí (`CIBERSEGURIDAD`) |
-   | Nube e infraestructura | 62.03 / 63.11 | no |
-   | Datos, analítica e inteligencia de negocio | 62.02 / 63.11 | no |
-   | Inteligencia artificial y agentes | 62.01 / 62.02 | no (`PROVISIONAL` si hace falta) |
-   | Automatización de procesos e integraciones | 62.02 | no |
-   | Comercio electrónico y plataformas digitales | 62.01 / 47.91 | no |
-   | Producto digital y experiencia de usuario | 62.01 / 74.10 | no |
-   | Telecomunicaciones y redes | 61.10 | sí (`TELECOMUNICACIONES`) |
-   | Internet de las cosas e industria 4.0 | 62.09 / 26.51 | no |
-   | Soporte y sistemas gestionados | 62.03 / 62.09 | no |
-   | Marketing digital de resultados · SEO y contenido | 73.11 | previstas en D-001 |
+   | Especialidad NS | Clase CNAE índice | Código | Clase de plaza |
+   | --- | --- | --- | --- |
+   | Implantación de ERP y sistemas de gestión | 62.02 | `ERP_GESTION` | base · **Manantial** |
+   | Desarrollo de software a medida | 62.01 | `SOFTWARE_MEDIDA` | base |
+   | Nube e infraestructura | 62.03 | `NUBE_INFRAESTRUCTURA` | base |
+   | Datos, analítica e inteligencia de negocio | 63.11 | `DATOS_ANALITICA` | base |
+   | Inteligencia artificial y agentes | 62.01 | `IA_AGENTES` | base |
+   | Ciberseguridad | 62.02 | `CIBERSEGURIDAD` | base |
+   | Telecomunicaciones | 61.10 | `TELECOMUNICACIONES` | base |
+   | Marketing digital de resultados | 73.11 | `MARKETING_DIGITAL` | base |
+   | Implantación de CRM y automatización comercial | 62.02 | `CRM_AUTOMATIZACION` | por demanda |
+   | Automatización de procesos e integraciones | 62.02 | `AUTOMATIZACION_PROCESOS` | por demanda |
+   | Comercio electrónico y plataformas digitales | 47.91 | `ECOMMERCE_PLATAFORMAS` | por demanda |
+   | Producto digital y experiencia de usuario | 74.10 | `PRODUCTO_DIGITAL_UX` | por demanda |
+   | Internet de las cosas e industria 4.0 | 62.09 | `IOT_INDUSTRIA` | por demanda |
+   | Soporte y sistemas gestionados | 62.03 | `SISTEMAS_GESTIONADOS` | por demanda |
+   | SEO y contenido | 73.11 | `SEO_CONTENIDO` | por demanda |
 
-   La lista es una propuesta de Claude pendiente de confirmación del fundador junto con la lista de plazas base (`docs/PENDIENTES_DEL_FUNDADOR.md`). NS-CAT v0.1 en código no cambia hasta entonces.
+   Fuera del bloque tecnológico, v0.2 añade como plaza base Derecho laboral e Inmobiliario de empresa, y como plazas por demanda Energía y eficiencia energética, Limpieza de instalaciones, Compliance y protección de datos y Formación para empresas. La lista completa, con descripciones y solapamientos, está en `apps/web/src/db/nscat.ts`; el razonamiento de cada prueba, en D-081.
 
 2. **Prueba de mercado nacional.** Las especialidades tecnológicas se prestan en remoto y §4 ya admite como titular a la empresa nacional o 100 % remota con equipo o clientes verificables en la zona. Su prueba de mercado se mide en España: una plaza tecnológica puede abrirse por demanda en una Sala aunque en la zona solo haya una empresa que la ofrezca.
 
@@ -304,7 +305,7 @@ ReferralRoute { referral_id, origin_chapter_id, target_chapter_id, level: CHAPTE
 ## 9. Pendientes del fundador
 
 1. Delimitar la Zona NS Sevilla (solo capital, o capital + área metropolitana).
-2. Confirmar la lista de **plazas base** de NS-CAT (D-080), con las especialidades Manantial (D-059) y el bloque de profesiones tecnológicas de §3.5, y con ella la primera versión NS-CAT de NS Sevilla. Ya no hay un número objetivo de plazas: el mínimo de fundación es un parámetro (D-041) y el máximo, el número de Especialidades NS.
+2. ~~Confirmar la lista de plazas base~~ → fijada en NS-CAT v0.2 (D-081): 24 plazas base (5 Manantiales, 7 tecnológicas, 12 más) y 11 por demanda. Queda del fundador: revocar o confirmar la implantación de ERP como Manantial tecnológico y decidir si Inmobiliario de empresa lo es.
 3. Fijar `nscat_version` sobre la CNAE-2025 antes de las admisiones reales: NS-CAT v0.1 en código usa clases de la CNAE-2009; verificar la correspondencia contra el INE.
 4. Fijar los umbrales de apertura y saturación (propuesta: ≥ 3× el Compromiso semanal de D-042, es decir, 3 Cesiones válidas por titular y semana en el flujo esperado; dos periodos de caída de flujo).
 5. Decidir si el enrutamiento a otras Salas de la zona requiere consentimiento del originador en cada caso o una preferencia general en su Business DNA.

@@ -2,7 +2,7 @@ import { asc, eq } from "drizzle-orm";
 import { getDb, schema } from "@/db/client";
 import { requireMember } from "@/lib/session";
 import { onboardAction } from "./actions";
-import { SPECIALTY_NAME } from "@/db/nscat";
+import { NSCAT, SPECIALTY_NAME, compareSeats } from "@/db/nscat";
 import { NORMAS_NS, NORMAS_VERSION } from "@/core/normas";
 
 export default async function AltaPage({ searchParams }: { searchParams: Promise<{ error?: string; candidatura?: string; sala?: string }> }) {
@@ -14,6 +14,9 @@ export default async function AltaPage({ searchParams }: { searchParams: Promise
   const cand = candidatura ? await db.query.betaRequests.findFirst({ where: eq(schema.betaRequests.id, candidatura) }) : undefined;
   const fromCandidacy = cand && cand.status === "APPROVED" ? cand : undefined;
   const seats = await db.select({ status: schema.categorySeats.status, name: schema.specialties.name, code: schema.specialties.nscatCode, holderId: schema.categorySeats.companyId }).from(schema.categorySeats).innerJoin(schema.specialties, eq(schema.specialties.id, schema.categorySeats.specialtyId)).where(eq(schema.categorySeats.chapterId, chapter.id)).orderBy(asc(schema.specialties.name));
+  // Toda Especialidad NS se puede solicitar (D-080): las que aún no tienen plaza en la Sala se abren al activar la empresa.
+  const seatByCode = new Map(seats.map((s) => [s.code, s]));
+  const options = NSCAT.map((s) => ({ code: s.code, name: s.name, status: seatByCode.get(s.code)?.status ?? "UNOPENED" })).sort(compareSeats);
   return (
     <div className="stack" style={{ gap: 24 }}>
       <div className="page-head">
@@ -34,7 +37,7 @@ export default async function AltaPage({ searchParams }: { searchParams: Promise
             <label htmlFor="sp">Especialidad (NS-CAT)</label>
             <select id="sp" name="specialtyCode" required defaultValue={fromCandidacy?.specialtyCode ?? ""}>
               <option value="" disabled>Comprobar disponibilidad de mi sector…</option>
-              {seats.map((s) => <option key={s.code} value={s.code} disabled={s.status === "ACTIVE"}>{s.name} · {s.status === "ACTIVE" ? "ocupada" : "vacante"}</option>)}
+              {options.map((s) => <option key={s.code} value={s.code} disabled={s.status === "ACTIVE"}>{s.name} · {s.status === "ACTIVE" ? "ocupada" : s.status === "VACANT" ? "vacante" : "plaza por demanda, se abre al activar"}</option>)}
             </select>
           </div>
         </fieldset>

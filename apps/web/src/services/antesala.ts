@@ -5,6 +5,7 @@
  * El sistema calcula el veredicto de plaza (vacante, ocupada, solapada, sin clasificar, duplicada)
  * para que la Directiva decida con un toque. Toda transición queda en el audit log.
  */
+import { openSeatOnDemand } from "@/services/plazas";
 import { and, asc, desc, eq, inArray, ne } from "drizzle-orm";
 import type { Db } from "@/db/client";
 import { schema } from "@/db/client";
@@ -100,10 +101,11 @@ export async function triageCandidacy(db: Db, chapterId: string, c: Candidacy, z
     return { seat: "UNCLASSIFIED", overlaps: [], duplicateOf, outsideZone, canApprove: false, recommendation: "Sin especialidad declarada. Clasifícala en NS-CAT antes de seguir; si no encaja en ninguna plaza, propón la especialidad al Consejo de Zona." };
   }
   const spec = NSCAT.find((s) => s.code === c.specialtyCode);
-  const seat = seats.find((s) => s.code === c.specialtyCode);
-  if (!spec || !seat) {
-    return { seat: "UNKNOWN_SPECIALTY", specialtyName: SPECIALTY_NAME[c.specialtyCode] ?? c.specialtyCode, overlaps: [], duplicateOf, outsideZone, canApprove: false, recommendation: "La especialidad no existe en esta Sala. Revisa la clasificación." };
+  if (!spec) {
+    return { seat: "UNKNOWN_SPECIALTY", specialtyName: SPECIALTY_NAME[c.specialtyCode] ?? c.specialtyCode, overlaps: [], duplicateOf, outsideZone, canApprove: false, recommendation: "La especialidad no existe en NS-CAT. Revisa la clasificación o propón la especialidad al Consejo de Zona." };
   }
+  // Plaza por demanda (D-080): la especialidad existe en NS-CAT pero la Sala aún no tiene su fila de plaza. Se abre al aprobar.
+  const seat = seats.find((s) => s.code === c.specialtyCode) ?? { code: spec.code, specialtyName: spec.name, status: "UNOPENED", holderName: null, holderId: null };
   const overlapCodes = new Set([...(spec.overlapsWith ?? []), ...NSCAT.filter((s) => s.overlapsWith?.includes(spec.code)).map((s) => s.code)]);
   const overlaps = seats.filter((s) => overlapCodes.has(s.code) && s.status === "ACTIVE" && s.holderName).map((s) => ({ specialtyName: s.specialtyName, holderName: s.holderName as string }));
 
@@ -111,6 +113,7 @@ export async function triageCandidacy(db: Db, chapterId: string, c: Candidacy, z
     return { seat: "TAKEN", specialtyName: seat.specialtyName, holderName: seat.holderName, overlaps, duplicateOf, outsideZone, canApprove: false, recommendation: `Plaza ocupada por ${seat.holderName}. NS le ayuda a fundar la siguiente Sala: Promotora de nueva Sala o sumarse a una en fundación (D-041). También: Antesala hasta que quede libre, otra Sala de la zona, o revisar si la especialidad real es otra.` };
   }
   const parts: string[] = [];
+  if (seat.status === "UNOPENED") parts.push(`Plaza por demanda (D-080): ${spec.name} aún no estaba abierta en esta Sala; se abre al aprobar la candidatura.`);
   if (duplicateOf?.kind === "MEMBER") parts.push(`${duplicateOf.name} ya es titular de la Sala: comprueba que no es la misma empresa.`);
   else if (duplicateOf) parts.push(`Parece repetida con ${duplicateOf.name}.`);
   if (overlaps.length) parts.push(`Plaza vacante, pero se solapa con ${overlaps.map((o) => `${o.specialtyName} (${o.holderName})`).join(" y ")}: confirma con ese titular que no compiten antes de aprobar.`);
@@ -168,8 +171,12 @@ export async function updateCandidacy(db: Db, input: UpdateCandidacyInput) {
   if (input.status && input.status !== from) {
     if (!CANDIDACY_TRANSITIONS[from]?.includes(input.status)) throw new CandidacyTransitionError(`No se puede pasar de ${CANDIDACY_LABEL[from]} a ${CANDIDACY_LABEL[input.status]}.`);
     if (input.status === "APPROVED") {
-      const triage = await triageCandidacy(db, input.chapterId, { ...c, specialtyCode: patch.specialtyCode !== undefined ? patch.specialtyCode : c.specialtyCode });
+      const code = patch.specialtyCode !== undefined ? patch.specialtyCode : c.specialtyCode;
+      const triage = await triageCandidacy(db, input.chapterId, { ...c, specialtyCode: code });
       if (!triage.canApprove) throw new CandidacyTransitionError(`No se puede aprobar: ${triage.recommendation}`);
+      // Plaza por demanda (D-080): aprobar una candidatura para una especialidad sin fila de plaza la abre en la Sala.
+      const sp = code ? await db.query.specialties.findFirst({ where: eq(schema.specialties.nscatCode, code) }) : undefined;
+      if (sp) await openSeatOnDemand(db, { chapterId: input.chapterId, specialtyId: sp.id, reason: `la candidatura aprobada de ${c.companyName}`, actor: { type: "USER", id: member.id } });
     }
     patch.status = input.status;
     if (["APPROVED", "WAITLISTED", "DECLINED"].includes(input.status)) patch.decidedAt = new Date();
