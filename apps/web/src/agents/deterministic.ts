@@ -5,6 +5,7 @@
  */
 import type { BusinessTrigger, IntroPackage, NeedDraft, SizeBand, TimingBand, ValueBand } from "@/core/types";
 import type { ExtractionInput, ExtractionOutput, IntentInput, InterviewInput, InterviewStep, IntroInput, LLMProvider, QualificationAnswer, QualificationInput } from "./provider";
+import { needPhrase } from "@/core/headline";
 import { scriptedInterview } from "./interview-script";
 import { interpretIntentRules } from "./intencion";
 import type { IntentProposal } from "@/core/intencion";
@@ -273,10 +274,11 @@ export class DeterministicProvider implements LLMProvider {
 
   async draftIntro(input: IntroInput): Promise<IntroPackage> {
     const contact = input.contactName ? `${input.contactName}, ` : "Hola, ";
-    const need = input.needSummary.split("·")[0].trim();
+    const subject = input.needSummary.split("·")[0].trim().split(/ (abrirá|prepara|necesita|presenta) /)[0];
+    const need = `${subject} necesita ${needPhrase(input.needDescription)}`;
     const pref = input.introductionPreferences ? input.introductionPreferences.toLowerCase().replace(/\.$/, "") : "una primera conversación de 20 minutos";
     return {
-      subject: `Presentación: ${input.receiverCompany} · ${need}`,
+      subject: `Presentación: ${input.receiverCompany} · ${input.needDescription.trim().replace(/\.$/, "")}`,
       message: `${contact}te presento a ${input.receiverPerson}, de ${input.receiverCompany}. Sé que ${need.toLowerCase().replace(/^empresa/, "vuestra empresa")} y creo que os pueden ayudar con ${input.receiverServices.slice(0, 2).join(" y ").toLowerCase()}. Los conozco y responden. Si te parece bien, ${input.receiverPerson} os propone ${pref}. Os dejo en contacto.`,
       context_for_receiver: `${input.originatorPerson} (${input.originatorCompany}) cede a ${input.thirdPartyCompany}. Contexto: ${input.detailedContext}`,
       suggested_next_step: input.introductionPreferences || "Primera conversación de 20 minutos esta semana.",

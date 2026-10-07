@@ -5,6 +5,7 @@ import { requireMember } from "@/lib/session";
 import { eur, eurRange, dateTime, hoursUntil, firstName } from "@/lib/format";
 import { Encaje, StateBadge } from "@/components/ui";
 import { PROMISE_LABEL } from "@/core/merit";
+import { cesionHeadline } from "@/core/headline";
 import { MAX_INFO_ROUNDS, QUESTION_STATES, QUICK_QUESTIONS, STATE_LABEL, TIMEOUTS } from "@/core/state-machine";
 import type { QualificationTurn, ReferralState, SignalEnvelope } from "@/core/types";
 import { canSendIntroFromNS, infoRound, type InfoRound } from "@/services/referrals";
@@ -75,11 +76,12 @@ export default async function CesionPage({ params }: { params: Promise<{ id: str
           <span className="spacer" />
           {expires !== null && ["ORIGINATOR_PENDING", "RECEIVER_PENDING"].includes(state) ? <span className="mono">caduca en {expires} h</span> : state === "DIRECTOR_PENDING" ? <span className="mono">la Directiva decide en {TIMEOUTS.directorHours} h</span> : null}
         </div>
-        <p className="eyebrow">{iAmReceiver ? "Cesión que recibes" : iAmOriginator ? "Cesión que cedes" : "Cesión de la Sala"} · {need.description}</p>
+        <p className="eyebrow">{iAmReceiver ? "Cesión que recibes" : iAmOriginator ? "Cesión que cedes" : "Cesión de la Sala"}</p>
         <div className="title">
           <Encaje total={match.score.total} band={match.score.band} />
-          <h1 style={{ fontSize: 26 }}>{env.chapter_layer.need_summary.split("·")[0].trim()}</h1>
+          <h1 style={{ fontSize: 26 }}>{cesionHeadline(need, env.chapter_layer)}</h1>
         </div>
+        <p className="mono" style={{ color: "var(--muted-2)" }}>Indicio de {originator.name}: {env.chapter_layer.need_summary}</p>
         <div className="row" style={{ color: "var(--muted-2)" }}>
           <span>Cedente: <strong style={{ color: "var(--porcelain)" }}>{originator.name}</strong> · {originatorPerson?.fullName}</span>
           <span>→</span>

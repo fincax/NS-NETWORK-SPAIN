@@ -8,6 +8,8 @@ La tarjeta de Cesión es la mejor pieza de UX del producto: el objeto donde la I
 
 Toda tarjeta muestra siempre **WHY · EVIDENCE · CONFIDENCE · UNKNOWN · NEXT ACTION**. Nunca solo un porcentaje. La **Promesa** es la pieza central de las dos caras.
 
+El **titular** de toda Cesión es la necesidad emparejada con este cesionario: «Empresa industrial de 51–200 empleados necesita adecuación de la línea de producción» (D-077). Un Indicio deriva varias necesidades para titulares distintos y su resumen se encabeza con la más probable, que puede no ser la de esta Cesión; ese resumen se muestra como contexto, nunca como titular. Lo mismo rige en Hoy, en la lista de Cesiones y en el Puente.
+
 ## Cara A · el cesionario acepta
 
 | | |
