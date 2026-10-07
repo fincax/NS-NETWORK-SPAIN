@@ -33,7 +33,7 @@ export default async function SalaPage() {
         <div>
           <p className="eyebrow">NS Sevilla · Sala</p>
           <h1>{chapter.name}</h1>
-          <p className="lead">{occupied} plazas ocupadas · {seats.length - occupied} vacantes · Ritmo {Math.max(1, chapter.weeklyPace)} Cesión válida por semana y titular, sin excusas; a la cuarta semana sin ceder, la plaza vuelve a la Antesala (D-042).</p>
+          <p className="lead">{occupied} plazas ocupadas · {seats.length - occupied} especialidades sin titular, abiertas en la Antesala · una plaza por cada Especialidad NS, sin tope (D-080) · Ritmo {Math.max(1, chapter.weeklyPace)} Cesión válida por semana y titular, sin excusas; a la cuarta semana sin ceder, la plaza vuelve a la Antesala (D-042).</p>
         </div>
         <Link href="/sala/alta" className="btn">Solicitar plaza para una empresa</Link>
       </div>

@@ -59,7 +59,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
           <a href="#plaza" className="btn primary">Solicitar plaza en la beta</a>
           <a href="#disponibilidad" className="btn">Comprobar disponibilidad de mi sector</a>
         </div>
-        <p className="mono" style={{ marginTop: 10 }}>Beta privada en NS Sevilla · {vacant.length} plazas vacantes de {seats.length} en NS Cumbre{pace ? ` · de un Apunte a la llamada al Interesado: ${pace.hours} h de media este mes` : ""}</p>
+        <p className="mono" style={{ marginTop: 10 }}>Beta privada en NS Sevilla · NS-CAT tiene {seats.length} especialidades · {vacant.length} sin titular en NS Cumbre{pace ? ` · de un Apunte a la llamada al Interesado: ${pace.hours} h de media este mes` : ""}</p>
       </section>
 
       <section id="como" className="narrative">
