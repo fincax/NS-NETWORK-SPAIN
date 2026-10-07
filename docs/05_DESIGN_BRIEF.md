@@ -49,7 +49,7 @@ La inteligencia se demuestra con **comportamiento** (explicaciones, precisión, 
 | **D-003** Doble consentimiento del empresario; Directiva solo por excepción | La referral card tiene dos caras (originador y receptor). Las excepciones de Directiva se explican en la propia card. |
 | **D-004** Admisión con umbrales + rúbrica + entrevista | El flujo público es "Solicitar plaza", nunca "Sign up". Debe sentirse como solicitar acceso a un club, no como registrarse en una app. |
 | **D-005** Cuota de incorporación + membresía anual, sin comisión | La página de membresía comunica pertenencia y ROI, no "pricing tiers" de SaaS. |
-| **D-006** Salas de 25–35 plazas, arranque con 12–15 fundadoras | La Sala cabe en una sola vista. Diseñar para 30 empresas, no para 3.000. |
+| **D-080** Sin tope de plazas: tantas como Especialidades NS; plazas base y por demanda (sustituye a D-006) | La Sala ya no cabe por fuerza en una sola vista: el mapa de plazas, la Balanza y la Gaceta se diseñan para una Sala de 15 y para una de 80, agrupando por bloques de especialidades (Manantiales, tecnológicas, resto) y con la vista "relevante para ti" como vista por defecto. Nunca para 3.000. |
 | **D-007** Marca institucional-premium, "el club empresarial del futuro" | Ver §4. |
 
 ---

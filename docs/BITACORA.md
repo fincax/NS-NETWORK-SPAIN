@@ -2,6 +2,27 @@
 
 Punto de parada y siguiente paso. Se actualiza al cerrar cada sesión de trabajo.
 
+## 7 de octubre de 2026 · servidor al día con D-075 a D-079; sin tope de plazas (D-080)
+
+**Dónde estamos.**
+
+- Las PR #25 (D-075, D-076), #26, #27 (D-077), #28 (D-078) y #29 (D-079: el Interesado puede ser persona jurídica, profesional o particular) están fusionadas en `main`. **El servidor está al día: `actualizar.sh` lo dejó en `f792522` (PR #29)** con las migraciones `0019` y `0020` aplicadas. D-079 no añade migración.
+
+- **CONFIRMADA por el fundador y registrada como D-080 (sustituye a D-006): sin tope de plazas por Sala.** Con una instrucción añadida: tener muy en cuenta las nuevas profesiones tecnológicas, que serán las más receptivas a lo agentic de NS. D-080 las recoge con cuatro reglas: NS-CAT las despliega con la misma finura que la 69.10 ("62.02 Consultoría informática" no es plaza), su prueba de mercado se mide en España porque se prestan en remoto, la Antesala las prioriza tras los Manantiales y las emergentes tienen vía rápida a `PROVISIONAL`. Actualizados `docs/12` (§0, §2.2, §3.4 las tres pruebas, §3.5 nuevo con la tabla de especialidades tecnológicas propuestas, §4, §6 sin escisión por tamaño, §8, §9), `CLAUDE.md` §3, el léxico (Plaza base, Plaza por demanda, Pruebas de Especialidad, Profesión tecnológica), `docs/05`, `docs/17` y pendientes (lista de plazas base, CNAE-2025). En código no hay nada que desactivar; NS-CAT v0.1 no cambia hasta que el fundador confirme la lista de plazas base. La propuesta tal como se presentó:
+  - El tope de 40 plazas (D-006) venía de los clubes presenciales, donde cada persona debe conocer de memoria a los demás; en NS esa memoria la lleva el Agente (Dossier, Gaceta "relevante para ti"). Levantar el tope es coherente con la tesis.
+  - **El máximo de plazas de una Sala es el número de Especialidades NS vigentes en NS-CAT.** La CNAE es el índice, nunca la plaza (D-001): su clase de cuatro dígitos es demasiado ancha ("Actividades jurídicas", "Consultoría informática").
+  - **Una Especialidad NS existe, y es plaza, solo si pasa tres pruebas a la vez:** (1) *del referido*: un referido válido para A no lo es para B; (2) *de la unidad de contratación*: el cliente contrataría proveedores distintos para A y B (despidos y convenios son un solo laboralista: una plaza; evita trocear para colar a un competidor); (3) *de la señal*: el Agente puede enrutar la necesidad a A o a B desde un Indicio típico sin preguntar. Condición de creación: *prueba de mercado*, al menos tres empresas independientes en la zona la ofrecen como actividad principal.
+  - Ejemplo: 69.10 se despliega en laboral, mercantil y societario, fiscal, concursal, inmobiliario y urbanístico, administrativo y contratación pública, penal económico, propiedad intelectual, compliance y datos, familia y sucesiones, extranjería (las dos últimas, plaza gracias a D-079). El generalista sigue D-001 (una plaza principal, capacidades secundarias sin exclusividad, `ADJACENT` a la Directiva); varias especialidades reales, D-047.
+  - **Lo que limita sin ser un número: la demanda.** Dos tipos de plaza: *plaza base* (las que NS-CAT marca para fundar cualquier Sala, Manantiales primero) y *plaza por demanda* (el resto; se abre en una Sala cuando sus Agentes detectan necesidades de esa especialidad que salen por Embajada o se pierden; enlaza con D-015, tres Embajadas abren candidatura preferente). El tamaño de cada Sala emerge de sus datos.
+  - Riesgos nombrados: carga del Protocolo II (mitiga "relevante para ti"), capacidad de la Directiva (D-048; agrupar especialidades sin tocar la plaza), plazas de nicho sin flujo (plaza por demanda y Prueba de Valor D-050). La promesa "nadie compite conmigo" no cambia.
+  - Nota técnica: NS-CAT en código usa códigos CNAE-2009; fijar `nscat_version` sobre la CNAE-2025 antes de admisiones reales (verificar correspondencia contra el INE).
+  - ~~**Si se confirma:** registrar D-080…~~ → hecho (ver arriba).
+
+**Siguiente paso acordado.**
+
+1. ~~Confirmar la propuesta de plazas sin tope~~ → D-080. Siguiente: el fundador confirma la **lista de plazas base** (Manantiales + bloque tecnológico de `docs/12` §3.5 + resto) y entonces se amplía NS-CAT en código (`nscat.ts`, marcas `base` y `tech`, prioridad en la Antesala) y se fija `nscat_version` sobre la CNAE-2025.
+2. Comprobar como Carlos: en el Apunte y en Ceder un Indicio aparece el tipo de Interesado; un particular se presenta como "Particular necesita …", sin sector ni plantilla. Comprobar también los puntos 1 y 2 de la sesión del 6 de octubre (Mi Agente, Interruptores y `ANTHROPIC_API_KEY`).
+
 ## 6 de octubre de 2026 · auditoría del panel del Timonel y «Mi Agente» construido (D-075)
 
 **Dónde estamos.**

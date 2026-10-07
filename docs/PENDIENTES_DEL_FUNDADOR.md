@@ -2,7 +2,7 @@
 
 Lo que se ha dejado deliberadamente "para más adelante". Claude lo recuerda cuando se le pide y cuando una feature toca uno de estos puntos. Cuando un punto se decide, pasa a `DECISIONS.md` y se tacha aquí con la referencia.
 
-**Última revisión:** 2026-10-01 (noche)
+**Última revisión:** 2026-10-07
 
 ## Protocolos de Sala (D-018, D-019) · detalles pospuestos el 2026-09-14
 
@@ -19,7 +19,10 @@ Lo que se ha dejado deliberadamente "para más adelante". Claude lo recuerda cua
 - **Panel de NS.** Hoy NS confirma las bajas desde la Antesala de la Sala con el rol `is_network`. Falta un panel propio de la red.
 - **Re-aceptación de las Normas NS** por los titulares existentes cuando cambie la versión (D-043).
 - **Manantial (D-059).** Confirmar qué especialidades llevan la marca en NS-CAT v0.1 (propuesta: administración de fincas, asesoría fiscal, seguros de empresa, arquitectura). Construir el Apunte de Interesado múltiple (una comunidad de propietarios → varias Cesiones de un toque, con decisor y plazo de la junta). Recoger la forma jurídica en el alta para admitir autónomos con NIF como titulares. Decidir si la Hoja de Méritos muestra "negocio contrastado para N especialidades" como reconocimiento del Manantial.
-- Delimitar la Zona NS Sevilla; lista de especialidades fundadoras de NS Cumbre y primera versión NS-CAT; umbrales de apertura y saturación; formato de los encuentros entre Salas (`docs/12` §9).
+- ~~Tamaño de la Sala (D-006: 25–35 plazas, tope 40)~~ → **sin tope** (D-080): el máximo es el número de Especialidades NS, definidas por las tres pruebas; plazas base y por demanda; profesiones tecnológicas priorizadas.
+- **Plazas base de NS-CAT (D-080).** Confirmar la lista de especialidades con la marca `base`: los Manantiales (D-059), el bloque tecnológico propuesto en `docs/12` §3.5 (software a medida, ERP, CRM, ciberseguridad, nube, datos e IA, automatización, comercio electrónico, producto digital, telecomunicaciones, IoT, sistemas gestionados) y el resto. Hasta entonces NS-CAT v0.1 en código (16 especialidades) no cambia. Candidata a Manantial tecnológico, a decidir: implantación de ERP y sistemas de gestión (un ERP nuevo arrastra datos, ciberseguridad, formación, financiación y mobiliario).
+- **CNAE-2025 (D-080).** NS-CAT v0.1 usa clases de la CNAE-2009; fijar `nscat_version` sobre la CNAE-2025 y verificar la correspondencia contra el INE antes de las admisiones reales.
+- Delimitar la Zona NS Sevilla; umbrales de apertura y saturación; formato de los encuentros entre Salas (`docs/12` §9).
 
 ## Modelo económico (D-025, D-041)
 

@@ -13,8 +13,10 @@ Criterios de cada nombre: castellano; una palabra siempre que sea posible; insti
 | --- | --- | --- | --- |
 | **Red NS** | La red mundial. | `Network` | "La Red NS enruta lo que la zona no cubre." |
 | **Zona** | Ciudad o área metropolitana que agrupa Salas. Lleva el nombre de la ciudad y pertenece a NS: "NS Sevilla". | `Zone` | "NS Sevilla tiene tres Salas activas." |
-| **Sala** | Unidad fundamental: empresas seleccionadas, una por especialidad. No es territorial. Nombre propio autorizado: "NS Cumbre". | `Chapter` | "Soy miembro de NS Cumbre." |
-| **Plaza** | Posición única de una especialidad dentro de una Sala. | `CategorySeat` | "La plaza de Derecho laboral está vacante." |
+| **Sala** | Unidad fundamental: empresas seleccionadas, una por especialidad. No es territorial. Sin tope de plazas: tantas como Especialidades NS vigentes; el tamaño emerge de la demanda (D-080). Nombre propio autorizado: "NS Cumbre". | `Chapter` | "Soy miembro de NS Cumbre." |
+| **Plaza** | Posición única de una especialidad dentro de una Sala. Una Sala tiene tantas plazas posibles como Especialidades NS (D-080). | `CategorySeat` | "La plaza de Derecho laboral está vacante." |
+| **Plaza base** | Especialidad que NS-CAT marca para fundar cualquier Sala: Manantiales primero, profesiones tecnológicas segundo, después el resto (D-080). | `Specialty{ base }` | "NS Cumbre tiene cubiertas sus plazas base." |
+| **Plaza por demanda** | Cualquier otra Especialidad NS. La Sala la abre cuando sus Agentes detectan necesidades de esa especialidad que salen por Embajada o se pierden (D-080). | `Specialty` sin `base` | "Mobiliario se abrió por demanda tras tres Embajadas." |
 | **Titular** | Empresa que ocupa una plaza. | `seat.company_id` | "El titular de Climatización recibe la cesión." |
 | **Timonel** | La persona que lleva el rumbo de su empresa en NS: da los vistos buenos, autoriza la Apertura, tiende el Puente y emite el Veredicto. El Agente trabaja 24/7; el Timonel manda (D-027). Invariable en género: el Timonel, la Timonel. Cada Titular designa un Timonel y puede designar un **Timonel suplente**. | `Member{ is_primary }` | "Carlos es el Timonel de Híspalis." "Los Timoneles de NS Cumbre se ven en el Pleno." |
 | **Antesala** | Lista de espera de empresas que aguardan plaza o fundan la siguiente Sala. También la pantalla donde la Directiva despacha las candidaturas con el veredicto de plaza (D-035). | `Waitlist` / `Candidacy` | "Hay doce empresas en la Antesala de NS Sevilla." |
@@ -131,8 +133,10 @@ Alternativas consideradas para Tramo: "Escalón" y "Nivel de cuota" (descartado 
 | **NS-ARP** | NS Agentic Referral Protocol: cómo los agentes descubren, comparten, cualifican, puntúan, autorizan y trazan Cesiones. |
 | **NS-ADP** | NS Agentic Disclosure Protocol: cómo los agentes redactan, filtran, envían, acusan y compilan Comunicados, Gaceta y Dossier. |
 | **NS-ATP** | NS Agentic Transparency Protocol: cómo se calculan, contrastan y publican la Balanza y el Ritmo, y cómo el Agente genera la Brújula y sus Movimientos. |
-| **NS-CAT** | Clasificación NS de Actividades: base CNAE + Especialidad NS, ampliable y versionada. |
-| **Especialidad** | Nivel de NS-CAT que otorga plaza. |
+| **NS-CAT** | Clasificación NS de Actividades: base CNAE + Especialidad NS, ampliable y versionada. La CNAE es el índice, nunca la plaza (D-001, D-080). Marca las especialidades `base`, `manantial` y `tech`. |
+| **Especialidad** | Nivel de NS-CAT que otorga plaza. Existe solo si pasa a la vez las tres Pruebas de Especialidad y la prueba de mercado (D-080). |
+| **Pruebas de Especialidad** | Las tres condiciones que hacen plaza a una especialidad (D-080): **del referido** (un referido válido para A no lo es para B), **de la unidad de contratación** (el cliente contrataría proveedores distintos para A y B) y **de la señal** (el Agente enruta la necesidad a A o a B desde un Indicio típico sin preguntar). Más la **prueba de mercado**: tres empresas independientes la ofrecen como actividad principal en la zona, o en España si es tecnológica. |
+| **Profesión tecnológica** | Especialidad NS con la marca `tech` (D-080): software a medida, ERP, CRM, ciberseguridad, nube, datos e IA, automatización, comercio electrónico, producto digital, telecomunicaciones, IoT, sistemas gestionados. Desplegadas con la misma finura que las jurídicas, prueba de mercado nacional, prioridad en la Antesala tras los Manantiales y vía rápida a `PROVISIONAL`. Son las más receptivas a lo agentic de NS. |
 | **Normas NS** | Texto único y versionado que toda empresa acepta de forma expresa, norma a norma, al ocupar su plaza: las cinco reglas inmutables y la condición de la cuota por Tramos. Sin aceptación no hay alta (D-043). | `RulesAcceptance{ rules_version }` |
 | **Reglas inmutables** | Nunca se cobra por una Cesión (expulsión); Compromiso obligatorio de una Cesión válida por semana con Escalera de cuatro semanas (D-010, D-042); calidad sobre cantidad; Comunicado semanal (D-018); Balanza pública (D-019). |
 
