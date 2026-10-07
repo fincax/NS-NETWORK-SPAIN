@@ -2,6 +2,16 @@
 
 Punto de parada y siguiente paso. Se actualiza al cerrar cada sesión de trabajo.
 
+## 7 de octubre de 2026 · servidor al día con D-075 a D-079
+
+**Dónde estamos.**
+
+- Las PR #25 (D-075, D-076), #26, #27 (D-077), #28 (D-078) y #29 (D-079: el Interesado puede ser persona jurídica, profesional o particular) están fusionadas en `main`. **El servidor está al día: `actualizar.sh` lo dejó en `f792522` (PR #29)** con las migraciones `0019` y `0020` aplicadas. D-079 no añade migración.
+
+**Siguiente paso acordado.**
+
+1. Comprobar como Carlos: en el Apunte y en Ceder un Indicio aparece el tipo de Interesado; un particular se presenta como "Particular necesita …", sin sector ni plantilla. Comprobar también los puntos 1 y 2 de la sesión del 6 de octubre (Mi Agente, Interruptores y `ANTHROPIC_API_KEY`).
+
 ## 6 de octubre de 2026 · auditoría del panel del Timonel y «Mi Agente» construido (D-075)
 
 **Dónde estamos.**
