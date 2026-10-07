@@ -2,9 +2,12 @@
 
 Punto de parada y siguiente paso. Se actualiza al cerrar cada sesión de trabajo.
 
-## 7 de octubre de 2026 · servidor al día con D-075 a D-079; sin tope de plazas (D-080)
+## 7 de octubre de 2026 · servidor al día con D-075 a D-079; sin tope de plazas (D-080); NS-CAT v0.2 (D-081)
 
 **Dónde estamos.**
+
+- **NS-CAT v0.2 y la plaza por demanda, construidos (D-081).** El fundador delegó la lista de plazas base. Resultado: 35 Especialidades NS, 24 base (5 Manantiales con la implantación de ERP como Manantial tecnológico, 7 tecnológicas, 12 más) y 11 por demanda. La plaza por demanda ya funciona: la Mesa abre la plaza cuando una necesidad de esa especialidad queda sin titular (`SEAT_OPENED_ON_DEMAND`), la Antesala la abre al aprobar una candidatura, y la semilla y `/api/jobs` solo precrean las base. Mi Sala ordena por captación (Manantial · Tech · Base · Por demanda) y enumera las especialidades aún sin plaza; la portada muestra las 35 en tres estados. 11 pruebas nuevas (236 en total), lint y build en verde. **Tras `actualizar.sh`, la primera pasada de `/api/jobs` (cada cinco minutos) inserta las especialidades nuevas y abre 8 plazas base en NS Cumbre.**
+- Después de D-080, Mi Sala y la portada decían "6 vacantes" y "6 plazas vacantes de 16", que sonaba a cupo. PR #31: ahora cuentan especialidades de NS-CAT sin titular. Fusionada y en el servidor (`27fb510`).
 
 - Las PR #25 (D-075, D-076), #26, #27 (D-077), #28 (D-078) y #29 (D-079: el Interesado puede ser persona jurídica, profesional o particular) están fusionadas en `main`. **El servidor está al día: `actualizar.sh` lo dejó en `f792522` (PR #29)** con las migraciones `0019` y `0020` aplicadas. D-079 no añade migración.
 
@@ -20,7 +23,7 @@ Punto de parada y siguiente paso. Se actualiza al cerrar cada sesión de trabajo
 
 **Siguiente paso acordado.**
 
-1. ~~Confirmar la propuesta de plazas sin tope~~ → D-080. Siguiente: el fundador confirma la **lista de plazas base** (Manantiales + bloque tecnológico de `docs/12` §3.5 + resto) y entonces se amplía NS-CAT en código (`nscat.ts`, marcas `base` y `tech`, prioridad en la Antesala) y se fija `nscat_version` sobre la CNAE-2025.
+1. ~~Confirmar la propuesta de plazas sin tope~~ → D-080. ~~Lista de plazas base~~ → NS-CAT v0.2 (D-081). Siguiente: fusionar la PR de D-081, `actualizar.sh`, esperar una pasada de `/api/jobs` y comprobar como Carlos que Mi Sala muestra las 8 plazas base nuevas (Implantación de ERP con marca Manantial y Tech; Software a medida, Nube, Datos, IA con Tech; Derecho laboral, Inmobiliario de empresa, Marketing digital) y la línea "11 especialidades más en NS-CAT v0.2 aún sin plaza". Decidir si ERP se queda como Manantial y si Inmobiliario de empresa lo es. CNAE-2025 sigue pendiente.
 2. Comprobar como Carlos: en el Apunte y en Ceder un Indicio aparece el tipo de Interesado; un particular se presenta como "Particular necesita …", sin sector ni plantilla. Comprobar también los puntos 1 y 2 de la sesión del 6 de octubre (Mi Agente, Interruptores y `ANTHROPIC_API_KEY`).
 
 ## 6 de octubre de 2026 · auditoría del panel del Timonel y «Mi Agente» construido (D-075)

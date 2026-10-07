@@ -9,8 +9,6 @@ import { runClock } from "@/services/clock";
 import { repairDemoProtagonist, runLatido } from "@/agents/latido";
 import { repairStuckInfoRequests } from "@/services/referrals";
 import { syncNscatSeats } from "@/db/seed";
-import { eq } from "drizzle-orm";
-import { schema } from "@/db/client";
 
 export const dynamic = "force-dynamic";
 
@@ -26,9 +24,10 @@ export async function GET(req: Request) {
   const protagonistReset = await repairDemoProtagonist(db);
   // Reloj de la Sala cada pasada: los plazos de horas de la Pregunta exprés (D-065) no pueden esperar a la Ronda de la mañana. Idempotente.
   const clock = await runClock(db);
-  // Plazas nuevas de NS-CAT (D-059) en la Sala de demostración ya creada: llegan con la actualización, sin resembrar.
-  const cumbre = await db.query.chapters.findFirst({ where: eq(schema.chapters.slug, "ns-cumbre") });
-  const newSeats = cumbre ? await syncNscatSeats(db, cumbre.id) : [];
+  // NS-CAT al día y plazas base nuevas (D-059, D-080) en todas las Salas ya creadas: llegan con la actualización, sin resembrar.
+  const chapters = await db.query.chapters.findMany({ columns: { id: true } });
+  const newSeats: string[] = [];
+  for (const ch of chapters) newSeats.push(...(await syncNscatSeats(db, ch.id)));
   const latido = await runLatido(db);
   const jobs = await runJobs(db, { max: 25 });
   return NextResponse.json({ ...jobs, latido, clock, repaired: repaired.length, newSeats, protagonistReset });
