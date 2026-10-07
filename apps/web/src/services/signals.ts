@@ -19,10 +19,15 @@ export interface CreateSignalInput {
   contactName?: string;
   contactRole?: string;
   contactEmail?: string; // capa 2: solo para el Puente desde NS (D-074, F4)
+  contactPhone?: string; // capa 2: el cesionario lo ve con la Apertura de empresa y contacto (D-078)
   thirdPartyExpectsContact?: boolean; // D-029
 }
 
 const PERSON_IN_TEXT = /\b(don|doña|sr\.|sra\.)\s+[A-ZÁÉÍÓÚ]/;
+/** Teléfonos (formato español, con o sin prefijo) y correos: datos de contacto que solo viven en la capa 2 (D-078). */
+const PHONE_IN_TEXT = /(?:\+34[\s.-]?)?\b[6789]\d{2}[\s.-]?\d{2,3}[\s.-]?\d{2}[\s.-]?\d{2}\b/g;
+const EMAIL_IN_TEXT = /[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g;
+const redactContacts = (t: string) => t.replace(EMAIL_IN_TEXT, "[correo]").replace(PHONE_IN_TEXT, "[teléfono]");
 
 export async function createSignal(db: Db, input: CreateSignalInput) {
   const company = await db.query.companies.findFirst({ where: eq(schema.companies.id, input.companyId) });
@@ -46,14 +51,16 @@ export async function createSignal(db: Db, input: CreateSignalInput) {
   if (leak) {
     extraction.qualification_layer.detailed_context = extraction.qualification_layer.detailed_context.replace(/\b(don|doña|sr\.|sra\.)\s+[A-ZÁÉÍÓÚ][^\s,.]*(\s+[A-ZÁÉÍÓÚ][^\s,.]*)?/g, "[persona]");
   }
+  extraction.chapter_layer.need_summary = redactContacts(extraction.chapter_layer.need_summary);
+  extraction.qualification_layer.detailed_context = redactContacts(extraction.qualification_layer.detailed_context);
   if (input.thirdPartyExpectsContact) extraction.chapter_layer.third_party_expects_contact = true;
   const envelope: SignalEnvelope = {
     chapter_layer: extraction.chapter_layer,
     qualification_layer: extraction.qualification_layer,
     identity_layer: extraction.identity_layer
-      ? { ...extraction.identity_layer, contact_person: input.contactName ? { name: input.contactName, role: input.contactRole, email: input.contactEmail, legal_basis: input.legalBasisForContact ?? "NONE" } : undefined }
+      ? { ...extraction.identity_layer, contact_person: input.contactName ? { name: input.contactName, role: input.contactRole, email: input.contactEmail, phone: input.contactPhone, legal_basis: input.legalBasisForContact ?? "NONE" } : undefined }
       : input.contactName
-        ? { third_party_company: { name: "Sin nombre" }, contact_person: { name: input.contactName, role: input.contactRole, email: input.contactEmail, legal_basis: input.legalBasisForContact ?? "NONE" } }
+        ? { third_party_company: { name: "Sin nombre" }, contact_person: { name: input.contactName, role: input.contactRole, email: input.contactEmail, phone: input.contactPhone, legal_basis: input.legalBasisForContact ?? "NONE" } }
         : undefined,
     private_layer: { source_material_refs: [bs.id], internal_notes: input.rawContent },
   };

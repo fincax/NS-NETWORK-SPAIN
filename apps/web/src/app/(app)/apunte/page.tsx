@@ -76,6 +76,7 @@ export default async function ApuntePage({ searchParams }: { searchParams: Promi
           <div className="form-grid">
             <div className="field"><label htmlFor="cn">Nombre</label><input id="cn" name="contactName" autoComplete="off" autoCapitalize="words" /></div>
             <div className="field"><label htmlFor="cr">Cargo</label><input id="cr" name="contactRole" autoComplete="off" /></div>
+            <div className="field"><label htmlFor="cp">Teléfono (opcional)</label><input id="cp" name="contactPhone" type="tel" inputMode="tel" autoComplete="off" placeholder="600 000 000" /><span className="hint">El cesionario lo verá solo cuando autorices la Apertura con contacto.</span></div>
             <div className="field"><label htmlFor="ce">Correo (opcional)</label><input id="ce" name="contactEmail" type="email" inputMode="email" autoComplete="off" /><span className="hint">Solo para enviar el Puente desde NS en tu nombre.</span></div>
           </div>
           <label className="norma"><input type="checkbox" name="contactConsent" value="1" /><span>Me ha autorizado a dar su contacto. Sin esto, la Sala solo verá la empresa, nunca a la persona.</span></label>
