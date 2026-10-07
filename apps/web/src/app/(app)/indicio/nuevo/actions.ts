@@ -19,6 +19,7 @@ export async function createSignalAction(formData: FormData) {
     visibility: String(formData.get("visibility")) as Visibility,
     contactName,
     contactRole: String(formData.get("contactRole") ?? "").trim() || undefined,
+    contactPhone: String(formData.get("contactPhone") ?? "").trim() || undefined,
     contactEmail: String(formData.get("contactEmail") ?? "").trim().toLowerCase() || undefined,
     legalBasisForContact: contactName ? (String(formData.get("legalBasisForContact")) as LegalBasis) : undefined,
     thirdPartyExpectsContact: formData.get("expectsContact") === "1",

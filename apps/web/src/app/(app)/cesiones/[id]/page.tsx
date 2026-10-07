@@ -125,7 +125,16 @@ export default async function CesionPage({ params }: { params: Promise<{ id: str
                 <p><strong>{env.identity_layer.third_party_company.name}</strong></p>
                 {env.identity_layer.contact_person ? (
                   showContact && !blockedContact ? (
+                    <>
                     <p>{env.identity_layer.contact_person.name}{env.identity_layer.contact_person.role ? ` · ${env.identity_layer.contact_person.role}` : ""} <span className="mono">· base jurídica {env.identity_layer.contact_person.legal_basis}</span></p>
+                    {env.identity_layer.contact_person.phone || env.identity_layer.contact_person.email ? (
+                      <p>
+                        {env.identity_layer.contact_person.phone ? <a href={`tel:${env.identity_layer.contact_person.phone.replace(/[\s.-]/g, "")}`}>{env.identity_layer.contact_person.phone}</a> : null}
+                        {env.identity_layer.contact_person.phone && env.identity_layer.contact_person.email ? " · " : ""}
+                        {env.identity_layer.contact_person.email ? <a href={`mailto:${env.identity_layer.contact_person.email}`}>{env.identity_layer.contact_person.email}</a> : null}
+                      </p>
+                    ) : null}
+                    </>
                   ) : (
                     <p className="locked">Persona de contacto: {blockedContact ? "bloqueada por Compliance (sin base jurídica)" : "solo con Apertura de empresa y contacto"}</p>
                   )

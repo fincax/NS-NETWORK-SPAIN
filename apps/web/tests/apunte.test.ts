@@ -52,3 +52,17 @@ describe("Apunte", () => {
     await expect(createApunte(db, { companyId, memberId, who: "Alguien", need: "una obra, me llevo una comisión del 5 %" })).rejects.toThrow(/D-010/);
   });
 });
+
+describe("Teléfono del contacto (D-078)", () => {
+  it("el teléfono viaja solo en la capa 2 y un teléfono o correo en las observaciones nunca llega a las capas de la Sala", async () => {
+    const r = await createApunte(db, { companyId, memberId, who: "Metalúrgica del Sur", need: "abre planta nueva en Dos Hermanas y busca obra", relation: "CLIENT", contactName: "Rocío Salas", contactRole: "Directora general", contactPhone: "600 123 456", contactEmail: "rocio@metalurgica.es", contactConsent: true, notes: "llamar al 611 22 33 44 o a rocio@metalurgica.es, presupuesto aprobado" });
+    const env = r.opportunitySignal.envelope as SignalEnvelope;
+    expect(env.identity_layer?.contact_person?.phone).toBe("600 123 456");
+    expect(env.identity_layer?.contact_person?.email).toBe("rocio@metalurgica.es");
+    expect(env.identity_layer?.contact_person?.legal_basis).toBe("CONSENT");
+    const shared = `${env.chapter_layer.need_summary} ${env.qualification_layer?.detailed_context ?? ""}`;
+    expect(shared).not.toMatch(/600|611|@/);
+    expect(env.qualification_layer?.detailed_context).toContain("[teléfono]");
+    expect(env.qualification_layer?.detailed_context).toContain("[correo]");
+  });
+});

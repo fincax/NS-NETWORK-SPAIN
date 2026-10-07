@@ -1857,3 +1857,18 @@ Servicio a la red        10 %   solo suma: acciones de dirección del mes (3 = 1
 
 **Revisit when.** El modelo genere resúmenes por necesidad con coste despreciable, o un titular haga falta en más superficies (Gaceta, Crónica).
 
+## D-078 · Teléfono de la persona de contacto, antes que el correo, y datos de contacto solo en la capa 2
+
+**Status:** CONFIRMED (el fundador: "debería venir sí o sí un apartado donde poner teléfono, antes que correo")
+**Date:** 2026-10-07
+
+**Context.** El Apunte y Ceder un Indicio recogían nombre, cargo y correo de la persona de contacto; el correo existe para el Puente desde NS (D-074). Para un referido, el dato de contacto natural es el teléfono, y no tenía campo: iba a Observaciones, es decir, al texto del Indicio, que la extracción copia a la capa 1 (cualificación), visible para los Agentes que declaran interés. El modelo de datos ya preveía `contact_person.phone`.
+
+**Choice.** Campo "Teléfono (opcional)" antes que "Correo (opcional)" en el Apunte (dentro de "Persona de contacto y observaciones") y en Ceder un Indicio. Viaja en `identity_layer.contact_person.phone` y el cesionario lo ve, junto al correo, solo con la Apertura de empresa y contacto, como enlace para llamar. Además, en la clasificación de privacidad (S2) todo teléfono y correo que aparezca en el texto se sustituye por "[teléfono]" y "[correo]" en las capas 0 y 1: los datos de contacto solo viven en la capa 2, escriba lo que escriba el Timonel en Observaciones.
+
+**Why.** Un referido se llama. Y el principio de NS-ARP es que una persona física nunca aparece en las capas de la Sala: el campo propio lleva el dato a su sitio y la redacción cubre el descuido.
+
+**Consequences.** `services/signals.ts` (`contactPhone`, `redactContacts`), `services/apunte.ts`, `apunte/actions.ts`, `apunte/page.tsx`, `indicio/nuevo/actions.ts`, `indicio/nuevo/page.tsx`, `cesiones/[id]/page.tsx`. Una prueba en `tests/apunte.test.ts`. La base jurídica sigue mandando: sin ella, la Sala solo ve la empresa.
+
+**Revisit when.** El Puente pueda enviarse por mensaje o llamada desde NS (hoy solo correo), o haya que validar formatos de teléfono fuera de España.
+
