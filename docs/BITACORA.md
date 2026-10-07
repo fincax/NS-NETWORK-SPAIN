@@ -2,6 +2,26 @@
 
 Punto de parada y siguiente paso. Se actualiza al cerrar cada sesión de trabajo.
 
+## 7 de octubre de 2026 · guía del Timonel contra la demo, y el Interesado tipado (D-077 a D-079)
+
+**Dónde estamos.** Sesión de preguntas del fundador sobre la **Guía del Timonel** (PDF de 6 de octubre, 8 páginas) con la demo delante, para presentarla a empresarios. Cada frase de la guía se ha contrastado con el código; la guía y la demo coinciden salvo un matiz: la página 6 dice que lo confidencial no se usa "ni para razonar", y eso es exacto para el ADN (`never_share`) pero un Indicio `COMPANY_ONLY` sí lo usa el Agente en privado ("Solo para ti" en Hoy, escenario D). De las preguntas salieron cuatro cambios, todos en la rama `claude/gifted-lamport-us52p3`:
+
+- **PR #26, fusionada y desplegada.** «Rastrear ahora» hacía siempre el lote de muestra aunque el servidor tuviera `NS_PUBLIC_FEEDS=real`; ahora usa el mismo selector de fuente que la Ronda y lee también las fuentes propias.
+- **PR #27, fusionada y desplegada (D-077).** La Cesión se titula con la necesidad emparejada ("Empresa industrial de 51–200 empleados necesita adecuación de la línea de producción"), no con la cabecera del Indicio; el resumen del Indicio queda como contexto. Aplica a la ficha, Hoy, la lista y el Puente. `core/headline.ts`.
+- **PR #28, fusionada (D-078).** Teléfono de la persona de contacto, antes que el correo, en el Apunte y en Ceder un Indicio; viaja en la capa 2 y el cesionario lo ve con la Apertura de contacto. Teléfonos y correos escritos en el texto se redactan de las capas 0/1.
+- **PR #29, abierta, pendiente de fusionar (D-079).** Regla de core del fundador: los titulares son empresas o autónomos, pero el **Interesado de una Cesión puede ser persona jurídica, profesional o autónomo, o particular**. `interesado_kind` en la capa 0, chips en el Apunte y en Ceder un Indicio, inferencia del Agente, `ideal_customer.customer_kinds` en el ADN (entrevista y «Dile a tu Agente»), puerta dura `CUSTOMER_KIND`, titular y fichas por tipo, Puente de tú a un particular, nombre del Interesado siempre a la capa 2. Demo: Triana y Alameda atienden particulares; escenario F (Carlos cede a un particular que ha heredado la empresa familiar). 214 pruebas en verde; semilla comprobada en base limpia.
+
+También hoy: el servidor de Clouding se actualiza entrando por SSH con la IP real (la de la guía es de ejemplo) y `bash /opt/ns-network/deploy/actualizar.sh`; la contraseña de la demo está en `/opt/ns-network/apps/web/.env.production` (`DEMO_USER`, `DEMO_PASSWORD`) y es la misma para todos los asistentes, que eligen su Timonel en el selector.
+
+**Siguiente paso acordado (por este orden).**
+
+1. Fusionar la **PR #29** y lanzar `bash /opt/ns-network/deploy/actualizar.sh`. Comprobar como Carlos: apuntar un referido con el chip "Particular" (por ejemplo, "Antonio Vera, ha heredado la empresa familiar y dos naves, necesita planificar la herencia; presupuesto de unos 20.000 €; decide él mismo; sabe que le llamarán") y ver que nacen Cesiones para Consultora Fiscal Triana y Bufete Alameda tituladas "Particular necesita …". El escenario F solo entra en datos nuevos: en el servidor, apuntarlo a mano.
+2. Seguir con las preguntas del fundador sobre la guía: iba frase a frase, y pide para cada una significado, origen y ejemplo. Última resuelta: diferencia entre «Ceder un Indicio» y el botón «Apuntar», y dónde va el contacto.
+3. Pendientes vistos hoy sin hacer: interruptor por fuente pública de NS en Mi Agente (hoy solo se pueden quitar fuentes propias); `TRIGGER_LABEL` duplicado (cosmético); `ANTHROPIC_API_KEY` en el servidor para que la prensa real produzca Indicios.
+4. Lo de siempre: aviso del domingo por correo para el Comunicado (F1); especialidades Manantial y forma jurídica en el alta; notificaciones push (D-039); resto de `docs/08` con el abogado.
+
+**Para actualizar el servidor** cuando haya código nuevo en `main`: `bash /opt/ns-network/deploy/actualizar.sh`.
+
 ## 6 de octubre de 2026 · auditoría del panel del Timonel y «Mi Agente» construido (D-075)
 
 **Dónde estamos.**
