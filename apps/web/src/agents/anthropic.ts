@@ -29,6 +29,7 @@ export class AnthropicProvider implements LLMProvider {
           content: `Estructura este Indicio (NS-ARP S1/S2) para la Sala. Ciudad por defecto: ${input.defaultCity}.
 Especialidades disponibles en la Sala (usa solo estos códigos en specialty_hints): ${input.availableSpecialties.map((s) => `${s.code} (${s.name}: ${s.description})`).join("; ")}.
 ADN de la empresa originadora (contexto de relación y sector): ${JSON.stringify({ description: input.originatorDna.company.description, industries: input.originatorDna.ideal_customer.industries })}.
+${input.interesadoKind ? `El Timonel ha marcado que el Interesado es ${{ EMPRESA: "una empresa", PROFESIONAL: "un profesional o autónomo", PARTICULAR: "un particular" }[input.interesadoKind]}: usa ese valor en chapter_layer.interesado_kind.` : "Deduce en chapter_layer.interesado_kind si el Interesado es EMPRESA, PROFESIONAL (autónomo) o PARTICULAR; para un particular, company_size_band se omite e industry es \"Particular\"."}${input.thirdPartyName ? ` El Interesado se llama "${input.thirdPartyName}": ponlo solo en identity_layer, nunca en capas 0/1.` : ""}
 Texto del Indicio: """${input.rawContent}"""
 Produce: chapter_layer (sin identidad), qualification_layer (contexto detallado sin nombres de personas), identity_layer solo si el texto nombra al tercero, needs (una por especialidad plausible, con plausibility 0..1, evidence y unknowns) y triggers.`,
         },
@@ -68,7 +69,7 @@ Notas privadas (nunca se comparten literalmente; extrae solo el hecho): """${inp
         {
           role: "user",
           content: `Redacta el Puente (introducción cálida) que ${input.originatorPerson} (${input.originatorCompany}) enviará desde su propio correo a ${input.contactName ?? "su contacto"} en ${input.thirdPartyCompany}, presentando a ${input.receiverPerson} de ${input.receiverCompany} (${input.receiverServices.join(", ")}).
-Lo que el Interesado necesita de ${input.receiverCompany}: ${input.needDescription} Resumen del Indicio: ${input.needSummary}. Contexto: ${input.detailedContext}. Preferencia de introducción del cesionario: ${input.introductionPreferences}.
+Lo que el Interesado necesita de ${input.receiverCompany}: ${input.needDescription} Resumen del Indicio: ${input.needSummary}. Contexto: ${input.detailedContext}.${input.interesadoKind === "PARTICULAR" ? " El Interesado es un particular: escríbele de tú y no hables de \"vuestra empresa\"." : input.interesadoKind === "PROFESIONAL" ? " El Interesado es un profesional o autónomo." : ""} Preferencia de introducción del cesionario: ${input.introductionPreferences}.
 Tono: cercano, breve, de empresario a empresario. Sin jerga. Sin mencionar NS ni agentes. Nunca menciones dinero, comisiones ni contraprestaciones.`,
         },
       ],

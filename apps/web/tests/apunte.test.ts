@@ -66,3 +66,17 @@ describe("Teléfono del contacto (D-078)", () => {
     expect(env.qualification_layer?.detailed_context).toContain("[correo]");
   });
 });
+
+describe("Apunte de un particular (D-079)", () => {
+  it("el tipo y el nombre del Interesado van a su sitio: tipo en capa 0, nombre solo en capa 2, y un Apunte \"Lo conozco\" no pierde el nombre", async () => {
+    const r = await createApunte(db, { companyId, memberId, who: "Rosario Gil", interesadoKind: "PARTICULAR", need: "ha heredado un piso y una participación en la empresa familiar y quiere planificar la herencia", relation: "KNOWN", notes: "presupuesto aprobado" });
+    const env = r.opportunitySignal.envelope as SignalEnvelope;
+    expect(env.chapter_layer.interesado_kind).toBe("PARTICULAR");
+    expect(env.chapter_layer.company_size_band).toBeUndefined();
+    expect(env.chapter_layer.need_summary).toMatch(/^Particular necesita/);
+    expect(env.chapter_layer.need_summary).not.toMatch(/Rosario/);
+    expect(env.qualification_layer?.detailed_context).not.toMatch(/Rosario/);
+    expect(env.identity_layer?.third_party_company.name).toBe("Rosario Gil");
+    expect(r.needs.map((n) => n.specialty_hints).flat()).toContain("ASESORIA_FISCAL");
+  });
+});

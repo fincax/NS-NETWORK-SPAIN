@@ -7,7 +7,7 @@ import { getProvider } from "@/agents/provider";
 import { isChapterActive } from "@/services/interruptores";
 import { enqueueMesa } from "@/services/jobs";
 import { runMesa, type MesaResult } from "@/agents/mesa";
-import type { PermissionVerb, SignalEnvelope, Visibility } from "@/core/types";
+import type { PermissionVerb, SignalEnvelope, Visibility, InteresadoKind } from "@/core/types";
 
 export interface CreateSignalInput {
   companyId: string;
@@ -20,6 +20,8 @@ export interface CreateSignalInput {
   contactRole?: string;
   contactEmail?: string; // capa 2: solo para el Puente desde NS (D-074, F4)
   contactPhone?: string; // capa 2: el cesionario lo ve con la Apertura de empresa y contacto (D-078)
+  interesadoKind?: InteresadoKind; // D-079: empresa, profesional o particular; si falta, el Agente lo infiere
+  thirdPartyName?: string; // nombre del Interesado dado por el Timonel (Apunte); solo capa 2
   thirdPartyExpectsContact?: boolean; // D-029
 }
 
@@ -44,7 +46,16 @@ export async function createSignal(db: Db, input: CreateSignalInput) {
   // S1 · extracción por el Agente de la empresa originadora
   const provider = await getProvider();
   const specialties = await db.query.specialties.findMany();
-  const extraction = await provider.extractSignal({ rawContent: input.rawContent, originatorDna: dnaRow.dna, availableSpecialties: specialties.map((s) => ({ code: s.nscatCode, name: s.name, description: s.description })), defaultCity: company.city });
+  const extraction = await provider.extractSignal({ rawContent: input.rawContent, originatorDna: dnaRow.dna, availableSpecialties: specialties.map((s) => ({ code: s.nscatCode, name: s.name, description: s.description })), defaultCity: company.city, interesadoKind: input.interesadoKind, thirdPartyName: input.thirdPartyName });
+  if (input.interesadoKind) extraction.chapter_layer.interesado_kind = input.interesadoKind;
+  if (extraction.chapter_layer.interesado_kind === "PARTICULAR") extraction.chapter_layer.company_size_band = undefined;
+  const thirdPartyName = input.thirdPartyName?.trim();
+  if (thirdPartyName && thirdPartyName.length > 1) {
+    const anon = extraction.chapter_layer.interesado_kind === "EMPRESA" ? "la empresa" : "la persona";
+    extraction.chapter_layer.need_summary = extraction.chapter_layer.need_summary.split(thirdPartyName).join(anon);
+    extraction.qualification_layer.detailed_context = extraction.qualification_layer.detailed_context.split(thirdPartyName).join(anon);
+    extraction.identity_layer = { ...(extraction.identity_layer ?? {}), third_party_company: { ...(extraction.identity_layer?.third_party_company ?? {}), name: thirdPartyName } };
+  }
 
   // S2 · clasificación de privacidad: personas físicas nunca en capa 0/1; la más restrictiva gana
   const leak = PERSON_IN_TEXT.test(extraction.chapter_layer.need_summary) || PERSON_IN_TEXT.test(extraction.qualification_layer.detailed_context);

@@ -34,6 +34,14 @@ export type PermissionVerb = z.infer<typeof PermissionVerb>;
 export const SizeBand = z.enum(["1-10", "11-50", "51-200", "201-500", "500+"]);
 export type SizeBand = z.infer<typeof SizeBand>;
 
+/**
+ * Quién es el Interesado de una Cesión (D-079). Los titulares de NS son empresas o autónomos; el Interesado puede ser
+ * una persona jurídica (EMPRESA), un profesional o autónomo (PROFESIONAL) o un particular (PARTICULAR).
+ */
+export const InteresadoKind = z.enum(["EMPRESA", "PROFESIONAL", "PARTICULAR"]);
+export type InteresadoKind = z.infer<typeof InteresadoKind>;
+export const INTERESADO_LABEL: Record<InteresadoKind, string> = { EMPRESA: "Empresa", PROFESIONAL: "Profesional o autónomo", PARTICULAR: "Particular" };
+
 export const TimingBand = z.enum(["IMMEDIATE", "30D", "90D", "180D", "UNKNOWN"]);
 export type TimingBand = z.infer<typeof TimingBand>;
 
@@ -63,6 +71,7 @@ export type GeoScope = z.infer<typeof GeoScope>;
 export const IdealCustomerProfile = z.object({
   industries: z.array(z.string()).default([]),
   company_size: z.array(SizeBand).default([]),
+  customer_kinds: z.array(InteresadoKind).optional(), // D-079: a quién atiende; ausente = empresas y profesionales; PARTICULAR solo si lo declara
   geography: z.array(z.string()).default([]), // ciudades/regiones/países servidos
   roles: z.array(z.string()).default([]),
   triggers: z.array(z.string()).default([]), // códigos de trigger: NEW_SITE, HEADCOUNT_GROWTH...
@@ -141,9 +150,10 @@ export type BusinessTrigger = z.infer<typeof BusinessTrigger>;
 
 export const ChapterLayer = z.object({
   need_summary: z.string(),
+  interesado_kind: InteresadoKind.optional(), // D-079 · ausente = EMPRESA (envelopes anteriores)
   industry: z.string(),
   geography: GeoScope,
-  company_size_band: SizeBand,
+  company_size_band: SizeBand.optional(), // no aplica a un particular
   timing: TimingBand,
   value_band: ValueBand.optional(),
   relationship_strength: RelationshipStrength,
@@ -164,6 +174,7 @@ export const LegalBasis = z.enum(["CONSENT", "LEGITIMATE_INTEREST", "CONTRACT", 
 export type LegalBasis = z.infer<typeof LegalBasis>;
 
 export const IdentityLayer = z.object({
+  /** El Interesado con nombre: empresa, profesional o particular (D-079). Conserva la clave por compatibilidad. */
   third_party_company: z.object({
     name: z.string(),
     website: z.string().optional(),
@@ -240,6 +251,7 @@ export type QualificationTurn = z.infer<typeof QualificationTurn>;
 
 export const DisqualificationCode = z.enum([
   "OUT_OF_GEO",
+  "CUSTOMER_KIND", // D-079: no atiende a ese tipo de Interesado
   "OUT_OF_ICP",
   "TICKET_MISMATCH",
   "NO_CAPACITY",

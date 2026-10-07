@@ -88,6 +88,17 @@ export const SCENARIOS = {
     originator: "securenet",
     rawContent: "Conozco una startup SaaS de 8 personas que busca diseño de identidad de marca antes de su ronda seed. Presupuesto ajustado, unos 6.000 €.",
   },
+  F: {
+    originator: "hispalis",
+    rawContent:
+      "Mi amigo Antonio Vera, particular, ha heredado de su padre la empresa familiar y dos naves en Alcalá de Guadaíra y necesita planificar fiscalmente la herencia y vender una de las naves este año. Presupuesto aprobado de unos 20.000 € para el asesoramiento; decide él mismo. Sabe que le llamarán.",
+    interesadoKind: "PARTICULAR" as const,
+    thirdPartyName: "Antonio Vera",
+    contactName: "Antonio Vera",
+    contactRole: "Particular",
+    legalBasisForContact: "CONSENT" as const,
+    thirdPartyExpectsContact: true,
+  },
   D: {
     originator: "fiscal-triana",
     rawContent: "Nota interna confidencial: mi cliente Aceitunas Vega Alta, empresa familiar de 35 empleados, prepara la venta de la empresa. Necesitará due diligence legal y valoración en los próximos seis meses.",

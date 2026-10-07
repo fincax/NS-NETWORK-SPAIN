@@ -80,6 +80,13 @@ export function hardGates(
   if (ctx.signalVisibility === "COMPANY_ONLY" && !ctx.originatorAllowsInternalMatching) {
     return { pass: false, code: "VISIBILITY_BLOCK", reason: "La señal es COMPANY_ONLY y el originador no autoriza matching interno." };
   }
+  // Tipo de Interesado (D-079): un particular solo llega a quien declara atender particulares.
+  const kind = layer0.interesado_kind ?? "EMPRESA";
+  const kinds = icp.customer_kinds ?? ["EMPRESA", "PROFESIONAL"];
+  if (!kinds.includes(kind)) {
+    const label = { EMPRESA: "empresas", PROFESIONAL: "profesionales o autónomos", PARTICULAR: "particulares" }[kind];
+    return { pass: false, code: "CUSTOMER_KIND", reason: `El Interesado es ${kind === "EMPRESA" ? "una empresa" : kind === "PROFESIONAL" ? "un profesional o autónomo" : "un particular"} y el ADN de la empresa no atiende a ${label}.` };
+  }
   // Geografía
   const geoTargets = [layer0.geography.city, layer0.geography.region, layer0.geography.country]
     .filter(Boolean)
@@ -174,8 +181,9 @@ function components(
   });
 
   // customer_profile_fit (industria pesa doble)
-  const indHit = icp.industries.length === 0 || includesAny(icp.industries, [layer0.industry]);
-  const sizeHit = icp.company_size.length === 0 || icp.company_size.includes(layer0.company_size_band);
+  const particular = (layer0.interesado_kind ?? "EMPRESA") === "PARTICULAR";
+  const indHit = particular || icp.industries.length === 0 || includesAny(icp.industries, [layer0.industry]);
+  const sizeHit = particular || icp.company_size.length === 0 || !layer0.company_size_band || icp.company_size.includes(layer0.company_size_band);
   const roleHit = !layer1?.decision_role || icp.roles.length === 0 || includesAny(icp.roles, [layer1.decision_role]);
   const cpf = (2 * (indHit ? 1 : 0) + (sizeHit ? 1 : 0) + (roleHit ? 1 : 0)) / 4;
   out.push({
@@ -183,7 +191,9 @@ function components(
     weight: WEIGHTS.customer_profile_fit,
     value: cpf,
     confidence: 0.85,
-    evidence: `${indHit ? "Industria dentro de tu ICP" : "Industria fuera de tu ICP"}; ${sizeHit ? `tamaño ${layer0.company_size_band} encaja` : `tamaño ${layer0.company_size_band} fuera de tu ICP`}${layer1?.decision_role ? `; decisor: ${layer1.decision_role}` : ""}.`,
+    evidence: particular
+      ? `Particular: tipo de Interesado que atiendes${layer1?.decision_role ? `; decide: ${layer1.decision_role}` : ""}.`
+      : `${indHit ? "Industria dentro de tu ICP" : "Industria fuera de tu ICP"}; ${!layer0.company_size_band ? "tamaño sin dato" : sizeHit ? `tamaño ${layer0.company_size_band} encaja` : `tamaño ${layer0.company_size_band} fuera de tu ICP`}${layer1?.decision_role ? `; decisor: ${layer1.decision_role}` : ""}.`,
   });
 
   // semantic_fit (techo 0.10)

@@ -5,7 +5,7 @@ import { requireMember } from "@/lib/session";
 import { eur, eurRange, dateTime, hoursUntil, firstName } from "@/lib/format";
 import { Encaje, StateBadge } from "@/components/ui";
 import { PROMISE_LABEL } from "@/core/merit";
-import { cesionHeadline } from "@/core/headline";
+import { cesionHeadline, subjectLine } from "@/core/headline";
 import { MAX_INFO_ROUNDS, QUESTION_STATES, QUICK_QUESTIONS, STATE_LABEL, TIMEOUTS } from "@/core/state-machine";
 import type { QualificationTurn, ReferralState, SignalEnvelope } from "@/core/types";
 import { canSendIntroFromNS, infoRound, type InfoRound } from "@/services/referrals";
@@ -144,7 +144,7 @@ export default async function CesionPage({ params }: { params: Promise<{ id: str
               <p className="locked">Identidad del Interesado restringida hasta la Apertura del cedente.</p>
             )}
             <p style={{ marginTop: 6 }}>{env.qualification_layer?.detailed_context}</p>
-            <p className="mono">{env.chapter_layer.industry} · {env.chapter_layer.company_size_band} empleados · {env.chapter_layer.geography.city ?? env.chapter_layer.geography.region}</p>
+            <p className="mono">{subjectLine(env.chapter_layer)}</p>
             {iAmOriginator && env.private_layer ? <p className="locked">Notas privadas y material de origen: COMPANY_ONLY. Tu Agente las usa; nunca las comparte.</p> : null}
           </div>
         </section>

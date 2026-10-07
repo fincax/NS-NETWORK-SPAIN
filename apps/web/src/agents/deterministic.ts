@@ -3,9 +3,9 @@
  * Sirve para la demo, los tests y como red de seguridad. NS-ARP §12: nunca reglas que inventen contenido;
  * lo que no está en el texto se devuelve como insuficiente o con confianza baja.
  */
-import type { BusinessTrigger, IntroPackage, NeedDraft, SizeBand, TimingBand, ValueBand } from "@/core/types";
+import type { BusinessTrigger, InteresadoKind, IntroPackage, NeedDraft, SizeBand, TimingBand, ValueBand } from "@/core/types";
 import type { ExtractionInput, ExtractionOutput, IntentInput, InterviewInput, InterviewStep, IntroInput, LLMProvider, QualificationAnswer, QualificationInput } from "./provider";
-import { needPhrase } from "@/core/headline";
+import { needPhrase, subjectOf } from "@/core/headline";
 import { scriptedInterview } from "./interview-script";
 import { interpretIntentRules } from "./intencion";
 import type { IntentProposal } from "@/core/intencion";
@@ -77,6 +77,10 @@ const NEEDS_BY_TRIGGER: Record<BusinessTrigger, { code: string; p: number; desc:
 };
 
 const EXPLICIT_NEEDS: { re: RegExp; code: string; p: number; desc: string }[] = [
+  // Necesidades de particulares y profesionales (D-079): se emparejan solo con quien declara atenderlos.
+  { re: /herencia|heredad[oa]|sucesi[oó]n hereditaria|plusval[ií]a|patrimonio (familiar|personal)/i, code: "ASESORIA_FISCAL", p: 0.85, desc: "Planificación fiscal de la herencia o del patrimonio." },
+  { re: /herencia|heredad[oa]|testamento|partici[oó]n/i, code: "LEGAL_MA", p: 0.6, desc: "Asesoramiento jurídico de la sucesión." },
+  { re: /reforma (de|en) (su|la|una|mi) (casa|vivienda|piso|cocina|ba[nñ]o|chalet)|reformar (su|la|una|mi) (casa|vivienda|piso|cocina|ba[nñ]o|chalet)/i, code: "OBRA_INDUSTRIAL", p: 0.6, desc: "Reforma de vivienda." },
   { re: /identidad de marca|branding|rebranding|nueva marca/i, code: "BRANDING", p: 0.9, desc: "Diseño de identidad de marca." },
   { re: /ciberseguridad|auditor[ií]a de seguridad/i, code: "CIBERSEGURIDAD", p: 0.9, desc: "Auditoría y protección de ciberseguridad." },
   { re: /due diligence/i, code: "LEGAL_MA", p: 0.9, desc: "Due diligence legal." },
@@ -119,7 +123,7 @@ function timing(text: string): TimingBand {
   if (/inmediat|urgente|esta semana|ya mismo/i.test(text)) return "IMMEDIATE";
   if (/este mes|30 d[ií]as|pr[oó]ximas semanas/i.test(text)) return "30D";
   if (/q[1-4]|trimestre|enero|febrero|marzo|abril|mayo|junio|julio|septiembre|octubre|noviembre|diciembre|90 d[ií]as|tres meses|antes de (la |su )?ronda/i.test(text)) return "90D";
-  if (/seis meses|segundo semestre|180 d[ií]as|pr[oó]ximo a[nñ]o|el a[nñ]o que viene/i.test(text)) return "180D";
+  if (/seis meses|segundo semestre|180 d[ií]as|pr[oó]ximo a[nñ]o|el a[nñ]o que viene|este a[nñ]o|antes de fin de a[nñ]o/i.test(text)) return "180D";
   return "UNKNOWN";
 }
 
@@ -139,6 +143,13 @@ function valueBand(text: string, triggers: BusinessTrigger[]): ValueBand | undef
   return undefined;
 }
 
+/** Quién es el Interesado (D-079), si el Timonel no lo marcó. */
+export function interesadoKindOf(text: string): InteresadoKind {
+  if (/\bparticular(es)?\b|persona f[ií]sica|mi (amig[oa]|vecin[oa]|cu[nñ]ad[oa]|herman[oa]|prim[oa]|suegr[oa]|padre|madre|hij[oa])\b|un matrimonio|una familia|una pareja|(su|mi) (casa|vivienda|piso|chalet)|ha heredado/i.test(text)) return "PARTICULAR";
+  if (/aut[oó]nom[oa]|freelance|profesional (independiente|por su cuenta|liberal)|(despacho|consulta|cl[ií]nica|estudio) propi[oa]|por su cuenta/i.test(text)) return "PROFESIONAL";
+  return "EMPRESA";
+}
+
 const THIRD_PARTY_RE = /cliente(?:\s+m[ií]o|\s+nuestro)?\s+([A-ZÁÉÍÓÚ][\wÁÉÍÓÚáéíóúñ]*(?:\s+(?:de|del|la|las|los|y|el)\s+[A-ZÁÉÍÓÚ][\wÁÉÍÓÚáéíóúñ]*|\s+[A-ZÁÉÍÓÚ][\wÁÉÍÓÚáéíóúñ]*)*)/;
 
 export class DeterministicProvider implements LLMProvider {
@@ -147,8 +158,11 @@ export class DeterministicProvider implements LLMProvider {
   async extractSignal(input: ExtractionInput): Promise<ExtractionOutput> {
     const text = input.rawContent;
     const triggers = TRIGGER_RULES.filter((r) => r.re.test(text)).map((r) => r.trigger);
-    const industry = INDUSTRY_RULES.find((r) => r.re.test(text))?.industry ?? "Servicios";
-    const { band, conf: sizeConf } = sizeBand(text);
+    const kind: InteresadoKind = input.interesadoKind ?? interesadoKindOf(text);
+    const industry = kind === "PARTICULAR" ? "Particular" : (INDUSTRY_RULES.find((r) => r.re.test(text))?.industry ?? "Servicios");
+    const sized = sizeBand(text);
+    const band: SizeBand | undefined = kind === "PARTICULAR" ? undefined : kind === "PROFESIONAL" ? "1-10" : sized.band;
+    const sizeConf = kind === "EMPRESA" ? sized.conf : 0.8;
     const city = CITIES.find((c) => new RegExp(c, "i").test(text)) ?? input.defaultCity;
     const geography = { country: "España", region: "Andalucía", city };
     const publicSource = /^fuente p[uú]blica/i.test(text.trim());
@@ -188,8 +202,7 @@ export class DeterministicProvider implements LLMProvider {
       if (!/presupuesto/i.test(text)) n.unknowns.push("Presupuesto sin confirmar.");
     }
 
-    const sizeLabel = band.replace("-", "–");
-    const industryLabel = industry === "Industrial" ? "Empresa industrial" : industry === "Tecnología" ? "Empresa tecnológica" : `Empresa de ${industry.toLowerCase()}`;
+    const subject = subjectOf({ interesado_kind: kind, industry, company_size_band: band });
     const what = triggers.includes("NEW_SITE")
       ? `abrirá nueva sede en ${city === "Sevilla" ? "Sevilla" : `${city} (área de Sevilla)`}`
       : triggers.includes("COMPANY_SALE")
@@ -205,12 +218,15 @@ export class DeterministicProvider implements LLMProvider {
     const relLabel = publicSource ? "fuente pública" : expectsContact ? "Interesado avisado" : { DIRECT: "relación directa", INDIRECT: "relación indirecta", WEAK: "relación débil", UNKNOWN: "relación sin confirmar" }[relationship];
 
     const tp = text.match(THIRD_PARTY_RE);
-    const thirdPartyName = tp?.[1]?.trim();
+    const thirdPartyName = input.thirdPartyName?.trim() || tp?.[1]?.trim();
+    const anon = kind === "EMPRESA" ? "la empresa" : "la persona";
+    const redactName = (t: string) => (thirdPartyName ? t.split(thirdPartyName).join(anon) : t);
     const decisionRole = text.match(/director(?:a)? (general|financier[oa]|de operaciones|de planta|de rrhh|de recursos humanos)|\bceo\b|gerente|propietari[oa]/i)?.[0];
 
     return {
       chapter_layer: {
-        need_summary: `${industryLabel} de ${sizeLabel} empleados ${what} · ${timingLabel} · ${relLabel}`,
+        need_summary: redactName(`${subject} ${what} · ${timingLabel} · ${relLabel}`),
+        interesado_kind: kind,
         industry,
         geography,
         company_size_band: band,
@@ -221,7 +237,7 @@ export class DeterministicProvider implements LLMProvider {
         confidence: Number(confidence.toFixed(2)),
       },
       qualification_layer: {
-        detailed_context: thirdPartyName ? text.split(tp![0]).join("cliente").split(thirdPartyName).join("la empresa") : text,
+        detailed_context: redactName(tp ? text.split(tp[0]).join("cliente") : text),
         triggers,
         constraints: [/presupuesto aprobado/i.test(text) ? "Presupuesto aprobado" : "", /licencia/i.test(text) ? "Licencia en trámite" : ""].filter(Boolean),
         decision_role: decisionRole ? capitalize(decisionRole) : undefined,
@@ -250,6 +266,10 @@ export class DeterministicProvider implements LLMProvider {
         return { answer: "", confidence: 0.2, insufficient: true };
       }
       case "DECISION_MAKER": {
+        // Un particular o un profesional decide por sí mismo (D-079).
+        if (/decide (él|ella|[eé]l) mism[oa]|decide (la|el) propi[oa] interesad[oa]|decide personalmente|es (él|ella) quien decide/i.test(text)) {
+          return { answer: "Decide la propia persona interesada.", confidence: 0.85, insufficient: false };
+        }
         const m = text.match(/director(?:a)? (general|financier[oa]|de operaciones|de planta|de rrhh)|\bceo\b|gerente|propietari[oa]|fundador/i);
         if (m) {
           const rel = /le aseguro|le llevamos|trato directo|conozco personalmente/i.test(text) ? " El cedente tiene trato directo con esa persona." : "";
@@ -275,11 +295,12 @@ export class DeterministicProvider implements LLMProvider {
   async draftIntro(input: IntroInput): Promise<IntroPackage> {
     const contact = input.contactName ? `${input.contactName}, ` : "Hola, ";
     const subject = input.needSummary.split("·")[0].trim().split(/ (abrirá|prepara|necesita|presenta) /)[0];
-    const need = `${subject} necesita ${needPhrase(input.needDescription)}`;
+    const particular = input.interesadoKind === "PARTICULAR";
+    const need = particular ? `necesitas ${needPhrase(input.needDescription)}` : `${subject} necesita ${needPhrase(input.needDescription)}`;
     const pref = input.introductionPreferences ? input.introductionPreferences.toLowerCase().replace(/\.$/, "") : "una primera conversación de 20 minutos";
     return {
       subject: `Presentación: ${input.receiverCompany} · ${input.needDescription.trim().replace(/\.$/, "")}`,
-      message: `${contact}te presento a ${input.receiverPerson}, de ${input.receiverCompany}. Sé que ${need.toLowerCase().replace(/^empresa/, "vuestra empresa")} y creo que os pueden ayudar con ${input.receiverServices.slice(0, 2).join(" y ").toLowerCase()}. Los conozco y responden. Si te parece bien, ${input.receiverPerson} os propone ${pref}. Os dejo en contacto.`,
+      message: `${contact}te presento a ${input.receiverPerson}, de ${input.receiverCompany}. Sé que ${particular ? need : need.toLowerCase().replace(/^empresa/, "vuestra empresa").replace(/^profesional/, "como profesional")} y creo que ${particular ? "te" : "os"} pueden ayudar con ${input.receiverServices.slice(0, 2).join(" y ").toLowerCase()}. Los conozco y responden. Si te parece bien, ${input.receiverPerson} ${particular ? "te" : "os"} propone ${pref}. Os dejo en contacto.`,
       context_for_receiver: `${input.originatorPerson} (${input.originatorCompany}) cede a ${input.thirdPartyCompany}. Contexto: ${input.detailedContext}`,
       suggested_next_step: input.introductionPreferences || "Primera conversación de 20 minutos esta semana.",
     };

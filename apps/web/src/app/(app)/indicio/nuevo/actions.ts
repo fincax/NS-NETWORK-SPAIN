@@ -17,6 +17,7 @@ export async function createSignalAction(formData: FormData) {
     memberId: member.id,
     rawContent: String(formData.get("rawContent")),
     visibility: String(formData.get("visibility")) as Visibility,
+    interesadoKind: (["EMPRESA", "PROFESIONAL", "PARTICULAR"].includes(String(formData.get("interesadoKind"))) ? String(formData.get("interesadoKind")) : "EMPRESA") as "EMPRESA" | "PROFESIONAL" | "PARTICULAR",
     contactName,
     contactRole: String(formData.get("contactRole") ?? "").trim() || undefined,
     contactPhone: String(formData.get("contactPhone") ?? "").trim() || undefined,

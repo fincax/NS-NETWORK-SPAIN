@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { getDb, schema } from "@/db/client";
 import { requireMember } from "@/lib/session";
 import { SPECIALTY_NAME } from "@/db/nscat";
-import { RELATION_LABEL, type ApunteRelation } from "@/services/apunte";
+import { INTERESADO_LABEL, RELATION_LABEL, type ApunteRelation } from "@/services/apunte";
 import { apunteAction } from "./actions";
 import { publishSignalAction } from "../indicio/nuevo/actions";
 import { DictationButton } from "@/components/dictation";
@@ -60,6 +60,11 @@ export default async function ApuntePage({ searchParams }: { searchParams: Promi
       <div className="field">
         <label htmlFor="who">Quién · empresa o persona</label>
         <input id="who" name="who" required autoFocus autoComplete="off" autoCapitalize="words" placeholder="Metalúrgica del Sur" />
+      </div>
+      <div className="chips" role="radiogroup" aria-label="Quién es el Interesado">
+        {(["EMPRESA", "PROFESIONAL", "PARTICULAR"] as const).map((k) => (
+          <label key={k}><input type="radio" name="interesadoKind" value={k} defaultChecked={k === "EMPRESA"} />{INTERESADO_LABEL[k]}</label>
+        ))}
       </div>
       <div className="field">
         <div className="row" style={{ justifyContent: "space-between" }}><label htmlFor="need">Qué necesita</label><DictationButton target="need" /></div>

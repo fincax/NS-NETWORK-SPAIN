@@ -19,6 +19,7 @@ export async function apunteAction(formData: FormData) {
       memberId: member.id,
       who: String(formData.get("who") ?? ""),
       need: String(formData.get("need") ?? ""),
+      interesadoKind: (["EMPRESA", "PROFESIONAL", "PARTICULAR"].includes(String(formData.get("interesadoKind"))) ? String(formData.get("interesadoKind")) : "EMPRESA") as "EMPRESA" | "PROFESIONAL" | "PARTICULAR",
       contactName: String(formData.get("contactName") ?? ""),
       contactRole: String(formData.get("contactRole") ?? ""),
       contactPhone: String(formData.get("contactPhone") ?? ""),

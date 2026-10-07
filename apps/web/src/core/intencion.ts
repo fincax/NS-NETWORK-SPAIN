@@ -10,7 +10,7 @@
  * Si el Agente no está seguro, lo dice (INSUFICIENTE) y pregunta, en vez de inventar (NS-ARP §12).
  */
 import { z } from "zod";
-import { BusinessDNA, BusinessTrigger, SizeBand, ValueBand } from "./types";
+import { BusinessDNA, BusinessTrigger, InteresadoKind, SizeBand, ValueBand } from "./types";
 
 export const IntentKind = z.enum(["ENCARGO", "ADN", "APUNTE", "INSUFICIENTE"]);
 export type IntentKind = z.infer<typeof IntentKind>;
@@ -32,6 +32,8 @@ export const DnaPatch = z.object({
   exclusions_add: z.array(z.string()).default([]), // ideal_customer.exclusions (sectores o situaciones que no quiere)
   geography_add: z.array(z.string()).default([]),
   company_size_add: z.array(SizeBand).default([]),
+  customer_kinds_add: z.array(InteresadoKind).default([]), // D-079: "también atiendo particulares"
+  customer_kinds_remove: z.array(InteresadoKind).default([]), // "no quiero particulares"
   triggers_add: z.array(BusinessTrigger).default([]),
   capacity: z.enum(["OPEN", "LIMITED", "FULL"]).optional(),
   objective_quarterly: z.string().optional(),
@@ -90,6 +92,9 @@ export function applyDnaPatch(dna: BusinessDNA, patch: DnaPatch): BusinessDNA {
   next.ideal_customer.geography = addAll(next.ideal_customer.geography, patch.geography_add);
   next.ideal_customer.company_size = addAll(next.ideal_customer.company_size, patch.company_size_add);
   next.ideal_customer.triggers = addAll(next.ideal_customer.triggers, patch.triggers_add);
+  const kinds = new Set([...(next.ideal_customer.customer_kinds ?? ["EMPRESA", "PROFESIONAL"]), ...patch.customer_kinds_add]);
+  for (const k of patch.customer_kinds_remove) kinds.delete(k);
+  next.ideal_customer.customer_kinds = [...kinds];
   return BusinessDNA.parse(next);
 }
 
@@ -105,6 +110,9 @@ export function describePatch(p: DnaPatch, triggerLabel: (t: string) => string =
   if (p.exclusions_add.length) out.push(`No quieres recibir: ${p.exclusions_add.join(", ")}.`);
   if (p.geography_add.length) out.push(`Zonas que añades: ${p.geography_add.join(", ")}.`);
   if (p.company_size_add.length) out.push(`Tamaño de cliente: ${p.company_size_add.join(" / ")} empleados.`);
+  const kindLabel = (k: InteresadoKind) => ({ EMPRESA: "empresas", PROFESIONAL: "profesionales y autónomos", PARTICULAR: "particulares" })[k];
+  if (p.customer_kinds_add.length) out.push(`Atiendes también a ${p.customer_kinds_add.map(kindLabel).join(" y ")}.`);
+  if (p.customer_kinds_remove.length) out.push(`Dejas de atender a ${p.customer_kinds_remove.map(kindLabel).join(" y ")}: se descartan en la puerta dura.`);
   if (p.triggers_add.length) out.push(`Señales que te interesan: ${p.triggers_add.map(triggerLabel).join(", ")}.`);
   if (p.capacity) out.push(`Capacidad ahora: ${{ OPEN: "abierta", LIMITED: "limitada", FULL: "completa" }[p.capacity]}.`);
   if (p.objective_quarterly) out.push(`Objetivo del trimestre: ${p.objective_quarterly}`);

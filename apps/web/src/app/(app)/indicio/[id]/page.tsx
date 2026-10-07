@@ -1,3 +1,4 @@
+import { subjectLine } from "@/core/headline";
 import { notFound } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { getDb, schema } from "@/db/client";
@@ -32,7 +33,7 @@ export default async function IndicioPage({ params }: { params: Promise<{ id: st
         <section className="card">
           <p className="eyebrow">Capa 0 · {internal ? "no se publica" : "visible en la Sala"}</p>
           <h2 style={{ fontSize: 20 }}>{l0.need_summary}</h2>
-          <p className="mono" style={{ marginTop: 8 }}>{l0.industry} · {l0.company_size_band} empleados · {l0.geography.city ?? l0.geography.region} · {l0.timing} · {l0.value_band ?? "valor sin estimar"} · confianza {Math.round(l0.confidence * 100)} %</p>
+          <p className="mono" style={{ marginTop: 8 }}>{subjectLine(l0)} · {l0.timing} · {l0.value_band ?? "valor sin estimar"} · confianza {Math.round(l0.confidence * 100)} %</p>
         </section>
         <section className="card">
           <p className="eyebrow">Necesidades que tu Agente ha detectado</p>

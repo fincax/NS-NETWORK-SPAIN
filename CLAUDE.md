@@ -216,6 +216,8 @@ La unidad fundamental de NS se denomina provisionalmente **Opportunity Signal**.
 
 Una Opportunity Signal es una señal estructurada que indica que puede existir una necesidad empresarial.
 
+**Quién puede ser el Interesado (D-079).** Los titulares de NS son empresas o autónomos. Pero el Interesado de una Cesión, quien tiene la necesidad, puede ser una **persona jurídica**, un **profesional o autónomo** o un **particular**. El Indicio lleva siempre ese dato en la capa de Sala (`interesado_kind`), sin identidad; cada titular declara en su ADN a qué tipos de Interesado atiende, y la puerta dura descarta lo demás con su motivo. Un particular no tiene sector ni plantilla: se presenta como "Particular necesita …", y su identidad, como la de toda persona física, solo se revela con base jurídica y en la Apertura.
+
 Ejemplo:
 
 ```text

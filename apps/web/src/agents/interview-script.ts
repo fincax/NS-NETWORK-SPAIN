@@ -3,14 +3,14 @@
  * seguridad sin clave del modelo. Una pregunta por tema, en orden; entiende respuestas en lenguaje natural
  * con reglas sencillas (listas, cifras en euros, ciudades, señales) y nunca inventa lo que no se dijo.
  */
-import type { BusinessDNA, SizeBand } from "@/core/types";
+import type { BusinessDNA, SizeBand, InteresadoKind } from "@/core/types";
 import { INTERVIEW_ORDER, type InterviewInput, type InterviewStep, type InterviewTopic } from "./provider";
 import { CITIES, TRIGGER_RULES } from "./deterministic";
 
 const QUESTION: Record<Exclude<InterviewTopic, "DONE">, (i: InterviewInput) => string> = {
   COMPANY: (i) => `Encantado de trabajar para ${i.companyName}, ${i.timonelName.split(" ")[0]}. Empecemos por lo esencial: ¿a qué se dedica la empresa, dónde trabaja y desde cuándo?`,
   SERVICES: () => "¿Qué servicios o productos ofrecéis exactamente? Y, tan importante como eso, ¿qué no hacéis aunque os lo pidan?",
-  IDEAL_CUSTOMER: () => "Descríbeme a vuestro cliente ideal: sectores, tamaño de empresa, zonas donde trabajáis y quién suele decidir la compra.",
+  IDEAL_CUSTOMER: () => "Descríbeme a vuestro cliente ideal: sectores, tamaño de empresa, zonas donde trabajáis y quién suele decidir la compra. ¿Atendéis también a particulares?",
   TRIGGERS: () => "¿Qué está pasando en una empresa cuando os necesita? Por ejemplo, abre una sede, contrata mucha gente, sale al extranjero, cambia de dirección…",
   COMMERCIAL: () => "Hablemos de cifras para que solo te lleve lo que merece la pena: ¿cuál es el ticket mínimo que os compensa y el máximo habitual, en euros? ¿Y cuánto suele durar la venta?",
   PERFECT_REFERRAL: () => "Explícame una situación real que para ti sería el referido perfecto. Con todo detalle: qué empresa, qué le pasa, quién decide, en qué momento.",
@@ -102,6 +102,14 @@ function apply(topic: InterviewTopic, answer: string, dna: BusinessDNA, input: I
       if (sz.length) d.ideal_customer.company_size = [...new Set([...d.ideal_customer.company_size, ...sz])];
       if (geo.length) d.ideal_customer.geography = [...new Set([...d.ideal_customer.geography, ...geo])];
       if (rl.length) d.ideal_customer.roles = [...new Set([...d.ideal_customer.roles, ...rl])];
+      // D-079: particulares solo si lo dice; "no ... particulares" los quita.
+      if (/\bparticular(es)?\b/i.test(a)) {
+        const no = /\b(no|nunca|ning[uú]n|sin)\b[^.]*\bparticular/i.test(a);
+        const kinds = new Set<InteresadoKind>(d.ideal_customer.customer_kinds ?? ["EMPRESA", "PROFESIONAL"]);
+        if (no) kinds.delete("PARTICULAR"); else kinds.add("PARTICULAR");
+        d.ideal_customer.customer_kinds = [...kinds];
+        learned.push(no ? "No atendéis a particulares: no os los llevaré." : "Atendéis también a particulares.");
+      }
       if (!ind.length && !sz.length && !geo.length) d.ideal_customer.problems = [...new Set([...d.ideal_customer.problems, a.slice(0, 160)])];
       learned.push(`Tu cliente ideal: ${[ind.join("/"), sz.length ? `${sz.join(" o ")} empleados` : "", geo.join(", ")].filter(Boolean).join(" · ") || "lo he anotado tal cual"}.`);
       break;

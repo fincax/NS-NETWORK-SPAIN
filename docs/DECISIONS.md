@@ -1872,3 +1872,28 @@ Servicio a la red        10 %   solo suma: acciones de dirección del mes (3 = 1
 
 **Revisit when.** El Puente pueda enviarse por mensaje o llamada desde NS (hoy solo correo), o haya que validar formatos de teléfono fuera de España.
 
+## D-079 · El Interesado de una Cesión puede ser persona jurídica, profesional o particular; los titulares, empresas o autónomos
+
+**Status:** CONFIRMED (el fundador: "los Timoneles son empresas o autónomos, pero las Cesiones pueden ser personas jurídicas o físicas o particulares; memoriza eso en el core")
+**Date:** 2026-10-07
+
+**Context.** El léxico ya decía que el Interesado es "cualquier entidad o persona con una necesidad real", pero el código asumía una empresa en todo el recorrido: la extracción buscaba sector y plantilla, el resumen decía "Empresa de … de N empleados", el Encaje comparaba industria y tamaño con el cliente ideal, el Puente hablaba de "vuestra empresa" y varios ADN de la demo descalificaban "particular". Un Apunte sobre un particular (Rosario, reforma de cocina) salía como "Empresa de servicios de 11–50 empleados".
+
+**Options.** (1) Mantener NS estrictamente B2B y rechazar particulares en el Apunte. (2) Tipar al Interesado y dejar que cada titular declare a quién atiende. (3) Tratar al particular como una empresa de 1 empleado (invisible en el ADN, Encaje falso).
+
+**Choice.** (2).
+
+- **Tres tipos**: `InteresadoKind = EMPRESA | PROFESIONAL | PARTICULAR`. La capa 0 lleva `interesado_kind` (sin identidad); un particular no tiene `company_size_band` y su industria es "Particular". El Timonel lo marca en el Apunte y en Ceder un Indicio (por defecto, empresa); si no lo marca, el Agente lo infiere del texto ("mi amigo", "particular", "su casa", "ha heredado" → particular; "autónomo", "freelance", "consulta propia" → profesional).
+- **El ADN declara a quién atiende**: `ideal_customer.customer_kinds`, por defecto empresas y profesionales; particulares solo si el titular lo dice (entrevista: "¿Atendéis también a particulares?"; «Dile a tu Agente»: "también atiendo particulares" / "no quiero particulares").
+- **Puerta dura** `CUSTOMER_KIND`: un particular solo llega a quien declara atender particulares, con motivo explicable. Para un particular, el perfil de cliente no compara industria ni tamaño.
+- **Titular y fichas**: "Particular necesita planificar fiscalmente la herencia"; "Profesional autónomo de salud necesita …"; la línea de ficha dice "Particular · Sevilla" en vez de sector y plantilla.
+- **Puente**: a un particular se le escribe de tú y nunca "vuestra empresa".
+- **Nombre del Interesado**: el Apunte pasa el "quién" explícitamente a la capa 2 (antes solo se capturaba si el texto decía "mi cliente X"; con "Lo conozco" se perdía) y se redacta de las capas 0/1 como "la empresa" o "la persona".
+- **Demo**: Consultora Fiscal Triana y Bufete Alameda atienden particulares (herencias, patrimonio, sucesiones). Escenario F: Carlos cede a un particular que ha heredado la empresa familiar y dos naves; Correduría Guadalquivir sigue sin atender particulares, y así se ve la puerta dura con su motivo.
+
+**Why.** El negocio cedido entre empresas incluye a las personas que están detrás: herencias, patrimonio, vivienda, seguros personales. Negarlo deja fuera referidos reales; tratarlos como empresas engaña al Encaje. Tipar al Interesado y dejar que cada titular decida mantiene la precisión y la explicabilidad.
+
+**Consequences.** `core/types.ts` (`InteresadoKind`, `interesado_kind`, `customer_kinds`, `CUSTOMER_KIND`), `core/headline.ts` (`subjectOf`, `subjectLine`), `core/scoring.ts`, `core/intencion.ts`, `agents/{provider,deterministic,anthropic,interview-script,intencion}.ts`, `services/{signals,apunte,referrals}.ts`, Apunte, Ceder un Indicio, ficha del Indicio y de la Cesión, `db/seed-data.ts`, `db/seed.ts` (escenario F), `scripts/seed.ts`, `prepareDemo`. Los envelopes guardados sin `interesado_kind` se leen como EMPRESA (valor por defecto del esquema). CLAUDE.md §5, NS-ARP §3 y el léxico recogen la regla. Pruebas en `tests/core.test.ts` y `tests/apunte.test.ts`.
+
+**Revisit when.** Haya especialidades de consumo en una Sala (reformas de vivienda, seguros personales, abogacía de familia) y convenga marcar en NS-CAT qué especialidades son "de particulares" para fundar Salas; o haga falta un cuarto tipo (asociaciones, comunidades de propietarios, administraciones).
+
