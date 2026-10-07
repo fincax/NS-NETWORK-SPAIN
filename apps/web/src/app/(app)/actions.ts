@@ -30,7 +30,7 @@ export async function prepareDemo() {
   if (!existing) {
     for (const sc of Object.values(SCENARIOS)) {
       const c = companies[sc.originator];
-      const created = await createSignal(db, { companyId: c.companyId, memberId: c.memberId, rawContent: sc.rawContent, visibility: "visibility" in sc ? sc.visibility : "CHAPTER", contactName: "contactName" in sc ? sc.contactName : undefined, contactRole: "contactRole" in sc ? sc.contactRole : undefined, legalBasisForContact: "legalBasisForContact" in sc ? sc.legalBasisForContact : undefined, thirdPartyExpectsContact: "thirdPartyExpectsContact" in sc ? sc.thirdPartyExpectsContact : false });
+      const created = await createSignal(db, { companyId: c.companyId, memberId: c.memberId, rawContent: sc.rawContent, visibility: "visibility" in sc ? sc.visibility : "CHAPTER", contactName: "contactName" in sc ? sc.contactName : undefined, contactRole: "contactRole" in sc ? sc.contactRole : undefined, legalBasisForContact: "legalBasisForContact" in sc ? sc.legalBasisForContact : undefined, thirdPartyExpectsContact: "thirdPartyExpectsContact" in sc ? sc.thirdPartyExpectsContact : false, interesadoKind: "interesadoKind" in sc ? sc.interesadoKind : undefined, thirdPartyName: "thirdPartyName" in sc ? sc.thirdPartyName : undefined });
       await publishSignal(db, created.opportunitySignal.id, c.memberId);
     }
     const pending = await db.query.referrals.findFirst({ where: and(eq(schema.referrals.receiverCompanyId, companies["hispalis"].companyId), eq(schema.referrals.originatorCompanyId, companies["guadalquivir"].companyId), eq(schema.referrals.state, "ORIGINATOR_PENDING")) });

@@ -73,10 +73,11 @@ Regla de orden: los verbos son independientes, no acumulativos. `SHARE` no impli
 interface SignalEnvelope {
   // Capa 0 · siempre visible en la Sala
   chapter_layer: {
-    need_summary: string;          // "Empresa industrial abrirá nueva sede en Sevilla"
-    industry: IndustryCode;
+    need_summary: string;          // "Empresa industrial abrirá nueva sede en Sevilla" · "Particular necesita planificar una herencia"
+    interesado_kind: "EMPRESA" | "PROFESIONAL" | "PARTICULAR"; // D-079: quién es el Interesado, sin identidad
+    industry: IndustryCode;        // "Particular" cuando interesado_kind = PARTICULAR
     geography: GeoScope;           // { country, region, city? }
-    company_size_band: SizeBand;   // "1-10" | "11-50" | "51-200" | "201-500" | "500+"
+    company_size_band?: SizeBand;  // "1-10" | "11-50" | "51-200" | "201-500" | "500+" · ausente en un particular
     timing: TimingBand;            // "IMMEDIATE" | "30D" | "90D" | "180D" | "UNKNOWN"
     value_band?: ValueBand;        // "<10K" | "10-50K" | "50-100K" | "100-500K" | ">500K"
     relationship_strength: "DIRECT" | "INDIRECT" | "WEAK" | "UNKNOWN";

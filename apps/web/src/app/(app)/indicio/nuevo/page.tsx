@@ -19,6 +19,15 @@ export default async function NuevoIndicioPage() {
           <span className="hint">Nunca escribas una contraprestación: un referido no se cobra. Los nombres de personas solo se usan en la capa 2 y con base jurídica.</span>
         </div>
         <fieldset>
+          <legend>Quién es el Interesado</legend>
+          <div className="radio-row">
+            <label><input type="radio" name="interesadoKind" value="EMPRESA" defaultChecked /> Empresa</label>
+            <label><input type="radio" name="interesadoKind" value="PROFESIONAL" /> Profesional o autónomo</label>
+            <label><input type="radio" name="interesadoKind" value="PARTICULAR" /> Particular</label>
+          </div>
+          <span className="hint">Un particular solo llega a los titulares que declaran atender particulares en su ADN.</span>
+        </fieldset>
+        <fieldset>
           <legend>Calidad del Indicio</legend>
           <label className="row" style={{ cursor: "pointer" }}>
             <input type="checkbox" name="expectsContact" value="1" style={{ accentColor: "var(--amber)", width: 18, height: 18 }} />

@@ -7,7 +7,10 @@ import type { Db } from "@/db/client";
 import { createSignal } from "@/services/signals";
 import { detectsReferralFee } from "@/core/compliance";
 
+import { INTERESADO_LABEL, type InteresadoKind } from "@/core/types";
+
 export type ApunteRelation = "CLIENT" | "KNOWN" | "HEARD";
+export { INTERESADO_LABEL };
 
 export const RELATION_LABEL: Record<ApunteRelation, string> = { CLIENT: "Es mi cliente", KNOWN: "Lo conozco", HEARD: "Me lo han contado" };
 
@@ -15,6 +18,7 @@ export interface ApunteInput {
   companyId: string;
   memberId: string;
   who: string; // empresa o persona
+  interesadoKind?: InteresadoKind; // D-079: empresa (por defecto), profesional o particular
   need: string; // qué necesita
   contactName?: string;
   contactRole?: string;
@@ -31,7 +35,8 @@ const clean = (s: string | undefined) => (s ?? "").replace(/\s+/g, " ").trim();
 /** El texto que recibe el Agente: una frase natural, como se lo contarías a un socio. */
 export function apunteText(i: ApunteInput): string {
   const who = clean(i.who);
-  const rel = i.relation === "CLIENT" ? `Mi cliente ${who}` : i.relation === "HEARD" ? `He oído que ${who}` : `Conozco a ${who}, que`;
+  const kind = i.interesadoKind === "PARTICULAR" ? ", particular," : i.interesadoKind === "PROFESIONAL" ? ", profesional autónomo," : "";
+  const rel = i.relation === "CLIENT" ? `Mi cliente ${who}${kind}` : i.relation === "HEARD" ? `He oído que ${who}${kind}` : `Conozco a ${who}${kind} que`;
   const parts = [`Apunte del Timonel. ${rel} necesita ${clean(i.need).replace(/\.$/, "")}.`];
   if (clean(i.notes)) parts.push(`Observaciones: ${clean(i.notes).replace(/\.$/, "")}.`);
   if (i.expectsContact) parts.push("Sabe que le llamarán.");
@@ -52,6 +57,8 @@ export async function createApunte(db: Db, input: ApunteInput) {
     rawContent: text,
     source: "APUNTE",
     visibility: "CHAPTER",
+    interesadoKind: input.interesadoKind ?? "EMPRESA",
+    thirdPartyName: clean(input.who),
     contactName,
     contactRole: clean(input.contactRole) || undefined,
     contactPhone: clean(input.contactPhone) || undefined,

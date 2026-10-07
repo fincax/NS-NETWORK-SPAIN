@@ -14,7 +14,7 @@ console.log(`Sala ${chapter.name} lista con ${Object.keys(companies).length} tit
 
 for (const [key, sc] of Object.entries(SCENARIOS)) {
   const c = companies[sc.originator];
-  const created = await createSignal(db, { companyId: c.companyId, memberId: c.memberId, rawContent: sc.rawContent, visibility: "visibility" in sc ? sc.visibility : "CHAPTER", contactName: "contactName" in sc ? sc.contactName : undefined, contactRole: "contactRole" in sc ? sc.contactRole : undefined, legalBasisForContact: "legalBasisForContact" in sc ? sc.legalBasisForContact : undefined, thirdPartyExpectsContact: "thirdPartyExpectsContact" in sc ? sc.thirdPartyExpectsContact : false });
+  const created = await createSignal(db, { companyId: c.companyId, memberId: c.memberId, rawContent: sc.rawContent, visibility: "visibility" in sc ? sc.visibility : "CHAPTER", contactName: "contactName" in sc ? sc.contactName : undefined, contactRole: "contactRole" in sc ? sc.contactRole : undefined, legalBasisForContact: "legalBasisForContact" in sc ? sc.legalBasisForContact : undefined, thirdPartyExpectsContact: "thirdPartyExpectsContact" in sc ? sc.thirdPartyExpectsContact : false, interesadoKind: "interesadoKind" in sc ? sc.interesadoKind : undefined, thirdPartyName: "thirdPartyName" in sc ? sc.thirdPartyName : undefined });
   const res = await publishSignal(db, created.opportunitySignal.id, c.memberId);
   console.log(`Escenario ${key} (${created.provider}): ${created.needs.length} necesidades · ${res.referralIds.length} Cesión(es) · ${res.discarded.length} descarte(s) · sin titular: ${res.uncovered.join(", ") || "ninguna"}`);
   for (const d of res.discarded) console.log(`   descartada ${d.company}: ${d.code} · ${d.reason}`);

@@ -3,7 +3,7 @@
  * y reciben salidas validadas con zod. Ninguna salida de modelo cambia estado sin pasar por el sistema.
  */
 import { z } from "zod";
-import { BusinessDNA, BusinessTrigger, ChapterLayer, IdentityLayer, IntroPackage, NeedDraft, QualificationLayer, type QualificationQuestionKind } from "@/core/types";
+import { BusinessDNA, BusinessTrigger, ChapterLayer, IdentityLayer, IntroPackage, NeedDraft, QualificationLayer, type QualificationQuestionKind, InteresadoKind } from "@/core/types";
 import type { IntentProposal } from "@/core/intencion";
 
 export const ExtractionOutput = z.object({
@@ -27,6 +27,8 @@ export interface ExtractionInput {
   originatorDna: BusinessDNA;
   availableSpecialties: { code: string; name: string; description: string }[];
   defaultCity: string;
+  interesadoKind?: InteresadoKind; // D-079: lo que el Timonel marcó; si falta, el Agente lo infiere del texto
+  thirdPartyName?: string; // el nombre que el Timonel dio al Interesado (Apunte): nunca en capas 0/1
 }
 
 export interface QualificationInput {
@@ -45,6 +47,7 @@ export interface IntroInput {
   thirdPartyCompany: string;
   contactName?: string;
   needSummary: string; // resumen del Indicio (contexto)
+  interesadoKind?: InteresadoKind; // D-079: a un particular se le escribe de tú y sin "vuestra empresa"
   needDescription: string; // la necesidad que cubre el cesionario (D-077)
   detailedContext: string;
   introductionPreferences: string;

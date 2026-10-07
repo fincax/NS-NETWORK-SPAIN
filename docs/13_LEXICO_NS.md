@@ -30,7 +30,7 @@ Criterios de cada nombre: castellano; una palabra siempre que sea posible; insti
 
 | Término NS | Qué es | Identificador técnico | Sustituye a |
 | --- | --- | --- | --- |
-| **Interesado** | Quien busca un producto o servicio de confianza: empresa, persona física, autónomo, asociación, fundación, comunidad de propietarios, administración, club deportivo… Cualquier entidad o persona con una necesidad real. Es el objeto de toda Cesión; nunca es miembro de NS por el hecho de serlo. Si es persona física, su identidad solo se revela con base jurídica y consentimiento (NS-ARP §8). | `ThirdParty` | "tercero", "prospecto", "lead" |
+| **Interesado** | Quien busca un producto o servicio de confianza: empresa, persona física, autónomo, asociación, fundación, comunidad de propietarios, administración, club deportivo… Cualquier entidad o persona con una necesidad real. Es el objeto de toda Cesión; nunca es miembro de NS por el hecho de serlo. Si es persona física, su identidad solo se revela con base jurídica y consentimiento (NS-ARP §8). Toda Cesión declara de qué tipo es: empresa, profesional o autónomo, o particular (D-079); cada titular dice en su ADN a cuáles atiende. | `ThirdParty`, `InteresadoKind`, `ideal_customer.customer_kinds` | "tercero", "prospecto", "lead" |
 | **Indicio** | Señal estructurada de que un Interesado puede tener una necesidad. Es la materia prima. | `OpportunitySignal` | "señal", "lead" |
 | **Pista** | Hipótesis de encaje entre un Indicio y una plaza, formulada por los agentes y aún sin cualificar. | `MatchCandidate` | "match" |
 | **Encaje** | Grado de ajuste explicable entre necesidad y titular (0–100 %). | `NSMatchScore` | "score" |

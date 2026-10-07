@@ -195,3 +195,37 @@ describe("Titular de la Cesión (D-077)", () => {
     expect(pkg.message).not.toMatch(/selección/);
   });
 });
+
+describe("Interesado particular o profesional (D-079)", () => {
+  it("un particular solo pasa la puerta dura de quien declara atender particulares, y el titular lo presenta como tal", async () => {
+    const { cesionHeadline, subjectLine } = await import("@/core/headline");
+    const layer0: ChapterLayer = { ...layer0A, interesado_kind: "PARTICULAR", industry: "Particular", company_size_band: undefined, need_summary: "Particular necesita planificar fiscalmente la herencia · 90 días · relación directa" };
+    const need: NeedDraft = { specialty_hints: ["ASESORIA_FISCAL"], description: "Planificación fiscal de la herencia o del patrimonio.", plausibility: 0.85, evidence: [], unknowns: [] };
+    const triana = cap("fiscal-triana", "ASESORIA_FISCAL");
+    const guadalquivir = cap("guadalquivir", "SEGUROS_EMPRESA");
+    expect(hardGates(need, layer0, triana, { signalVisibility: "CHAPTER" }).pass).toBe(true);
+    const g = hardGates(need, layer0, guadalquivir, { signalVisibility: "CHAPTER" });
+    expect(g.pass).toBe(false);
+    expect(g.code).toBe("CUSTOMER_KIND");
+    expect(g.reason).toMatch(/particular/);
+    expect(cesionHeadline(need, layer0)).toBe("Particular necesita planificación fiscal de la herencia o del patrimonio");
+    expect(subjectLine(layer0)).toBe("Particular · Dos Hermanas");
+    expect(subjectLine({ ...layer0A, interesado_kind: "PROFESIONAL", industry: "Sanitario", company_size_band: "1-10" })).toBe("Profesional o autónomo · Sanitario · Dos Hermanas");
+    // Una empresa sigue pasando como siempre; un ADN sin el campo atiende empresas y profesionales.
+    expect(hardGates(need, { ...layer0A }, guadalquivir, { signalVisibility: "CHAPTER" }).code).not.toBe("CUSTOMER_KIND");
+  });
+
+  it("el Agente infiere quién es el Interesado y el Puente a un particular se escribe de tú", async () => {
+    const { interesadoKindOf, DeterministicProvider } = await import("@/agents/deterministic");
+    expect(interesadoKindOf("Mi amigo Antonio ha heredado dos naves y necesita planificar la herencia")).toBe("PARTICULAR");
+    expect(interesadoKindOf("Conozco a una fisioterapeuta con consulta propia que busca seguro de responsabilidad civil")).toBe("PROFESIONAL");
+    expect(interesadoKindOf("Mi cliente Metalúrgica del Sur abre planta en Dos Hermanas")).toBe("EMPRESA");
+    const pkg = await new DeterministicProvider().draftIntro({
+      originatorCompany: "Reformas Industriales Híspalis", originatorPerson: "Carlos Ruiz", receiverCompany: "Consultora Fiscal Triana", receiverPerson: "Alberto Vidal",
+      receiverServices: ["Planificación fiscal", "Herencias"], thirdPartyCompany: "Antonio Vera", contactName: "Antonio", interesadoKind: "PARTICULAR",
+      needSummary: "Particular necesita planificar fiscalmente la herencia · 90 días · relación directa", needDescription: "Planificación fiscal de la herencia o del patrimonio.", detailedContext: "Ha heredado la empresa familiar y dos naves.", introductionPreferences: "Reunión confidencial.",
+    });
+    expect(pkg.message).toContain("Sé que necesitas planificación fiscal de la herencia");
+    expect(pkg.message).not.toMatch(/vuestra empresa/);
+  });
+});

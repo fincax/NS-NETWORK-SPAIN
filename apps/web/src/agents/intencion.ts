@@ -134,6 +134,11 @@ export function interpretIntentRules(input: IntentInput): IntentProposal {
     const triggers = TRIGGER_RULES.filter((r) => r.re.test(clause) || r.re.test(singular(clause))).map((r) => r.trigger);
     const sizes = sizesIn(clause);
     const cities = citiesIn(clause);
+    if (/\bparticular(es)?\b/i.test(clause)) {
+      if (neg) { patch.customer_kinds_remove.push("PARTICULAR"); understood.push("No quieres particulares: se descartan en la puerta dura."); }
+      else { patch.customer_kinds_add.push("PARTICULAR"); understood.push("Atiendes también a particulares."); }
+      continue;
+    }
     if (neg && industries.length) { patch.exclusions_add.push(...industries); patch.industries_remove.push(...industries); understood.push(`No quieres recibir ${industries.join(", ").toLowerCase()}.`); continue; }
     if (neg && sizes.length) { patch.exclusions_add.push(SMALL.test(clause) ? "Pymes y pequeños negocios" : "Grandes cuentas"); understood.push(`Descartas ${SMALL.test(clause) ? "pymes y pequeños negocios" : "grandes cuentas"}.`); continue; }
     if (CAPACITY_FULL.test(clause)) { patch.capacity = "FULL"; understood.push("Capacidad completa: tu Agente lo tendrá en cuenta al cualificar."); continue; }
@@ -156,6 +161,8 @@ export function interpretIntentRules(input: IntentInput): IntentProposal {
   patch.geography_add = dedupe(patch.geography_add);
   patch.company_size_add = dedupe(patch.company_size_add);
   patch.triggers_add = dedupe(patch.triggers_add);
+  patch.customer_kinds_add = dedupe(patch.customer_kinds_add);
+  patch.customer_kinds_remove = dedupe(patch.customer_kinds_remove);
 
   let encargo: IntentEncargo | undefined;
   if (wantsEncargo) {
